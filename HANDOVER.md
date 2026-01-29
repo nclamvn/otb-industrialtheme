@@ -7,7 +7,7 @@
 
 ---
 
-## Cap nhat lan cuoi: 14/01/2026 (Session 2)
+## Cap nhat lan cuoi: 29/01/2026 (Session 3 - UI Design)
 
 ---
 
@@ -174,6 +174,87 @@ apps/web          -> Build OK
 ```
 
 **Swagger Docs:** `http://localhost:3001/api/docs`
+
+---
+
+## SESSION 29/01/2026 - Session 3 (UI Design)
+
+### Thay doi chinh
+
+1. **Khoi phuc giao dien** - Client khong hai long voi sidebar mau nau do
+   - Reset ve commit `2569d32` (truoc khi doi sidebar)
+   - Tao backup branch: `backup-apple-design-2026-01-29`
+
+2. **Thiet ke card moi - Watermark Icon Design**
+   - Icon lon (h-32 w-32) lam watermark o goc phai duoi
+   - Opacity 10% (`text-{color}-500/10`)
+   - Typography lon hon (`text-3xl font-bold tracking-tight`)
+   - Ap dung cho ~90+ stat cards tren 22 trang
+
+### Design Pattern moi cho Stat Cards
+
+```tsx
+<Card className="relative overflow-hidden">
+  {/* Watermark icon */}
+  <IconName className="absolute -bottom-4 -right-4 h-32 w-32 text-{color}-500/10" />
+
+  <CardHeader className="pb-2">
+    <CardTitle className="text-sm font-medium text-muted-foreground">
+      Title
+    </CardTitle>
+  </CardHeader>
+
+  <CardContent className="relative">
+    <div className="text-3xl font-bold tracking-tight text-{color}-600">
+      $9,600,000
+    </div>
+    <p className="text-sm text-muted-foreground mt-1">Description</p>
+  </CardContent>
+</Card>
+```
+
+### Cac trang da cap nhat (22 files)
+
+```
+apps/web/app/(dashboard)/
+├── budget/page.tsx
+├── budget/[id]/page.tsx
+├── dashboard/page.tsx
+├── sku-proposal/page.tsx
+├── wssi/page.tsx
+├── wssi/alerts/page.tsx
+├── wssi/[id]/page.tsx
+├── approvals/page.tsx
+├── size-profiles/page.tsx
+├── settings/audit/page.tsx
+├── otb-analysis/page.tsx
+├── predictive-alerts/page.tsx
+├── ai-auto-plan/page.tsx
+└── analytics/
+    ├── page.tsx
+    ├── kpi/page.tsx
+    ├── simulator/page.tsx
+    ├── forecast/page.tsx
+    ├── insights/page.tsx
+    ├── automation/page.tsx
+    ├── comparison/page.tsx
+    ├── decisions/page.tsx
+    └── demand/page.tsx
+```
+
+### Git Commits
+
+```
+daf1414 style: modern watermark icon design for stat cards
+2569d32 style: increase user dropdown menu size (reset point)
+```
+
+### Backup Branch
+
+```bash
+# Neu can tham khao thiet ke Apple truoc do:
+git checkout backup-apple-design-2026-01-29
+```
 
 ---
 
