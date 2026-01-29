@@ -13,6 +13,10 @@ import {
   User,
   Calendar,
   MessageSquare,
+  DollarSign,
+  Activity,
+  ClipboardList,
+  GitBranch,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -377,14 +381,15 @@ export default function BudgetDetailPage({
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Main Info */}
         <div className="lg:col-span-2 space-y-6">
-          <Card>
-            <CardHeader>
+          <Card className="relative overflow-hidden">
+            <DollarSign className="absolute -bottom-4 -right-4 h-32 w-32 text-emerald-500/10" />
+            <CardHeader className="pb-2">
               <div className="flex items-center justify-between">
-                <CardTitle>Budget Information</CardTitle>
+                <CardTitle className="text-sm font-medium text-muted-foreground">Budget Information</CardTitle>
                 {getStatusBadge(budget.status)}
               </div>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="relative space-y-4">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div>
                   <p className="text-sm text-muted-foreground">Season</p>
@@ -498,14 +503,12 @@ export default function BudgetDetailPage({
           </Card>
 
           {/* Budget Analytics */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <BarChart3 className="h-5 w-5" />
-                Budget Analytics
-              </CardTitle>
+          <Card className="relative overflow-hidden">
+            <BarChart3 className="absolute -bottom-4 -right-4 h-32 w-32 text-blue-500/10" />
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Budget Analytics</CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="relative">
               <Tabs defaultValue="overview" className="space-y-4">
                 <TabsList>
                   <TabsTrigger value="overview">Overview</TabsTrigger>
@@ -516,9 +519,12 @@ export default function BudgetDetailPage({
                 <TabsContent value="overview" className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     {/* Seasonal vs Replenishment */}
-                    <Card>
-                      <CardContent className="pt-4">
-                        <div className="text-sm text-muted-foreground mb-2">Budget Split</div>
+                    <Card className="relative overflow-hidden">
+                      <PieChart className="absolute -bottom-4 -right-4 h-32 w-32 text-indigo-500/10" />
+                      <CardHeader className="pb-2">
+                        <CardTitle className="text-sm font-medium text-muted-foreground">Budget Split</CardTitle>
+                      </CardHeader>
+                      <CardContent className="relative">
                         <div className="space-y-3">
                           <div>
                             <div className="flex justify-between text-sm mb-1">
@@ -561,9 +567,12 @@ export default function BudgetDetailPage({
                     </Card>
 
                     {/* Status Progress */}
-                    <Card>
-                      <CardContent className="pt-4">
-                        <div className="text-sm text-muted-foreground mb-2">Approval Progress</div>
+                    <Card className="relative overflow-hidden">
+                      <ClipboardList className="absolute -bottom-4 -right-4 h-32 w-32 text-green-500/10" />
+                      <CardHeader className="pb-2">
+                        <CardTitle className="text-sm font-medium text-muted-foreground">Approval Progress</CardTitle>
+                      </CardHeader>
+                      <CardContent className="relative">
                         <div className="flex items-center gap-3">
                           <div className="flex-1">
                             <Progress
@@ -622,11 +631,12 @@ export default function BudgetDetailPage({
 
           {/* Rejection Info */}
           {budget.status === 'REJECTED' && budget.rejectionReason && (
-            <Card className="border-red-200 bg-red-50">
-              <CardHeader>
-                <CardTitle className="text-red-800">Rejection Details</CardTitle>
+            <Card className="relative overflow-hidden border-red-200 bg-red-50">
+              <XCircle className="absolute -bottom-4 -right-4 h-32 w-32 text-red-500/10" />
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium text-red-800">Rejection Details</CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="relative">
                 <div className="space-y-2">
                   <div className="flex items-center gap-2 text-sm text-red-800">
                     <User className="h-4 w-4" />
@@ -654,11 +664,12 @@ export default function BudgetDetailPage({
         <div className="space-y-6">
           {/* Workflow Status */}
           {budget.workflow && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Approval Workflow</CardTitle>
+            <Card className="relative overflow-hidden">
+              <GitBranch className="absolute -bottom-4 -right-4 h-32 w-32 text-purple-500/10" />
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium text-muted-foreground">Approval Workflow</CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="relative">
                 <div className="space-y-4">
                   {budget.workflow.steps.map((step) => (
                     <div key={step.id} className="flex items-start gap-3">
@@ -689,11 +700,12 @@ export default function BudgetDetailPage({
           )}
 
           {/* Activity */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Activity</CardTitle>
+          <Card className="relative overflow-hidden">
+            <Activity className="absolute -bottom-4 -right-4 h-32 w-32 text-orange-500/10" />
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Activity</CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="relative">
               <div className="space-y-4">
                 <div className="flex items-start gap-3">
                   <User className="h-4 w-4 mt-0.5 text-muted-foreground" />

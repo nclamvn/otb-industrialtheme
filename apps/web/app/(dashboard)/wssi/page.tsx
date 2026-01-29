@@ -407,61 +407,61 @@ export default function WSSIPage() {
 
       {/* Summary Cards */}
       <div className="grid gap-4 md:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">{t('salesVsPlan')}</CardTitle>
-            <BarChart3 className="h-4 w-4 text-muted-foreground" />
+        <Card className="relative overflow-hidden">
+          <BarChart3 className="absolute -bottom-4 -right-4 h-32 w-32 text-blue-500/10" />
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">{t('salesVsPlan')}</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
+          <CardContent className="relative">
+            <div className="text-3xl font-bold tracking-tight text-blue-600">
               {summary?.totals.averageSalesVariance
                 ? `${summary.totals.averageSalesVariance > 0 ? '+' : ''}${summary.totals.averageSalesVariance.toFixed(1)}%`
                 : '0%'}
             </div>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-sm text-muted-foreground mt-1">
               {t('actual')}: {formatCurrency(summary?.totals.totalSalesActual || 0)}
             </p>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">{t('weeksOfCover')}</CardTitle>
-            <Package className="h-4 w-4 text-muted-foreground" />
+        <Card className="relative overflow-hidden">
+          <Package className="absolute -bottom-4 -right-4 h-32 w-32 text-purple-500/10" />
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">{t('weeksOfCover')}</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
+          <CardContent className="relative">
+            <div className="text-3xl font-bold tracking-tight text-purple-600">
               {summary?.totals.averageWoC?.toFixed(1) || '0'} {t('weeks')}
             </div>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-sm text-muted-foreground mt-1">
               {t('target')}
             </p>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">{t('sellThruRate')}</CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
+        <Card className="relative overflow-hidden">
+          <TrendingUp className="absolute -bottom-4 -right-4 h-32 w-32 text-green-500/10" />
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">{t('sellThruRate')}</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
+          <CardContent className="relative">
+            <div className="text-3xl font-bold tracking-tight text-green-600">
               {summary?.totals.averageSellThrough?.toFixed(1) || '0'}%
             </div>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-sm text-muted-foreground mt-1">
               {t('records', { count: summary?.recordCount || 0 })}
             </p>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">{t('activeAlerts')}</CardTitle>
-            <AlertTriangle className="h-4 w-4 text-orange-500" />
+        <Card className="relative overflow-hidden">
+          <AlertTriangle className="absolute -bottom-4 -right-4 h-32 w-32 text-orange-500/10" />
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">{t('activeAlerts')}</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-orange-600">{alertCount}</div>
-            <p className="text-xs text-muted-foreground">
+          <CardContent className="relative">
+            <div className="text-3xl font-bold tracking-tight text-orange-600">{alertCount}</div>
+            <p className="text-sm text-muted-foreground mt-1">
               {t('needsAction')}
             </p>
           </CardContent>

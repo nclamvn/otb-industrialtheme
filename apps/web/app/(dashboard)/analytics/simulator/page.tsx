@@ -387,112 +387,118 @@ export default function SimulatorPage() {
               <TabsContent value="metrics">
                 <div className="grid gap-4 md:grid-cols-3">
                   {/* Revenue */}
-                  <div className="rounded-lg border p-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm text-muted-foreground">{t('revenue')}</span>
-                      <Badge variant={result.revenue.change > 0 ? 'default' : 'secondary'}>
-                        {result.revenue.change > 0 ? '+' : ''}{result.revenue.change.toFixed(1)}%
-                      </Badge>
-                    </div>
-                    <div className="flex items-end gap-2">
-                      <span className="text-2xl font-bold">
+                  <Card className="relative overflow-hidden">
+                    <DollarSign className="absolute -bottom-4 -right-4 h-32 w-32 text-green-500/10" />
+                    <CardContent className="relative p-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-medium text-muted-foreground">{t('revenue')}</span>
+                        <Badge variant={result.revenue.change > 0 ? 'default' : 'secondary'}>
+                          {result.revenue.change > 0 ? '+' : ''}{result.revenue.change.toFixed(1)}%
+                        </Badge>
+                      </div>
+                      <div className="text-3xl font-bold tracking-tight text-green-600">
                         ${(result.revenue.projected / 1000000).toFixed(2)}M
-                      </span>
-                      <span className="text-sm text-muted-foreground mb-0.5">
+                      </div>
+                      <p className="text-sm text-muted-foreground mt-1">
                         {t('from')} ${(result.revenue.base / 1000000).toFixed(2)}M
-                      </span>
-                    </div>
-                  </div>
+                      </p>
+                    </CardContent>
+                  </Card>
 
                   {/* Gross Margin */}
-                  <div className="rounded-lg border p-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm text-muted-foreground">{t('grossMargin')}</span>
-                      <Badge variant={result.grossMargin.change > 0 ? 'default' : 'secondary'}>
-                        {result.grossMargin.change > 0 ? '+' : ''}{result.grossMargin.change.toFixed(1)}pp
-                      </Badge>
-                    </div>
-                    <div className="flex items-end gap-2">
-                      <span className="text-2xl font-bold">
+                  <Card className="relative overflow-hidden">
+                    <TrendingDown className="absolute -bottom-4 -right-4 h-32 w-32 text-blue-500/10" />
+                    <CardContent className="relative p-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-medium text-muted-foreground">{t('grossMargin')}</span>
+                        <Badge variant={result.grossMargin.change > 0 ? 'default' : 'secondary'}>
+                          {result.grossMargin.change > 0 ? '+' : ''}{result.grossMargin.change.toFixed(1)}pp
+                        </Badge>
+                      </div>
+                      <div className="text-3xl font-bold tracking-tight text-blue-600">
                         {result.grossMargin.projected.toFixed(1)}%
-                      </span>
-                      <span className="text-sm text-muted-foreground mb-0.5">
+                      </div>
+                      <p className="text-sm text-muted-foreground mt-1">
                         {t('from')} {result.grossMargin.base.toFixed(1)}%
-                      </span>
-                    </div>
-                  </div>
+                      </p>
+                    </CardContent>
+                  </Card>
 
                   {/* Sell-Through */}
-                  <div className="rounded-lg border p-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm text-muted-foreground">{t('sellThrough')}</span>
-                      <Badge variant={result.sellThrough.change > 0 ? 'default' : 'secondary'}>
-                        {result.sellThrough.change > 0 ? '+' : ''}{result.sellThrough.change.toFixed(1)}pp
-                      </Badge>
-                    </div>
-                    <div className="flex items-end gap-2">
-                      <span className="text-2xl font-bold">
+                  <Card className="relative overflow-hidden">
+                    <Zap className="absolute -bottom-4 -right-4 h-32 w-32 text-purple-500/10" />
+                    <CardContent className="relative p-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-medium text-muted-foreground">{t('sellThrough')}</span>
+                        <Badge variant={result.sellThrough.change > 0 ? 'default' : 'secondary'}>
+                          {result.sellThrough.change > 0 ? '+' : ''}{result.sellThrough.change.toFixed(1)}pp
+                        </Badge>
+                      </div>
+                      <div className="text-3xl font-bold tracking-tight text-purple-600">
                         {result.sellThrough.projected.toFixed(1)}%
-                      </span>
-                      <span className="text-sm text-muted-foreground mb-0.5">
+                      </div>
+                      <p className="text-sm text-muted-foreground mt-1">
                         {t('from')} {result.sellThrough.base.toFixed(1)}%
-                      </span>
-                    </div>
-                  </div>
+                      </p>
+                    </CardContent>
+                  </Card>
 
                   {/* Inventory Turn */}
-                  <div className="rounded-lg border p-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm text-muted-foreground">{t('inventoryTurn')}</span>
-                      <Badge variant={result.inventoryTurn.change > 0 ? 'default' : 'secondary'}>
-                        {result.inventoryTurn.change > 0 ? '+' : ''}{result.inventoryTurn.change.toFixed(2)}x
-                      </Badge>
-                    </div>
-                    <div className="flex items-end gap-2">
-                      <span className="text-2xl font-bold">
+                  <Card className="relative overflow-hidden">
+                    <Package className="absolute -bottom-4 -right-4 h-32 w-32 text-orange-500/10" />
+                    <CardContent className="relative p-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-medium text-muted-foreground">{t('inventoryTurn')}</span>
+                        <Badge variant={result.inventoryTurn.change > 0 ? 'default' : 'secondary'}>
+                          {result.inventoryTurn.change > 0 ? '+' : ''}{result.inventoryTurn.change.toFixed(2)}x
+                        </Badge>
+                      </div>
+                      <div className="text-3xl font-bold tracking-tight text-orange-600">
                         {result.inventoryTurn.projected.toFixed(1)}x
-                      </span>
-                      <span className="text-sm text-muted-foreground mb-0.5">
+                      </div>
+                      <p className="text-sm text-muted-foreground mt-1">
                         {t('from')} {result.inventoryTurn.base.toFixed(1)}x
-                      </span>
-                    </div>
-                  </div>
+                      </p>
+                    </CardContent>
+                  </Card>
 
                   {/* Weeks of Supply */}
-                  <div className="rounded-lg border p-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm text-muted-foreground">{t('weeksOfSupply')}</span>
-                      <Badge variant={result.weeksOfSupply.change < 0 ? 'default' : 'secondary'}>
-                        {result.weeksOfSupply.change > 0 ? '+' : ''}{result.weeksOfSupply.change.toFixed(1)}
-                      </Badge>
-                    </div>
-                    <div className="flex items-end gap-2">
-                      <span className="text-2xl font-bold">
+                  <Card className="relative overflow-hidden">
+                    <Clock className="absolute -bottom-4 -right-4 h-32 w-32 text-cyan-500/10" />
+                    <CardContent className="relative p-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-medium text-muted-foreground">{t('weeksOfSupply')}</span>
+                        <Badge variant={result.weeksOfSupply.change < 0 ? 'default' : 'secondary'}>
+                          {result.weeksOfSupply.change > 0 ? '+' : ''}{result.weeksOfSupply.change.toFixed(1)}
+                        </Badge>
+                      </div>
+                      <div className="text-3xl font-bold tracking-tight text-cyan-600">
                         {result.weeksOfSupply.projected.toFixed(1)}
-                      </span>
-                      <span className="text-sm text-muted-foreground mb-0.5">
+                      </div>
+                      <p className="text-sm text-muted-foreground mt-1">
                         {t('from')} {result.weeksOfSupply.base.toFixed(1)}
-                      </span>
-                    </div>
-                  </div>
+                      </p>
+                    </CardContent>
+                  </Card>
 
                   {/* Stock-Out Rate */}
-                  <div className="rounded-lg border p-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm text-muted-foreground">{t('stockOutRate')}</span>
-                      <Badge variant={result.stockOutRate.change < 0 ? 'default' : 'secondary'}>
-                        {result.stockOutRate.change > 0 ? '+' : ''}{result.stockOutRate.change.toFixed(1)}pp
-                      </Badge>
-                    </div>
-                    <div className="flex items-end gap-2">
-                      <span className="text-2xl font-bold">
+                  <Card className="relative overflow-hidden">
+                    <AlertTriangle className="absolute -bottom-4 -right-4 h-32 w-32 text-red-500/10" />
+                    <CardContent className="relative p-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-medium text-muted-foreground">{t('stockOutRate')}</span>
+                        <Badge variant={result.stockOutRate.change < 0 ? 'default' : 'secondary'}>
+                          {result.stockOutRate.change > 0 ? '+' : ''}{result.stockOutRate.change.toFixed(1)}pp
+                        </Badge>
+                      </div>
+                      <div className="text-3xl font-bold tracking-tight text-red-600">
                         {result.stockOutRate.projected.toFixed(1)}%
-                      </span>
-                      <span className="text-sm text-muted-foreground mb-0.5">
+                      </div>
+                      <p className="text-sm text-muted-foreground mt-1">
                         {t('from')} {result.stockOutRate.base.toFixed(1)}%
-                      </span>
-                    </div>
-                  </div>
+                      </p>
+                    </CardContent>
+                  </Card>
                 </div>
               </TabsContent>
 

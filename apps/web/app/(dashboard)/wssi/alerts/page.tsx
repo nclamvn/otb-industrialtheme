@@ -259,51 +259,51 @@ export default function WSSIAlertsPage() {
 
       {/* Summary Cards */}
       <div className="grid gap-4 md:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Total Alerts</CardTitle>
-            <Bell className="h-4 w-4 text-muted-foreground" />
+        <Card className="relative overflow-hidden">
+          <Bell className="absolute -bottom-4 -right-4 h-32 w-32 text-blue-500/10" />
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Total Alerts</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{total}</div>
-            <p className="text-xs text-muted-foreground">
+          <CardContent className="relative">
+            <div className="text-3xl font-bold tracking-tight text-blue-600">{total}</div>
+            <p className="text-sm text-muted-foreground mt-1">
               {activeTab === 'active' ? 'Active alerts' : 'Acknowledged alerts'}
             </p>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Critical</CardTitle>
-            <AlertTriangle className="h-4 w-4 text-red-500" />
+        <Card className="relative overflow-hidden">
+          <AlertTriangle className="absolute -bottom-4 -right-4 h-32 w-32 text-red-500/10" />
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Critical</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-red-600">{criticalCount}</div>
-            <p className="text-xs text-muted-foreground">Immediate action needed</p>
+          <CardContent className="relative">
+            <div className="text-3xl font-bold tracking-tight text-red-600">{criticalCount}</div>
+            <p className="text-sm text-muted-foreground mt-1">Immediate action needed</p>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">High Priority</CardTitle>
-            <AlertTriangle className="h-4 w-4 text-orange-500" />
+        <Card className="relative overflow-hidden">
+          <AlertTriangle className="absolute -bottom-4 -right-4 h-32 w-32 text-orange-500/10" />
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">High Priority</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-orange-600">{highCount}</div>
-            <p className="text-xs text-muted-foreground">Review soon</p>
+          <CardContent className="relative">
+            <div className="text-3xl font-bold tracking-tight text-orange-600">{highCount}</div>
+            <p className="text-sm text-muted-foreground mt-1">Review soon</p>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Other</CardTitle>
-            <BellOff className="h-4 w-4 text-muted-foreground" />
+        <Card className="relative overflow-hidden">
+          <BellOff className="absolute -bottom-4 -right-4 h-32 w-32 text-gray-500/10" />
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Other</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
+          <CardContent className="relative">
+            <div className="text-3xl font-bold tracking-tight text-gray-600">
               {alerts.length - criticalCount - highCount}
             </div>
-            <p className="text-xs text-muted-foreground">Medium & low priority</p>
+            <p className="text-sm text-muted-foreground mt-1">Medium & low priority</p>
           </CardContent>
         </Card>
       </div>

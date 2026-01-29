@@ -300,64 +300,52 @@ export default function PredictiveAlertsPage() {
 
       {/* Summary Cards */}
       <div className="grid md:grid-cols-4 gap-4">
-        <Card>
-          <CardContent className="pt-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">
-                  {t('critical')}
-                </p>
-                <p className="text-2xl font-bold text-red-500">{summary.critical}</p>
-              </div>
-              <div className="h-10 w-10 rounded-full bg-red-500/10 flex items-center justify-center">
-                <AlertTriangle className="h-5 w-5 text-red-500" />
-              </div>
-            </div>
+        <Card className="relative overflow-hidden">
+          <AlertTriangle className="absolute -bottom-4 -right-4 h-32 w-32 text-red-500/10" />
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              {t('critical')}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="relative">
+            <div className="text-3xl font-bold tracking-tight text-red-600">{summary.critical}</div>
+            <p className="text-sm text-muted-foreground mt-1">{t('criticalAlerts')}</p>
           </CardContent>
         </Card>
-        <Card>
-          <CardContent className="pt-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">
-                  {t('warning')}
-                </p>
-                <p className="text-2xl font-bold text-yellow-500">{summary.warning}</p>
-              </div>
-              <div className="h-10 w-10 rounded-full bg-yellow-500/10 flex items-center justify-center">
-                <AlertCircle className="h-5 w-5 text-yellow-500" />
-              </div>
-            </div>
+        <Card className="relative overflow-hidden">
+          <AlertCircle className="absolute -bottom-4 -right-4 h-32 w-32 text-yellow-500/10" />
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              {t('warning')}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="relative">
+            <div className="text-3xl font-bold tracking-tight text-yellow-600">{summary.warning}</div>
+            <p className="text-sm text-muted-foreground mt-1">{t('warningAlerts')}</p>
           </CardContent>
         </Card>
-        <Card>
-          <CardContent className="pt-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">
-                  {t('info')}
-                </p>
-                <p className="text-2xl font-bold text-blue-500">{summary.info}</p>
-              </div>
-              <div className="h-10 w-10 rounded-full bg-blue-500/10 flex items-center justify-center">
-                <Info className="h-5 w-5 text-blue-500" />
-              </div>
-            </div>
+        <Card className="relative overflow-hidden">
+          <Info className="absolute -bottom-4 -right-4 h-32 w-32 text-blue-500/10" />
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              {t('info')}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="relative">
+            <div className="text-3xl font-bold tracking-tight text-blue-600">{summary.info}</div>
+            <p className="text-sm text-muted-foreground mt-1">{t('infoAlerts')}</p>
           </CardContent>
         </Card>
-        <Card>
-          <CardContent className="pt-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">
-                  {tCommon('all')}
-                </p>
-                <p className="text-2xl font-bold">{summary.total}</p>
-              </div>
-              <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
-                <Bell className="h-5 w-5 text-primary" />
-              </div>
-            </div>
+        <Card className="relative overflow-hidden">
+          <Bell className="absolute -bottom-4 -right-4 h-32 w-32 text-primary/10" />
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              {tCommon('all')}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="relative">
+            <div className="text-3xl font-bold tracking-tight">{summary.total}</div>
+            <p className="text-sm text-muted-foreground mt-1">{t('totalAlerts')}</p>
           </CardContent>
         </Card>
       </div>

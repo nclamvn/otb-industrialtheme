@@ -257,57 +257,57 @@ export default function AutomationPage() {
 
       {/* Stats Cards */}
       <div className="grid gap-4 md:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Auto-Approved</CardTitle>
-            <CheckCircle className="h-4 w-4 text-green-500" />
+        <Card className="relative overflow-hidden">
+          <CheckCircle className="absolute -bottom-4 -right-4 h-32 w-32 text-green-500/10" />
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Auto-Approved</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{approvalStats?.autoApproved || 0}</div>
-            <p className="text-xs text-muted-foreground">
+          <CardContent className="relative">
+            <div className="text-3xl font-bold tracking-tight text-green-600">{approvalStats?.autoApproved || 0}</div>
+            <p className="text-sm text-muted-foreground mt-1">
               of {approvalStats?.totalProcessed || 0} processed
             </p>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Pending Reorders</CardTitle>
-            <Package className="h-4 w-4 text-orange-500" />
+        <Card className="relative overflow-hidden">
+          <Package className="absolute -bottom-4 -right-4 h-32 w-32 text-orange-500/10" />
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Pending Reorders</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{reorderSummary.total || 0}</div>
-            <p className="text-xs text-muted-foreground">
+          <CardContent className="relative">
+            <div className="text-3xl font-bold tracking-tight text-orange-600">{reorderSummary.total || 0}</div>
+            <p className="text-sm text-muted-foreground mt-1">
               {reorderSummary.critical || 0} critical
             </p>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Active Rules</CardTitle>
-            <Settings className="h-4 w-4 text-blue-500" />
+        <Card className="relative overflow-hidden">
+          <Settings className="absolute -bottom-4 -right-4 h-32 w-32 text-blue-500/10" />
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Active Rules</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
+          <CardContent className="relative">
+            <div className="text-3xl font-bold tracking-tight text-blue-600">
               {rules.filter(r => r.enabled).length}
             </div>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-sm text-muted-foreground mt-1">
               of {rules.length} total rules
             </p>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Reorder Value</CardTitle>
-            <TrendingUp className="h-4 w-4 text-purple-500" />
+        <Card className="relative overflow-hidden">
+          <TrendingUp className="absolute -bottom-4 -right-4 h-32 w-32 text-purple-500/10" />
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Reorder Value</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
+          <CardContent className="relative">
+            <div className="text-3xl font-bold tracking-tight text-purple-600">
               {formatCurrency(reorderSummary.totalValue || 0)}
             </div>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-sm text-muted-foreground mt-1">
               {reorderSummary.totalUnits || 0} units
             </p>
           </CardContent>

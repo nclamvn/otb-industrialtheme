@@ -206,62 +206,58 @@ export default function AnalyticsPage() {
       {/* Quick Navigation */}
       <div className="grid gap-4 md:grid-cols-4">
         <Link href="/analytics/demand">
-          <Card className="hover:border-primary/50 transition-colors cursor-pointer h-full">
-            <CardContent className="pt-6">
-              <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
-                  <TrendingUp className="h-5 w-5 text-blue-600" />
-                </div>
-                <div>
-                  <p className="font-medium">{t('demandForecasting')}</p>
-                  <p className="text-xs text-muted-foreground">{t('aiPredictions')}</p>
-                </div>
+          <Card className="relative overflow-hidden hover:border-primary/50 transition-colors cursor-pointer h-full">
+            <TrendingUp className="absolute -bottom-4 -right-4 h-32 w-32 text-blue-500/10" />
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">{t('demandForecasting')}</CardTitle>
+            </CardHeader>
+            <CardContent className="relative">
+              <div className="text-3xl font-bold tracking-tight text-blue-600">
+                {t('aiPredictions')}
               </div>
+              <p className="text-sm text-muted-foreground mt-1">{t('viewDemandForecasts')}</p>
             </CardContent>
           </Card>
         </Link>
         <Link href="/analytics/performance">
-          <Card className="hover:border-primary/50 transition-colors cursor-pointer h-full">
-            <CardContent className="pt-6">
-              <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
-                  <Target className="h-5 w-5 text-green-600" />
-                </div>
-                <div>
-                  <p className="font-medium">{t('performance')}</p>
-                  <p className="text-xs text-muted-foreground">{t('kpiTracking')}</p>
-                </div>
+          <Card className="relative overflow-hidden hover:border-primary/50 transition-colors cursor-pointer h-full">
+            <Target className="absolute -bottom-4 -right-4 h-32 w-32 text-green-500/10" />
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">{t('performance')}</CardTitle>
+            </CardHeader>
+            <CardContent className="relative">
+              <div className="text-3xl font-bold tracking-tight text-green-600">
+                {t('kpiTracking')}
               </div>
+              <p className="text-sm text-muted-foreground mt-1">{t('viewPerformanceMetrics')}</p>
             </CardContent>
           </Card>
         </Link>
         <Link href="/analytics/simulator">
-          <Card className="hover:border-primary/50 transition-colors cursor-pointer h-full">
-            <CardContent className="pt-6">
-              <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
-                  <Calculator className="h-5 w-5 text-purple-600" />
-                </div>
-                <div>
-                  <p className="font-medium">{t('whatIfSimulator')}</p>
-                  <p className="text-xs text-muted-foreground">{t('scenarioPlanning')}</p>
-                </div>
+          <Card className="relative overflow-hidden hover:border-primary/50 transition-colors cursor-pointer h-full">
+            <Calculator className="absolute -bottom-4 -right-4 h-32 w-32 text-purple-500/10" />
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">{t('whatIfSimulator')}</CardTitle>
+            </CardHeader>
+            <CardContent className="relative">
+              <div className="text-3xl font-bold tracking-tight text-purple-600">
+                {t('scenarioPlanning')}
               </div>
+              <p className="text-sm text-muted-foreground mt-1">{t('runSimulations')}</p>
             </CardContent>
           </Card>
         </Link>
         <Link href="/analytics/insights">
-          <Card className="hover:border-primary/50 transition-colors cursor-pointer h-full">
-            <CardContent className="pt-6">
-              <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-lg bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center">
-                  <Sparkles className="h-5 w-5 text-orange-600" />
-                </div>
-                <div>
-                  <p className="font-medium">{t('aiInsights')}</p>
-                  <p className="text-xs text-muted-foreground">{t('smartRecommendations')}</p>
-                </div>
+          <Card className="relative overflow-hidden hover:border-primary/50 transition-colors cursor-pointer h-full">
+            <Sparkles className="absolute -bottom-4 -right-4 h-32 w-32 text-orange-500/10" />
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">{t('aiInsights')}</CardTitle>
+            </CardHeader>
+            <CardContent className="relative">
+              <div className="text-3xl font-bold tracking-tight text-orange-600">
+                {t('smartRecommendations')}
               </div>
+              <p className="text-sm text-muted-foreground mt-1">{t('viewAiInsights')}</p>
             </CardContent>
           </Card>
         </Link>

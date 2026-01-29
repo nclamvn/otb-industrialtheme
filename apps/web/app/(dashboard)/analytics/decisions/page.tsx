@@ -257,26 +257,26 @@ export default function DecisionCopilotPage() {
           const Icon = highlight.type === 'positive' ? TrendingUp :
                       highlight.type === 'negative' ? TrendingDown : Target;
           return (
-            <Card key={i} className={cn(
-              'border-l-4',
-              highlight.type === 'positive' && 'border-l-green-500',
-              highlight.type === 'negative' && 'border-l-red-500',
-              highlight.type === 'neutral' && 'border-l-blue-500'
-            )}>
+            <Card key={i} className="relative overflow-hidden">
+              <Icon className={cn(
+                'absolute -bottom-4 -right-4 h-32 w-32',
+                highlight.type === 'positive' && 'text-green-500/10',
+                highlight.type === 'negative' && 'text-red-500/10',
+                highlight.type === 'neutral' && 'text-blue-500/10'
+              )} />
               <CardHeader className="pb-2">
-                <CardDescription className="flex items-center gap-2">
-                  <Icon className={cn(
-                    'h-4 w-4',
-                    highlight.type === 'positive' && 'text-green-500',
-                    highlight.type === 'negative' && 'text-red-500',
-                    highlight.type === 'neutral' && 'text-blue-500'
-                  )} />
+                <CardTitle className="text-sm font-medium text-muted-foreground">
                   {highlight.metric}
-                </CardDescription>
+                </CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{highlight.value}</div>
-                <p className="text-xs text-muted-foreground mt-1">{highlight.context}</p>
+              <CardContent className="relative">
+                <div className={cn(
+                  'text-3xl font-bold tracking-tight',
+                  highlight.type === 'positive' && 'text-green-600',
+                  highlight.type === 'negative' && 'text-red-600',
+                  highlight.type === 'neutral' && 'text-blue-600'
+                )}>{highlight.value}</div>
+                <p className="text-sm text-muted-foreground mt-1">{highlight.context}</p>
                 <div className={cn(
                   'text-xs mt-2 flex items-center gap-1',
                   highlight.change >= 0 ? 'text-green-600' : 'text-red-600'

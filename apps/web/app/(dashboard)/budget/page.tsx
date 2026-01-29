@@ -273,65 +273,65 @@ export default function BudgetPage() {
         </Link>
       </PageHeader>
 
-      {/* Summary Cards */}
+      {/* Summary Cards - Modern Watermark Design */}
       <div className="grid gap-4 md:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">{t('totalBudgetCard')}</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
+        <Card className="relative overflow-hidden">
+          <DollarSign className="absolute -bottom-4 -right-4 h-32 w-32 text-primary/5" />
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">{t('totalBudgetCard')}</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
+          <CardContent className="relative">
+            <div className="text-3xl font-bold tracking-tight">
               ${summary.totalBudget.toLocaleString()}
             </div>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-sm text-muted-foreground mt-1">
               {t('allocations', { count: summary.count })}
             </p>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">{t('approved')}</CardTitle>
-            <CheckCircle className="h-4 w-4 text-green-600" />
+        <Card className="relative overflow-hidden">
+          <CheckCircle className="absolute -bottom-4 -right-4 h-32 w-32 text-green-500/10" />
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">{t('approved')}</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-green-600">
+          <CardContent className="relative">
+            <div className="text-3xl font-bold tracking-tight text-green-600">
               ${summary.approvedBudget.toLocaleString()}
             </div>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-sm text-muted-foreground mt-1">
               {t('ofTotal', { percent: ((summary.approvedBudget / summary.totalBudget) * 100 || 0).toFixed(1) })}
             </p>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">{t('pending')}</CardTitle>
-            <Clock className="h-4 w-4 text-yellow-600" />
+        <Card className="relative overflow-hidden">
+          <Clock className="absolute -bottom-4 -right-4 h-32 w-32 text-yellow-500/10" />
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">{t('pending')}</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-yellow-600">
+          <CardContent className="relative">
+            <div className="text-3xl font-bold tracking-tight text-yellow-600">
               ${summary.pendingBudget.toLocaleString()}
             </div>
-            <p className="text-xs text-muted-foreground">{t('awaitingApproval')}</p>
+            <p className="text-sm text-muted-foreground mt-1">{t('awaitingApproval')}</p>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">{t('draft')}</CardTitle>
-            <XCircle className="h-4 w-4 text-gray-600" />
+        <Card className="relative overflow-hidden">
+          <XCircle className="absolute -bottom-4 -right-4 h-32 w-32 text-gray-500/10" />
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">{t('draft')}</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-gray-600">
+          <CardContent className="relative">
+            <div className="text-3xl font-bold tracking-tight text-gray-600">
               ${(
                 summary.totalBudget -
                 summary.approvedBudget -
                 summary.pendingBudget
               ).toLocaleString()}
             </div>
-            <p className="text-xs text-muted-foreground">{t('notSubmitted')}</p>
+            <p className="text-sm text-muted-foreground mt-1">{t('notSubmitted')}</p>
           </CardContent>
         </Card>
       </div>

@@ -476,38 +476,38 @@ export default function DemandAnalyticsPage() {
 
               {/* Seasonal Insights */}
               <div className="grid gap-4 md:grid-cols-3 mt-6">
-                <Card className="bg-muted/50">
-                  <CardContent className="pt-4">
-                    <div className="flex items-center gap-2 mb-2">
-                      <TrendingUp className="h-4 w-4 text-green-500" />
-                      <span className="font-medium">Peak Season</span>
-                    </div>
-                    <p className="text-2xl font-bold">Nov - Dec</p>
-                    <p className="text-sm text-muted-foreground">
+                <Card className="relative overflow-hidden">
+                  <TrendingUp className="absolute -bottom-4 -right-4 h-32 w-32 text-green-500/10" />
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm font-medium text-muted-foreground">Peak Season</CardTitle>
+                  </CardHeader>
+                  <CardContent className="relative">
+                    <div className="text-3xl font-bold tracking-tight text-green-600">Nov - Dec</div>
+                    <p className="text-sm text-muted-foreground mt-1">
                       +45% above average demand
                     </p>
                   </CardContent>
                 </Card>
-                <Card className="bg-muted/50">
-                  <CardContent className="pt-4">
-                    <div className="flex items-center gap-2 mb-2">
-                      <TrendingDown className="h-4 w-4 text-amber-500" />
-                      <span className="font-medium">Low Season</span>
-                    </div>
-                    <p className="text-2xl font-bold">Jan - Feb</p>
-                    <p className="text-sm text-muted-foreground">
+                <Card className="relative overflow-hidden">
+                  <TrendingDown className="absolute -bottom-4 -right-4 h-32 w-32 text-amber-500/10" />
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm font-medium text-muted-foreground">Low Season</CardTitle>
+                  </CardHeader>
+                  <CardContent className="relative">
+                    <div className="text-3xl font-bold tracking-tight text-amber-600">Jan - Feb</div>
+                    <p className="text-sm text-muted-foreground mt-1">
                       -20% below average demand
                     </p>
                   </CardContent>
                 </Card>
-                <Card className="bg-muted/50">
-                  <CardContent className="pt-4">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Target className="h-4 w-4 text-blue-500" />
-                      <span className="font-medium">YoY Growth</span>
-                    </div>
-                    <p className="text-2xl font-bold">+12.5%</p>
-                    <p className="text-sm text-muted-foreground">
+                <Card className="relative overflow-hidden">
+                  <Target className="absolute -bottom-4 -right-4 h-32 w-32 text-blue-500/10" />
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm font-medium text-muted-foreground">YoY Growth</CardTitle>
+                  </CardHeader>
+                  <CardContent className="relative">
+                    <div className="text-3xl font-bold tracking-tight text-blue-600">+12.5%</div>
+                    <p className="text-sm text-muted-foreground mt-1">
                       Consistent growth trend
                     </p>
                   </CardContent>

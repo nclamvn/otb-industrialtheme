@@ -250,69 +250,61 @@ export default function WSSIDetailPage() {
 
       {/* Quick Stats */}
       <div className="grid gap-4 md:grid-cols-4">
-        <Card>
+        <Card className="relative overflow-hidden">
+          <BarChart3 className="absolute -bottom-4 -right-4 h-32 w-32 text-blue-500/10" />
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium flex items-center gap-2">
-              <BarChart3 className="h-4 w-4" />
-              Sales Performance
-            </CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">Sales Performance</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className={`text-2xl font-bold ${getVarianceColor(Number(record.salesVariancePct))}`}>
+          <CardContent className="relative">
+            <div className={`text-3xl font-bold tracking-tight ${getVarianceColor(Number(record.salesVariancePct))}`}>
               {Number(record.salesVariancePct) > 0 ? '+' : ''}{Number(record.salesVariancePct).toFixed(1)}%
             </div>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-muted-foreground mt-1">
               Actual: ${Number(record.salesActualValue).toLocaleString()}
             </p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="relative overflow-hidden">
+          <Package className="absolute -bottom-4 -right-4 h-32 w-32 text-purple-500/10" />
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium flex items-center gap-2">
-              <Package className="h-4 w-4" />
-              Weeks of Cover
-            </CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">Weeks of Cover</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
+          <CardContent className="relative">
+            <div className="text-3xl font-bold tracking-tight text-purple-600">
               {Number(record.weeksOfCover).toFixed(1)} wks
             </div>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-muted-foreground mt-1">
               Closing Stock: ${Number(record.closingStockValue).toLocaleString()}
             </p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="relative overflow-hidden">
+          <TrendingUp className="absolute -bottom-4 -right-4 h-32 w-32 text-green-500/10" />
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium flex items-center gap-2">
-              <TrendingUp className="h-4 w-4" />
-              Sell-Through Rate
-            </CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">Sell-Through Rate</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
+          <CardContent className="relative">
+            <div className="text-3xl font-bold tracking-tight text-green-600">
               {Number(record.sellThroughPct).toFixed(1)}%
             </div>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-muted-foreground mt-1">
               Units Sold: {record.salesActualUnits.toLocaleString()}
             </p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="relative overflow-hidden">
+          <Bell className="absolute -bottom-4 -right-4 h-32 w-32 text-orange-500/10" />
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium flex items-center gap-2">
-              <Bell className="h-4 w-4" />
-              Active Alerts
-            </CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">Active Alerts</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className={`text-2xl font-bold ${activeAlerts.length > 0 ? 'text-orange-600' : 'text-green-600'}`}>
+          <CardContent className="relative">
+            <div className={`text-3xl font-bold tracking-tight ${activeAlerts.length > 0 ? 'text-orange-600' : 'text-green-600'}`}>
               {activeAlerts.length}
             </div>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-muted-foreground mt-1">
               {activeAlerts.length > 0 ? 'Needs attention' : 'All clear'}
             </p>
           </CardContent>

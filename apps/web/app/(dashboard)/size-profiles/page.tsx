@@ -358,47 +358,47 @@ export default function SizeProfilesPage() {
 
       {/* Stats Cards */}
       <div className="grid gap-4 md:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Total Profiles</CardTitle>
-            <ListChecks className="h-4 w-4 text-muted-foreground" />
+        <Card className="relative overflow-hidden">
+          <ListChecks className="absolute -bottom-4 -right-4 h-32 w-32 text-blue-500/10" />
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Total Profiles</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{profiles.length}</div>
-            <p className="text-xs text-muted-foreground">{activeProfiles} active</p>
+          <CardContent className="relative">
+            <div className="text-3xl font-bold tracking-tight text-blue-600">{profiles.length}</div>
+            <p className="text-sm text-muted-foreground mt-1">{activeProfiles} active</p>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">System Optimal</CardTitle>
-            <Sparkles className="h-4 w-4 text-purple-500" />
+        <Card className="relative overflow-hidden">
+          <Sparkles className="absolute -bottom-4 -right-4 h-32 w-32 text-purple-500/10" />
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">System Optimal</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{byType['SYSTEM_OPTIMAL'] || 0}</div>
-            <p className="text-xs text-muted-foreground">AI-generated</p>
+          <CardContent className="relative">
+            <div className="text-3xl font-bold tracking-tight text-purple-600">{byType['SYSTEM_OPTIMAL'] || 0}</div>
+            <p className="text-sm text-muted-foreground mt-1">AI-generated</p>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Final Approved</CardTitle>
-            <BarChart3 className="h-4 w-4 text-green-500" />
+        <Card className="relative overflow-hidden">
+          <BarChart3 className="absolute -bottom-4 -right-4 h-32 w-32 text-green-500/10" />
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Final Approved</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{byType['FINAL'] || 0}</div>
-            <p className="text-xs text-muted-foreground">Ready for use</p>
+          <CardContent className="relative">
+            <div className="text-3xl font-bold tracking-tight text-green-600">{byType['FINAL'] || 0}</div>
+            <p className="text-sm text-muted-foreground mt-1">Ready for use</p>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Size Definitions</CardTitle>
-            <ListChecks className="h-4 w-4 text-muted-foreground" />
+        <Card className="relative overflow-hidden">
+          <ListChecks className="absolute -bottom-4 -right-4 h-32 w-32 text-orange-500/10" />
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Size Definitions</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{definitions.length}</div>
-            <p className="text-xs text-muted-foreground">
+          <CardContent className="relative">
+            <div className="text-3xl font-bold tracking-tight text-orange-600">{definitions.length}</div>
+            <p className="text-sm text-muted-foreground mt-1">
               {definitions.filter((d) => d.isActive).length} active
             </p>
           </CardContent>

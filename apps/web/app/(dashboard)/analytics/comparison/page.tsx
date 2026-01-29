@@ -204,44 +204,44 @@ export default function ComparisonPage() {
 
       {/* Summary Cards */}
       <div className="grid gap-4 md:grid-cols-4">
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-muted-foreground">{t('revenueChange')}</span>
-              <Badge className="bg-green-500">+11.1%</Badge>
-            </div>
-            <p className="text-2xl font-bold mt-2">$1.5M</p>
-            <p className="text-xs text-muted-foreground">{t('vs')} $1.35M</p>
+        <Card className="relative overflow-hidden">
+          <TrendingUp className="absolute -bottom-4 -right-4 h-32 w-32 text-green-500/10" />
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">{t('revenueChange')}</CardTitle>
+          </CardHeader>
+          <CardContent className="relative">
+            <div className="text-3xl font-bold tracking-tight text-green-600">$1.5M</div>
+            <p className="text-sm text-muted-foreground mt-1">{t('vs')} $1.35M <Badge className="bg-green-500 ml-2">+11.1%</Badge></p>
           </CardContent>
         </Card>
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-muted-foreground">{t('marginImprovement')}</span>
-              <Badge className="bg-green-500">+2.2pp</Badge>
-            </div>
-            <p className="text-2xl font-bold mt-2">52.3%</p>
-            <p className="text-xs text-muted-foreground">{t('vs')} 50.1%</p>
+        <Card className="relative overflow-hidden">
+          <TrendingUp className="absolute -bottom-4 -right-4 h-32 w-32 text-blue-500/10" />
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">{t('marginImprovement')}</CardTitle>
+          </CardHeader>
+          <CardContent className="relative">
+            <div className="text-3xl font-bold tracking-tight text-blue-600">52.3%</div>
+            <p className="text-sm text-muted-foreground mt-1">{t('vs')} 50.1% <Badge className="bg-green-500 ml-2">+2.2pp</Badge></p>
           </CardContent>
         </Card>
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-muted-foreground">{t('unitsGrowth')}</span>
-              <Badge className="bg-green-500">+7.1%</Badge>
-            </div>
-            <p className="text-2xl font-bold mt-2">45K</p>
-            <p className="text-xs text-muted-foreground">{t('vs')} 42K</p>
+        <Card className="relative overflow-hidden">
+          <TrendingUp className="absolute -bottom-4 -right-4 h-32 w-32 text-purple-500/10" />
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">{t('unitsGrowth')}</CardTitle>
+          </CardHeader>
+          <CardContent className="relative">
+            <div className="text-3xl font-bold tracking-tight text-purple-600">45K</div>
+            <p className="text-sm text-muted-foreground mt-1">{t('vs')} 42K <Badge className="bg-green-500 ml-2">+7.1%</Badge></p>
           </CardContent>
         </Card>
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-muted-foreground">{t('markdownReduction')}</span>
-              <Badge className="bg-green-500">-3.6pp</Badge>
-            </div>
-            <p className="text-2xl font-bold mt-2">18.5%</p>
-            <p className="text-xs text-muted-foreground">{t('vs')} 22.1%</p>
+        <Card className="relative overflow-hidden">
+          <TrendingDown className="absolute -bottom-4 -right-4 h-32 w-32 text-orange-500/10" />
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">{t('markdownReduction')}</CardTitle>
+          </CardHeader>
+          <CardContent className="relative">
+            <div className="text-3xl font-bold tracking-tight text-orange-600">18.5%</div>
+            <p className="text-sm text-muted-foreground mt-1">{t('vs')} 22.1% <Badge className="bg-green-500 ml-2">-3.6pp</Badge></p>
           </CardContent>
         </Card>
       </div>

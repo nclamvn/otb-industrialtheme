@@ -328,56 +328,52 @@ export default function KPIDashboardPage() {
 
       {/* Summary Cards */}
       <div className="grid gap-4 md:grid-cols-4">
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">{t('onTrack')}</p>
-                <p className="text-3xl font-bold text-green-600">{onTrack}</p>
-              </div>
-              <div className="h-12 w-12 rounded-full bg-green-100 flex items-center justify-center">
-                <CheckCircle className="h-6 w-6 text-green-600" />
-              </div>
+        <Card className="relative overflow-hidden">
+          <CheckCircle className="absolute -bottom-4 -right-4 h-32 w-32 text-green-500/10" />
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">{t('onTrack')}</CardTitle>
+          </CardHeader>
+          <CardContent className="relative">
+            <div className="text-3xl font-bold tracking-tight text-green-600">
+              {onTrack}
             </div>
+            <p className="text-sm text-muted-foreground mt-1">{t('kpisOnTrack', { count: onTrack })}</p>
           </CardContent>
         </Card>
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">{t('atRisk')}</p>
-                <p className="text-3xl font-bold text-yellow-600">{atRisk}</p>
-              </div>
-              <div className="h-12 w-12 rounded-full bg-yellow-100 flex items-center justify-center">
-                <AlertTriangle className="h-6 w-6 text-yellow-600" />
-              </div>
+        <Card className="relative overflow-hidden">
+          <AlertTriangle className="absolute -bottom-4 -right-4 h-32 w-32 text-yellow-500/10" />
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">{t('atRisk')}</CardTitle>
+          </CardHeader>
+          <CardContent className="relative">
+            <div className="text-3xl font-bold tracking-tight text-yellow-600">
+              {atRisk}
             </div>
+            <p className="text-sm text-muted-foreground mt-1">{t('kpisAtRisk', { count: atRisk })}</p>
           </CardContent>
         </Card>
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">{t('offTrack')}</p>
-                <p className="text-3xl font-bold text-red-600">{offTrack}</p>
-              </div>
-              <div className="h-12 w-12 rounded-full bg-red-100 flex items-center justify-center">
-                <XCircle className="h-6 w-6 text-red-600" />
-              </div>
+        <Card className="relative overflow-hidden">
+          <XCircle className="absolute -bottom-4 -right-4 h-32 w-32 text-red-500/10" />
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">{t('offTrack')}</CardTitle>
+          </CardHeader>
+          <CardContent className="relative">
+            <div className="text-3xl font-bold tracking-tight text-red-600">
+              {offTrack}
             </div>
+            <p className="text-sm text-muted-foreground mt-1">{t('kpisOffTrack', { count: offTrack })}</p>
           </CardContent>
         </Card>
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">{t('activeAlerts')}</p>
-                <p className="text-3xl font-bold text-blue-600">{activeAlerts}</p>
-              </div>
-              <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center">
-                <Bell className="h-6 w-6 text-blue-600" />
-              </div>
+        <Card className="relative overflow-hidden">
+          <Bell className="absolute -bottom-4 -right-4 h-32 w-32 text-blue-500/10" />
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">{t('activeAlerts')}</CardTitle>
+          </CardHeader>
+          <CardContent className="relative">
+            <div className="text-3xl font-bold tracking-tight text-blue-600">
+              {activeAlerts}
             </div>
+            <p className="text-sm text-muted-foreground mt-1">{t('alertsActive', { count: activeAlerts })}</p>
           </CardContent>
         </Card>
       </div>

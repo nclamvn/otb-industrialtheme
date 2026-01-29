@@ -310,51 +310,51 @@ export default function OTBAnalysisPage() {
 
       {/* Summary Cards */}
       <div className="grid gap-4 md:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">{t('totalPlans')}</CardTitle>
-            <Package className="h-4 w-4 text-muted-foreground" />
+        <Card className="relative overflow-hidden">
+          <Package className="absolute -bottom-4 -right-4 h-32 w-32 text-blue-500/10" />
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">{t('totalPlans')}</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{totals.count}</div>
-            <p className="text-xs text-muted-foreground">{t('activePlans')}</p>
+          <CardContent className="relative">
+            <div className="text-3xl font-bold tracking-tight text-blue-600">{totals.count}</div>
+            <p className="text-sm text-muted-foreground mt-1">{t('activePlans')}</p>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">{t('totalAmount')}</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
+        <Card className="relative overflow-hidden">
+          <DollarSign className="absolute -bottom-4 -right-4 h-32 w-32 text-green-500/10" />
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">{t('totalAmount')}</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
+          <CardContent className="relative">
+            <div className="text-3xl font-bold tracking-tight text-green-600">
               ${totals.totalAmount.toLocaleString()}
             </div>
-            <p className="text-xs text-muted-foreground">{t('plannedSpend')}</p>
+            <p className="text-sm text-muted-foreground mt-1">{t('plannedSpend')}</p>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">{t('totalUnits')}</CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
+        <Card className="relative overflow-hidden">
+          <TrendingUp className="absolute -bottom-4 -right-4 h-32 w-32 text-orange-500/10" />
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">{t('totalUnits')}</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
+          <CardContent className="relative">
+            <div className="text-3xl font-bold tracking-tight text-orange-600">
               {totals.totalUnits.toLocaleString()}
             </div>
-            <p className="text-xs text-muted-foreground">{t('plannedUnits')}</p>
+            <p className="text-sm text-muted-foreground mt-1">{t('plannedUnits')}</p>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">{t('aiProposals')}</CardTitle>
-            <Sparkles className="h-4 w-4 text-purple-600" />
+        <Card className="relative overflow-hidden">
+          <Sparkles className="absolute -bottom-4 -right-4 h-32 w-32 text-purple-500/10" />
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">{t('aiProposals')}</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-purple-600">{t('ready')}</div>
-            <p className="text-xs text-muted-foreground">{t('generateProposals')}</p>
+          <CardContent className="relative">
+            <div className="text-3xl font-bold tracking-tight text-purple-600">{t('ready')}</div>
+            <p className="text-sm text-muted-foreground mt-1">{t('generateProposals')}</p>
           </CardContent>
         </Card>
       </div>

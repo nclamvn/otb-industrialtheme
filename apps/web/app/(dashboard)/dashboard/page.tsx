@@ -3,12 +3,12 @@
 import { useState } from 'react';
 import { ContextBar } from '@/components/layout/context-bar';
 import { PageHeader } from '@/components/layout/page-header';
-import { KPICard } from '@/components/ui/kpi-card';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { DataTable } from '@/components/ui/data-table';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { InlineProgress } from '@/components/ui/inline-progress';
 import { TrendChart } from '@/components/charts/trend-chart';
-import { DollarSign, TrendingUp, Package, AlertTriangle } from 'lucide-react';
+import { DollarSign, TrendingUp, TrendingDown, Package, AlertTriangle } from 'lucide-react';
 
 // Mock data
 const mockKPIs = {
@@ -95,37 +95,75 @@ export default function DashboardPage() {
       <div className="p-4 space-y-4">
         {/* KPI Cards */}
         <div className="grid grid-cols-4 gap-3">
-          <KPICard
-            label="Net Sales"
-            value={mockKPIs.netSales.value}
-            trend={mockKPIs.netSales.trend}
-            icon={<DollarSign className="h-4 w-4" />}
-          />
-          <KPICard
-            label="Sell-Through"
-            value={mockKPIs.sellThrough.value}
-            trend={mockKPIs.sellThrough.trend}
-            status="warning"
-            icon={<TrendingUp className="h-4 w-4" />}
-          />
-          <KPICard
-            label="Weeks of Cover"
-            value={mockKPIs.woc.value}
-            trend={mockKPIs.woc.trend}
-            status="success"
-            icon={<Package className="h-4 w-4" />}
-          />
-          <KPICard
-            label="Alerts"
-            value={
-              <span className="flex items-center gap-3 font-data text-2xl font-semibold">
-                <span className="text-status-critical">{mockKPIs.alerts.critical}</span>
-                <span className="text-status-warning">{mockKPIs.alerts.warning}</span>
-                <span className="text-status-success">{mockKPIs.alerts.healthy}</span>
-              </span>
-            }
-            icon={<AlertTriangle className="h-4 w-4" />}
-          />
+          {/* Net Sales Card */}
+          <Card className="relative overflow-hidden">
+            <DollarSign className="absolute -bottom-4 -right-4 h-32 w-32 text-emerald-500/10" />
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Net Sales</CardTitle>
+            </CardHeader>
+            <CardContent className="relative">
+              <div className="text-3xl font-bold tracking-tight text-emerald-600">
+                {mockKPIs.netSales.value}
+              </div>
+              <p className="text-sm text-muted-foreground mt-1 flex items-center gap-1">
+                <TrendingUp className="h-3 w-3 text-emerald-500" />
+                <span className="text-emerald-500">+{mockKPIs.netSales.trend.value}%</span>
+                <span>{mockKPIs.netSales.trend.label}</span>
+              </p>
+            </CardContent>
+          </Card>
+
+          {/* Sell-Through Card */}
+          <Card className="relative overflow-hidden">
+            <TrendingUp className="absolute -bottom-4 -right-4 h-32 w-32 text-amber-500/10" />
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Sell-Through</CardTitle>
+            </CardHeader>
+            <CardContent className="relative">
+              <div className="text-3xl font-bold tracking-tight text-amber-600">
+                {mockKPIs.sellThrough.value}
+              </div>
+              <p className="text-sm text-muted-foreground mt-1 flex items-center gap-1">
+                <TrendingDown className="h-3 w-3 text-red-500" />
+                <span className="text-red-500">{mockKPIs.sellThrough.trend.value}%</span>
+                <span>{mockKPIs.sellThrough.trend.label}</span>
+              </p>
+            </CardContent>
+          </Card>
+
+          {/* Weeks of Cover Card */}
+          <Card className="relative overflow-hidden">
+            <Package className="absolute -bottom-4 -right-4 h-32 w-32 text-blue-500/10" />
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Weeks of Cover</CardTitle>
+            </CardHeader>
+            <CardContent className="relative">
+              <div className="text-3xl font-bold tracking-tight text-blue-600">
+                {mockKPIs.woc.value}
+              </div>
+              <p className="text-sm text-muted-foreground mt-1">
+                Target: 4-6 weeks
+              </p>
+            </CardContent>
+          </Card>
+
+          {/* Alerts Card */}
+          <Card className="relative overflow-hidden">
+            <AlertTriangle className="absolute -bottom-4 -right-4 h-32 w-32 text-rose-500/10" />
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Alerts</CardTitle>
+            </CardHeader>
+            <CardContent className="relative">
+              <div className="text-3xl font-bold tracking-tight flex items-center gap-3">
+                <span className="text-rose-600">{mockKPIs.alerts.critical}</span>
+                <span className="text-amber-600">{mockKPIs.alerts.warning}</span>
+                <span className="text-emerald-600">{mockKPIs.alerts.healthy}</span>
+              </div>
+              <p className="text-sm text-muted-foreground mt-1">
+                Critical / Warning / Healthy
+              </p>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Charts Row */}

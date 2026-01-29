@@ -335,62 +335,50 @@ export default function AuditTrailPage() {
 
       {/* Stats */}
       <div className="grid gap-4 md:grid-cols-4">
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                <History className="h-5 w-5 text-primary" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold">{auditLogs.length}</p>
-                <p className="text-xs text-muted-foreground">Total Logs</p>
-              </div>
-            </div>
+        <Card className="relative overflow-hidden">
+          <History className="absolute -bottom-4 -right-4 h-32 w-32 text-blue-500/10" />
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Total Logs</CardTitle>
+          </CardHeader>
+          <CardContent className="relative">
+            <div className="text-3xl font-bold tracking-tight text-blue-600">{auditLogs.length}</div>
+            <p className="text-sm text-muted-foreground mt-1">All recorded activities</p>
           </CardContent>
         </Card>
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
-                <Plus className="h-5 w-5 text-green-600" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold">
-                  {auditLogs.filter((l) => l.action.includes('CREATE')).length}
-                </p>
-                <p className="text-xs text-muted-foreground">{tCommon('create')}</p>
-              </div>
+        <Card className="relative overflow-hidden">
+          <Plus className="absolute -bottom-4 -right-4 h-32 w-32 text-green-500/10" />
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">{tCommon('create')}</CardTitle>
+          </CardHeader>
+          <CardContent className="relative">
+            <div className="text-3xl font-bold tracking-tight text-green-600">
+              {auditLogs.filter((l) => l.action.includes('CREATE')).length}
             </div>
+            <p className="text-sm text-muted-foreground mt-1">New records created</p>
           </CardContent>
         </Card>
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
-                <Edit className="h-5 w-5 text-blue-600" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold">
-                  {auditLogs.filter((l) => l.action.includes('UPDATE')).length}
-                </p>
-                <p className="text-xs text-muted-foreground">{tCommon('update')}</p>
-              </div>
+        <Card className="relative overflow-hidden">
+          <Edit className="absolute -bottom-4 -right-4 h-32 w-32 text-amber-500/10" />
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">{tCommon('update')}</CardTitle>
+          </CardHeader>
+          <CardContent className="relative">
+            <div className="text-3xl font-bold tracking-tight text-amber-600">
+              {auditLogs.filter((l) => l.action.includes('UPDATE')).length}
             </div>
+            <p className="text-sm text-muted-foreground mt-1">Records modified</p>
           </CardContent>
         </Card>
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
-                <User className="h-5 w-5 text-purple-600" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold">
-                  {new Set(auditLogs.map((l) => l.userId)).size}
-                </p>
-                <p className="text-xs text-muted-foreground">Active Users</p>
-              </div>
+        <Card className="relative overflow-hidden">
+          <User className="absolute -bottom-4 -right-4 h-32 w-32 text-purple-500/10" />
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Active Users</CardTitle>
+          </CardHeader>
+          <CardContent className="relative">
+            <div className="text-3xl font-bold tracking-tight text-purple-600">
+              {new Set(auditLogs.map((l) => l.userId)).size}
             </div>
+            <p className="text-sm text-muted-foreground mt-1">Unique contributors</p>
           </CardContent>
         </Card>
       </div>

@@ -18,6 +18,11 @@ import {
   Target,
   Sparkles,
   ArrowUpRight,
+  DollarSign,
+  TrendingUp,
+  Package,
+  Archive,
+  BarChart3,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -489,52 +494,70 @@ export default function AutoOTBPlanningPage() {
             <CardContent className="space-y-6">
               {/* Summary Cards */}
               <div className="grid md:grid-cols-6 gap-4">
-                <Card>
-                  <CardContent className="pt-4">
-                    <p className="text-xs text-muted-foreground">{t('totalOTB')}</p>
-                    <p className="text-xl font-bold">
+                <Card className="relative overflow-hidden">
+                  <DollarSign className="absolute -bottom-4 -right-4 h-32 w-32 text-blue-500/10" />
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm font-medium text-muted-foreground">{t('totalOTB')}</CardTitle>
+                  </CardHeader>
+                  <CardContent className="relative">
+                    <div className="text-3xl font-bold tracking-tight text-blue-600">
                       {formatCurrency(selectedPlan.generatedData.summary.totalOTB)}
-                    </p>
+                    </div>
                   </CardContent>
                 </Card>
-                <Card>
-                  <CardContent className="pt-4">
-                    <p className="text-xs text-muted-foreground">{t('salesPlan')}</p>
-                    <p className="text-xl font-bold">
+                <Card className="relative overflow-hidden">
+                  <BarChart3 className="absolute -bottom-4 -right-4 h-32 w-32 text-green-500/10" />
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm font-medium text-muted-foreground">{t('salesPlan')}</CardTitle>
+                  </CardHeader>
+                  <CardContent className="relative">
+                    <div className="text-3xl font-bold tracking-tight text-green-600">
                       {formatCurrency(selectedPlan.generatedData.summary.totalSalesPlan)}
-                    </p>
+                    </div>
                   </CardContent>
                 </Card>
-                <Card>
-                  <CardContent className="pt-4">
-                    <p className="text-xs text-muted-foreground">{t('receiptPlan')}</p>
-                    <p className="text-xl font-bold">
+                <Card className="relative overflow-hidden">
+                  <Package className="absolute -bottom-4 -right-4 h-32 w-32 text-purple-500/10" />
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm font-medium text-muted-foreground">{t('receiptPlan')}</CardTitle>
+                  </CardHeader>
+                  <CardContent className="relative">
+                    <div className="text-3xl font-bold tracking-tight text-purple-600">
                       {formatCurrency(selectedPlan.generatedData.summary.totalReceiptPlan)}
-                    </p>
+                    </div>
                   </CardContent>
                 </Card>
-                <Card>
-                  <CardContent className="pt-4">
-                    <p className="text-xs text-muted-foreground">{t('openingStock')}</p>
-                    <p className="text-xl font-bold">
+                <Card className="relative overflow-hidden">
+                  <Archive className="absolute -bottom-4 -right-4 h-32 w-32 text-orange-500/10" />
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm font-medium text-muted-foreground">{t('openingStock')}</CardTitle>
+                  </CardHeader>
+                  <CardContent className="relative">
+                    <div className="text-3xl font-bold tracking-tight text-orange-600">
                       {formatCurrency(selectedPlan.generatedData.summary.openingStock)}
-                    </p>
+                    </div>
                   </CardContent>
                 </Card>
-                <Card>
-                  <CardContent className="pt-4">
-                    <p className="text-xs text-muted-foreground">{t('closingStock')}</p>
-                    <p className="text-xl font-bold">
+                <Card className="relative overflow-hidden">
+                  <Archive className="absolute -bottom-4 -right-4 h-32 w-32 text-cyan-500/10" />
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm font-medium text-muted-foreground">{t('closingStock')}</CardTitle>
+                  </CardHeader>
+                  <CardContent className="relative">
+                    <div className="text-3xl font-bold tracking-tight text-cyan-600">
                       {formatCurrency(selectedPlan.generatedData.summary.targetClosingStock)}
-                    </p>
+                    </div>
                   </CardContent>
                 </Card>
-                <Card>
-                  <CardContent className="pt-4">
-                    <p className="text-xs text-muted-foreground">{t('growthVsLY')}</p>
-                    <p className="text-xl font-bold text-green-600">
+                <Card className="relative overflow-hidden">
+                  <TrendingUp className="absolute -bottom-4 -right-4 h-32 w-32 text-emerald-500/10" />
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm font-medium text-muted-foreground">{t('growthVsLY')}</CardTitle>
+                  </CardHeader>
+                  <CardContent className="relative">
+                    <div className="text-3xl font-bold tracking-tight text-emerald-600">
                       {selectedPlan.generatedData.summary.growthVsLY}
-                    </p>
+                    </div>
                   </CardContent>
                 </Card>
               </div>

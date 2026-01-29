@@ -415,30 +415,30 @@ export default function ForecastPage() {
             </CardHeader>
             <CardContent>
               <div className="grid gap-6 md:grid-cols-3">
-                <div className="rounded-lg border p-4">
-                  <div className="flex items-center gap-2 text-green-600 mb-2">
-                    <TrendingUp className="h-5 w-5" />
-                    <span className="font-medium">{t('upwardTrend')}</span>
-                  </div>
-                  <p className="text-2xl font-bold">+2.5%</p>
-                  <p className="text-sm text-muted-foreground">{t('monthlyGrowthRate')}</p>
-                </div>
-                <div className="rounded-lg border p-4">
-                  <div className="flex items-center gap-2 text-blue-600 mb-2">
-                    <Target className="h-5 w-5" />
-                    <span className="font-medium">{t('trendStrength')}</span>
-                  </div>
-                  <p className="text-2xl font-bold">87%</p>
-                  <p className="text-sm text-muted-foreground">{t('rSquaredCorrelation')}</p>
-                </div>
-                <div className="rounded-lg border p-4">
-                  <div className="flex items-center gap-2 text-purple-600 mb-2">
-                    <RefreshCw className="h-5 w-5" />
-                    <span className="font-medium">{t('seasonality')}</span>
-                  </div>
-                  <p className="text-2xl font-bold">6 {t('months')}</p>
-                  <p className="text-sm text-muted-foreground">{t('cyclePeriod')}</p>
-                </div>
+                <Card className="relative overflow-hidden">
+                  <TrendingUp className="absolute -bottom-4 -right-4 h-32 w-32 text-green-500/10" />
+                  <CardContent className="relative p-4">
+                    <p className="text-sm font-medium text-muted-foreground">{t('upwardTrend')}</p>
+                    <p className="text-3xl font-bold tracking-tight text-green-600">+2.5%</p>
+                    <p className="text-sm text-muted-foreground mt-1">{t('monthlyGrowthRate')}</p>
+                  </CardContent>
+                </Card>
+                <Card className="relative overflow-hidden">
+                  <Target className="absolute -bottom-4 -right-4 h-32 w-32 text-blue-500/10" />
+                  <CardContent className="relative p-4">
+                    <p className="text-sm font-medium text-muted-foreground">{t('trendStrength')}</p>
+                    <p className="text-3xl font-bold tracking-tight text-blue-600">87%</p>
+                    <p className="text-sm text-muted-foreground mt-1">{t('rSquaredCorrelation')}</p>
+                  </CardContent>
+                </Card>
+                <Card className="relative overflow-hidden">
+                  <RefreshCw className="absolute -bottom-4 -right-4 h-32 w-32 text-purple-500/10" />
+                  <CardContent className="relative p-4">
+                    <p className="text-sm font-medium text-muted-foreground">{t('seasonality')}</p>
+                    <p className="text-3xl font-bold tracking-tight text-purple-600">6 {t('months')}</p>
+                    <p className="text-sm text-muted-foreground mt-1">{t('cyclePeriod')}</p>
+                  </CardContent>
+                </Card>
               </div>
             </CardContent>
           </Card>
@@ -531,20 +531,20 @@ export default function ForecastPage() {
             <CardContent>
               <div className="grid gap-4 md:grid-cols-3">
                 {[
-                  { name: t('conservative'), growth: '+12%', value: 95000, color: 'blue' },
-                  { name: t('baseCase'), growth: '+18%', value: 102000, color: 'green' },
-                  { name: t('optimistic'), growth: '+25%', value: 110000, color: 'purple' },
+                  { name: t('conservative'), growth: '+12%', value: 95000, color: 'blue', Icon: Target },
+                  { name: t('baseCase'), growth: '+18%', value: 102000, color: 'green', Icon: TrendingUp },
+                  { name: t('optimistic'), growth: '+25%', value: 110000, color: 'purple', Icon: ArrowUpRight },
                 ].map((scenario) => (
-                  <div key={scenario.name} className="rounded-lg border p-4">
-                    <div className="flex items-center gap-2 mb-3">
-                      <div className={`h-3 w-3 rounded-full bg-${scenario.color}-500`} />
-                      <span className="font-medium">{scenario.name}</span>
-                    </div>
-                    <p className="text-2xl font-bold">${(scenario.value / 1000).toFixed(0)}K</p>
-                    <p className="text-sm text-muted-foreground">
-                      {t('growth')}: <span className="text-green-600">{scenario.growth}</span>
-                    </p>
-                  </div>
+                  <Card key={scenario.name} className="relative overflow-hidden">
+                    <scenario.Icon className={`absolute -bottom-4 -right-4 h-32 w-32 text-${scenario.color}-500/10`} />
+                    <CardContent className="relative p-4">
+                      <p className="text-sm font-medium text-muted-foreground">{scenario.name}</p>
+                      <p className={`text-3xl font-bold tracking-tight text-${scenario.color}-600`}>${(scenario.value / 1000).toFixed(0)}K</p>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        {t('growth')}: <span className="text-green-600">{scenario.growth}</span>
+                      </p>
+                    </CardContent>
+                  </Card>
                 ))}
               </div>
             </CardContent>

@@ -213,47 +213,47 @@ export default function ApprovalsPage() {
 
       {/* Summary Cards */}
       <div className="grid gap-4 md:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">{t('totalPending')}</CardTitle>
-            <Clock className="h-4 w-4 text-yellow-600" />
+        <Card className="relative overflow-hidden">
+          <Clock className="absolute -bottom-4 -right-4 h-32 w-32 text-yellow-500/10" />
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">{t('totalPending')}</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{summary.total}</div>
-            <p className="text-xs text-muted-foreground">{t('awaitingAction')}</p>
+          <CardContent className="relative">
+            <div className="text-3xl font-bold tracking-tight text-yellow-600">{summary.total}</div>
+            <p className="text-sm text-muted-foreground mt-1">{t('awaitingAction')}</p>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">{t('budget')}</CardTitle>
-            <DollarSign className="h-4 w-4 text-blue-600" />
+        <Card className="relative overflow-hidden">
+          <DollarSign className="absolute -bottom-4 -right-4 h-32 w-32 text-blue-500/10" />
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">{t('budget')}</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{summary.budget}</div>
-            <p className="text-xs text-muted-foreground">{t('budgetApprovals')}</p>
+          <CardContent className="relative">
+            <div className="text-3xl font-bold tracking-tight text-blue-600">{summary.budget}</div>
+            <p className="text-sm text-muted-foreground mt-1">{t('budgetApprovals')}</p>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">{t('otbPlans')}</CardTitle>
-            <BarChart3 className="h-4 w-4 text-purple-600" />
+        <Card className="relative overflow-hidden">
+          <BarChart3 className="absolute -bottom-4 -right-4 h-32 w-32 text-purple-500/10" />
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">{t('otbPlans')}</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{summary.otb}</div>
-            <p className="text-xs text-muted-foreground">{t('otbApprovals')}</p>
+          <CardContent className="relative">
+            <div className="text-3xl font-bold tracking-tight text-purple-600">{summary.otb}</div>
+            <p className="text-sm text-muted-foreground mt-1">{t('otbApprovals')}</p>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">{t('skuProposals')}</CardTitle>
-            <FileSpreadsheet className="h-4 w-4 text-green-600" />
+        <Card className="relative overflow-hidden">
+          <FileSpreadsheet className="absolute -bottom-4 -right-4 h-32 w-32 text-green-500/10" />
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">{t('skuProposals')}</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{summary.sku}</div>
-            <p className="text-xs text-muted-foreground">{t('skuApprovals')}</p>
+          <CardContent className="relative">
+            <div className="text-3xl font-bold tracking-tight text-green-600">{summary.sku}</div>
+            <p className="text-sm text-muted-foreground mt-1">{t('skuApprovals')}</p>
           </CardContent>
         </Card>
       </div>
