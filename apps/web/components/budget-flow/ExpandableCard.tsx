@@ -256,6 +256,8 @@ export function ExpandableCard({ node, onDrillDown, onBudgetUpdate }: Expandable
         'transition-all duration-300 ease-out',
         'border overflow-hidden',
         'rounded-xl', // Unified: rounded-xl (12px)
+        'border-l-4', // Unified: border-l-4 (4px) - moved to outer for proper rounding
+        levelStyles.band,
         'shadow-sm hover:shadow-md', // Unified: shadow-sm default, shadow-md hover
         levelStyles.bg,
         isExpanded ? 'border-amber-300 shadow-lg shadow-amber-100/50 dark:shadow-amber-900/30' : 'border-slate-200 dark:border-neutral-800',
@@ -267,8 +269,6 @@ export function ExpandableCard({ node, onDrillDown, onBudgetUpdate }: Expandable
         onClick={() => !isEditingMain && setIsExpanded(!isExpanded)}
         className={cn(
           'w-full text-left p-4 transition-all duration-200', // Unified: p-4 (16px)
-          'border-l-4', // Unified: border-l-4 (4px)
-          levelStyles.band,
           isExpanded ? 'bg-gradient-to-br from-amber-50/80 to-white dark:from-amber-950/50 dark:to-neutral-950' : 'bg-white dark:bg-neutral-950 hover:bg-amber-50/30 dark:hover:bg-amber-950/30',
           !isEditingMain && 'cursor-pointer'
         )}
