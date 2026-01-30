@@ -40,9 +40,9 @@ export function CardTab({
       className={cn(
         'w-full flex items-center gap-3',
         'py-3 px-4 transition-all duration-150',
-        'border border-slate-200/60 rounded-lg mb-1',
-        'hover:bg-amber-50/80 hover:border-amber-200/60',
-        'focus:outline-none focus:bg-amber-50/60 focus:border-amber-200',
+        'border border-slate-200 rounded-lg mb-1.5',
+        'hover:bg-amber-50 hover:border-amber-300',
+        'focus:outline-none focus:bg-amber-50 focus:border-amber-300',
       )}
       aria-expanded={isExpanded}
     >

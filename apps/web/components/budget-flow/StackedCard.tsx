@@ -37,7 +37,7 @@ export function StackedCard({
 
       {/* Expanded Content */}
       {isExpanded && (
-        <div className="pl-4 ml-3 border-l-2 border-slate-100">
+        <div className="pl-4 ml-3 border-l-2 border-slate-200">
           <CardContent node={node}>
             {hasChildren && (
               <StackedCardContainer
