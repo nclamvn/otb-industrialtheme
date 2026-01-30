@@ -16,7 +16,6 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import {
   Select,
   SelectContent,
@@ -24,15 +23,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Calendar } from '@/components/ui/calendar';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
 import { Separator } from '@/components/ui/separator';
-import { CalendarIcon, Ticket, Paperclip, DollarSign } from 'lucide-react';
-import { format } from 'date-fns';
+import { Ticket, Paperclip, DollarSign } from 'lucide-react';
 import {
   TicketType,
   TicketPriority,
@@ -210,50 +202,34 @@ export function CreateTicketDialog({
           {/* Priority */}
           <div className="space-y-2">
             <Label>{t('fields.priority')} *</Label>
-            <RadioGroup
-              value={priority}
-              onValueChange={(v) => setPriority(v as TicketPriority)}
-              className="flex gap-4"
-            >
+            <div className="flex gap-2 flex-wrap">
               {Object.entries(TICKET_PRIORITY_CONFIG).map(([key, config]) => (
-                <div key={key} className="flex items-center space-x-2">
-                  <RadioGroupItem value={key} id={`priority-${key}`} />
-                  <Label
-                    htmlFor={`priority-${key}`}
-                    className={cn('cursor-pointer', config.color)}
-                  >
-                    {config.dot} {t(`priority.${key}`)}
-                  </Label>
-                </div>
+                <Button
+                  key={key}
+                  type="button"
+                  variant={priority === key ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setPriority(key as TicketPriority)}
+                  className={cn(
+                    priority === key && config.bgColor,
+                    priority === key && config.color
+                  )}
+                >
+                  {config.dot} {t(`priority.${key}`)}
+                </Button>
               ))}
-            </RadioGroup>
+            </div>
           </div>
 
           {/* Deadline */}
           <div className="space-y-2">
             <Label>{t('fields.deadline')}</Label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  className={cn(
-                    'w-full justify-start text-left font-normal',
-                    !deadline && 'text-muted-foreground'
-                  )}
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {deadline ? format(deadline, 'PPP') : 'Select deadline'}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0">
-                <Calendar
-                  mode="single"
-                  selected={deadline}
-                  onSelect={setDeadline}
-                  initialFocus
-                />
-              </PopoverContent>
-            </Popover>
+            <Input
+              type="date"
+              value={deadline ? deadline.toISOString().split('T')[0] : ''}
+              onChange={(e) => setDeadline(e.target.value ? new Date(e.target.value) : undefined)}
+              className="w-full"
+            />
           </div>
 
           <Separator />
