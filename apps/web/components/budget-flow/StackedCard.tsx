@@ -25,14 +25,18 @@ export function StackedCard({
   return (
     <div
       className={cn(
-        'relative rounded-lg overflow-hidden shadow-md',
+        'relative rounded-xl overflow-hidden',
         'transition-all duration-300 ease-out',
+        'border',
         colors.border,
-        'border-2',
-        !isExpanded && siblingIndex > 0 && '-mt-11',
+        colors.shadow,
+        colors.bg,
+        // Stacking effect when collapsed
+        !isExpanded && siblingIndex > 0 && '-mt-12',
       )}
       style={{
         zIndex: totalSiblings - siblingIndex,
+        marginLeft: `${colors.indent}px`,
       }}
       data-card-id={node.id}
       data-level={node.level}
@@ -103,10 +107,7 @@ export function StackedCardContainer({
   if (!parentExpanded || nodes.length === 0) return null;
 
   return (
-    <div
-      className="space-y-0"
-      style={{ marginLeft: `${depth * 8}px` }}
-    >
+    <div className="space-y-3 pt-2">
       {nodes.map((node, index) => (
         <StackedCard
           key={node.id}

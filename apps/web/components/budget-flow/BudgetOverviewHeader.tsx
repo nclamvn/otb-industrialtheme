@@ -6,7 +6,6 @@ import {
   formatCurrency,
   formatPercentage,
   calculateAllocation,
-  getBudgetHealthColor,
 } from './utils/budget-calculations';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -17,6 +16,10 @@ import {
   Layers,
   Download,
   RefreshCw,
+  Wallet,
+  TrendingUp,
+  PiggyBank,
+  Percent,
 } from 'lucide-react';
 
 interface BudgetOverviewHeaderProps {
@@ -40,63 +43,93 @@ export function BudgetOverviewHeader({
 }: BudgetOverviewHeaderProps) {
   const { allocated, remaining, percentage, isOverBudget } = calculateAllocation(rootNode);
 
+  // Progress bar color
+  const getProgressColor = () => {
+    if (percentage > 1) return 'bg-red-500';
+    if (percentage > 0.95) return 'bg-amber-500';
+    return 'bg-slate-800';
+  };
+
   return (
-    <Card className="mb-6" data-onboard="budget-header">
+    <Card className="mb-6 border-slate-200 shadow-sm" data-onboard="budget-header">
       <CardContent className="p-6">
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+        <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
           {/* Budget Summary */}
           <div className="flex-1">
-            <div className="flex items-center gap-3 mb-2">
-              <span className="text-2xl">💰</span>
-              <h1 className="text-2xl font-bold text-gray-900">
-                {rootNode.name}
-              </h1>
-              {rootNode.metadata?.seasonYear && (
-                <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-medium">
-                  {rootNode.metadata.seasonYear}
-                </span>
-              )}
+            {/* Title */}
+            <div className="flex items-center gap-3 mb-6">
+              <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-slate-900">
+                <Wallet className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <h1 className="text-xl font-bold text-slate-900">
+                  {rootNode.name}
+                </h1>
+                {rootNode.metadata?.seasonYear && (
+                  <span className="text-sm text-slate-500">
+                    Season {rootNode.metadata.seasonYear}
+                  </span>
+                )}
+              </div>
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
-              <div>
-                <p className="text-sm text-gray-500">Total Budget</p>
-                <p className="text-xl font-bold text-gray-900">
+            {/* Stats Grid - Clean, minimal */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+              {/* Total Budget */}
+              <div className="space-y-1">
+                <div className="flex items-center gap-2 text-slate-500 text-sm">
+                  <Wallet className="w-4 h-4" />
+                  Total Budget
+                </div>
+                <p className="text-2xl font-bold text-slate-900 tracking-tight">
                   {formatCurrency(rootNode.budget)}
                 </p>
               </div>
-              <div>
-                <p className="text-sm text-gray-500">Allocated</p>
-                <p className="text-xl font-bold text-blue-600">
+
+              {/* Allocated */}
+              <div className="space-y-1">
+                <div className="flex items-center gap-2 text-slate-500 text-sm">
+                  <TrendingUp className="w-4 h-4" />
+                  Allocated
+                </div>
+                <p className="text-2xl font-bold text-slate-700 tracking-tight">
                   {formatCurrency(allocated)}
                 </p>
               </div>
-              <div>
-                <p className="text-sm text-gray-500">
+
+              {/* Remaining/Over */}
+              <div className="space-y-1">
+                <div className="flex items-center gap-2 text-slate-500 text-sm">
+                  <PiggyBank className="w-4 h-4" />
                   {isOverBudget ? 'Over Budget' : 'Remaining'}
-                </p>
+                </div>
                 <p className={cn(
-                  'text-xl font-bold',
-                  isOverBudget ? 'text-red-600' : 'text-green-600'
+                  'text-2xl font-bold tracking-tight',
+                  isOverBudget ? 'text-red-600' : 'text-emerald-600'
                 )}>
                   {formatCurrency(Math.abs(remaining))}
                 </p>
               </div>
-              <div>
-                <p className="text-sm text-gray-500">Utilization</p>
-                <p className="text-xl font-bold text-gray-900">
+
+              {/* Utilization */}
+              <div className="space-y-1">
+                <div className="flex items-center gap-2 text-slate-500 text-sm">
+                  <Percent className="w-4 h-4" />
+                  Utilization
+                </div>
+                <p className="text-2xl font-bold text-slate-900 tracking-tight">
                   {formatPercentage(percentage)}
                 </p>
               </div>
             </div>
 
-            {/* Progress Bar */}
-            <div className="mt-4">
-              <div className="relative h-4 bg-gray-200 rounded-full overflow-hidden">
+            {/* Progress Bar - Minimal */}
+            <div className="mt-6">
+              <div className="relative h-2 bg-slate-100 rounded-full overflow-hidden">
                 <div
                   className={cn(
                     'h-full rounded-full transition-all duration-500',
-                    getBudgetHealthColor(percentage),
+                    getProgressColor(),
                   )}
                   style={{ width: `${Math.min(percentage * 100, 100)}%` }}
                 />
@@ -104,15 +137,18 @@ export function BudgetOverviewHeader({
             </div>
           </div>
 
-          {/* Actions */}
+          {/* Actions - Clean buttons */}
           <div className="flex flex-wrap items-center gap-2" data-onboard="view-toggle">
             {/* View Mode Toggle */}
-            <div className="flex items-center bg-gray-100 rounded-lg p-1">
+            <div className="flex items-center bg-slate-100 rounded-lg p-1">
               <Button
                 variant={viewMode === 'stacked' ? 'default' : 'ghost'}
                 size="sm"
                 onClick={() => onViewModeChange('stacked')}
-                className="gap-1"
+                className={cn(
+                  'gap-1.5',
+                  viewMode === 'stacked' && 'bg-slate-900 text-white hover:bg-slate-800'
+                )}
               >
                 <Layers className="w-4 h-4" />
                 Stacked
@@ -121,7 +157,10 @@ export function BudgetOverviewHeader({
                 variant={viewMode === 'grid' ? 'default' : 'ghost'}
                 size="sm"
                 onClick={() => onViewModeChange('grid')}
-                className="gap-1"
+                className={cn(
+                  'gap-1.5',
+                  viewMode === 'grid' && 'bg-slate-900 text-white hover:bg-slate-800'
+                )}
               >
                 <Grid3X3 className="w-4 h-4" />
                 Grid
@@ -135,6 +174,7 @@ export function BudgetOverviewHeader({
                 size="sm"
                 onClick={onExpandAll}
                 title="Expand All (Ctrl+E)"
+                className="border-slate-200 text-slate-600 hover:bg-slate-50"
               >
                 <ChevronDown className="w-4 h-4" />
               </Button>
@@ -143,6 +183,7 @@ export function BudgetOverviewHeader({
                 size="sm"
                 onClick={onCollapseAll}
                 title="Collapse All (Ctrl+W)"
+                className="border-slate-200 text-slate-600 hover:bg-slate-50"
               >
                 <ChevronUp className="w-4 h-4" />
               </Button>
@@ -150,13 +191,23 @@ export function BudgetOverviewHeader({
 
             {/* Other Actions */}
             {onRefresh && (
-              <Button variant="outline" size="sm" onClick={onRefresh}>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={onRefresh}
+                className="border-slate-200 text-slate-600 hover:bg-slate-50"
+              >
                 <RefreshCw className="w-4 h-4" />
               </Button>
             )}
             {onExport && (
-              <Button variant="outline" size="sm" onClick={onExport}>
-                <Download className="w-4 h-4 mr-1" />
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={onExport}
+                className="border-slate-200 text-slate-600 hover:bg-slate-50"
+              >
+                <Download className="w-4 h-4 mr-1.5" />
                 Export
               </Button>
             )}

@@ -7,7 +7,6 @@ import {
   formatCurrency,
   formatPercentage,
   calculateAllocation,
-  getBudgetHealthColor,
 } from './utils/budget-calculations';
 
 interface CardContentProps {
@@ -21,45 +20,58 @@ export function CardContent({ node, children, onProductUpdate, onSizeUpdate }: C
   const colors = getHierarchyColor(node.level);
   const { allocated, remaining, percentage, isOverBudget } = calculateAllocation(node);
 
+  // Budget bar color based on utilization
+  const getProgressColor = () => {
+    if (percentage > 1) return 'bg-red-500';
+    if (percentage > 0.95) return 'bg-amber-500';
+    if (percentage > 0.8) return 'bg-emerald-500';
+    return 'bg-slate-700';
+  };
+
   return (
     <div className={cn(
-      'p-4 space-y-4',
+      'px-5 py-4 border-t',
+      colors.border,
       colors.bg,
     )}>
       {/* Budget Summary Bar */}
-      <div className="space-y-2">
+      <div className="space-y-3">
+        {/* Labels */}
         <div className="flex justify-between text-sm">
-          <span className={colors.text}>
-            Allocated: {formatCurrency(allocated)} / {formatCurrency(node.budget)}
+          <span className="text-slate-600">
+            Allocated: <span className="font-semibold text-slate-900">{formatCurrency(allocated)}</span>
+            <span className="text-slate-400 mx-1">/</span>
+            {formatCurrency(node.budget)}
           </span>
           <span className={cn(
-            'font-medium',
-            isOverBudget ? 'text-red-600' : 'text-green-600'
+            'font-semibold',
+            isOverBudget ? 'text-red-600' : 'text-emerald-600'
           )}>
             {isOverBudget ? 'Over: ' : 'Remaining: '}
             {formatCurrency(Math.abs(remaining))}
           </span>
         </div>
 
-        <div className="relative h-3 bg-gray-200 rounded-full overflow-hidden">
+        {/* Progress Bar - Minimal, professional */}
+        <div className="relative h-2 bg-slate-100 rounded-full overflow-hidden">
           <div
             className={cn(
               'h-full rounded-full transition-all duration-500',
-              getBudgetHealthColor(percentage),
+              getProgressColor(),
             )}
             style={{ width: `${Math.min(percentage * 100, 100)}%` }}
           />
-          {isOverBudget && (
-            <div
-              className="absolute top-0 right-0 h-full bg-red-500 opacity-50"
-              style={{ width: `${(percentage - 1) * 100}%` }}
-            />
-          )}
         </div>
 
-        <div className="flex justify-between text-xs text-gray-500">
+        {/* Percentage indicator */}
+        <div className="flex justify-between text-xs text-slate-400">
           <span>0%</span>
-          <span className="font-medium">{formatPercentage(percentage)}</span>
+          <span className={cn(
+            'font-medium',
+            percentage > 0.95 ? 'text-amber-600' : 'text-slate-600'
+          )}>
+            {formatPercentage(percentage)} utilized
+          </span>
           <span>100%</span>
         </div>
       </div>
