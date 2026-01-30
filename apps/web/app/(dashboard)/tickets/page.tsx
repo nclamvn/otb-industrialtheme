@@ -1,9 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { Ticket as TicketIcon } from 'lucide-react';
+import { Ticket as TicketIcon, Send, CheckCircle2 } from 'lucide-react';
 import { PageHeader } from '@/components/shared/page-header';
 import {
   TicketList,
@@ -19,9 +19,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { TicketTimeline } from '@/components/tickets/TicketTimeline';
 import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
+import {
+  PlanningRequestDialog,
+  PlanningRequestItem,
+  DEMO_SUPPLIERS,
+} from '@/components/supplier';
 
 // Demo available items for creating tickets
 const DEMO_AVAILABLE_ITEMS = [
@@ -85,6 +92,22 @@ export default function TicketsPage() {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
+  const [isSendRequestOpen, setIsSendRequestOpen] = useState(false);
+
+  // Convert ticket items to planning request items
+  const planningItems = useMemo<PlanningRequestItem[]>(() => {
+    if (!selectedTicket) return [];
+    return selectedTicket.items.map((item, index) => ({
+      styleCode: `STY-${selectedTicket.season}-${String(index + 1).padStart(3, '0')}`,
+      productName: item.name,
+      category: item.type === 'otb_plan' ? 'OTB Plan' : item.type === 'sku_proposal' ? 'SKU' : 'Sizing',
+      gender: 'Unisex',
+      size: 'Various',
+      units: Math.floor(item.budget / 50), // Demo: derive units from budget
+      unitPrice: 50,
+      totalValue: item.budget,
+    }));
+  }, [selectedTicket]);
 
   const handleCreateTicket = async (input: CreateTicketInput) => {
     try {
@@ -116,6 +139,16 @@ export default function TicketsPage() {
       currency: 'USD',
       maximumFractionDigits: 0,
     }).format(value);
+  };
+
+  const handleSendToSupplier = () => {
+    setIsDetailOpen(false);
+    setIsSendRequestOpen(true);
+  };
+
+  const handleSupplierRequestSuccess = (requestId: string, requestNumber: string) => {
+    toast.success(`Planning request ${requestNumber} sent to supplier`);
+    // TODO: Update ticket status or add to history
   };
 
   return (
@@ -157,6 +190,31 @@ export default function TicketsPage() {
 
           {selectedTicket && (
             <div className="space-y-6">
+              {/* Approved Status Banner - Show Send to Supplier option */}
+              {selectedTicket.status === 'approved' && (
+                <div className="p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 rounded-lg bg-emerald-100 dark:bg-emerald-900/50">
+                        <CheckCircle2 className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+                      </div>
+                      <div>
+                        <p className="font-medium text-emerald-700 dark:text-emerald-300">
+                          All Approvals Complete!
+                        </p>
+                        <p className="text-sm text-emerald-600 dark:text-emerald-400">
+                          Ready to send planning request to supplier
+                        </p>
+                      </div>
+                    </div>
+                    <Button onClick={handleSendToSupplier} className="bg-emerald-600 hover:bg-emerald-700">
+                      <Send className="h-4 w-4 mr-2" />
+                      Send to Supplier
+                    </Button>
+                  </div>
+                </div>
+              )}
+
               {/* Ticket Card */}
               <TicketCard
                 ticket={selectedTicket}
@@ -181,6 +239,19 @@ export default function TicketsPage() {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Planning Request Dialog - After Approval */}
+      {selectedTicket && (
+        <PlanningRequestDialog
+          open={isSendRequestOpen}
+          onOpenChange={setIsSendRequestOpen}
+          ticketId={selectedTicket.id}
+          ticketNumber={selectedTicket.number}
+          items={planningItems}
+          suppliers={DEMO_SUPPLIERS}
+          onSuccess={handleSupplierRequestSuccess}
+        />
+      )}
     </div>
   );
 }
