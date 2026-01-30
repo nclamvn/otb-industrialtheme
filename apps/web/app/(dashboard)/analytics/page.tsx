@@ -76,7 +76,7 @@ export default function AnalyticsPage() {
   const [selectedBrand, setSelectedBrand] = useState('all');
 
   // Store Performance & Price Range hooks
-  const { data: storeData, summary: storeSummary } = useStorePerformance({});
+  const { comparisons: storeData, summary: storeSummary } = useStorePerformance({});
   const { analysis: priceAnalysis } = usePriceRange();
 
   // Translated demo data
