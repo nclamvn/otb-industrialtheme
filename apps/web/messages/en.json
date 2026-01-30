@@ -49,7 +49,8 @@
     "details": "Details",
     "more": "More",
     "less": "Less",
-    "reset": "Reset"
+    "reset": "Reset",
+    "done": "Done"
   },
   "navigation": {
     "dashboard": "Dashboard",
@@ -2133,6 +2134,51 @@
       "title": "Next Steps",
       "wssi": "Start WSSI Draft",
       "sku": "Create SKU Proposal"
+    }
+  },
+  "supplier": {
+    "title": "Supplier Management",
+    "sendRequest": "Send Planning Request",
+    "selectSupplier": "Select Supplier",
+    "requestNumber": "Request #",
+    "method": {
+      "email": "Email",
+      "api": "API Integration",
+      "manual": "Manual"
+    },
+    "status": {
+      "draft": "Draft",
+      "pending": "Pending",
+      "sent": "Sent",
+      "acknowledged": "Acknowledged",
+      "confirmed": "Confirmed",
+      "failed": "Failed"
+    },
+    "actions": {
+      "send": "Send Request",
+      "resend": "Resend",
+      "download": "Download Files",
+      "viewDetails": "View Details"
+    },
+    "fields": {
+      "supplier": "Supplier",
+      "contactPerson": "Contact Person",
+      "email": "Email",
+      "phone": "Phone",
+      "deliveryDate": "Delivery Date",
+      "notes": "Notes"
+    },
+    "attachments": {
+      "csv": "CSV Export",
+      "pdf": "PDF Report"
+    },
+    "messages": {
+      "selectSupplier": "Please select a supplier",
+      "sendingEmail": "Sending email to {email}",
+      "connectingApi": "Connecting to {name} API",
+      "preparingFiles": "Preparing files for download",
+      "requestSent": "Request sent successfully",
+      "requestFailed": "Failed to send request"
     }
   }
 }
