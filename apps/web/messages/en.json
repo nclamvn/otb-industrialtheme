@@ -1939,5 +1939,55 @@
     "info": "Info",
     "warning": "Warning",
     "critical": "Critical"
+  },
+  "export": {
+    "title": "Export Planning CSV",
+    "button": "Export",
+    "options": "Export Options",
+    "scope": "Data Scope",
+    "scopeAll": "All Data",
+    "scopeSelected": "Selected Only",
+    "columns": "Include Columns",
+    "dateFormat": "Date Format",
+    "delimiter": "Delimiter",
+    "preview": "Preview",
+    "previewRows": "First 5 rows",
+    "exporting": "Exporting...",
+    "success": "Export completed",
+    "download": "Download CSV",
+    "preparing": "Preparing data...",
+    "generating": "Generating CSV...",
+    "downloading": "Starting download..."
+  },
+  "decision": {
+    "title": "Decision Required",
+    "approve": "Approve",
+    "reject": "Reject",
+    "alternate": "Request Alternate",
+    "comment": "Add comment",
+    "commentPlaceholder": "Optional comment...",
+    "submittedBy": "Submitted by",
+    "submittedAt": "Submitted at",
+    "version": "Version",
+    "pending": "Pending Decision",
+    "approved": "Approved",
+    "rejected": "Rejected",
+    "otbQuestion": "Is the Alternate OTB Plan accepted?",
+    "sizingQuestion": "Is the Sizing Change submitted?",
+    "confirmApprove": "Are you sure you want to approve?",
+    "confirmReject": "Are you sure you want to reject?"
+  },
+  "workflow": {
+    "status": "Workflow Status",
+    "currentStep": "Current Step",
+    "waitingFor": "Waiting for",
+    "steps": {
+      "budget": "Budget",
+      "otb": "OTB Allocation",
+      "submit": "Submit Plan",
+      "wssi": "WSSI",
+      "sizing": "Sizing",
+      "approval": "Approval"
+    }
   }
 }

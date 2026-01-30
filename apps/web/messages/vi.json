@@ -1939,5 +1939,55 @@
     "info": "Thông tin",
     "warning": "Cảnh báo",
     "critical": "Nghiêm trọng"
+  },
+  "export": {
+    "title": "Xuất CSV Kế hoạch",
+    "button": "Xuất",
+    "options": "Tùy chọn xuất",
+    "scope": "Phạm vi dữ liệu",
+    "scopeAll": "Tất cả",
+    "scopeSelected": "Chỉ đã chọn",
+    "columns": "Chọn cột",
+    "dateFormat": "Định dạng ngày",
+    "delimiter": "Dấu phân cách",
+    "preview": "Xem trước",
+    "previewRows": "5 dòng đầu",
+    "exporting": "Đang xuất...",
+    "success": "Xuất hoàn tất",
+    "download": "Tải CSV",
+    "preparing": "Đang chuẩn bị...",
+    "generating": "Đang tạo CSV...",
+    "downloading": "Đang tải xuống..."
+  },
+  "decision": {
+    "title": "Cần quyết định",
+    "approve": "Phê duyệt",
+    "reject": "Từ chối",
+    "alternate": "Yêu cầu bản thay thế",
+    "comment": "Thêm ghi chú",
+    "commentPlaceholder": "Ghi chú (tùy chọn)...",
+    "submittedBy": "Người gửi",
+    "submittedAt": "Thời gian gửi",
+    "version": "Phiên bản",
+    "pending": "Chờ quyết định",
+    "approved": "Đã duyệt",
+    "rejected": "Đã từ chối",
+    "otbQuestion": "Kế hoạch OTB thay thế có được chấp nhận không?",
+    "sizingQuestion": "Thay đổi Size đã được gửi chưa?",
+    "confirmApprove": "Bạn có chắc muốn phê duyệt?",
+    "confirmReject": "Bạn có chắc muốn từ chối?"
+  },
+  "workflow": {
+    "status": "Trạng thái quy trình",
+    "currentStep": "Bước hiện tại",
+    "waitingFor": "Đang chờ",
+    "steps": {
+      "budget": "Ngân sách",
+      "otb": "Phân bổ OTB",
+      "submit": "Gửi kế hoạch",
+      "wssi": "WSSI",
+      "sizing": "Sizing",
+      "approval": "Phê duyệt"
+    }
   }
 }
