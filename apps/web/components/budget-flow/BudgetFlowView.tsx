@@ -8,10 +8,13 @@ import { BudgetBreadcrumb } from './BudgetBreadcrumb';
 import { BudgetFilters, useBudgetFilters, filterBudgetNodes } from './BudgetFilters';
 import { StackedCard } from './StackedCard';
 import { ExpandableCard } from './ExpandableCard';
+import { GapCopilot } from './gap-handling';
 import { useStackedCards } from './hooks/useStackedCards';
 import { useKeyboardNavigation } from './hooks/useKeyboardNavigation';
 import { formatCurrency } from './utils/budget-calculations';
 import { getHierarchyColor } from './utils/hierarchy-colors';
+import { Sparkles } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface BudgetFlowViewProps {
   data: BudgetNode;
@@ -70,6 +73,9 @@ export function BudgetFlowView({
 }: BudgetFlowViewProps) {
   // Drill-down state - which node is currently focused
   const [focusedNodeId, setFocusedNodeId] = useState<string | null>(null);
+
+  // Gap Copilot state
+  const [isGapCopilotOpen, setIsGapCopilotOpen] = useState(false);
 
   // Filter state
   const { filters, setFilters } = useBudgetFilters();
@@ -136,6 +142,21 @@ export function BudgetFlowView({
       setFocusedNodeId(null);
     }
   }, [breadcrumbPath]);
+
+  // Handle node selection from Gap Copilot
+  const handleNodeSelectFromCopilot = useCallback((nodeId: string) => {
+    const node = findNodeById(data, nodeId);
+    if (node) {
+      // Find the parent path and set focus
+      const path = getPathToNode(data, nodeId);
+      if (path.length > 1) {
+        // Set focus to the parent of the selected node
+        setFocusedNodeId(path[path.length - 2].id);
+      }
+      // Expand the node
+      toggleCard(nodeId);
+    }
+  }, [data, toggleCard]);
 
   // Render List View (flat rows)
   const renderListView = () => {
@@ -237,6 +258,28 @@ export function BudgetFlowView({
         <span>⌘W Collapse all</span>
         {focusedNodeId && <span>⌫ Back</span>}
       </div>
+
+      {/* Gap Copilot Toggle Button */}
+      <Button
+        onClick={() => setIsGapCopilotOpen(true)}
+        className={cn(
+          'fixed bottom-6 right-6 h-14 w-14 rounded-full shadow-xl',
+          'bg-gradient-to-br from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600',
+          'flex items-center justify-center transition-all hover:scale-110',
+          isGapCopilotOpen && 'hidden'
+        )}
+      >
+        <Sparkles className="h-6 w-6 text-white" />
+      </Button>
+
+      {/* Gap Copilot Panel */}
+      <GapCopilot
+        data={data}
+        isOpen={isGapCopilotOpen}
+        onClose={() => setIsGapCopilotOpen(false)}
+        onBudgetUpdate={onBudgetUpdate}
+        onNodeSelect={handleNodeSelectFromCopilot}
+      />
     </div>
   );
 }
