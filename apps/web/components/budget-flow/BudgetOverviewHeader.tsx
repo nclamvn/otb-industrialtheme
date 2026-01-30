@@ -15,6 +15,7 @@ import {
   Layers,
   Download,
   RefreshCw,
+  ArrowLeft,
 } from 'lucide-react';
 
 interface BudgetOverviewHeaderProps {
@@ -25,6 +26,7 @@ interface BudgetOverviewHeaderProps {
   onCollapseAll: () => void;
   onExport?: () => void;
   onRefresh?: () => void;
+  onBack?: () => void;
 }
 
 export function BudgetOverviewHeader({
@@ -35,6 +37,7 @@ export function BudgetOverviewHeader({
   onCollapseAll,
   onExport,
   onRefresh,
+  onBack,
 }: BudgetOverviewHeaderProps) {
   const { allocated, remaining, percentage, isOverBudget } = calculateAllocation(rootNode);
 
@@ -42,15 +45,27 @@ export function BudgetOverviewHeader({
     <div className="mb-8">
       {/* Title Row */}
       <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900">
-            {rootNode.name}
-          </h1>
-          {rootNode.metadata?.seasonYear && (
-            <p className="text-sm text-slate-500 mt-1">
-              Season {rootNode.metadata.seasonYear}
-            </p>
+        <div className="flex items-center gap-3">
+          {onBack && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onBack}
+              className="h-10 w-10 p-0 rounded-full"
+            >
+              <ArrowLeft className="w-5 h-5" />
+            </Button>
           )}
+          <div>
+            <h1 className="text-2xl font-bold text-slate-900">
+              {rootNode.name}
+            </h1>
+            {rootNode.metadata?.seasonYear && (
+              <p className="text-sm text-slate-500 mt-1">
+                Season {rootNode.metadata.seasonYear}
+              </p>
+            )}
+          </div>
         </div>
 
         {/* Actions */}
@@ -103,41 +118,46 @@ export function BudgetOverviewHeader({
         </div>
       </div>
 
-      {/* Stats Row - Inline */}
-      <div className="flex items-center gap-8 text-sm">
-        <div>
-          <span className="text-slate-500">Budget</span>
-          <span className="ml-2 font-semibold text-slate-900 tabular-nums">
+      {/* Stats Row - Premium Design */}
+      <div className="flex items-center gap-6 p-4 bg-white border border-slate-200 rounded-xl">
+        <div className="flex items-baseline gap-2">
+          <span className="text-xs uppercase tracking-wide text-slate-400 font-medium">Budget</span>
+          <span className="text-lg font-bold text-slate-900 tabular-nums">
             {formatCurrency(rootNode.budget)}
           </span>
         </div>
-        <div>
-          <span className="text-slate-500">Allocated</span>
-          <span className="ml-2 font-semibold text-slate-700 tabular-nums">
+        <div className="w-px h-8 bg-slate-200" />
+        <div className="flex items-baseline gap-2">
+          <span className="text-xs uppercase tracking-wide text-slate-400 font-medium">Allocated</span>
+          <span className="text-lg font-bold text-slate-700 tabular-nums">
             {formatCurrency(allocated)}
           </span>
         </div>
-        <div>
-          <span className="text-slate-500">{isOverBudget ? 'Over' : 'Remaining'}</span>
+        <div className="w-px h-8 bg-slate-200" />
+        <div className="flex items-baseline gap-2">
+          <span className="text-xs uppercase tracking-wide text-slate-400 font-medium">
+            {isOverBudget ? 'Over' : 'Remaining'}
+          </span>
           <span className={cn(
-            'ml-2 font-semibold tabular-nums',
+            'text-lg font-bold tabular-nums',
             isOverBudget ? 'text-red-600' : 'text-emerald-600'
           )}>
             {formatCurrency(Math.abs(remaining))}
           </span>
         </div>
-        <div className="flex items-center gap-2 flex-1">
-          <div className="flex-1 max-w-xs h-1.5 bg-slate-100 rounded-full overflow-hidden">
+        <div className="w-px h-8 bg-slate-200" />
+        <div className="flex items-center gap-3 flex-1">
+          <div className="flex-1 max-w-xs h-2 bg-slate-100 rounded-full overflow-hidden">
             <div
               className={cn(
-                'h-full rounded-full',
+                'h-full rounded-full transition-all duration-300',
                 percentage > 1 ? 'bg-red-500' :
                 percentage > 0.95 ? 'bg-amber-500' : 'bg-slate-800'
               )}
               style={{ width: `${Math.min(percentage * 100, 100)}%` }}
             />
           </div>
-          <span className="text-slate-600 font-medium tabular-nums">
+          <span className="text-slate-700 font-bold tabular-nums">
             {formatPercentage(percentage)}
           </span>
         </div>

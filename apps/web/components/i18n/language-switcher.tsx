@@ -43,7 +43,7 @@ export function LanguageSwitcher({ locale: propLocale }: LanguageSwitcherProps) 
   return (
     <div
       className={cn(
-        'inline-flex items-center rounded-md border border-border bg-muted/50 p-0.5',
+        'inline-flex items-center rounded-md p-0.5',
         'transition-all duration-200',
         isPending && 'opacity-50 cursor-wait'
       )}

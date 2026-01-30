@@ -54,6 +54,7 @@
   "navigation": {
     "dashboard": "Bảng điều khiển",
     "budget": "Ngân sách tài chính",
+    "budgetFlow": "Phân bổ ngân sách",
     "otb": "Phân tích OTB",
     "wssi": "WSSI",
     "sku": "Đề xuất SKU",

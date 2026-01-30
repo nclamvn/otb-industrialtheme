@@ -4,25 +4,7 @@ import { cn } from '@/lib/utils';
 import { CardTabProps, HierarchyLevel } from './types';
 import { getHierarchyColor, getStatusColor } from './utils/hierarchy-colors';
 import { formatCurrency, formatPercentage } from './utils/budget-calculations';
-import {
-  ChevronRight,
-  ChevronDown,
-  Wallet,
-  Tag,
-  Users,
-  Package,
-  ShoppingBag,
-  Ruler,
-} from 'lucide-react';
-
-const LEVEL_ICONS: Record<HierarchyLevel, React.ElementType> = {
-  0: Wallet,
-  1: Tag,
-  2: Users,
-  3: Package,
-  4: ShoppingBag,
-  5: Ruler,
-};
+import { ChevronRight, ChevronDown } from 'lucide-react';
 
 export function CardTab({
   node,
@@ -32,57 +14,60 @@ export function CardTab({
 }: CardTabProps & { isExpanded?: boolean }) {
   const colors = getHierarchyColor(node.level);
   const statusColors = getStatusColor(node.status);
-  const LevelIcon = LEVEL_ICONS[node.level] || Package;
 
   return (
     <button
       onClick={onClick}
       className={cn(
-        'w-full flex items-center gap-3',
-        'py-3 px-4 transition-all duration-150',
-        'border border-slate-200 rounded-lg mb-1.5',
-        'hover:bg-amber-50 hover:border-amber-300',
-        'focus:outline-none focus:bg-amber-50 focus:border-amber-300',
+        'w-full text-left',
+        'p-5 transition-all duration-200',
+        'bg-white border border-slate-200 rounded-xl mb-2',
+        'hover:bg-amber-50/50 hover:border-amber-200',
+        'focus:outline-none focus:bg-amber-50/50 focus:border-amber-300',
+        'group',
       )}
       aria-expanded={isExpanded}
     >
-      {/* Left Color Band */}
-      <div className={cn(
-        'self-stretch rounded-full',
-        colors.accent,
-        colors.accentWidth,
-      )} />
+      <div className="flex items-start gap-4">
+        {/* Left Color Band */}
+        <div className={cn(
+          'w-1 self-stretch rounded-full flex-shrink-0',
+          colors.accent,
+        )} />
 
-      {/* Icon */}
-      <LevelIcon className={cn('w-4 h-4 flex-shrink-0', colors.textMuted)} />
+        {/* Content */}
+        <div className="flex-1 min-w-0">
+          {/* Top row: Name + Status */}
+          <div className="flex items-center gap-2 mb-3">
+            <span className={cn('font-medium', colors.text)}>
+              {node.name}
+            </span>
+            <div className="flex items-center gap-1.5">
+              <span className={cn('w-1.5 h-1.5 rounded-full', statusColors.dot)} />
+              <span className={cn('text-xs', statusColors.badge)}>{node.status}</span>
+            </div>
+          </div>
 
-      {/* Name */}
-      <span className={cn('font-medium flex-1 text-left', colors.text)}>
-        {node.name}
-      </span>
-
-      {/* Status dot */}
-      <div className="flex items-center gap-1.5">
-        <span className={cn('w-1.5 h-1.5 rounded-full', statusColors.dot)} />
-        <span className={cn('text-xs', statusColors.badge)}>{node.status}</span>
-      </div>
-
-      {/* Budget */}
-      <div className="text-right ml-4">
-        <div className={cn('font-semibold tabular-nums', colors.text)}>
-          {formatCurrency(node.budget)}
+          {/* Bottom row: Large amount */}
+          <div className="flex items-baseline justify-between">
+            <span className={cn('text-2xl font-bold tracking-tight tabular-nums', colors.text)}>
+              {formatCurrency(node.budget)}
+            </span>
+            <span className={cn('text-sm tabular-nums', colors.textMuted)}>
+              {formatPercentage(node.percentage)} of total
+            </span>
+          </div>
         </div>
-        <div className={cn('text-xs tabular-nums', colors.textMuted)}>
-          {formatPercentage(node.percentage)}
+
+        {/* Chevron */}
+        <div className="flex-shrink-0 pt-1">
+          {isExpanded ? (
+            <ChevronDown className="w-5 h-5 text-slate-400 group-hover:text-slate-600" />
+          ) : (
+            <ChevronRight className="w-5 h-5 text-slate-400 group-hover:text-slate-600" />
+          )}
         </div>
       </div>
-
-      {/* Chevron */}
-      {isExpanded ? (
-        <ChevronDown className={cn('w-4 h-4 flex-shrink-0', colors.textMuted)} />
-      ) : (
-        <ChevronRight className={cn('w-4 h-4 flex-shrink-0', colors.textMuted)} />
-      )}
     </button>
   );
 }

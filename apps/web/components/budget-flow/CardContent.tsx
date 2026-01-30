@@ -26,27 +26,27 @@ export function CardContent({ node, children }: CardContentProps) {
   }
 
   return (
-    <div className="py-3">
-      {/* Compact progress indicator */}
+    <div className="py-4">
+      {/* Premium progress indicator */}
       {hasAllocations && (
-        <div className="flex items-center gap-3 text-xs text-slate-500 mb-3">
-          <div className="flex-1 h-1 bg-slate-100 rounded-full overflow-hidden">
+        <div className="flex items-center gap-4 text-xs text-slate-500 mb-4 px-1">
+          <div className="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
             <div
               className={cn(
-                'h-full rounded-full transition-all',
-                percentage > 1 ? 'bg-red-400' :
-                percentage > 0.95 ? 'bg-amber-400' : 'bg-slate-400'
+                'h-full rounded-full transition-all duration-300',
+                percentage > 1 ? 'bg-red-500' :
+                percentage > 0.95 ? 'bg-amber-500' : 'bg-slate-700'
               )}
               style={{ width: `${Math.min(percentage * 100, 100)}%` }}
             />
           </div>
-          <span className="tabular-nums whitespace-nowrap">
+          <span className="tabular-nums whitespace-nowrap font-medium text-slate-600">
             {formatCurrency(allocated)} / {formatCurrency(node.budget)}
           </span>
           {remaining !== 0 && (
             <span className={cn(
-              'tabular-nums',
-              isOverBudget ? 'text-red-500' : 'text-emerald-500'
+              'tabular-nums font-medium',
+              isOverBudget ? 'text-red-600' : 'text-emerald-600'
             )}>
               {isOverBudget ? '+' : '-'}{formatCurrency(Math.abs(remaining))}
             </span>

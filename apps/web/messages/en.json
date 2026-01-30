@@ -54,6 +54,7 @@
   "navigation": {
     "dashboard": "Dashboard",
     "budget": "Financial Budget",
+    "budgetFlow": "Budget Flow",
     "otb": "OTB Analysis",
     "wssi": "WSSI",
     "sku": "SKU Proposal",

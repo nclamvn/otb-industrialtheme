@@ -38,6 +38,8 @@ export interface BudgetNode {
     gender?: string;
     category?: string;
     seasonYear?: string;
+    brand?: string;
+    location?: string;
   };
 }
 

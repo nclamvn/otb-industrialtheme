@@ -1,10 +1,22 @@
 'use client';
 
-import { useState } from 'react';
+import Link from 'next/link';
 import { BudgetFlowView } from '@/components/budget-flow';
 import { BudgetNode } from '@/components/budget-flow/types';
+import { useBudgetData } from '@/components/budget-flow/hooks/useBudgetData';
+import { formatCurrency } from '@/components/budget-flow/utils/budget-calculations';
+import { Loader2, ArrowRight, Layers } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
-// Mock data - replace with actual API call
+// Available budgets for quick access
+const AVAILABLE_BUDGETS = [
+  { id: 'ss26-hugo-boss', name: 'Hugo Boss SS26', brand: 'Hugo Boss', budget: 2100000, status: 'verified' },
+  { id: 'ss26-max-mara', name: 'Max Mara SS26', brand: 'Max Mara', budget: 1800000, status: 'verified' },
+  { id: 'ss26-burberry', name: 'Burberry SS26', brand: 'Burberry', budget: 3200000, status: 'verified' },
+  { id: 'ss26-ferragamo', name: 'Ferragamo SS26', brand: 'Ferragamo', budget: 2500000, status: 'draft' },
+];
+
+// Demo data for the main view
 const mockBudgetData: BudgetNode = {
   id: 'root',
   name: 'FY 2026 Spring Summer',
@@ -43,35 +55,6 @@ const mockBudgetData: BudgetNode = {
               allocated: 195000,
               percentage: 0.333,
               status: 'verified',
-              children: [
-                {
-                  id: 'rex-male-outerwear-coat',
-                  name: 'Wool Coat A2501',
-                  level: 4,
-                  budget: 70000,
-                  allocated: 70000,
-                  percentage: 0.35,
-                  status: 'verified',
-                },
-                {
-                  id: 'rex-male-outerwear-jacket',
-                  name: 'Down Jacket B3201',
-                  level: 4,
-                  budget: 60000,
-                  allocated: 58000,
-                  percentage: 0.30,
-                  status: 'draft',
-                },
-                {
-                  id: 'rex-male-outerwear-blazer',
-                  name: 'Blazer C1501',
-                  level: 4,
-                  budget: 45000,
-                  allocated: 45000,
-                  percentage: 0.225,
-                  status: 'verified',
-                },
-              ],
             },
             {
               id: 'rex-male-tops',
@@ -110,35 +93,6 @@ const mockBudgetData: BudgetNode = {
           allocated: 350000,
           percentage: 0.385,
           status: 'draft',
-          children: [
-            {
-              id: 'rex-female-dresses',
-              name: 'Dresses',
-              level: 3,
-              budget: 100000,
-              allocated: 95000,
-              percentage: 0.25,
-              status: 'verified',
-            },
-            {
-              id: 'rex-female-outerwear',
-              name: 'Outerwear',
-              level: 3,
-              budget: 150000,
-              allocated: 140000,
-              percentage: 0.375,
-              status: 'draft',
-            },
-            {
-              id: 'rex-female-tops',
-              name: 'Tops',
-              level: 3,
-              budget: 150000,
-              allocated: 115000,
-              percentage: 0.375,
-              status: 'warning',
-            },
-          ],
         },
         {
           id: 'rex-unisex',
@@ -183,29 +137,146 @@ const mockBudgetData: BudgetNode = {
   ],
 };
 
-export default function BudgetFlowPage() {
-  const [budgetData] = useState<BudgetNode>(mockBudgetData);
+// Export to CSV function
+function exportToCSV(data: BudgetNode) {
+  const rows: string[] = [];
+  rows.push('Level,Name,Budget,Allocated,Percentage,Status');
 
-  const handleNodeUpdate = (id: string, data: Partial<BudgetNode>) => {
-    console.log('Update node:', id, data);
-  };
+  function flatten(node: BudgetNode, level: number = 0) {
+    const indent = '  '.repeat(level);
+    rows.push([
+      level,
+      `"${indent}${node.name}"`,
+      node.budget,
+      node.allocated,
+      `${(node.percentage * 100).toFixed(1)}%`,
+      node.status,
+    ].join(','));
+
+    if (node.children) {
+      node.children.forEach(child => flatten(child, level + 1));
+    }
+  }
+
+  flatten(data);
+
+  const csv = rows.join('\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `budget-${data.name.replace(/\s+/g, '-')}-${new Date().toISOString().split('T')[0]}.csv`;
+  link.click();
+  URL.revokeObjectURL(url);
+}
+
+export default function BudgetFlowPage() {
+  const { data, isLoading, error, refresh, updateBudget } = useBudgetData({
+    initialData: mockBudgetData,
+  });
 
   const handleExport = () => {
-    console.log('Export budget data');
+    if (data) {
+      exportToCSV(data);
+    }
   };
 
-  const handleRefresh = () => {
-    console.log('Refresh data');
+  const handleRefresh = async () => {
+    await refresh();
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="flex items-center gap-3 text-slate-500">
+          <Loader2 className="w-5 h-5 animate-spin" />
+          <span>Loading budget data...</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-500 mb-4">{error}</p>
+          <button
+            onClick={handleRefresh}
+            className="px-4 py-2 bg-slate-800 text-white rounded-lg hover:bg-slate-700"
+          >
+            Try Again
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!data) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-slate-500">No budget data available</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen">
-      <BudgetFlowView
-        data={budgetData}
-        onNodeUpdate={handleNodeUpdate}
-        onExport={handleExport}
-        onRefresh={handleRefresh}
-      />
+      {/* Quick Access to Other Budgets */}
+      <div className="px-6 pt-4 pb-2">
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-sm font-medium text-slate-500 uppercase tracking-wider">
+            Quick Access
+          </h2>
+          <Link
+            href="/budget"
+            className="text-sm text-amber-600 hover:text-amber-700 flex items-center gap-1"
+          >
+            View All Budgets
+            <ArrowRight className="w-4 h-4" />
+          </Link>
+        </div>
+        <div className="flex gap-3 overflow-x-auto pb-2">
+          {AVAILABLE_BUDGETS.map((budget) => (
+            <Link
+              key={budget.id}
+              href={`/budget-flow/${budget.id}`}
+              className={cn(
+                'flex-shrink-0 px-4 py-3 rounded-xl border transition-all',
+                'bg-white hover:bg-amber-50 hover:border-amber-200',
+                'border-slate-200'
+              )}
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center">
+                  <Layers className="w-5 h-5 text-slate-600" />
+                </div>
+                <div>
+                  <div className="font-medium text-slate-800">{budget.brand}</div>
+                  <div className="text-sm text-slate-500">
+                    {formatCurrency(budget.budget)}
+                  </div>
+                </div>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </div>
+
+      {/* Demo Budget Flow View */}
+      <div className="border-t border-slate-200 mt-2">
+        <div className="px-6 py-3 bg-amber-50/50 border-b border-amber-100">
+          <p className="text-sm text-amber-700">
+            <strong>Demo Mode:</strong> Showing sample budget data. Click a budget above to view real allocation details.
+          </p>
+        </div>
+        <BudgetFlowView
+          data={data}
+          onBudgetUpdate={updateBudget}
+          onExport={handleExport}
+          onRefresh={handleRefresh}
+        />
+      </div>
     </div>
   );
 }

@@ -18,6 +18,7 @@ import {
   XCircle,
   BarChart3,
   LayoutList,
+  Layers,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
@@ -229,6 +230,10 @@ export default function BudgetPage() {
               <DropdownMenuItem onClick={() => router.push(`/budget/${budget.id}`)}>
                 <Eye className="mr-2 h-4 w-4" />
                 {tCommon('view')}
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => router.push(`/budget-flow/${budget.id}`)}>
+                <Layers className="mr-2 h-4 w-4" />
+                Budget Flow
               </DropdownMenuItem>
               {['DRAFT', 'REJECTED'].includes(budget.status) && (
                 <>

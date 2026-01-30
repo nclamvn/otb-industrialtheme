@@ -37,6 +37,7 @@ import {
   LineChart,
   LogOut,
   Settings,
+  Layers,
 } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import {
@@ -65,6 +66,7 @@ import { User, CreditCard, HelpCircle } from 'lucide-react';
 const navigation = [
   { key: 'dashboard', href: '/', icon: LayoutDashboard },         // Overview
   { key: 'budget', href: '/budget', icon: DollarSign },           // Step 1: Financial Budget
+  { key: 'budgetFlow', href: '/budget-flow', icon: Layers },      // Budget Flow View
   { key: 'otb', href: '/otb-analysis', icon: TrendingUp },        // Step 2: OTB Analysis
   { key: 'sku', href: '/sku-proposal', icon: Package },           // Step 3: SKU Proposal
   { key: 'wssi', href: '/wssi', icon: CalendarDays },             // WSSI Planning
