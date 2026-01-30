@@ -58,6 +58,7 @@
     "otb": "Phân tích OTB",
     "wssi": "WSSI",
     "sku": "Đề xuất SKU",
+    "tickets": "Phiếu yêu cầu",
     "approvals": "Phê duyệt",
     "analytics": "Phân tích",
     "reports": "Báo cáo",
@@ -2045,6 +2046,93 @@
       "commentAdded": "Có bình luận mới",
       "versionCreated": "Phiên bản mới",
       "exportReady": "Xuất file sẵn sàng"
+    }
+  },
+  "ticket": {
+    "title": "Phiếu yêu cầu",
+    "create": "Tạo phiếu",
+    "submit": "Gửi phê duyệt",
+    "update": "Cập nhật phiếu",
+    "cancel": "Hủy phiếu",
+    "view": "Xem chi tiết",
+    "number": "Mã phiếu",
+    "type": {
+      "otb_plan": "Gửi kế hoạch OTB",
+      "sku_proposal": "Đề xuất SKU",
+      "sizing_change": "Thay đổi Size"
+    },
+    "status": {
+      "draft": "Bản nháp",
+      "submitted": "Đã gửi",
+      "in_review": "Đang xét duyệt",
+      "approved": "Đã duyệt",
+      "rejected": "Đã từ chối",
+      "updated": "Đã cập nhật",
+      "cancelled": "Đã hủy"
+    },
+    "priority": {
+      "low": "Thấp",
+      "normal": "Bình thường",
+      "high": "Cao",
+      "urgent": "Khẩn cấp"
+    },
+    "fields": {
+      "title": "Tiêu đề",
+      "description": "Mô tả",
+      "priority": "Độ ưu tiên",
+      "deadline": "Hạn chót",
+      "items": "Mục",
+      "createdBy": "Người tạo",
+      "assignedTo": "Người phụ trách",
+      "type": "Loại"
+    },
+    "actions": {
+      "selectItems": "Chọn mục để gửi",
+      "selectedCount": "Đã chọn {count} mục",
+      "totalBudget": "Tổng: {amount}"
+    },
+    "history": {
+      "title": "Lịch sử phiếu",
+      "created": "Tạo phiếu",
+      "submitted": "Gửi phê duyệt",
+      "approved": "Đã duyệt",
+      "rejected": "Đã từ chối",
+      "updated": "Cập nhật phiếu",
+      "cancelled": "Hủy phiếu",
+      "commented": "Thêm bình luận"
+    }
+  },
+  "portfo": {
+    "title": "Tích hợp Portfo",
+    "upload": "Tải lên Portfo",
+    "uploading": "Đang tải lên Portfo...",
+    "success": "Tải lên thành công",
+    "failed": "Tải lên thất bại",
+    "retry": "Thử lại",
+    "openInPortfo": "Mở trong Portfo",
+    "document": {
+      "type": "Loại tài liệu",
+      "version": "Phiên bản",
+      "season": "Mùa",
+      "brand": "Thương hiệu",
+      "budget": "Ngân sách",
+      "approved": "Đã duyệt"
+    },
+    "options": {
+      "notifyStakeholders": "Thông báo cho các bên liên quan",
+      "createBackup": "Tạo bản sao lưu"
+    },
+    "status": {
+      "validating": "Đang xác thực tài liệu...",
+      "transforming": "Đang chuyển đổi định dạng...",
+      "uploading": "Đang tải lên Portfo...",
+      "verifying": "Đang xác minh...",
+      "backup": "Đang tạo bản sao lưu..."
+    },
+    "nextSteps": {
+      "title": "Bước tiếp theo",
+      "wssi": "Bắt đầu WSSI",
+      "sku": "Tạo đề xuất SKU"
     }
   }
 }

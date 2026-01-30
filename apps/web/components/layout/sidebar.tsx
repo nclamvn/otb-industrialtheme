@@ -38,6 +38,7 @@ import {
   LogOut,
   Settings,
   Layers,
+  Ticket,
 } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import {
@@ -70,6 +71,7 @@ const navigation = [
   { key: 'otb', href: '/otb-analysis', icon: TrendingUp },        // Step 2: OTB Analysis
   { key: 'sku', href: '/sku-proposal', icon: Package },           // Step 3: SKU Proposal
   { key: 'wssi', href: '/wssi', icon: CalendarDays },             // WSSI Planning
+  { key: 'tickets', href: '/tickets', icon: Ticket },             // Ticket System
   { key: 'approvals', href: '/approvals', icon: CheckSquare },    // Approvals
   { key: 'settings', href: '/settings', icon: Settings },         // Settings
 ];

@@ -58,6 +58,7 @@
     "otb": "OTB Analysis",
     "wssi": "WSSI",
     "sku": "SKU Proposal",
+    "tickets": "Tickets",
     "approvals": "Approvals",
     "analytics": "Analytics",
     "reports": "Reports",
@@ -2045,6 +2046,93 @@
       "commentAdded": "Comment Added",
       "versionCreated": "New Version",
       "exportReady": "Export Ready"
+    }
+  },
+  "ticket": {
+    "title": "Tickets",
+    "create": "Create Ticket",
+    "submit": "Submit for Approval",
+    "update": "Update Ticket",
+    "cancel": "Cancel Ticket",
+    "view": "View Details",
+    "number": "Ticket #",
+    "type": {
+      "otb_plan": "OTB Plan Submission",
+      "sku_proposal": "SKU Proposal",
+      "sizing_change": "Sizing Change"
+    },
+    "status": {
+      "draft": "Draft",
+      "submitted": "Submitted",
+      "in_review": "In Review",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "updated": "Updated",
+      "cancelled": "Cancelled"
+    },
+    "priority": {
+      "low": "Low",
+      "normal": "Normal",
+      "high": "High",
+      "urgent": "Urgent"
+    },
+    "fields": {
+      "title": "Title",
+      "description": "Description",
+      "priority": "Priority",
+      "deadline": "Deadline",
+      "items": "Items",
+      "createdBy": "Created by",
+      "assignedTo": "Assigned to",
+      "type": "Type"
+    },
+    "actions": {
+      "selectItems": "Select Items to Include",
+      "selectedCount": "{count} items selected",
+      "totalBudget": "Total: {amount}"
+    },
+    "history": {
+      "title": "Ticket History",
+      "created": "Ticket Created",
+      "submitted": "Submitted for Approval",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "updated": "Ticket Updated",
+      "cancelled": "Ticket Cancelled",
+      "commented": "Comment Added"
+    }
+  },
+  "portfo": {
+    "title": "Portfo Integration",
+    "upload": "Upload to Portfo",
+    "uploading": "Uploading to Portfo...",
+    "success": "Upload Successful",
+    "failed": "Upload Failed",
+    "retry": "Retry Upload",
+    "openInPortfo": "Open in Portfo",
+    "document": {
+      "type": "Document Type",
+      "version": "Version",
+      "season": "Season",
+      "brand": "Brand",
+      "budget": "Budget",
+      "approved": "Approved"
+    },
+    "options": {
+      "notifyStakeholders": "Notify stakeholders",
+      "createBackup": "Create backup in system"
+    },
+    "status": {
+      "validating": "Validating document...",
+      "transforming": "Transforming data format...",
+      "uploading": "Uploading to Portfo...",
+      "verifying": "Verifying upload...",
+      "backup": "Creating backup..."
+    },
+    "nextSteps": {
+      "title": "Next Steps",
+      "wssi": "Start WSSI Draft",
+      "sku": "Create SKU Proposal"
     }
   }
 }
