@@ -390,6 +390,13 @@ export interface SKUItem {
   collectionId?: string | null;
   gender: Gender;
   categoryId: string;
+
+  // GAP-6: Item Number field (maps to Excel ITEM NO column)
+  itemNo?: string | null;
+
+  // GAP-7: Composition field (maps to Excel COMPOSITION column)
+  // Separate from material - composition is the fabric breakdown like "95% Cotton, 5% Elastane"
+  composition?: string | null;
   category?: Category;
   subcategoryId?: string | null;
   subcategory?: Subcategory | null;

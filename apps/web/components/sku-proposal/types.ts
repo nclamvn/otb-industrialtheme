@@ -127,6 +127,12 @@ export interface ProposalProduct {
   sizes: SizeAllocation[];
   isExpanded?: boolean;
   hasChanges?: boolean;
+
+  // GAP-6: Item Number field (maps to Excel ITEM NO column)
+  itemNo?: string;          // Explicit item number, separate from styleCode
+
+  // GAP-7: Composition field (maps to Excel COMPOSITION column)
+  composition?: string;     // Material composition e.g. "95% Cotton, 5% Elastane"
 }
 
 // ============================================
@@ -561,6 +567,10 @@ export interface ProductEntry {
   sizeQuantities: Record<string, number>;
   totalQuantity: number;
   totalValue: number;
+
+  // GAP-6 & GAP-7: Additional Excel fields
+  itemNo?: string;          // ITEM NO column
+  composition?: string;     // COMPOSITION column (e.g. "95% Cotton, 5% Elastane")
 }
 
 export interface GeneratedSKU {
@@ -578,4 +588,8 @@ export interface GeneratedSKU {
   costPrice: number;
   quantity: number;
   value: number;
+
+  // GAP-6 & GAP-7: Additional Excel fields
+  itemNo?: string;          // ITEM NO column
+  composition?: string;     // COMPOSITION column
 }
