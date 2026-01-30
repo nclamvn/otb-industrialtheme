@@ -2180,5 +2180,44 @@
       "requestSent": "Request sent successfully",
       "requestFailed": "Failed to send request"
     }
+  },
+  "storePerformance": {
+    "title": "Store Performance",
+    "description": "Compare performance by store group (REX vs TTP)",
+    "storeGroup": "Store Group",
+    "rex": "REX",
+    "ttp": "TTP",
+    "all": "All Stores",
+    "sellThrough": "Sell-Through",
+    "sellThruPercent": "ST%",
+    "variance": "Variance",
+    "winner": "Winner",
+    "tie": "Tie",
+    "leads": "{store} leads",
+    "equal": "Equal performance",
+    "metrics": {
+      "qtySold": "Qty Sold",
+      "qtyOnHand": "On Hand",
+      "qtyReceived": "Received",
+      "salesValue": "Sales Value",
+      "salesUnits": "Sales Units"
+    },
+    "trend": {
+      "up": "Trending Up",
+      "down": "Trending Down",
+      "stable": "Stable"
+    },
+    "comparison": {
+      "title": "Store Comparison",
+      "vsIndicator": "vs",
+      "details": "View Details"
+    },
+    "summary": {
+      "totalSKUs": "Total SKUs",
+      "avgSellThru": "Avg Sell-Through",
+      "totalSales": "Total Sales",
+      "topPerformers": "Top Performers",
+      "bottomPerformers": "Bottom Performers"
+    }
   }
 }

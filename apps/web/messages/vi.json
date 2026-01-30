@@ -2180,5 +2180,44 @@
       "requestSent": "Đã gửi yêu cầu thành công",
       "requestFailed": "Gửi yêu cầu thất bại"
     }
+  },
+  "storePerformance": {
+    "title": "Hiệu suất Cửa hàng",
+    "description": "So sánh hiệu suất theo nhóm cửa hàng (REX vs TTP)",
+    "storeGroup": "Nhóm cửa hàng",
+    "rex": "REX",
+    "ttp": "TTP",
+    "all": "Tất cả cửa hàng",
+    "sellThrough": "Tỷ lệ bán",
+    "sellThruPercent": "ST%",
+    "variance": "Chênh lệch",
+    "winner": "Dẫn đầu",
+    "tie": "Hòa",
+    "leads": "{store} dẫn đầu",
+    "equal": "Hiệu suất ngang nhau",
+    "metrics": {
+      "qtySold": "SL đã bán",
+      "qtyOnHand": "Tồn kho",
+      "qtyReceived": "Đã nhận",
+      "salesValue": "Doanh thu",
+      "salesUnits": "Số lượng bán"
+    },
+    "trend": {
+      "up": "Tăng",
+      "down": "Giảm",
+      "stable": "Ổn định"
+    },
+    "comparison": {
+      "title": "So sánh cửa hàng",
+      "vsIndicator": "vs",
+      "details": "Xem chi tiết"
+    },
+    "summary": {
+      "totalSKUs": "Tổng SKU",
+      "avgSellThru": "TB tỷ lệ bán",
+      "totalSales": "Tổng doanh thu",
+      "topPerformers": "Hiệu suất cao",
+      "bottomPerformers": "Hiệu suất thấp"
+    }
   }
 }
