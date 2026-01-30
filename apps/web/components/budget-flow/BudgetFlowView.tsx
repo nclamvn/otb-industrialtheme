@@ -9,11 +9,12 @@ import { BudgetFilters, useBudgetFilters, filterBudgetNodes } from './BudgetFilt
 import { StackedCard } from './StackedCard';
 import { ExpandableCard } from './ExpandableCard';
 import { GapCopilot } from './gap-handling';
+import { VersionHistoryPanel } from './version-history';
 import { useStackedCards } from './hooks/useStackedCards';
 import { useKeyboardNavigation } from './hooks/useKeyboardNavigation';
 import { formatCurrency } from './utils/budget-calculations';
 import { getHierarchyColor } from './utils/hierarchy-colors';
-import { Sparkles } from 'lucide-react';
+import { Sparkles, History } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface BudgetFlowViewProps {
@@ -76,6 +77,9 @@ export function BudgetFlowView({
 
   // Gap Copilot state
   const [isGapCopilotOpen, setIsGapCopilotOpen] = useState(false);
+
+  // Version History state
+  const [isVersionHistoryOpen, setIsVersionHistoryOpen] = useState(false);
 
   // Filter state
   const { filters, setFilters } = useBudgetFilters();
@@ -259,18 +263,35 @@ export function BudgetFlowView({
         {focusedNodeId && <span>⌫ Back</span>}
       </div>
 
-      {/* Gap Copilot Toggle Button */}
-      <Button
-        onClick={() => setIsGapCopilotOpen(true)}
-        className={cn(
-          'fixed bottom-6 right-6 h-14 w-14 rounded-full shadow-xl',
-          'bg-gradient-to-br from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600',
-          'flex items-center justify-center transition-all hover:scale-110',
-          isGapCopilotOpen && 'hidden'
-        )}
-      >
-        <Sparkles className="h-6 w-6 text-white" />
-      </Button>
+      {/* Floating Action Buttons */}
+      <div className={cn(
+        'fixed bottom-6 right-6 flex flex-col gap-3',
+        (isGapCopilotOpen || isVersionHistoryOpen) && 'hidden'
+      )}>
+        {/* Version History Button */}
+        <Button
+          onClick={() => setIsVersionHistoryOpen(true)}
+          className={cn(
+            'h-12 w-12 rounded-full shadow-lg',
+            'bg-slate-700 hover:bg-slate-800',
+            'flex items-center justify-center transition-all hover:scale-110'
+          )}
+        >
+          <History className="h-5 w-5 text-white" />
+        </Button>
+
+        {/* Gap Copilot Button */}
+        <Button
+          onClick={() => setIsGapCopilotOpen(true)}
+          className={cn(
+            'h-14 w-14 rounded-full shadow-xl',
+            'bg-gradient-to-br from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600',
+            'flex items-center justify-center transition-all hover:scale-110'
+          )}
+        >
+          <Sparkles className="h-6 w-6 text-white" />
+        </Button>
+      </div>
 
       {/* Gap Copilot Panel */}
       <GapCopilot
@@ -279,6 +300,13 @@ export function BudgetFlowView({
         onClose={() => setIsGapCopilotOpen(false)}
         onBudgetUpdate={onBudgetUpdate}
         onNodeSelect={handleNodeSelectFromCopilot}
+      />
+
+      {/* Version History Panel */}
+      <VersionHistoryPanel
+        data={data}
+        isOpen={isVersionHistoryOpen}
+        onClose={() => setIsVersionHistoryOpen(false)}
       />
     </div>
   );
