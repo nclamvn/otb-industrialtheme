@@ -256,8 +256,6 @@ export function ExpandableCard({ node, onDrillDown, onBudgetUpdate }: Expandable
         'transition-all duration-300 ease-out',
         'border overflow-hidden',
         'rounded-xl', // Unified: rounded-xl (12px)
-        'border-l-4', // Unified: border-l-4 (4px) - moved to outer for proper rounding
-        levelStyles.band,
         'shadow-sm hover:shadow-md', // Unified: shadow-sm default, shadow-md hover
         levelStyles.bg,
         isExpanded ? 'border-amber-300 shadow-lg shadow-amber-100/50 dark:shadow-amber-900/30' : 'border-slate-200 dark:border-neutral-800',
