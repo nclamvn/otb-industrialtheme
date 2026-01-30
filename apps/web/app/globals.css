@@ -2,6 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Stacked Cards UI */
+@import '../styles/stacked-cards.css';
+
 /* ═══════════════════════════════════════════════════════════════════════════
    DAFC OTB PLATFORM - INTEGRATED DESIGN SYSTEM
    Brand: DAFC (Champagne Gold + Forest Green)

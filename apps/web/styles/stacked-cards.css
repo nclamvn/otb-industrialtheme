@@ -1,0 +1,135 @@
+/* Stacked Cards Animation */
+.stacked-card {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.stacked-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+}
+
+.stacked-card.collapsed {
+  cursor: pointer;
+}
+
+.stacked-card.collapsed:hover {
+  transform: translateY(-4px) scale(1.01);
+}
+
+/* Tab Animation */
+.card-tab {
+  position: relative;
+  overflow: hidden;
+}
+
+.card-tab::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.1),
+    transparent
+  );
+  transition: left 0.5s ease;
+}
+
+.card-tab:hover::before {
+  left: 100%;
+}
+
+/* Expand/Collapse Animation */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    max-height: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    max-height: 2000px;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 1;
+    max-height: 2000px;
+  }
+  to {
+    opacity: 0;
+    max-height: 0;
+  }
+}
+
+.card-content-enter {
+  animation: slideDown 0.3s ease-out forwards;
+}
+
+.card-content-exit {
+  animation: slideUp 0.2s ease-in forwards;
+}
+
+/* Stack Effect - Visible tabs */
+.stacked-container > .stacked-card:not(:first-child) {
+  margin-top: -44px;
+}
+
+.stacked-container > .stacked-card:not(:first-child).expanded,
+.stacked-container > .stacked-card:not(:first-child):has(~ .expanded) {
+  margin-top: 8px;
+}
+
+/* Focus States */
+.card-tab:focus-visible {
+  outline: 2px solid white;
+  outline-offset: -2px;
+}
+
+/* Level Indicators */
+.level-indicator {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+}
+
+/* Budget Health Bar */
+.budget-bar {
+  height: 8px;
+  border-radius: 4px;
+  background: #e5e7eb;
+  overflow: hidden;
+}
+
+.budget-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.5s ease, background-color 0.3s ease;
+}
+
+/* Keyboard Navigation Highlight */
+.stacked-card.keyboard-selected {
+  outline: 3px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* Print Styles */
+@media print {
+  .stacked-card {
+    break-inside: avoid;
+    margin-top: 0 !important;
+  }
+
+  .card-content {
+    display: block !important;
+    height: auto !important;
+    opacity: 1 !important;
+  }
+}

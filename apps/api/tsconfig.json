@@ -20,7 +20,10 @@
     "paths": {
       "@/*": ["src/*"],
       "@dafc/shared": ["../../packages/shared/src"],
-      "@dafc/database": ["../../packages/database/src"]
+      "@dafc/database": ["../../packages/database/src"],
+      "@dafc/excelai-core": ["../../packages/excelai-core/dist"],
+      "@dafc/excelai-ai": ["../../packages/excelai-ai/dist"],
+      "@dafc/excelai-tools": ["../../packages/excelai-tools/dist"]
     }
   },
   "include": ["src/**/*"],
