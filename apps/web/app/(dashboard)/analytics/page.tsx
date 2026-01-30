@@ -29,7 +29,20 @@ import {
   Filter,
   Download,
   RefreshCw,
+  Building2,
+  DollarSign,
 } from 'lucide-react';
+import {
+  StorePerformanceCard,
+  StoreComparisonPanel,
+  useStorePerformance,
+} from '@/components/store-performance';
+import {
+  PriceRangeChart,
+  PriceRangePanel,
+  usePriceRange,
+} from '@/components/price-range';
+import { VarianceIndicator } from '@/components/shared/VarianceIndicator';
 
 // Demo data - static values
 const summaryMetrics = {
@@ -61,6 +74,10 @@ export default function AnalyticsPage() {
 
   const [selectedSeason, setSelectedSeason] = useState('ss25');
   const [selectedBrand, setSelectedBrand] = useState('all');
+
+  // Store Performance & Price Range hooks
+  const { data: storeData, summary: storeSummary } = useStorePerformance({});
+  const { analysis: priceAnalysis } = usePriceRange();
 
   // Translated demo data
   const heatmapData = useMemo(() => [
@@ -267,6 +284,14 @@ export default function AnalyticsPage() {
       <Tabs defaultValue="overview" className="space-y-4">
         <TabsList>
           <TabsTrigger value="overview">{t('overview')}</TabsTrigger>
+          <TabsTrigger value="store" className="flex items-center gap-1">
+            <Building2 className="w-4 h-4" />
+            Store Performance
+          </TabsTrigger>
+          <TabsTrigger value="price" className="flex items-center gap-1">
+            <DollarSign className="w-4 h-4" />
+            Price Analysis
+          </TabsTrigger>
           <TabsTrigger value="forecast">{t('forecast')}</TabsTrigger>
           <TabsTrigger value="performance">{t('performance')}</TabsTrigger>
           <TabsTrigger value="category">{t('categoryAnalysis')}</TabsTrigger>
@@ -390,6 +415,78 @@ export default function AnalyticsPage() {
               </div>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        {/* Store Performance Tab */}
+        <TabsContent value="store" className="space-y-6">
+          {/* Store Summary Cards */}
+          <div className="grid grid-cols-2 gap-4">
+            <StorePerformanceCard
+              data={{
+                id: 'rex',
+                storeGroup: 'REX',
+                sellThruPercent: storeSummary.rex.avgSellThru,
+                qtyReceived: 500,
+                qtySold: Math.round(500 * storeSummary.rex.avgSellThru),
+                qtyOnHand: Math.round(500 * (1 - storeSummary.rex.avgSellThru)),
+                salesValue: storeSummary.rex.totalSalesValue,
+                salesUnits: storeSummary.rex.totalSalesUnits,
+                trend: 'up',
+              }}
+              showDetails={true}
+            />
+            <StorePerformanceCard
+              data={{
+                id: 'ttp',
+                storeGroup: 'TTP',
+                sellThruPercent: storeSummary.ttp.avgSellThru,
+                qtyReceived: 500,
+                qtySold: Math.round(500 * storeSummary.ttp.avgSellThru),
+                qtyOnHand: Math.round(500 * (1 - storeSummary.ttp.avgSellThru)),
+                salesValue: storeSummary.ttp.totalSalesValue,
+                salesUnits: storeSummary.ttp.totalSalesUnits,
+                trend: 'stable',
+              }}
+              showDetails={true}
+            />
+          </div>
+
+          {/* SKU Comparison Panels */}
+          <h3 className="font-semibold text-lg">SKU Comparison (REX vs TTP)</h3>
+          <div className="space-y-4">
+            {storeData.slice(0, 5).map((item) => (
+              <StoreComparisonPanel key={item.sku.id} data={item} />
+            ))}
+          </div>
+        </TabsContent>
+
+        {/* Price Analysis Tab */}
+        <TabsContent value="price" className="space-y-6">
+          <div className="grid grid-cols-4 gap-4">
+            <div className="p-4 rounded-xl border bg-white dark:bg-slate-800">
+              <div className="text-sm text-slate-500">Price Bands</div>
+              <div className="text-2xl font-bold">{priceAnalysis.data.length}</div>
+            </div>
+            <div className="p-4 rounded-xl border bg-white dark:bg-slate-800">
+              <div className="text-sm text-slate-500">Avg Sell-Through</div>
+              <div className="text-2xl font-bold text-green-600">
+                {(priceAnalysis.totals.avgSellThru * 100).toFixed(1)}%
+              </div>
+            </div>
+            <div className="p-4 rounded-xl border bg-white dark:bg-slate-800">
+              <div className="text-sm text-slate-500">Total Units</div>
+              <div className="text-2xl font-bold">{priceAnalysis.totals.totalUnits.toLocaleString()}</div>
+            </div>
+            <div className="p-4 rounded-xl border bg-white dark:bg-slate-800">
+              <div className="text-sm text-slate-500">YoY Trend</div>
+              <div className="flex items-center gap-2">
+                <span className="text-2xl font-bold">+12.5%</span>
+                <VarianceIndicator value={0.125} />
+              </div>
+            </div>
+          </div>
+
+          <PriceRangePanel brandId="ferragamo" seasonId="ss25" />
         </TabsContent>
 
         <TabsContent value="forecast" className="space-y-4">
