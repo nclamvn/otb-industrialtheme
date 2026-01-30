@@ -2293,5 +2293,34 @@
     "value": "Value",
     "skus": "SKUs",
     "noLimit": "No limit"
+  },
+  "delivery": {
+    "title": "Delivery Planning",
+    "description": "Multi-location delivery matrix planning",
+    "matrix": "Delivery Matrix",
+    "store": "Store",
+    "month": "Month",
+    "totalUnits": "Total Units",
+    "plannedUnits": "Planned",
+    "confirmedUnits": "Confirmed",
+    "receivedUnits": "Received",
+    "saveChanges": "Save Changes",
+    "reset": "Reset",
+    "export": "Export",
+    "filterSku": "Filter SKU...",
+    "share": "Share",
+    "monthlyBreakdown": "Monthly Breakdown",
+    "status": {
+      "planned": "Planned",
+      "confirmed": "Confirmed",
+      "inTransit": "In Transit",
+      "received": "Received",
+      "cancelled": "Cancelled"
+    },
+    "stores": {
+      "dafc": "DAFC",
+      "rex": "REX",
+      "ttp": "TTP"
+    }
   }
 }

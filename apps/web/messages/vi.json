@@ -2293,5 +2293,34 @@
     "value": "Giá trị",
     "skus": "SKU",
     "noLimit": "Không giới hạn"
+  },
+  "delivery": {
+    "title": "Kế hoạch giao hàng",
+    "description": "Lập kế hoạch giao hàng đa địa điểm",
+    "matrix": "Ma trận giao hàng",
+    "store": "Cửa hàng",
+    "month": "Tháng",
+    "totalUnits": "Tổng số lượng",
+    "plannedUnits": "Dự kiến",
+    "confirmedUnits": "Đã xác nhận",
+    "receivedUnits": "Đã nhận",
+    "saveChanges": "Lưu thay đổi",
+    "reset": "Đặt lại",
+    "export": "Xuất file",
+    "filterSku": "Lọc SKU...",
+    "share": "Tỷ lệ",
+    "monthlyBreakdown": "Phân bổ theo tháng",
+    "status": {
+      "planned": "Dự kiến",
+      "confirmed": "Đã xác nhận",
+      "inTransit": "Đang vận chuyển",
+      "received": "Đã nhận",
+      "cancelled": "Đã hủy"
+    },
+    "stores": {
+      "dafc": "DAFC",
+      "rex": "REX",
+      "ttp": "TTP"
+    }
   }
 }
