@@ -29,8 +29,8 @@ export function CardContent({ node, children }: CardContentProps) {
     <div className="py-4">
       {/* Premium progress indicator */}
       {hasAllocations && (
-        <div className="flex items-center gap-4 text-xs text-slate-500 mb-4 px-1">
-          <div className="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+        <div className="flex items-center gap-4 text-xs text-slate-500 dark:text-neutral-400 mb-4 px-1">
+          <div className="flex-1 h-1.5 bg-slate-100 dark:bg-neutral-800 rounded-full overflow-hidden">
             <div
               className={cn(
                 'h-full rounded-full transition-all duration-300',
@@ -40,7 +40,7 @@ export function CardContent({ node, children }: CardContentProps) {
               style={{ width: `${Math.min(percentage * 100, 100)}%` }}
             />
           </div>
-          <span className="tabular-nums whitespace-nowrap font-medium text-slate-600">
+          <span className="tabular-nums whitespace-nowrap font-medium text-slate-600 dark:text-neutral-300">
             {formatCurrency(allocated)} / {formatCurrency(node.budget)}
           </span>
           {remaining !== 0 && (

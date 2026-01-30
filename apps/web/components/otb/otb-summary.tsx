@@ -1,9 +1,6 @@
 'use client';
 
 import { useMemo } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
 import {
   TrendingUp,
@@ -15,16 +12,14 @@ import {
   CheckCircle,
   Target,
 } from 'lucide-react';
-
-// Format currency helper
-const formatCurrency = (value: number) => {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(value);
-};
+import {
+  BudgetProgressBar,
+  BudgetStatusBadge,
+  getBudgetHealth,
+  getHealthStyles,
+  formatBudgetCurrency,
+  formatBudgetPercentage,
+} from '@/components/ui/budget';
 
 // Format compact currency
 const formatCompactCurrency = (value: number) => {
@@ -34,7 +29,7 @@ const formatCompactCurrency = (value: number) => {
   if (value >= 1000) {
     return `$${(value / 1000).toFixed(0)}K`;
   }
-  return formatCurrency(value);
+  return formatBudgetCurrency(value);
 };
 
 interface OTBSummaryData {
@@ -64,7 +59,7 @@ export function OTBSummary({ data, period = 'Current Period', className }: OTBSu
       data.bomInventory -
       data.onOrder;
 
-    const budgetUtilization = data.totalBudget > 0 ? (otb / data.totalBudget) * 100 : 0;
+    const budgetUtilization = data.totalBudget > 0 ? otb / data.totalBudget : 0;
     const isOverBudget = otb > data.totalBudget;
     const variance = data.totalBudget - otb;
 
@@ -94,137 +89,139 @@ export function OTBSummary({ data, period = 'Current Period', className }: OTBSu
       salesVariancePercent,
       turnover,
       weeksOfSupply,
-      status: isOverBudget ? 'over' : budgetUtilization < 80 ? 'under' : 'optimal',
+      status: isOverBudget ? 'over' : budgetUtilization < 0.8 ? 'under' : 'optimal',
     };
   }, [data]);
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'over':
-        return 'text-red-600';
-      case 'under':
-        return 'text-yellow-600';
-      default:
-        return 'text-green-600';
-    }
+  // Map status to unified design system
+  const health = getBudgetHealth(calculations.budgetUtilization);
+  const healthStyles = getHealthStyles(health);
+
+  const statusConfig = {
+    over: {
+      badge: 'error' as const,
+      icon: AlertTriangle,
+      label: 'Over Budget',
+      borderColor: 'border-l-red-500',
+    },
+    under: {
+      badge: 'warning' as const,
+      icon: TrendingDown,
+      label: 'Under-utilized',
+      borderColor: 'border-l-amber-500',
+    },
+    optimal: {
+      badge: 'verified' as const,
+      icon: CheckCircle,
+      label: 'On Track',
+      borderColor: 'border-l-green-500',
+    },
   };
 
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'over':
-        return <AlertTriangle className="h-4 w-4 text-red-600" />;
-      case 'under':
-        return <TrendingDown className="h-4 w-4 text-yellow-600" />;
-      default:
-        return <CheckCircle className="h-4 w-4 text-green-600" />;
-    }
-  };
+  const currentStatus = statusConfig[calculations.status];
+  const StatusIcon = currentStatus.icon;
 
   return (
-    <Card className={className}>
-      <CardHeader className="pb-2">
+    <div
+      className={cn(
+        // Unified: rounded-xl, p-4, shadow-sm, hover:shadow-md, border-l-4
+        'rounded-xl border border-slate-200 bg-white overflow-hidden',
+        'shadow-sm hover:shadow-md transition-all duration-200',
+        'border-l-4',
+        currentStatus.borderColor,
+        className
+      )}
+    >
+      {/* Header */}
+      <div className="p-4 pb-2">
         <div className="flex items-center justify-between">
           <div>
-            <CardTitle className="text-sm font-medium">OTB Summary</CardTitle>
-            <CardDescription>{period}</CardDescription>
+            <h3 className="text-sm font-semibold text-slate-900">OTB Summary</h3>
+            <p className="text-xs text-slate-500">{period}</p>
           </div>
-          <Badge variant="outline" className={cn('gap-1', getStatusColor(calculations.status))}>
-            {getStatusIcon(calculations.status)}
-            {calculations.status === 'over' ? 'Over Budget' :
-             calculations.status === 'under' ? 'Under-utilized' : 'On Track'}
-          </Badge>
+          <BudgetStatusBadge status={currentStatus.badge} />
         </div>
-      </CardHeader>
-      <CardContent className="space-y-4">
+      </div>
+
+      {/* Content */}
+      <div className="p-4 pt-2 space-y-4">
         {/* Main OTB Display */}
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-3xl font-bold">
+            <p className="text-3xl font-bold text-slate-900 tabular-nums">
               {formatCompactCurrency(calculations.otb)}
             </p>
-            <p className="text-sm text-muted-foreground">Open-To-Buy</p>
+            <p className="text-sm text-slate-500">Open-To-Buy</p>
           </div>
           <div className="text-right">
             <p className={cn(
-              'text-lg font-semibold',
-              calculations.variance >= 0 ? 'text-green-600' : 'text-red-600'
+              'text-lg font-semibold tabular-nums',
+              healthStyles.text
             )}>
               {calculations.variance >= 0 ? '+' : ''}{formatCompactCurrency(calculations.variance)}
             </p>
-            <p className="text-sm text-muted-foreground">vs Budget</p>
+            <p className="text-sm text-slate-500">vs Budget</p>
           </div>
         </div>
 
-        {/* Progress Bar */}
-        <div className="space-y-1">
-          <div className="flex justify-between text-xs text-muted-foreground">
-            <span>Budget Utilization</span>
-            <span>{calculations.budgetUtilization.toFixed(1)}%</span>
-          </div>
-          <Progress
-            value={Math.min(100, calculations.budgetUtilization)}
-            className={cn('h-2', calculations.budgetUtilization > 100 && 'bg-red-100')}
-          />
-        </div>
+        {/* Progress Bar using unified component */}
+        <BudgetProgressBar
+          budget={data.totalBudget}
+          allocated={calculations.otb}
+          size="md"
+        />
 
-        {/* Quick Stats Grid */}
+        {/* Quick Stats Grid - Unified card style */}
         <div className="grid grid-cols-2 gap-3">
-          <div className="flex items-center gap-2 p-2 bg-muted/30 rounded-lg">
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
-            <div>
-              <p className="text-xs text-muted-foreground">Budget</p>
-              <p className="text-sm font-medium">{formatCompactCurrency(data.totalBudget)}</p>
+          {[
+            { icon: DollarSign, label: 'Budget', value: data.totalBudget },
+            { icon: TrendingUp, label: 'Planned Sales', value: data.plannedSales },
+            { icon: Package, label: 'Inventory', value: data.bomInventory },
+            { icon: ShoppingCart, label: 'On Order', value: data.onOrder },
+          ].map((item) => (
+            <div
+              key={item.label}
+              className="flex items-center gap-2 p-3 bg-slate-50 rounded-xl"
+            >
+              <div className="h-8 w-8 rounded-lg bg-white flex items-center justify-center">
+                <item.icon className="h-4 w-4 text-slate-500" />
+              </div>
+              <div>
+                <p className="text-xs text-slate-500">{item.label}</p>
+                <p className="text-sm font-semibold text-slate-900 tabular-nums">
+                  {formatCompactCurrency(item.value)}
+                </p>
+              </div>
             </div>
-          </div>
-          <div className="flex items-center gap-2 p-2 bg-muted/30 rounded-lg">
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
-            <div>
-              <p className="text-xs text-muted-foreground">Planned Sales</p>
-              <p className="text-sm font-medium">{formatCompactCurrency(data.plannedSales)}</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2 p-2 bg-muted/30 rounded-lg">
-            <Package className="h-4 w-4 text-muted-foreground" />
-            <div>
-              <p className="text-xs text-muted-foreground">Inventory</p>
-              <p className="text-sm font-medium">{formatCompactCurrency(data.bomInventory)}</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2 p-2 bg-muted/30 rounded-lg">
-            <ShoppingCart className="h-4 w-4 text-muted-foreground" />
-            <div>
-              <p className="text-xs text-muted-foreground">On Order</p>
-              <p className="text-sm font-medium">{formatCompactCurrency(data.onOrder)}</p>
-            </div>
-          </div>
+          ))}
         </div>
 
         {/* Key Metrics */}
-        <div className="flex justify-between text-sm pt-2 border-t">
+        <div className="flex justify-between text-sm pt-4 border-t border-slate-100">
           <div className="text-center">
-            <p className="font-semibold">{calculations.turnover.toFixed(1)}x</p>
-            <p className="text-xs text-muted-foreground">Turnover</p>
+            <p className="font-semibold text-slate-900 tabular-nums">{calculations.turnover.toFixed(1)}x</p>
+            <p className="text-xs text-slate-500">Turnover</p>
           </div>
           <div className="text-center">
-            <p className="font-semibold">{calculations.weeksOfSupply.toFixed(1)}</p>
-            <p className="text-xs text-muted-foreground">WOS</p>
+            <p className="font-semibold text-slate-900 tabular-nums">{calculations.weeksOfSupply.toFixed(1)}</p>
+            <p className="text-xs text-slate-500">WOS</p>
           </div>
           <div className="text-center">
             <p className={cn(
-              'font-semibold',
+              'font-semibold tabular-nums',
               data.actualSales && calculations.salesVariancePercent >= 0 ? 'text-green-600' : 'text-red-600'
             )}>
               {data.actualSales ? `${calculations.salesVariancePercent >= 0 ? '+' : ''}${calculations.salesVariancePercent.toFixed(1)}%` : 'N/A'}
             </p>
-            <p className="text-xs text-muted-foreground">Sales Var.</p>
+            <p className="text-xs text-slate-500">Sales Var.</p>
           </div>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }
 
-// Compact version for lists
+// Compact version for lists - Updated with unified design
 export function OTBSummaryCompact({
   otb,
   budget,
@@ -236,26 +233,34 @@ export function OTBSummaryCompact({
   status?: 'over' | 'under' | 'optimal';
   className?: string;
 }) {
-  const utilization = budget > 0 ? (otb / budget) * 100 : 0;
+  const utilization = budget > 0 ? otb / budget : 0;
+  const health = getBudgetHealth(utilization);
+  const healthStyles = getHealthStyles(health);
 
   return (
     <div className={cn('flex items-center gap-3', className)}>
       <div className="flex-1">
         <div className="flex items-center justify-between mb-1">
-          <span className="text-sm font-medium">{formatCompactCurrency(otb)}</span>
-          <span className="text-xs text-muted-foreground">{utilization.toFixed(0)}%</span>
+          <span className="text-sm font-medium text-slate-900 tabular-nums">
+            {formatCompactCurrency(otb)}
+          </span>
+          <span className="text-xs text-slate-500 tabular-nums">
+            {formatBudgetPercentage(utilization)}
+          </span>
         </div>
-        <Progress
-          value={Math.min(100, utilization)}
-          className={cn('h-1.5', utilization > 100 && 'bg-red-100')}
-        />
+        <div className="h-2 bg-slate-200 rounded-full overflow-hidden">
+          <div
+            className={cn('h-full rounded-full transition-all duration-500', healthStyles.bar)}
+            style={{ width: `${Math.min(utilization * 100, 100)}%` }}
+          />
+        </div>
       </div>
       {status === 'over' ? (
-        <AlertTriangle className="h-4 w-4 text-red-500" />
+        <AlertTriangle className="h-4 w-4 text-red-500 flex-shrink-0" />
       ) : status === 'under' ? (
-        <TrendingDown className="h-4 w-4 text-yellow-500" />
+        <TrendingDown className="h-4 w-4 text-amber-500 flex-shrink-0" />
       ) : (
-        <Target className="h-4 w-4 text-green-500" />
+        <Target className="h-4 w-4 text-green-500 flex-shrink-0" />
       )}
     </div>
   );

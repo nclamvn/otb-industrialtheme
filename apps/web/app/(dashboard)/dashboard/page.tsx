@@ -3,12 +3,17 @@
 import { useState } from 'react';
 import { ContextBar } from '@/components/layout/context-bar';
 import { PageHeader } from '@/components/layout/page-header';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { DataTable } from '@/components/ui/data-table';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { InlineProgress } from '@/components/ui/inline-progress';
 import { TrendChart } from '@/components/charts/trend-chart';
 import { DollarSign, TrendingUp, TrendingDown, Package, AlertTriangle } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import {
+  getBudgetHealth,
+  getHealthStyles,
+  formatBudgetCurrency,
+} from '@/components/ui/budget';
 
 // Mock data
 const mockKPIs = {
@@ -93,125 +98,199 @@ export default function DashboardPage() {
 
       {/* Content */}
       <div className="p-4 space-y-4">
-        {/* KPI Cards */}
+        {/* KPI Cards - Unified Design: rounded-xl, border-l-4, shadow-sm hover:shadow-md */}
         <div className="grid grid-cols-4 gap-3">
           {/* Net Sales Card */}
-          <Card className="relative overflow-hidden">
-            <DollarSign className="absolute -bottom-4 -right-4 h-32 w-32 text-emerald-500/10" />
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Net Sales</CardTitle>
-            </CardHeader>
-            <CardContent className="relative">
-              <div className="text-3xl font-bold tracking-tight text-emerald-600">
-                {mockKPIs.netSales.value}
+          <div
+            className={cn(
+              'rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 overflow-hidden',
+              'shadow-sm hover:shadow-md transition-all duration-200',
+              'border-l-4 border-l-green-500'
+            )}
+          >
+            <div className="p-4">
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">Net Sales</p>
+                  <div className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums">
+                    {mockKPIs.netSales.value}
+                  </div>
+                  <div className="flex items-center gap-1 mt-2">
+                    <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-xs font-medium bg-green-50 dark:bg-green-950 text-green-700">
+                      <TrendingUp className="h-3 w-3" />
+                      +{mockKPIs.netSales.trend.value}%
+                    </span>
+                    <span className="text-xs text-slate-400 dark:text-neutral-500">{mockKPIs.netSales.trend.label}</span>
+                  </div>
+                </div>
+                <div className="h-10 w-10 rounded-xl bg-green-50 dark:bg-green-950 flex items-center justify-center">
+                  <DollarSign className="h-5 w-5 text-green-600" />
+                </div>
               </div>
-              <p className="text-sm text-muted-foreground mt-1 flex items-center gap-1">
-                <TrendingUp className="h-3 w-3 text-emerald-500" />
-                <span className="text-emerald-500">+{mockKPIs.netSales.trend.value}%</span>
-                <span>{mockKPIs.netSales.trend.label}</span>
-              </p>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
 
           {/* Sell-Through Card */}
-          <Card className="relative overflow-hidden">
-            <TrendingUp className="absolute -bottom-4 -right-4 h-32 w-32 text-amber-500/10" />
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Sell-Through</CardTitle>
-            </CardHeader>
-            <CardContent className="relative">
-              <div className="text-3xl font-bold tracking-tight text-amber-600">
-                {mockKPIs.sellThrough.value}
+          <div
+            className={cn(
+              'rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 overflow-hidden',
+              'shadow-sm hover:shadow-md transition-all duration-200',
+              'border-l-4 border-l-amber-500'
+            )}
+          >
+            <div className="p-4">
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">Sell-Through</p>
+                  <div className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums">
+                    {mockKPIs.sellThrough.value}
+                  </div>
+                  <div className="flex items-center gap-1 mt-2">
+                    <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-xs font-medium bg-red-50 dark:bg-red-950 text-red-700">
+                      <TrendingDown className="h-3 w-3" />
+                      {mockKPIs.sellThrough.trend.value}%
+                    </span>
+                    <span className="text-xs text-slate-400 dark:text-neutral-500">{mockKPIs.sellThrough.trend.label}</span>
+                  </div>
+                </div>
+                <div className="h-10 w-10 rounded-xl bg-amber-50 dark:bg-amber-950 flex items-center justify-center">
+                  <TrendingUp className="h-5 w-5 text-amber-600" />
+                </div>
               </div>
-              <p className="text-sm text-muted-foreground mt-1 flex items-center gap-1">
-                <TrendingDown className="h-3 w-3 text-red-500" />
-                <span className="text-red-500">{mockKPIs.sellThrough.trend.value}%</span>
-                <span>{mockKPIs.sellThrough.trend.label}</span>
-              </p>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
 
           {/* Weeks of Cover Card */}
-          <Card className="relative overflow-hidden">
-            <Package className="absolute -bottom-4 -right-4 h-32 w-32 text-blue-500/10" />
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Weeks of Cover</CardTitle>
-            </CardHeader>
-            <CardContent className="relative">
-              <div className="text-3xl font-bold tracking-tight text-blue-600">
-                {mockKPIs.woc.value}
+          <div
+            className={cn(
+              'rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 overflow-hidden',
+              'shadow-sm hover:shadow-md transition-all duration-200',
+              'border-l-4 border-l-blue-500'
+            )}
+          >
+            <div className="p-4">
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">Weeks of Cover</p>
+                  <div className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums">
+                    {mockKPIs.woc.value}
+                  </div>
+                  <p className="text-xs text-slate-500 dark:text-neutral-400 mt-2">
+                    Target: 4-6 weeks
+                  </p>
+                </div>
+                <div className="h-10 w-10 rounded-xl bg-blue-50 dark:bg-blue-950 flex items-center justify-center">
+                  <Package className="h-5 w-5 text-blue-600" />
+                </div>
               </div>
-              <p className="text-sm text-muted-foreground mt-1">
-                Target: 4-6 weeks
-              </p>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
 
           {/* Alerts Card */}
-          <Card className="relative overflow-hidden">
-            <AlertTriangle className="absolute -bottom-4 -right-4 h-32 w-32 text-rose-500/10" />
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Alerts</CardTitle>
-            </CardHeader>
-            <CardContent className="relative">
-              <div className="text-3xl font-bold tracking-tight flex items-center gap-3">
-                <span className="text-rose-600">{mockKPIs.alerts.critical}</span>
-                <span className="text-amber-600">{mockKPIs.alerts.warning}</span>
-                <span className="text-emerald-600">{mockKPIs.alerts.healthy}</span>
+          <div
+            className={cn(
+              'rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 overflow-hidden',
+              'shadow-sm hover:shadow-md transition-all duration-200',
+              'border-l-4 border-l-red-500'
+            )}
+          >
+            <div className="p-4">
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">Alerts</p>
+                  <div className="flex items-center gap-2 mt-1">
+                    <span className="inline-flex items-center justify-center h-7 min-w-[28px] px-2 rounded-full text-sm font-bold bg-red-50 dark:bg-red-950 text-red-700 border border-red-200 tabular-nums">
+                      {mockKPIs.alerts.critical}
+                    </span>
+                    <span className="inline-flex items-center justify-center h-7 min-w-[28px] px-2 rounded-full text-sm font-bold bg-amber-50 dark:bg-amber-950 text-amber-700 border border-amber-200 tabular-nums">
+                      {mockKPIs.alerts.warning}
+                    </span>
+                    <span className="inline-flex items-center justify-center h-7 min-w-[28px] px-2 rounded-full text-sm font-bold bg-green-50 dark:bg-green-950 text-green-700 border border-green-200 tabular-nums">
+                      {mockKPIs.alerts.healthy}
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-400 dark:text-neutral-500 mt-2">
+                    Critical / Warning / Healthy
+                  </p>
+                </div>
+                <div className="h-10 w-10 rounded-xl bg-red-50 dark:bg-red-950 flex items-center justify-center">
+                  <AlertTriangle className="h-5 w-5 text-red-600" />
+                </div>
               </div>
-              <p className="text-sm text-muted-foreground mt-1">
-                Critical / Warning / Healthy
-              </p>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </div>
 
-        {/* Charts Row */}
+        {/* Charts Row - Unified Design */}
         <div className="grid grid-cols-2 gap-4">
           {/* Trend Chart */}
-          <div className="ind-card">
-            <div className="ind-card-header">
-              <h2 className="text-md font-semibold">Weekly Trend</h2>
+          <div
+            className={cn(
+              'rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 overflow-hidden',
+              'shadow-sm hover:shadow-md transition-all duration-200',
+              'border-l-4 border-l-slate-600'
+            )}
+          >
+            <div className="p-4 border-b border-slate-100 dark:border-neutral-800">
+              <h2 className="text-sm font-semibold text-slate-900 dark:text-neutral-100">Weekly Trend</h2>
             </div>
-            <div className="ind-card-content">
+            <div className="p-4">
               <TrendChart data={mockChartData} height={250} />
             </div>
           </div>
 
           {/* Category Breakdown */}
-          <div className="ind-card">
-            <div className="ind-card-header">
-              <h2 className="text-md font-semibold">By Category</h2>
+          <div
+            className={cn(
+              'rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 overflow-hidden',
+              'shadow-sm hover:shadow-md transition-all duration-200',
+              'border-l-4 border-l-slate-400'
+            )}
+          >
+            <div className="p-4 border-b border-slate-100 dark:border-neutral-800">
+              <h2 className="text-sm font-semibold text-slate-900 dark:text-neutral-100">By Category</h2>
             </div>
-            <div className="ind-card-content space-y-3">
-              {mockCategories.map((cat) => (
-                <div key={cat.id} className="flex items-center justify-between">
-                  <span className="text-content">{cat.name}</span>
-                  <div className="flex items-center gap-3">
-                    <div className="w-32 h-2 bg-surface-secondary rounded overflow-hidden">
-                      <div
-                        className="h-full bg-accent rounded"
-                        style={{ width: `${(cat.sales / 1500) * 100}%` }}
-                      />
+            <div className="p-4 space-y-3">
+              {mockCategories.map((cat) => {
+                const percentage = (cat.sales / 1500) * 100;
+                const health = getBudgetHealth(percentage / 100);
+                const healthStyles = getHealthStyles(health);
+                return (
+                  <div key={cat.id} className="flex items-center justify-between">
+                    <span className="text-sm text-slate-900 dark:text-neutral-100">{cat.name}</span>
+                    <div className="flex items-center gap-3">
+                      {/* Unified h-2 progress bar */}
+                      <div className="w-32 h-2 bg-slate-200 dark:bg-neutral-700 rounded-full overflow-hidden">
+                        <div
+                          className={cn('h-full rounded-full transition-all duration-500', healthStyles.bar)}
+                          style={{ width: `${percentage}%` }}
+                        />
+                      </div>
+                      <span className="tabular-nums w-12 text-right text-sm text-slate-500 dark:text-neutral-400">
+                        {Math.round((cat.sales / 3615) * 100)}%
+                      </span>
                     </div>
-                    <span className="font-data tabular-nums w-12 text-right text-content-secondary">
-                      {Math.round((cat.sales / 3615) * 100)}%
-                    </span>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </div>
 
-        {/* Category Table */}
-        <div className="ind-card">
-          <div className="ind-card-header flex items-center justify-between">
-            <h2 className="text-md font-semibold">Category Performance</h2>
+        {/* Category Table - Unified Design */}
+        <div
+          className={cn(
+            'rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 overflow-hidden',
+            'shadow-sm hover:shadow-md transition-all duration-200',
+            'border-l-4 border-l-slate-800'
+          )}
+        >
+          <div className="p-4 border-b border-slate-100 dark:border-neutral-800 flex items-center justify-between">
+            <h2 className="text-sm font-semibold text-slate-900 dark:text-neutral-100">Category Performance</h2>
             <input
               type="text"
               placeholder="Search..."
-              className="ind-input ind-input-sm w-48"
+              className="px-3 py-1.5 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-200 focus:border-amber-300 w-48"
             />
           </div>
           <DataTable

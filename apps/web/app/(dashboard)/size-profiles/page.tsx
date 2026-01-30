@@ -17,8 +17,8 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { cn } from '@/lib/utils';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -358,51 +358,83 @@ export default function SizeProfilesPage() {
 
       {/* Stats Cards */}
       <div className="grid gap-4 md:grid-cols-4">
-        <Card className="relative overflow-hidden">
-          <ListChecks className="absolute -bottom-4 -right-4 h-32 w-32 text-blue-500/10" />
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Total Profiles</CardTitle>
-          </CardHeader>
-          <CardContent className="relative">
-            <div className="text-3xl font-bold tracking-tight text-blue-600">{profiles.length}</div>
-            <p className="text-sm text-muted-foreground mt-1">{activeProfiles} active</p>
-          </CardContent>
-        </Card>
+        <div
+          className={cn(
+            'relative overflow-hidden rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950',
+            'shadow-sm hover:shadow-md transition-all duration-200',
+            'border-l-4 border-l-blue-500 p-4'
+          )}
+        >
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-xl bg-blue-50 dark:bg-blue-950 flex items-center justify-center">
+              <ListChecks className="h-5 w-5 text-blue-500" />
+            </div>
+            <div>
+              <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">Total Profiles</p>
+              <p className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums">{profiles.length}</p>
+            </div>
+          </div>
+          <p className="text-sm text-slate-500 dark:text-neutral-400 mt-2">{activeProfiles} active</p>
+        </div>
 
-        <Card className="relative overflow-hidden">
-          <Sparkles className="absolute -bottom-4 -right-4 h-32 w-32 text-purple-500/10" />
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">System Optimal</CardTitle>
-          </CardHeader>
-          <CardContent className="relative">
-            <div className="text-3xl font-bold tracking-tight text-purple-600">{byType['SYSTEM_OPTIMAL'] || 0}</div>
-            <p className="text-sm text-muted-foreground mt-1">AI-generated</p>
-          </CardContent>
-        </Card>
+        <div
+          className={cn(
+            'relative overflow-hidden rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950',
+            'shadow-sm hover:shadow-md transition-all duration-200',
+            'border-l-4 border-l-purple-500 p-4'
+          )}
+        >
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-xl bg-purple-50 dark:bg-purple-950 flex items-center justify-center">
+              <Sparkles className="h-5 w-5 text-purple-500" />
+            </div>
+            <div>
+              <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">System Optimal</p>
+              <p className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums">{byType['SYSTEM_OPTIMAL'] || 0}</p>
+            </div>
+          </div>
+          <p className="text-sm text-slate-500 dark:text-neutral-400 mt-2">AI-generated</p>
+        </div>
 
-        <Card className="relative overflow-hidden">
-          <BarChart3 className="absolute -bottom-4 -right-4 h-32 w-32 text-green-500/10" />
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Final Approved</CardTitle>
-          </CardHeader>
-          <CardContent className="relative">
-            <div className="text-3xl font-bold tracking-tight text-green-600">{byType['FINAL'] || 0}</div>
-            <p className="text-sm text-muted-foreground mt-1">Ready for use</p>
-          </CardContent>
-        </Card>
+        <div
+          className={cn(
+            'relative overflow-hidden rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950',
+            'shadow-sm hover:shadow-md transition-all duration-200',
+            'border-l-4 border-l-green-500 p-4'
+          )}
+        >
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-xl bg-green-50 dark:bg-green-950 flex items-center justify-center">
+              <BarChart3 className="h-5 w-5 text-green-500" />
+            </div>
+            <div>
+              <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">Final Approved</p>
+              <p className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums">{byType['FINAL'] || 0}</p>
+            </div>
+          </div>
+          <p className="text-sm text-slate-500 dark:text-neutral-400 mt-2">Ready for use</p>
+        </div>
 
-        <Card className="relative overflow-hidden">
-          <ListChecks className="absolute -bottom-4 -right-4 h-32 w-32 text-orange-500/10" />
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Size Definitions</CardTitle>
-          </CardHeader>
-          <CardContent className="relative">
-            <div className="text-3xl font-bold tracking-tight text-orange-600">{definitions.length}</div>
-            <p className="text-sm text-muted-foreground mt-1">
-              {definitions.filter((d) => d.isActive).length} active
-            </p>
-          </CardContent>
-        </Card>
+        <div
+          className={cn(
+            'relative overflow-hidden rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950',
+            'shadow-sm hover:shadow-md transition-all duration-200',
+            'border-l-4 border-l-amber-500 p-4'
+          )}
+        >
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-xl bg-amber-50 dark:bg-amber-950 flex items-center justify-center">
+              <ListChecks className="h-5 w-5 text-amber-500" />
+            </div>
+            <div>
+              <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">Size Definitions</p>
+              <p className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums">{definitions.length}</p>
+            </div>
+          </div>
+          <p className="text-sm text-slate-500 dark:text-neutral-400 mt-2">
+            {definitions.filter((d) => d.isActive).length} active
+          </p>
+        </div>
       </div>
 
       {/* Tabs */}

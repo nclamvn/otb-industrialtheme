@@ -270,6 +270,124 @@ export const budgetsApi = {
 
   reject: (id: string, reason: string) =>
     apiClient.post<unknown>(`/api/v1/budgets/${id}/reject`, { reason }),
+
+  // ============================================
+  // Budget Tree APIs (Task #1 - Budget Flow)
+  // ============================================
+
+  /** Get hierarchical budget tree */
+  getTree: (id: string) =>
+    apiClient.get<{ budget: unknown; tree: unknown[]; nodeCount: number }>(`/api/v1/budgets/${id}/tree`),
+
+  /** Get a specific tree node */
+  getNode: (id: string, nodeId: string) =>
+    apiClient.get<unknown>(`/api/v1/budgets/${id}/tree/nodes/${nodeId}`),
+
+  /** Initialize tree from master data */
+  initializeTree: (id: string, options?: { includeBrands?: boolean; includeGenders?: boolean; includeCategories?: boolean; includeSubcategories?: boolean; defaultPercentages?: Record<string, number> }) =>
+    apiClient.post<{ message: string; nodeCount: number }>(`/api/v1/budgets/${id}/tree/initialize`, options),
+
+  /** Create a new tree node */
+  createNode: (id: string, data: { parentId?: string; level: number; name: string; nodeType: string; budgetValue: number; allocatedValue?: number; percentage?: number; status?: string; brandId?: string; categoryId?: string; subcategoryId?: string; gender?: string; sortOrder?: number; metadata?: Record<string, unknown> }) =>
+    apiClient.post<unknown>(`/api/v1/budgets/${id}/tree/nodes`, data),
+
+  /** Update a tree node budget */
+  updateNode: (id: string, nodeId: string, data: { name?: string; budgetValue?: number; allocatedValue?: number; percentage?: number; status?: string; isLocked?: boolean; sortOrder?: number; metadata?: Record<string, unknown> }) =>
+    apiClient.patch<unknown>(`/api/v1/budgets/${id}/nodes/${nodeId}`, data),
+
+  /** Delete a tree node */
+  deleteNode: (id: string, nodeId: string) =>
+    apiClient.delete<{ deleted: boolean }>(`/api/v1/budgets/${id}/nodes/${nodeId}`),
+
+  /** Batch update multiple nodes */
+  batchUpdateNodes: (id: string, updates: { nodeId: string; budgetValue: number; reason?: string }[]) =>
+    apiClient.post<unknown[]>(`/api/v1/budgets/${id}/tree/batch-update`, { updates }),
+
+  // ============================================
+  // Gap Analysis APIs (Task #3 - Gap Copilot)
+  // ============================================
+
+  /** Run gap analysis on budget tree */
+  analyzeGaps: (id: string, options?: { minGapPercent?: number; levels?: number[]; includeChildren?: boolean }) =>
+    apiClient.post<{ totalNodes: number; nodesWithGaps: number; totalBudget: number; totalAllocated: number; totalGap: number; avgGapPercent: number; bySeverity: Record<string, number>; byType: Record<string, number>; results: unknown[] }>(`/api/v1/budgets/${id}/analyze-gaps`, options),
+
+  /** Get latest gap analysis results */
+  getGapAnalysis: (id: string) =>
+    apiClient.get<unknown>(`/api/v1/budgets/${id}/gaps`),
+
+  /** Get nodes with significant gaps */
+  getSignificantGaps: (id: string, minGapPercent?: number) =>
+    apiClient.get<unknown[]>(`/api/v1/budgets/${id}/gaps/significant`, { minGapPercent }),
+
+  // ============================================
+  // AI Suggestions APIs (Task #3 - Gap Copilot)
+  // ============================================
+
+  /** Generate AI-powered budget suggestions */
+  generateSuggestions: (id: string, options?: { maxSuggestions?: number; minConfidence?: number; focusNodeIds?: string[]; types?: string[] }) =>
+    apiClient.post<unknown[]>(`/api/v1/budgets/${id}/ai-suggestions`, options),
+
+  /** Get pending suggestions for budget */
+  getPendingSuggestions: (id: string) =>
+    apiClient.get<unknown[]>(`/api/v1/budgets/${id}/suggestions`),
+
+  /** Get a specific suggestion */
+  getSuggestion: (id: string, suggestionId: string) =>
+    apiClient.get<unknown>(`/api/v1/budgets/${id}/suggestions/${suggestionId}`),
+
+  /** Apply a suggestion */
+  applySuggestion: (id: string, suggestionId: string, options?: { applyToNodeIds?: string[]; comment?: string }) =>
+    apiClient.post<{ success: boolean; appliedActions: number }>(`/api/v1/budgets/${id}/suggestions/${suggestionId}/apply`, options),
+
+  /** Dismiss a suggestion */
+  dismissSuggestion: (id: string, suggestionId: string, reason: string) =>
+    apiClient.post<{ success: boolean }>(`/api/v1/budgets/${id}/suggestions/${suggestionId}/dismiss`, { reason }),
+
+  // ============================================
+  // Version History APIs (Task #4 - Version History)
+  // ============================================
+
+  /** List all versions for a budget */
+  getVersions: (id: string, params?: { page?: number; limit?: number; status?: string; tags?: string[] }) => {
+    const { tags, ...rest } = params || {};
+    const queryParams: Record<string, string | number | boolean | undefined> = { ...rest };
+    if (tags && tags.length > 0) {
+      queryParams.tags = tags.join(',');
+    }
+    return apiClient.get<{ data: unknown[]; meta: { total: number; page: number; limit: number; totalPages: number } }>(`/api/v1/budgets/${id}/versions`, queryParams);
+  },
+
+  /** Create a new version (snapshot) */
+  createVersion: (id: string, data: { name: string; description?: string; tags?: string[] }) =>
+    apiClient.post<unknown>(`/api/v1/budgets/${id}/versions`, data),
+
+  /** Get current (active) version */
+  getCurrentVersion: (id: string) =>
+    apiClient.get<unknown>(`/api/v1/budgets/${id}/versions/current`),
+
+  /** Get a specific version */
+  getVersion: (id: string, versionId: string) =>
+    apiClient.get<unknown>(`/api/v1/budgets/${id}/versions/${versionId}`),
+
+  /** Submit a version for approval */
+  submitVersion: (id: string, versionId: string, comments?: string) =>
+    apiClient.post<unknown>(`/api/v1/budgets/${id}/versions/${versionId}/submit`, { comments }),
+
+  /** Approve a version */
+  approveVersion: (id: string, versionId: string, comments?: string) =>
+    apiClient.post<unknown>(`/api/v1/budgets/${id}/versions/${versionId}/approve`, { comments }),
+
+  /** Reject a version */
+  rejectVersion: (id: string, versionId: string, reason: string) =>
+    apiClient.post<unknown>(`/api/v1/budgets/${id}/versions/${versionId}/reject`, { reason }),
+
+  /** Compare two versions */
+  compareVersions: (id: string, version1: string, version2: string) =>
+    apiClient.post<{ version1: unknown; version2: unknown; summary: { totalBudgetDiff: number; totalBudgetDiffPercent: number; totalAllocatedDiff: number; totalAllocatedDiffPercent: number; nodesAdded: number; nodesRemoved: number; nodesModified: number; nodesUnchanged: number }; changes: unknown[] }>(`/api/v1/budgets/${id}/versions/compare`, { version1, version2 }),
+
+  /** Rollback to a specific version */
+  rollback: (id: string, versionId: string, options?: { createBackup?: boolean; reason?: string }) =>
+    apiClient.post<{ success: boolean; newVersionId?: string }>(`/api/v1/budgets/${id}/rollback/${versionId}`, options),
 };
 
 // OTB Plans endpoints

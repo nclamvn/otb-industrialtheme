@@ -1,6 +1,5 @@
 'use client';
 
-import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import {
   TrendingUp,
@@ -20,6 +19,7 @@ import {
   ShoppingCart,
   type LucideIcon,
 } from 'lucide-react';
+import { formatBudgetCurrency } from '@/components/ui/budget';
 
 // Icon mapping for server component compatibility
 const iconMap: Record<string, LucideIcon> = {
@@ -53,42 +53,49 @@ interface StatsCardProps {
   sparklineData?: number[];
 }
 
+// Unified color system matching budget card design
 const colorClasses = {
   blue: {
-    icon: 'text-blue-600 dark:text-blue-400',
-    bg: 'bg-blue-100 dark:bg-blue-900/30',
-    trend: 'text-blue-600 dark:text-blue-400',
-    sparkline: 'hsl(var(--chart-1))',
+    icon: 'text-blue-600',
+    bg: 'bg-blue-50',
+    border: 'border-l-blue-500',
+    trend: 'text-blue-600',
+    sparkline: '#3b82f6',
   },
   green: {
-    icon: 'text-green-600 dark:text-green-400',
-    bg: 'bg-green-100 dark:bg-green-900/30',
-    trend: 'text-green-600 dark:text-green-400',
-    sparkline: 'hsl(var(--chart-4))',
+    icon: 'text-green-600',
+    bg: 'bg-green-50',
+    border: 'border-l-green-500',
+    trend: 'text-green-600',
+    sparkline: '#22c55e',
   },
   orange: {
-    icon: 'text-orange-600 dark:text-orange-400',
-    bg: 'bg-orange-100 dark:bg-orange-900/30',
-    trend: 'text-orange-600 dark:text-orange-400',
-    sparkline: 'hsl(var(--chart-3))',
+    icon: 'text-amber-600',
+    bg: 'bg-amber-50',
+    border: 'border-l-amber-500',
+    trend: 'text-amber-600',
+    sparkline: '#f59e0b',
   },
   purple: {
-    icon: 'text-purple-600 dark:text-purple-400',
-    bg: 'bg-purple-100 dark:bg-purple-900/30',
-    trend: 'text-purple-600 dark:text-purple-400',
-    sparkline: 'hsl(var(--primary))',
+    icon: 'text-purple-600',
+    bg: 'bg-purple-50',
+    border: 'border-l-purple-500',
+    trend: 'text-purple-600',
+    sparkline: '#8b5cf6',
   },
   red: {
-    icon: 'text-red-600 dark:text-red-400',
-    bg: 'bg-red-100 dark:bg-red-900/30',
-    trend: 'text-red-600 dark:text-red-400',
-    sparkline: 'hsl(var(--chart-5))',
+    icon: 'text-red-600',
+    bg: 'bg-red-50',
+    border: 'border-l-red-500',
+    trend: 'text-red-600',
+    sparkline: '#ef4444',
   },
   yellow: {
-    icon: 'text-yellow-600 dark:text-yellow-400',
-    bg: 'bg-yellow-100 dark:bg-yellow-900/30',
-    trend: 'text-yellow-600 dark:text-yellow-400',
-    sparkline: 'hsl(var(--chart-3))',
+    icon: 'text-yellow-600',
+    bg: 'bg-yellow-50',
+    border: 'border-l-yellow-500',
+    trend: 'text-yellow-600',
+    sparkline: '#eab308',
   },
 };
 
@@ -144,38 +151,51 @@ export function StatsCard({
       : Minus
     : null;
 
+  // Unified health-based trend colors
   const trendColor = trend
     ? trend.value > 0
-      ? 'text-green-600 dark:text-green-400'
+      ? 'text-green-600 bg-green-50'
       : trend.value < 0
-      ? 'text-red-600 dark:text-red-400'
-      : 'text-muted-foreground'
+      ? 'text-red-600 bg-red-50'
+      : 'text-slate-500 bg-slate-50'
     : '';
 
   return (
-    <Card className="hover:shadow-md transition-shadow">
-      <CardContent className="p-6">
+    <div
+      className={cn(
+        // Unified: rounded-xl, p-4, shadow-sm, hover:shadow-md, border-l-4
+        'rounded-xl border border-slate-200 bg-white overflow-hidden',
+        'shadow-sm hover:shadow-md transition-all duration-200',
+        'border-l-4',
+        colors.border
+      )}
+    >
+      <div className="p-4">
         <div className="flex items-start justify-between">
-          <div className="space-y-1">
-            <p className="text-sm font-medium text-muted-foreground">{title}</p>
-            <div className="flex items-baseline gap-2">
-              <span className="text-2xl font-bold">{value}</span>
+          <div className="space-y-1 flex-1 min-w-0">
+            <p className="text-sm font-medium text-slate-500">{title}</p>
+            <div className="flex items-baseline gap-2 flex-wrap">
+              <span className="text-2xl font-bold text-slate-900 tabular-nums">{value}</span>
               {trend && TrendIcon && (
-                <span className={cn('flex items-center text-xs font-medium', trendColor)}>
-                  <TrendIcon className="h-3 w-3 mr-0.5" />
+                <span className={cn(
+                  'inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-xs font-medium',
+                  trendColor
+                )}>
+                  <TrendIcon className="h-3 w-3" />
                   {Math.abs(trend.value)}%
                 </span>
               )}
             </div>
             {description && (
-              <p className="text-xs text-muted-foreground">{description}</p>
+              <p className="text-xs text-slate-500">{description}</p>
             )}
             {trend && (
-              <p className="text-xs text-muted-foreground">{trend.label}</p>
+              <p className="text-xs text-slate-500">{trend.label}</p>
             )}
           </div>
-          <div className="flex flex-col items-end gap-2">
-            <div className={cn('h-10 w-10 rounded-lg flex items-center justify-center', colors.bg)}>
+          <div className="flex flex-col items-end gap-2 flex-shrink-0">
+            {/* Unified: w-10 h-10 rounded-xl icon container */}
+            <div className={cn('h-10 w-10 rounded-xl flex items-center justify-center', colors.bg)}>
               <Icon className={cn('h-5 w-5', colors.icon)} />
             </div>
             {sparklineData && (
@@ -183,7 +203,7 @@ export function StatsCard({
             )}
           </div>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

@@ -1,7 +1,6 @@
 'use client';
 
 import Link from 'next/link';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Plus,
   FileText,
@@ -44,13 +43,14 @@ interface QuickActionsProps {
   description?: string;
 }
 
+// Unified color classes
 const colorClasses = {
-  default: 'bg-muted/50 text-foreground',
-  primary: 'bg-primary/10 text-primary',
-  secondary: 'bg-secondary/10 text-secondary',
-  success: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
-  warning: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400',
-  danger: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
+  default: 'bg-slate-100 dark:bg-neutral-800 text-slate-600 dark:text-neutral-300',
+  primary: 'bg-blue-50 dark:bg-blue-950 text-blue-600 dark:text-blue-400',
+  secondary: 'bg-slate-50 dark:bg-neutral-900 text-slate-600 dark:text-neutral-300',
+  success: 'bg-green-50 dark:bg-green-950 text-green-600 dark:text-green-400',
+  warning: 'bg-amber-50 dark:bg-amber-950 text-amber-600 dark:text-amber-400',
+  danger: 'bg-red-50 dark:bg-red-950 text-red-600 dark:text-red-400',
 };
 
 export function QuickActions({
@@ -63,12 +63,21 @@ export function QuickActions({
   const displayDescription = description || t('commonTasks');
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{displayTitle}</CardTitle>
-        <CardDescription>{displayDescription}</CardDescription>
-      </CardHeader>
-      <CardContent>
+    <div
+      className={cn(
+        // Unified: rounded-xl, shadow-sm, border-l-4
+        'rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 overflow-hidden',
+        'shadow-sm border-l-4 border-l-slate-600'
+      )}
+    >
+      {/* Header */}
+      <div className="p-4 border-b border-slate-100 dark:border-neutral-800">
+        <h3 className="text-sm font-semibold text-slate-900 dark:text-neutral-100">{displayTitle}</h3>
+        <p className="text-xs text-slate-500 dark:text-neutral-400">{displayDescription}</p>
+      </div>
+
+      {/* Content */}
+      <div className="p-4">
         <div className="grid gap-3">
           {actions.map((action) => {
             const Icon = iconMap[action.icon] || Plus;
@@ -78,25 +87,30 @@ export function QuickActions({
               <Link
                 key={action.href}
                 href={action.href}
-                className="flex items-center gap-3 rounded-lg border p-3 hover:bg-muted/50 transition-colors group"
+                className={cn(
+                  // Unified: rounded-xl, shadow-sm, hover:shadow-md
+                  'flex items-center gap-3 rounded-xl border border-slate-200 dark:border-neutral-800 p-3',
+                  'shadow-sm hover:shadow-md transition-all duration-200 group'
+                )}
               >
+                {/* Unified: w-10 h-10 rounded-xl icon container */}
                 <div
                   className={cn(
-                    'h-10 w-10 rounded-lg flex items-center justify-center shrink-0 transition-transform group-hover:scale-110',
+                    'h-10 w-10 rounded-xl flex items-center justify-center shrink-0 transition-transform group-hover:scale-110',
                     iconColorClass
                   )}
                 >
                   <Icon className="h-5 w-5" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="text-sm font-medium truncate">{action.title}</p>
-                  <p className="text-xs text-muted-foreground truncate">{action.description}</p>
+                  <p className="text-sm font-semibold text-slate-900 dark:text-neutral-100 truncate">{action.title}</p>
+                  <p className="text-xs text-slate-500 dark:text-neutral-400 truncate">{action.description}</p>
                 </div>
               </Link>
             );
           })}
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

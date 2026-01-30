@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { cn } from '@/lib/utils';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { PageHeader } from '@/components/shared/page-header';
 import { WORKFLOW_STATUS_LABELS } from '@/types';
@@ -128,9 +128,9 @@ export default function ApprovalsPage() {
 
   const getTypeBadge = (type: string) => {
     const colors: Record<string, string> = {
-      BUDGET_APPROVAL: 'bg-blue-100 text-blue-800',
-      OTB_APPROVAL: 'bg-purple-100 text-purple-800',
-      SKU_APPROVAL: 'bg-green-100 text-green-800',
+      BUDGET_APPROVAL: 'bg-blue-100 dark:bg-blue-950 text-blue-800 dark:text-blue-300',
+      OTB_APPROVAL: 'bg-purple-100 dark:bg-purple-950 text-purple-800 dark:text-purple-300',
+      SKU_APPROVAL: 'bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300',
     };
 
     const labelKeys: Record<string, string> = {
@@ -148,10 +148,10 @@ export default function ApprovalsPage() {
 
   const getStatusBadge = (status: string) => {
     const colors: Record<string, string> = {
-      PENDING: 'bg-yellow-100 text-yellow-800',
-      IN_PROGRESS: 'bg-blue-100 text-blue-800',
-      COMPLETED: 'bg-green-100 text-green-800',
-      REJECTED: 'bg-red-100 text-red-800',
+      PENDING: 'bg-yellow-100 dark:bg-yellow-950 text-yellow-800 dark:text-yellow-300',
+      IN_PROGRESS: 'bg-blue-100 dark:bg-blue-950 text-blue-800 dark:text-blue-300',
+      COMPLETED: 'bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300',
+      REJECTED: 'bg-red-100 dark:bg-red-950 text-red-800 dark:text-red-300',
     };
 
     return (
@@ -211,51 +211,83 @@ export default function ApprovalsPage() {
         description={t('description')}
       />
 
-      {/* Summary Cards */}
+      {/* Summary Cards - Unified Design */}
       <div className="grid gap-4 md:grid-cols-4">
-        <Card className="relative overflow-hidden">
-          <Clock className="absolute -bottom-4 -right-4 h-32 w-32 text-yellow-500/10" />
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">{t('totalPending')}</CardTitle>
-          </CardHeader>
-          <CardContent className="relative">
-            <div className="text-3xl font-bold tracking-tight text-yellow-600">{summary.total}</div>
-            <p className="text-sm text-muted-foreground mt-1">{t('awaitingAction')}</p>
-          </CardContent>
-        </Card>
+        <div className={cn(
+          'relative overflow-hidden rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950',
+          'shadow-sm hover:shadow-md transition-all duration-200',
+          'border-l-4 border-l-amber-500'
+        )}>
+          <div className="p-4">
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">{t('totalPending')}</p>
+                <div className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums">{summary.total}</div>
+                <p className="text-xs text-slate-500 dark:text-neutral-400 mt-1">{t('awaitingAction')}</p>
+              </div>
+              <div className="h-10 w-10 rounded-xl bg-amber-50 dark:bg-amber-950 flex items-center justify-center">
+                <Clock className="h-5 w-5 text-amber-600" />
+              </div>
+            </div>
+          </div>
+        </div>
 
-        <Card className="relative overflow-hidden">
-          <DollarSign className="absolute -bottom-4 -right-4 h-32 w-32 text-blue-500/10" />
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">{t('budget')}</CardTitle>
-          </CardHeader>
-          <CardContent className="relative">
-            <div className="text-3xl font-bold tracking-tight text-blue-600">{summary.budget}</div>
-            <p className="text-sm text-muted-foreground mt-1">{t('budgetApprovals')}</p>
-          </CardContent>
-        </Card>
+        <div className={cn(
+          'relative overflow-hidden rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950',
+          'shadow-sm hover:shadow-md transition-all duration-200',
+          'border-l-4 border-l-blue-500'
+        )}>
+          <div className="p-4">
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">{t('budget')}</p>
+                <div className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums">{summary.budget}</div>
+                <p className="text-xs text-slate-500 dark:text-neutral-400 mt-1">{t('budgetApprovals')}</p>
+              </div>
+              <div className="h-10 w-10 rounded-xl bg-blue-50 dark:bg-blue-950 flex items-center justify-center">
+                <DollarSign className="h-5 w-5 text-blue-600" />
+              </div>
+            </div>
+          </div>
+        </div>
 
-        <Card className="relative overflow-hidden">
-          <BarChart3 className="absolute -bottom-4 -right-4 h-32 w-32 text-purple-500/10" />
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">{t('otbPlans')}</CardTitle>
-          </CardHeader>
-          <CardContent className="relative">
-            <div className="text-3xl font-bold tracking-tight text-purple-600">{summary.otb}</div>
-            <p className="text-sm text-muted-foreground mt-1">{t('otbApprovals')}</p>
-          </CardContent>
-        </Card>
+        <div className={cn(
+          'relative overflow-hidden rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950',
+          'shadow-sm hover:shadow-md transition-all duration-200',
+          'border-l-4 border-l-purple-500'
+        )}>
+          <div className="p-4">
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">{t('otbPlans')}</p>
+                <div className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums">{summary.otb}</div>
+                <p className="text-xs text-slate-500 dark:text-neutral-400 mt-1">{t('otbApprovals')}</p>
+              </div>
+              <div className="h-10 w-10 rounded-xl bg-purple-50 dark:bg-purple-950 flex items-center justify-center">
+                <BarChart3 className="h-5 w-5 text-purple-600" />
+              </div>
+            </div>
+          </div>
+        </div>
 
-        <Card className="relative overflow-hidden">
-          <FileSpreadsheet className="absolute -bottom-4 -right-4 h-32 w-32 text-green-500/10" />
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">{t('skuProposals')}</CardTitle>
-          </CardHeader>
-          <CardContent className="relative">
-            <div className="text-3xl font-bold tracking-tight text-green-600">{summary.sku}</div>
-            <p className="text-sm text-muted-foreground mt-1">{t('skuApprovals')}</p>
-          </CardContent>
-        </Card>
+        <div className={cn(
+          'relative overflow-hidden rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950',
+          'shadow-sm hover:shadow-md transition-all duration-200',
+          'border-l-4 border-l-green-500'
+        )}>
+          <div className="p-4">
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">{t('skuProposals')}</p>
+                <div className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums">{summary.sku}</div>
+                <p className="text-xs text-slate-500 dark:text-neutral-400 mt-1">{t('skuApprovals')}</p>
+              </div>
+              <div className="h-10 w-10 rounded-xl bg-green-50 dark:bg-green-950 flex items-center justify-center">
+                <FileSpreadsheet className="h-5 w-5 text-green-600" />
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Tabs */}

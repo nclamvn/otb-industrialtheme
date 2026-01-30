@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -17,6 +16,7 @@ import {
 import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
+import { BudgetStatusBadge } from '@/components/ui/budget';
 
 interface ProactiveAlert {
   id: string;
@@ -48,19 +48,22 @@ interface AlertSummary {
 const severityConfig = {
   critical: {
     icon: AlertTriangle,
-    color: 'text-red-600 bg-red-100 dark:bg-red-900/30',
+    color: 'text-red-600 bg-red-50',
+    borderColor: 'border-l-red-500',
     badge: 'destructive' as const,
     label: 'Critical',
   },
   warning: {
     icon: AlertCircle,
-    color: 'text-amber-600 bg-amber-100 dark:bg-amber-900/30',
+    color: 'text-amber-600 bg-amber-50',
+    borderColor: 'border-l-amber-500',
     badge: 'secondary' as const,
     label: 'Warning',
   },
   info: {
     icon: Info,
-    color: 'text-blue-600 bg-blue-100 dark:bg-blue-900/30',
+    color: 'text-blue-600 bg-blue-50',
+    borderColor: 'border-l-blue-500',
     badge: 'outline' as const,
     label: 'Info',
   },
@@ -119,12 +122,21 @@ export function ProactiveAlertsWidget() {
   };
 
   return (
-    <Card className="border-amber-500/20">
-      <CardHeader className="pb-3">
+    <div
+      className={cn(
+        // Unified: rounded-xl, shadow-sm, hover:shadow-md, border-l-4
+        'rounded-xl border border-slate-200 bg-white overflow-hidden',
+        'shadow-sm hover:shadow-md transition-all duration-200',
+        'border-l-4 border-l-amber-500'
+      )}
+    >
+      {/* Header */}
+      <div className="p-4 pb-3 border-b border-slate-100">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="h-8 w-8 rounded-lg bg-amber-500/10 flex items-center justify-center relative">
-              <Bell className="h-4 w-4 text-amber-600" />
+            {/* Unified: w-10 h-10 rounded-xl icon container */}
+            <div className="h-10 w-10 rounded-xl bg-amber-50 flex items-center justify-center relative">
+              <Bell className="h-5 w-5 text-amber-600" />
               {summary.critical > 0 && (
                 <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-red-500 text-white text-[10px] flex items-center justify-center font-bold">
                   {summary.critical}
@@ -132,10 +144,10 @@ export function ProactiveAlertsWidget() {
               )}
             </div>
             <div>
-              <CardTitle className="text-base">Proactive Alerts</CardTitle>
-              <CardDescription className="text-xs">
+              <h3 className="text-sm font-semibold text-slate-900">Proactive Alerts</h3>
+              <p className="text-xs text-slate-500">
                 {summary.total > 0 ? `${summary.total} alerts detected` : 'No active alerts'}
-              </CardDescription>
+              </p>
             </div>
           </div>
           <Button
@@ -169,9 +181,10 @@ export function ProactiveAlertsWidget() {
             )}
           </div>
         )}
-      </CardHeader>
+      </div>
 
-      <CardContent>
+      {/* Content */}
+      <div className="p-4">
         {isLoading ? (
           <div className="space-y-3">
             {[1, 2, 3].map((i) => (
@@ -193,38 +206,40 @@ export function ProactiveAlertsWidget() {
                     key={alert.id}
                     href={getAlertUrl(alert)}
                     className={cn(
-                      'block p-3 rounded-lg border bg-card/50 hover:bg-card/80 transition-colors',
-                      alert.severity === 'critical' && 'border-red-500/30 bg-red-50/50 dark:bg-red-950/20'
+                      // Unified: rounded-xl, border-l-4, shadow-sm, hover:shadow-md
+                      'block p-3 rounded-xl border border-slate-200 bg-white',
+                      'border-l-4 shadow-sm hover:shadow-md transition-all duration-200',
+                      config.borderColor
                     )}
                   >
                     <div className="flex items-start gap-3">
-                      <div className={cn('h-8 w-8 rounded-lg flex items-center justify-center shrink-0', config.color)}>
+                      <div className={cn('h-8 w-8 rounded-xl flex items-center justify-center shrink-0', config.color)}>
                         <Icon className="h-4 w-4" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between gap-2 mb-1">
-                          <p className="text-sm font-medium truncate">{alert.title}</p>
+                          <p className="text-sm font-semibold text-slate-900 truncate">{alert.title}</p>
                           <Badge variant={config.badge} className="shrink-0 text-xs">
                             {config.label}
                           </Badge>
                         </div>
-                        <p className="text-xs text-muted-foreground line-clamp-2">
+                        <p className="text-xs text-slate-500 line-clamp-2">
                           {alert.message}
                         </p>
                         {alert.metric && (
                           <div className="flex items-center gap-2 mt-2 text-xs">
-                            <span className="text-muted-foreground">Current:</span>
+                            <span className="text-slate-500">Current:</span>
                             <span className={cn(
-                              'font-medium',
+                              'font-medium tabular-nums',
                               alert.severity === 'critical' && 'text-red-600'
                             )}>
                               {alert.metric.current.toLocaleString()} {alert.metric.unit}
                             </span>
-                            <span className="text-muted-foreground">/ Threshold:</span>
-                            <span>{alert.metric.threshold.toLocaleString()} {alert.metric.unit}</span>
+                            <span className="text-slate-500">/ Threshold:</span>
+                            <span className="tabular-nums">{alert.metric.threshold.toLocaleString()} {alert.metric.unit}</span>
                           </div>
                         )}
-                        <div className="flex items-center gap-1 mt-2 text-xs text-primary">
+                        <div className="flex items-center gap-1 mt-2 text-xs text-amber-600">
                           <span>View details</span>
                           <ChevronRight className="h-3 w-3" />
                         </div>
@@ -235,11 +250,11 @@ export function ProactiveAlertsWidget() {
               })}
 
               {alerts.length === 0 && (
-                <div className="text-center py-8 text-muted-foreground">
+                <div className="text-center py-8 text-slate-400">
                   <CheckCircle2 className="h-10 w-10 mx-auto mb-3 text-green-500" />
                   <p className="text-sm font-medium text-green-600">All Clear!</p>
                   <p className="text-xs mt-1">No anomalies detected</p>
-                  <p className="text-xs text-muted-foreground mt-2">
+                  <p className="text-xs text-slate-400 mt-2">
                     Last checked: {lastRefresh.toLocaleTimeString()}
                   </p>
                 </div>
@@ -249,7 +264,7 @@ export function ProactiveAlertsWidget() {
         )}
 
         {alerts.length > 0 && (
-          <div className="mt-4 pt-3 border-t">
+          <div className="mt-4 pt-3 border-t border-slate-100">
             <Link href="/predictive-alerts">
               <Button variant="outline" size="sm" className="w-full">
                 View All Alerts
@@ -258,7 +273,7 @@ export function ProactiveAlertsWidget() {
             </Link>
           </div>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

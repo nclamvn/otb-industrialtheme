@@ -53,13 +53,13 @@ function ChangeIndicator({ change }: { change: VersionChange }) {
 
   return (
     <div className="flex items-center gap-2 text-sm">
-      <span className="text-slate-600">{change.nodeName}</span>
+      <span className="text-slate-600 dark:text-neutral-400">{change.nodeName}</span>
       {change.diff !== undefined && (
         <span
           className={cn(
             'flex items-center gap-1 font-medium tabular-nums',
-            isIncrease && 'text-green-600',
-            isDecrease && 'text-red-600'
+            isIncrease && 'text-green-600 dark:text-green-400',
+            isDecrease && 'text-red-600 dark:text-red-400'
           )}
         >
           {isIncrease ? (
@@ -107,7 +107,7 @@ function VersionCard({
       {/* Timeline line */}
       <div className="flex flex-col items-center">
         {/* Top line */}
-        {!isFirst && <div className="w-0.5 h-4 bg-slate-200" />}
+        {!isFirst && <div className="w-0.5 h-4 bg-slate-200 dark:bg-neutral-700" />}
 
         {/* Commit dot */}
         <div
@@ -116,29 +116,29 @@ function VersionCard({
             isSelected
               ? 'bg-amber-500 border-amber-600'
               : version.isCurrent
-              ? 'bg-amber-100 border-amber-300'
-              : 'bg-white border-slate-300'
+              ? 'bg-amber-100 dark:bg-amber-900/30 border-amber-300 dark:border-amber-700'
+              : 'bg-white dark:bg-neutral-900 border-slate-300 dark:border-neutral-700'
           )}
         >
           {version.createdBy.id === 'system' ? (
             <Sparkles
               className={cn(
                 'w-4 h-4',
-                isSelected ? 'text-white' : 'text-slate-500'
+                isSelected ? 'text-white' : 'text-slate-500 dark:text-neutral-400'
               )}
             />
           ) : (
             <GitCommit
               className={cn(
                 'w-4 h-4',
-                isSelected ? 'text-white' : 'text-slate-500'
+                isSelected ? 'text-white' : 'text-slate-500 dark:text-neutral-400'
               )}
             />
           )}
         </div>
 
         {/* Bottom line */}
-        {!isLast && <div className="w-0.5 flex-1 bg-slate-200" />}
+        {!isLast && <div className="w-0.5 flex-1 bg-slate-200 dark:bg-neutral-700" />}
       </div>
 
       {/* Content */}
@@ -147,8 +147,8 @@ function VersionCard({
         className={cn(
           'flex-1 p-4 rounded-xl border transition-all mb-4 cursor-pointer',
           isSelected
-            ? 'bg-amber-50 border-amber-300 shadow-md'
-            : 'bg-white border-slate-200 hover:border-amber-200 hover:bg-amber-50/30'
+            ? 'bg-amber-50 dark:bg-amber-950/30 border-amber-300 dark:border-amber-700 shadow-md'
+            : 'bg-white dark:bg-neutral-950 border-slate-200 dark:border-neutral-800 hover:border-amber-200 dark:hover:border-amber-700 hover:bg-amber-50/30 dark:hover:bg-amber-950/20'
         )}
       >
         {/* Header */}
@@ -159,8 +159,8 @@ function VersionCard({
                 className={cn(
                   'text-xs',
                   version.createdBy.id === 'system'
-                    ? 'bg-purple-100 text-purple-700'
-                    : 'bg-slate-100 text-slate-700'
+                    ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400'
+                    : 'bg-slate-100 dark:bg-neutral-800 text-slate-700 dark:text-neutral-300'
                 )}
               >
                 {initials}
@@ -168,7 +168,7 @@ function VersionCard({
             </Avatar>
             <div>
               <div className="flex items-center gap-2">
-                <span className="font-semibold text-slate-800">
+                <span className="font-semibold text-slate-800 dark:text-neutral-100">
                   {version.name}
                 </span>
                 <Badge className={cn('text-xs', statusColors.bg, statusColors.text)}>
@@ -180,7 +180,7 @@ function VersionCard({
                   </Badge>
                 )}
               </div>
-              <div className="flex items-center gap-2 text-xs text-slate-500">
+              <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-neutral-400">
                 <span>{version.createdBy.name}</span>
                 <span>•</span>
                 <span>{formatDistanceToNow(version.createdAt, { addSuffix: true })}</span>
@@ -254,7 +254,7 @@ function VersionCard({
 
         {/* Description */}
         {version.description && (
-          <p className="text-sm text-slate-600 mb-3">{version.description}</p>
+          <p className="text-sm text-slate-600 dark:text-neutral-400 mb-3">{version.description}</p>
         )}
 
         {/* Changes */}
@@ -264,7 +264,7 @@ function VersionCard({
               <ChangeIndicator key={change.id} change={change} />
             ))}
             {version.changes.length > 3 && (
-              <span className="text-xs text-slate-500">
+              <span className="text-xs text-slate-500 dark:text-neutral-400">
                 +{version.changes.length - 3} more changes
               </span>
             )}
@@ -274,7 +274,7 @@ function VersionCard({
         {/* Tags */}
         {version.tags && version.tags.length > 0 && (
           <div className="flex items-center gap-1.5">
-            <Tag className="w-3.5 h-3.5 text-slate-400" />
+            <Tag className="w-3.5 h-3.5 text-slate-400 dark:text-neutral-500" />
             {version.tags.map((tag) => (
               <Badge
                 key={tag}
@@ -288,11 +288,11 @@ function VersionCard({
         )}
 
         {/* Version number */}
-        <div className="mt-3 pt-3 border-t border-slate-100 flex items-center justify-between">
-          <span className="text-xs text-slate-400 font-mono">
+        <div className="mt-3 pt-3 border-t border-slate-100 dark:border-neutral-800 flex items-center justify-between">
+          <span className="text-xs text-slate-400 dark:text-neutral-500 font-mono">
             v{version.versionNumber}.0
           </span>
-          <span className="text-xs text-slate-400">
+          <span className="text-xs text-slate-400 dark:text-neutral-500">
             {formatCurrency(version.snapshot.budget)} total budget
           </span>
         </div>
@@ -326,8 +326,8 @@ export function VersionTimeline({
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <GitBranch className="w-5 h-5 text-slate-500" />
-          <h3 className="font-semibold text-slate-800">Version History</h3>
+          <GitBranch className="w-5 h-5 text-slate-500 dark:text-neutral-400" />
+          <h3 className="font-semibold text-slate-800 dark:text-neutral-100">Version History</h3>
           <Badge variant="secondary" className="text-xs">
             {versions.length} versions
           </Badge>

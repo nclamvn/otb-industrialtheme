@@ -292,7 +292,7 @@ export default function BudgetFlowDetailPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="flex items-center gap-3 text-slate-500">
+        <div className="flex items-center gap-3 text-slate-500 dark:text-neutral-400">
           <Loader2 className="w-5 h-5 animate-spin" />
           <span>Loading budget data...</span>
         </div>
@@ -305,7 +305,7 @@ export default function BudgetFlowDetailPage() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <p className="text-red-500 mb-4">{error || 'Budget not found'}</p>
-          <p className="text-slate-500 mb-4">Budget ID: {budgetId}</p>
+          <p className="text-slate-500 dark:text-neutral-400 mb-4">Budget ID: {budgetId}</p>
           <Link href="/budget">
             <Button variant="outline">
               <ArrowLeft className="w-4 h-4 mr-2" />
@@ -321,12 +321,12 @@ export default function BudgetFlowDetailPage() {
     <div className="min-h-screen">
       {/* Breadcrumb */}
       <div className="px-6 pt-4">
-        <nav className="flex items-center gap-2 text-sm text-slate-500">
-          <Link href="/budget" className="hover:text-slate-900 transition-colors">
+        <nav className="flex items-center gap-2 text-sm text-slate-500 dark:text-neutral-400">
+          <Link href="/budget" className="hover:text-slate-900 dark:hover:text-neutral-100 transition-colors">
             Budget
           </Link>
           <span>/</span>
-          <span className="text-slate-900 font-medium">{data.name}</span>
+          <span className="text-slate-900 dark:text-neutral-100 font-medium">{data.name}</span>
         </nav>
       </div>
 

@@ -22,6 +22,40 @@ export interface ProductData {
   aiSuggestion?: string;
 }
 
+// Extended KPIs for rich data display
+export interface BudgetKPIs {
+  // Gap Analysis
+  gap: number;                    // budget - allocated
+  gapPercent: number;             // gap as percentage
+  gapSeverity: 'ok' | 'info' | 'warning' | 'critical';
+
+  // Historical Comparison
+  lastYearBudget?: number;
+  lastYearVariance?: number;      // % change vs last year
+  lastYearVarianceAmount?: number;
+
+  // Performance Metrics
+  sellThruPercent?: number;       // sell-through rate
+  weeksOfCover?: number;          // WoC
+  growthPercent?: number;         // growth rate
+
+  // AI/System Metrics
+  systemProposedValue?: number;
+  systemConfidence?: number;      // 0-100
+  varianceFromSystem?: number;
+
+  // Inventory
+  skuCount?: number;
+  totalUnits?: number;
+  avgUnitPrice?: number;
+
+  // Children Summary
+  childrenCount?: number;
+  childrenWithGaps?: number;
+  overBudgetCount?: number;
+  underBudgetCount?: number;
+}
+
 export interface BudgetNode {
   id: string;
   name: string;
@@ -33,6 +67,8 @@ export interface BudgetNode {
   status: CardStatus;
   children?: BudgetNode[];
   products?: ProductData[];
+  // Extended KPIs
+  kpis?: BudgetKPIs;
   metadata?: {
     collection?: string;
     gender?: string;

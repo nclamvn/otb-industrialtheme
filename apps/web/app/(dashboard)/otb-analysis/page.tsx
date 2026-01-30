@@ -20,7 +20,7 @@ import {
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { cn } from '@/lib/utils';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -310,53 +310,105 @@ export default function OTBAnalysisPage() {
 
       {/* Summary Cards */}
       <div className="grid gap-4 md:grid-cols-4">
-        <Card className="relative overflow-hidden">
-          <Package className="absolute -bottom-4 -right-4 h-32 w-32 text-blue-500/10" />
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">{t('totalPlans')}</CardTitle>
-          </CardHeader>
-          <CardContent className="relative">
-            <div className="text-3xl font-bold tracking-tight text-blue-600">{totals.count}</div>
-            <p className="text-sm text-muted-foreground mt-1">{t('activePlans')}</p>
-          </CardContent>
-        </Card>
-
-        <Card className="relative overflow-hidden">
-          <DollarSign className="absolute -bottom-4 -right-4 h-32 w-32 text-green-500/10" />
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">{t('totalAmount')}</CardTitle>
-          </CardHeader>
-          <CardContent className="relative">
-            <div className="text-3xl font-bold tracking-tight text-green-600">
-              ${totals.totalAmount.toLocaleString()}
+        <div
+          className={cn(
+            'relative overflow-hidden rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950',
+            'shadow-sm hover:shadow-md transition-all duration-200',
+            'border-l-4 border-l-blue-500'
+          )}
+        >
+          <div className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">
+                  {t('totalPlans')}
+                </p>
+                <p className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums">
+                  {totals.count}
+                </p>
+                <p className="text-xs text-slate-500 dark:text-neutral-400 mt-1">{t('activePlans')}</p>
+              </div>
+              <div className="h-10 w-10 rounded-xl bg-blue-50 dark:bg-blue-950 flex items-center justify-center">
+                <Package className="h-5 w-5 text-blue-500" />
+              </div>
             </div>
-            <p className="text-sm text-muted-foreground mt-1">{t('plannedSpend')}</p>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
-        <Card className="relative overflow-hidden">
-          <TrendingUp className="absolute -bottom-4 -right-4 h-32 w-32 text-orange-500/10" />
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">{t('totalUnits')}</CardTitle>
-          </CardHeader>
-          <CardContent className="relative">
-            <div className="text-3xl font-bold tracking-tight text-orange-600">
-              {totals.totalUnits.toLocaleString()}
+        <div
+          className={cn(
+            'relative overflow-hidden rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950',
+            'shadow-sm hover:shadow-md transition-all duration-200',
+            'border-l-4 border-l-purple-500'
+          )}
+        >
+          <div className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">
+                  {t('totalAmount')}
+                </p>
+                <p className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums">
+                  ${totals.totalAmount.toLocaleString()}
+                </p>
+                <p className="text-xs text-slate-500 dark:text-neutral-400 mt-1">{t('plannedSpend')}</p>
+              </div>
+              <div className="h-10 w-10 rounded-xl bg-purple-50 dark:bg-purple-950 flex items-center justify-center">
+                <DollarSign className="h-5 w-5 text-purple-500" />
+              </div>
             </div>
-            <p className="text-sm text-muted-foreground mt-1">{t('plannedUnits')}</p>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
-        <Card className="relative overflow-hidden">
-          <Sparkles className="absolute -bottom-4 -right-4 h-32 w-32 text-purple-500/10" />
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">{t('aiProposals')}</CardTitle>
-          </CardHeader>
-          <CardContent className="relative">
-            <div className="text-3xl font-bold tracking-tight text-purple-600">{t('ready')}</div>
-            <p className="text-sm text-muted-foreground mt-1">{t('generateProposals')}</p>
-          </CardContent>
-        </Card>
+        <div
+          className={cn(
+            'relative overflow-hidden rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950',
+            'shadow-sm hover:shadow-md transition-all duration-200',
+            'border-l-4 border-l-green-500'
+          )}
+        >
+          <div className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">
+                  {t('totalUnits')}
+                </p>
+                <p className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums">
+                  {totals.totalUnits.toLocaleString()}
+                </p>
+                <p className="text-xs text-slate-500 dark:text-neutral-400 mt-1">{t('plannedUnits')}</p>
+              </div>
+              <div className="h-10 w-10 rounded-xl bg-green-50 dark:bg-green-950 flex items-center justify-center">
+                <TrendingUp className="h-5 w-5 text-green-500" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div
+          className={cn(
+            'relative overflow-hidden rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950',
+            'shadow-sm hover:shadow-md transition-all duration-200',
+            'border-l-4 border-l-amber-500'
+          )}
+        >
+          <div className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">
+                  {t('aiProposals')}
+                </p>
+                <p className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums">
+                  {t('ready')}
+                </p>
+                <p className="text-xs text-slate-500 dark:text-neutral-400 mt-1">{t('generateProposals')}</p>
+              </div>
+              <div className="h-10 w-10 rounded-xl bg-amber-50 dark:bg-amber-950 flex items-center justify-center">
+                <Sparkles className="h-5 w-5 text-amber-500" />
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Filters */}

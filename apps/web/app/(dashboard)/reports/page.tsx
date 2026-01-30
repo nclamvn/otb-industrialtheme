@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import { useTranslations } from 'next-intl';
+import { cn } from '@/lib/utils';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -268,47 +269,64 @@ export default function ReportsPage() {
 
           {/* Report Types */}
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {reportTypes.map((report) => {
+            {reportTypes.map((report, index) => {
               const Icon = report.icon;
               const isGenerating = generatingReport === report.id;
 
+              // Color mapping for each report type
+              const colorClasses = [
+                { border: 'border-l-emerald-500', bg: 'bg-emerald-50 dark:bg-emerald-950', text: 'text-emerald-600' },
+                { border: 'border-l-blue-500', bg: 'bg-blue-50 dark:bg-blue-950', text: 'text-blue-600' },
+                { border: 'border-l-violet-500', bg: 'bg-violet-50 dark:bg-violet-950', text: 'text-violet-600' },
+                { border: 'border-l-amber-500', bg: 'bg-amber-50 dark:bg-amber-950', text: 'text-amber-600' },
+                { border: 'border-l-rose-500', bg: 'bg-rose-50 dark:bg-rose-950', text: 'text-rose-600' },
+              ];
+              const colors = colorClasses[index % colorClasses.length];
+
               return (
-                <Card key={report.id}>
-                  <CardHeader>
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                          <Icon className="h-5 w-5 text-primary" />
-                        </div>
-                        <div>
-                          <CardTitle className="text-base">{t(report.nameKey)}</CardTitle>
-                          <CardDescription className="text-xs mt-1">
-                            {t(report.descKey)}
-                          </CardDescription>
-                        </div>
-                      </div>
+                <div
+                  key={report.id}
+                  className={cn(
+                    'relative overflow-hidden rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950',
+                    'shadow-sm hover:shadow-md transition-all duration-200',
+                    'border-l-4 p-4',
+                    colors.border
+                  )}
+                >
+                  <div className="flex items-start gap-3 mb-4">
+                    <div className={cn(
+                      'h-10 w-10 rounded-xl flex items-center justify-center',
+                      colors.bg
+                    )}>
+                      <Icon className={cn('h-5 w-5', colors.text)} />
                     </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex flex-wrap gap-2">
-                      {report.formats.map((format) => {
-                        const FormatIcon = formatIcons[format as keyof typeof formatIcons];
-                        return (
-                          <Button
-                            key={format}
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleGenerateReport(report.id, format)}
-                            disabled={isGenerating}
-                          >
-                            <FormatIcon className="h-4 w-4 mr-1" />
-                            {format.toUpperCase()}
-                          </Button>
-                        );
-                      })}
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-sm font-semibold text-slate-900 dark:text-neutral-100">
+                        {t(report.nameKey)}
+                      </h3>
+                      <p className="text-xs text-slate-500 dark:text-neutral-400 mt-1">
+                        {t(report.descKey)}
+                      </p>
                     </div>
-                  </CardContent>
-                </Card>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {report.formats.map((format) => {
+                      const FormatIcon = formatIcons[format as keyof typeof formatIcons];
+                      return (
+                        <Button
+                          key={format}
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleGenerateReport(report.id, format)}
+                          disabled={isGenerating}
+                        >
+                          <FormatIcon className="h-4 w-4 mr-1" />
+                          {format.toUpperCase()}
+                        </Button>
+                      );
+                    })}
+                  </div>
+                </div>
               );
             })}
           </div>

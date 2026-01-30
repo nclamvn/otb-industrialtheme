@@ -53,7 +53,7 @@ export function BudgetFilters({ filters, onFiltersChange, className }: BudgetFil
       <div className="flex items-center gap-3">
         {/* Search Input */}
         <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-neutral-400" />
           <input
             type="text"
             placeholder="Search by name..."
@@ -61,16 +61,16 @@ export function BudgetFilters({ filters, onFiltersChange, className }: BudgetFil
             onChange={(e) => updateFilter('search', e.target.value)}
             className={cn(
               'w-full pl-10 pr-4 py-2 rounded-lg',
-              'border border-slate-200 bg-white',
-              'text-sm placeholder:text-slate-400',
-              'focus:outline-none focus:border-amber-300 focus:ring-2 focus:ring-amber-100',
+              'border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950',
+              'text-sm text-slate-900 dark:text-neutral-100 placeholder:text-slate-400 dark:placeholder:text-neutral-500',
+              'focus:outline-none focus:border-amber-300 dark:focus:border-amber-500 focus:ring-2 focus:ring-amber-100 dark:focus:ring-amber-900',
               'transition-all duration-200'
             )}
           />
           {filters.search && (
             <button
               onClick={() => updateFilter('search', '')}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:text-neutral-400 dark:hover:text-neutral-200"
             >
               <X className="w-4 h-4" />
             </button>
@@ -84,9 +84,9 @@ export function BudgetFilters({ filters, onFiltersChange, className }: BudgetFil
             onChange={(e) => updateFilter('status', e.target.value as BudgetStatus)}
             className={cn(
               'appearance-none pl-4 pr-10 py-2 rounded-lg',
-              'border border-slate-200 bg-white',
-              'text-sm font-medium text-slate-700',
-              'focus:outline-none focus:border-amber-300 focus:ring-2 focus:ring-amber-100',
+              'border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950',
+              'text-sm font-medium text-slate-700 dark:text-neutral-300',
+              'focus:outline-none focus:border-amber-300 dark:focus:border-amber-500 focus:ring-2 focus:ring-amber-100 dark:focus:ring-amber-900',
               'cursor-pointer transition-all duration-200'
             )}
           >
@@ -96,7 +96,7 @@ export function BudgetFilters({ filters, onFiltersChange, className }: BudgetFil
               </option>
             ))}
           </select>
-          <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+          <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-neutral-400 pointer-events-none" />
         </div>
 
         {/* Advanced Filters Toggle */}
@@ -106,7 +106,7 @@ export function BudgetFilters({ filters, onFiltersChange, className }: BudgetFil
           onClick={() => setShowAdvanced(!showAdvanced)}
           className={cn(
             'gap-1.5',
-            showAdvanced && 'bg-amber-50 text-amber-700'
+            showAdvanced && 'bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400'
           )}
         >
           <Filter className="w-4 h-4" />
@@ -122,7 +122,7 @@ export function BudgetFilters({ filters, onFiltersChange, className }: BudgetFil
             variant="ghost"
             size="sm"
             onClick={clearFilters}
-            className="text-slate-500 hover:text-slate-700"
+            className="text-slate-500 hover:text-slate-700 dark:text-neutral-400 dark:hover:text-neutral-200"
           >
             <X className="w-4 h-4 mr-1" />
             Clear
@@ -132,8 +132,8 @@ export function BudgetFilters({ filters, onFiltersChange, className }: BudgetFil
 
       {/* Advanced Filters */}
       {showAdvanced && (
-        <div className="flex items-center gap-4 p-4 bg-slate-50 rounded-lg border border-slate-200">
-          <span className="text-sm text-slate-500">Budget Range:</span>
+        <div className="flex items-center gap-4 p-4 bg-slate-50 dark:bg-neutral-900 rounded-lg border border-slate-200 dark:border-neutral-800">
+          <span className="text-sm text-slate-500 dark:text-neutral-400">Budget Range:</span>
           <div className="flex items-center gap-2">
             <input
               type="number"
@@ -142,12 +142,12 @@ export function BudgetFilters({ filters, onFiltersChange, className }: BudgetFil
               onChange={(e) => updateFilter('minBudget', e.target.value ? Number(e.target.value) : null)}
               className={cn(
                 'w-32 px-3 py-1.5 rounded-lg',
-                'border border-slate-200 bg-white',
-                'text-sm placeholder:text-slate-400',
-                'focus:outline-none focus:border-amber-300'
+                'border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950',
+                'text-sm text-slate-900 dark:text-neutral-100 placeholder:text-slate-400 dark:placeholder:text-neutral-500',
+                'focus:outline-none focus:border-amber-300 dark:focus:border-amber-500'
               )}
             />
-            <span className="text-slate-400">—</span>
+            <span className="text-slate-400 dark:text-neutral-500">—</span>
             <input
               type="number"
               placeholder="Max"
@@ -155,9 +155,9 @@ export function BudgetFilters({ filters, onFiltersChange, className }: BudgetFil
               onChange={(e) => updateFilter('maxBudget', e.target.value ? Number(e.target.value) : null)}
               className={cn(
                 'w-32 px-3 py-1.5 rounded-lg',
-                'border border-slate-200 bg-white',
-                'text-sm placeholder:text-slate-400',
-                'focus:outline-none focus:border-amber-300'
+                'border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950',
+                'text-sm text-slate-900 dark:text-neutral-100 placeholder:text-slate-400 dark:placeholder:text-neutral-500',
+                'focus:outline-none focus:border-amber-300 dark:focus:border-amber-500'
               )}
             />
           </div>
@@ -171,8 +171,8 @@ export function BudgetFilters({ filters, onFiltersChange, className }: BudgetFil
                 className={cn(
                   'flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium transition-colors',
                   filters.status === option.value
-                    ? 'bg-slate-800 text-white'
-                    : 'bg-white border border-slate-200 text-slate-600 hover:border-slate-300'
+                    ? 'bg-slate-800 dark:bg-neutral-200 text-white dark:text-neutral-900'
+                    : 'bg-white dark:bg-neutral-950 border border-slate-200 dark:border-neutral-800 text-slate-600 dark:text-neutral-400 hover:border-slate-300 dark:hover:border-neutral-700'
                 )}
               >
                 <span className={cn('w-2 h-2 rounded-full', option.color)} />

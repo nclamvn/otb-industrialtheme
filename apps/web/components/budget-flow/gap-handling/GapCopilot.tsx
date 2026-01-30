@@ -59,19 +59,19 @@ export function GapCopilot({
   return (
     <div
       className={cn(
-        'fixed right-0 top-0 h-full bg-white border-l shadow-2xl z-50 flex flex-col transition-all duration-300',
+        'fixed right-0 top-0 h-full bg-white dark:bg-neutral-950 border-l dark:border-neutral-800 shadow-2xl z-50 flex flex-col transition-all duration-300',
         isExpanded ? 'w-[600px]' : 'w-[420px]'
       )}
     >
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b bg-gradient-to-r from-amber-50 to-orange-50">
+      <div className="flex items-center justify-between p-4 border-b dark:border-neutral-800 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30">
         <div className="flex items-center gap-3">
-          <div className="p-2.5 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 shadow-lg shadow-orange-200">
+          <div className="p-2.5 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 shadow-lg shadow-orange-200 dark:shadow-orange-900/30">
             <Sparkles className="h-5 w-5 text-white" />
           </div>
           <div>
-            <h3 className="font-semibold text-slate-800">Gap Copilot</h3>
-            <p className="text-xs text-slate-500">AI-powered budget optimization</p>
+            <h3 className="font-semibold text-slate-800 dark:text-neutral-100">Gap Copilot</h3>
+            <p className="text-xs text-slate-500 dark:text-neutral-400">AI-powered budget optimization</p>
           </div>
         </div>
 
@@ -105,17 +105,17 @@ export function GapCopilot({
         onValueChange={setActiveTab}
         className="flex-1 flex flex-col overflow-hidden"
       >
-        <TabsList className="grid w-full grid-cols-2 p-1 m-4 mb-0 bg-slate-100 rounded-lg">
+        <TabsList className="grid w-full grid-cols-2 p-1 m-4 mb-0 bg-slate-100 dark:bg-neutral-800 rounded-lg">
           <TabsTrigger
             value="suggestions"
-            className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm"
+            className="flex items-center gap-2 data-[state=active]:bg-white dark:data-[state=active]:bg-neutral-900 data-[state=active]:shadow-sm"
           >
             <Sparkles className="h-4 w-4" />
             AI Suggestions
           </TabsTrigger>
           <TabsTrigger
             value="analysis"
-            className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm"
+            className="flex items-center gap-2 data-[state=active]:bg-white dark:data-[state=active]:bg-neutral-900 data-[state=active]:shadow-sm"
           >
             <BarChart3 className="h-4 w-4" />
             Gap Analysis
@@ -142,12 +142,12 @@ export function GapCopilot({
       </Tabs>
 
       {/* Footer */}
-      <div className="p-4 border-t bg-slate-50">
-        <div className="flex items-center gap-2 text-xs text-slate-500">
+      <div className="p-4 border-t dark:border-neutral-800 bg-slate-50 dark:bg-neutral-900">
+        <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-neutral-400">
           <MessageSquare className="w-4 h-4" />
           <span>
             Need help? Ask the{' '}
-            <button className="text-amber-600 hover:underline font-medium">
+            <button className="text-amber-600 dark:text-amber-400 hover:underline font-medium">
               DAFC Copilot
             </button>{' '}
             for personalized advice.

@@ -2,11 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { AlertTriangle, CheckCircle, Clock, RefreshCw, ShoppingCart, Loader2 } from 'lucide-react';
+import { AlertTriangle, CheckCircle, Clock, RefreshCw, ShoppingCart, Loader2, Layers } from 'lucide-react';
 import { MOCStatusGrid } from './MOCStatusGrid';
 import { ReplenishmentAlertList } from './ReplenishmentAlertList';
 import type { ReplenishmentDashboardData, MOCData, ReplenishmentAlert } from '@/types/replenishment';
@@ -229,37 +229,97 @@ export function ReplenishmentDashboard({ brandId }: Props) {
 
       {/* Summary */}
       <div className="grid grid-cols-4 gap-4">
-        <Card>
-          <CardHeader className="pb-2"><CardTitle className="text-sm text-muted-foreground">{t('categories')}</CardTitle></CardHeader>
-          <CardContent><div className="text-2xl font-bold">{summary.totalCategories}</div></CardContent>
-        </Card>
-        <Card className="border-red-200 bg-red-50">
-          <CardHeader className="pb-2"><CardTitle className="text-sm text-red-700">{t('critical')}</CardTitle></CardHeader>
-          <CardContent>
-            <div className="flex items-center gap-2">
+        {/* Total Categories Card */}
+        <div
+          className={cn(
+            'relative overflow-hidden rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950',
+            'shadow-sm hover:shadow-md transition-all duration-200',
+            'border-l-4 border-l-blue-500 p-4'
+          )}
+        >
+          <div className="flex items-start justify-between">
+            <div>
+              <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">
+                {t('categories')}
+              </p>
+              <p className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums">
+                {summary.totalCategories}
+              </p>
+            </div>
+            <div className="h-10 w-10 rounded-xl bg-blue-50 dark:bg-blue-950 flex items-center justify-center">
+              <Layers className="h-5 w-5 text-blue-500" />
+            </div>
+          </div>
+        </div>
+
+        {/* Critical Card */}
+        <div
+          className={cn(
+            'relative overflow-hidden rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950',
+            'shadow-sm hover:shadow-md transition-all duration-200',
+            'border-l-4 border-l-red-500 p-4'
+          )}
+        >
+          <div className="flex items-start justify-between">
+            <div>
+              <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">
+                {t('critical')}
+              </p>
+              <p className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums">
+                {summary.criticalCount}
+              </p>
+            </div>
+            <div className="h-10 w-10 rounded-xl bg-red-50 dark:bg-red-950 flex items-center justify-center">
               <AlertTriangle className="h-5 w-5 text-red-500" />
-              <span className="text-2xl font-bold text-red-700">{summary.criticalCount}</span>
             </div>
-          </CardContent>
-        </Card>
-        <Card className="border-yellow-200 bg-yellow-50">
-          <CardHeader className="pb-2"><CardTitle className="text-sm text-yellow-700">{t('warning')}</CardTitle></CardHeader>
-          <CardContent>
-            <div className="flex items-center gap-2">
+          </div>
+        </div>
+
+        {/* Warning Card */}
+        <div
+          className={cn(
+            'relative overflow-hidden rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950',
+            'shadow-sm hover:shadow-md transition-all duration-200',
+            'border-l-4 border-l-yellow-500 p-4'
+          )}
+        >
+          <div className="flex items-start justify-between">
+            <div>
+              <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">
+                {t('warning')}
+              </p>
+              <p className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums">
+                {summary.warningCount}
+              </p>
+            </div>
+            <div className="h-10 w-10 rounded-xl bg-yellow-50 dark:bg-yellow-950 flex items-center justify-center">
               <Clock className="h-5 w-5 text-yellow-500" />
-              <span className="text-2xl font-bold text-yellow-700">{summary.warningCount}</span>
             </div>
-          </CardContent>
-        </Card>
-        <Card className="border-green-200 bg-green-50">
-          <CardHeader className="pb-2"><CardTitle className="text-sm text-green-700">{t('normal')}</CardTitle></CardHeader>
-          <CardContent>
-            <div className="flex items-center gap-2">
+          </div>
+        </div>
+
+        {/* Healthy/Normal Card */}
+        <div
+          className={cn(
+            'relative overflow-hidden rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950',
+            'shadow-sm hover:shadow-md transition-all duration-200',
+            'border-l-4 border-l-green-500 p-4'
+          )}
+        >
+          <div className="flex items-start justify-between">
+            <div>
+              <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">
+                {t('normal')}
+              </p>
+              <p className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums">
+                {summary.healthyCount}
+              </p>
+            </div>
+            <div className="h-10 w-10 rounded-xl bg-green-50 dark:bg-green-950 flex items-center justify-center">
               <CheckCircle className="h-5 w-5 text-green-500" />
-              <span className="text-2xl font-bold text-green-700">{summary.healthyCount}</span>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
 
       {/* Tabs */}

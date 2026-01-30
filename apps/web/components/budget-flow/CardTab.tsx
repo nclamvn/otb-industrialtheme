@@ -1,10 +1,28 @@
 'use client';
 
 import { cn } from '@/lib/utils';
-import { CardTabProps, HierarchyLevel } from './types';
-import { getHierarchyColor, getStatusColor } from './utils/hierarchy-colors';
-import { formatCurrency, formatPercentage } from './utils/budget-calculations';
+import { CardTabProps } from './types';
+import {
+  getLevelStyles,
+  BudgetStatusBadge,
+  formatBudgetCurrency,
+  formatBudgetPercentage,
+  BudgetCardStatus,
+  BudgetLevel,
+} from '@/components/ui/budget';
 import { ChevronRight, ChevronDown } from 'lucide-react';
+
+// Map node status to BudgetCardStatus
+function mapStatus(status: string): BudgetCardStatus {
+  const statusMap: Record<string, BudgetCardStatus> = {
+    draft: 'draft',
+    verified: 'verified',
+    warning: 'warning',
+    error: 'error',
+    locked: 'locked',
+  };
+  return statusMap[status] || 'draft';
+}
 
 export function CardTab({
   node,
@@ -12,59 +30,55 @@ export function CardTab({
   isLast = false,
   isExpanded = false,
 }: CardTabProps & { isExpanded?: boolean }) {
-  const colors = getHierarchyColor(node.level);
-  const statusColors = getStatusColor(node.status);
+  // Use unified design system
+  const level = Math.min(Math.max(node.level, 1), 5) as BudgetLevel;
+  const levelStyles = getLevelStyles(level);
 
   return (
     <button
       onClick={onClick}
       className={cn(
         'w-full text-left',
-        'p-5 transition-all duration-200',
-        'bg-white border border-slate-200 rounded-xl mb-2',
-        'hover:bg-amber-50/50 hover:border-amber-200',
-        'focus:outline-none focus:bg-amber-50/50 focus:border-amber-300',
+        'p-4 transition-all duration-200', // Unified: p-4 (16px)
+        'border border-slate-200 dark:border-neutral-800 rounded-xl mb-2', // Unified: rounded-xl (12px)
+        'border-l-4', // Unified: border-l-4 (4px)
+        levelStyles.band,
+        levelStyles.bg,
+        'shadow-sm hover:shadow-md', // Unified: shadow-sm default, shadow-md hover
+        'hover:bg-amber-50/50 dark:hover:bg-amber-950/50 hover:border-amber-200 dark:hover:border-amber-800',
+        'focus:outline-none focus:bg-amber-50/50 dark:focus:bg-amber-950/50 focus:border-amber-300 dark:focus:border-amber-700',
         'group',
       )}
       aria-expanded={isExpanded}
     >
-      <div className="flex items-start gap-4">
-        {/* Left Color Band */}
-        <div className={cn(
-          'w-1 self-stretch rounded-full flex-shrink-0',
-          colors.accent,
-        )} />
-
+      <div className="flex items-center gap-4">
         {/* Content */}
         <div className="flex-1 min-w-0">
           {/* Top row: Name + Status */}
           <div className="flex items-center gap-2 mb-3">
-            <span className={cn('font-medium', colors.text)}>
+            <span className="font-semibold text-slate-900 dark:text-neutral-100">
               {node.name}
             </span>
-            <div className="flex items-center gap-1.5">
-              <span className={cn('w-1.5 h-1.5 rounded-full', statusColors.dot)} />
-              <span className={cn('text-xs', statusColors.badge)}>{node.status}</span>
-            </div>
+            <BudgetStatusBadge status={mapStatus(node.status)} />
           </div>
 
-          {/* Bottom row: Large amount */}
+          {/* Bottom row: Large amount + percentage */}
           <div className="flex items-baseline justify-between">
-            <span className={cn('text-2xl font-bold tracking-tight tabular-nums', colors.text)}>
-              {formatCurrency(node.budget)}
+            <span className="text-2xl font-bold tracking-tight tabular-nums text-slate-900 dark:text-neutral-100">
+              {formatBudgetCurrency(node.budget)}
             </span>
-            <span className={cn('text-sm tabular-nums', colors.textMuted)}>
-              {formatPercentage(node.percentage)} of total
+            <span className="text-sm tabular-nums text-slate-500 dark:text-neutral-400">
+              {formatBudgetPercentage(node.percentage)} of total
             </span>
           </div>
         </div>
 
         {/* Chevron */}
-        <div className="flex-shrink-0 pt-1">
+        <div className="flex-shrink-0">
           {isExpanded ? (
-            <ChevronDown className="w-5 h-5 text-slate-400 group-hover:text-slate-600" />
+            <ChevronDown className="w-5 h-5 text-slate-400 dark:text-neutral-500 group-hover:text-slate-600 dark:group-hover:text-neutral-300" />
           ) : (
-            <ChevronRight className="w-5 h-5 text-slate-400 group-hover:text-slate-600" />
+            <ChevronRight className="w-5 h-5 text-slate-400 dark:text-neutral-500 group-hover:text-slate-600 dark:group-hover:text-neutral-300" />
           )}
         </div>
       </div>

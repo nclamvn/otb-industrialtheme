@@ -7,6 +7,7 @@ import { BudgetOverviewHeader } from './BudgetOverviewHeader';
 import { BudgetBreadcrumb } from './BudgetBreadcrumb';
 import { BudgetFilters, useBudgetFilters, filterBudgetNodes } from './BudgetFilters';
 import { StackedCard } from './StackedCard';
+import { EnhancedBudgetCard } from './EnhancedBudgetCard';
 import { ExpandableCard } from './ExpandableCard';
 import { GapCopilot } from './gap-handling';
 import { VersionHistoryPanel } from './version-history';
@@ -162,11 +163,34 @@ export function BudgetFlowView({
     }
   }, [data, toggleCard]);
 
+  // Recursive renderer for EnhancedBudgetCard
+  const renderEnhancedNode = (node: BudgetNode, depth: number = 0) => {
+    const hasChildren = !!(node.children && node.children.length > 0);
+    const expanded = isExpanded(node.id);
+
+    return (
+      <div key={node.id} style={{ marginLeft: depth > 0 ? `${depth * 16}px` : 0 }}>
+        <EnhancedBudgetCard
+          node={node}
+          onClick={() => toggleCard(node.id)}
+          isExpanded={expanded}
+          hasChildren={hasChildren}
+        />
+        {/* Render children recursively when expanded */}
+        {expanded && hasChildren && (
+          <div className="mt-1">
+            {node.children!.map((child) => renderEnhancedNode(child, depth + 1))}
+          </div>
+        )}
+      </div>
+    );
+  };
+
   // Render List View (flat rows)
   const renderListView = () => {
     if (filteredChildren.length === 0) {
       return (
-        <div className="text-center py-12 text-slate-500">
+        <div className="text-center py-12 text-slate-500 dark:text-neutral-400">
           <p>No items match your filters</p>
         </div>
       );
@@ -174,19 +198,7 @@ export function BudgetFlowView({
 
     return (
       <div className="space-y-1">
-        {filteredChildren.map((child) => (
-          <StackedCard
-            key={child.id}
-            node={child}
-            isExpanded={isExpanded(child.id)}
-            onToggle={toggleCard}
-            onNodeUpdate={onNodeUpdate}
-            onProductUpdate={onProductUpdate}
-            onSizeUpdate={onSizeUpdate}
-            expandedIds={state.expandedIds}
-            depth={0}
-          />
-        ))}
+        {filteredChildren.map((child) => renderEnhancedNode(child, 0))}
       </div>
     );
   };
@@ -195,7 +207,7 @@ export function BudgetFlowView({
   const renderGridView = () => {
     if (filteredChildren.length === 0) {
       return (
-        <div className="text-center py-12 text-slate-500">
+        <div className="text-center py-12 text-slate-500 dark:text-neutral-400">
           <p>No items match your filters</p>
         </div>
       );
@@ -245,7 +257,7 @@ export function BudgetFlowView({
 
       {/* Results count */}
       {displayNode.children && (
-        <div className="text-sm text-slate-500 mb-4">
+        <div className="text-sm text-slate-500 dark:text-neutral-400 mb-4">
           Showing {filteredChildren.length} of {displayNode.children.length} items
         </div>
       )}
@@ -255,7 +267,7 @@ export function BudgetFlowView({
       </div>
 
       {/* Keyboard hints - minimal */}
-      <div className="mt-6 text-xs text-slate-400 flex gap-4">
+      <div className="mt-6 text-xs text-slate-400 dark:text-neutral-500 flex gap-4">
         <span>↑↓ Navigate</span>
         <span>←→ Collapse/Expand</span>
         <span>⌘E Expand all</span>
@@ -273,7 +285,7 @@ export function BudgetFlowView({
           onClick={() => setIsVersionHistoryOpen(true)}
           className={cn(
             'h-12 w-12 rounded-full shadow-lg',
-            'bg-slate-700 hover:bg-slate-800',
+            'bg-slate-700 hover:bg-slate-800 dark:bg-neutral-700 dark:hover:bg-neutral-600',
             'flex items-center justify-center transition-all hover:scale-110'
           )}
         >

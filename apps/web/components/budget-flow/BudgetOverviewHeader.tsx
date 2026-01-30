@@ -57,11 +57,11 @@ export function BudgetOverviewHeader({
             </Button>
           )}
           <div>
-            <h1 className="text-2xl font-bold text-slate-900">
+            <h1 className="text-2xl font-bold text-slate-900 dark:text-neutral-100">
               {rootNode.name}
             </h1>
             {rootNode.metadata?.seasonYear && (
-              <p className="text-sm text-slate-500 mt-1">
+              <p className="text-sm text-slate-500 dark:text-neutral-400 mt-1">
                 Season {rootNode.metadata.seasonYear}
               </p>
             )}
@@ -70,14 +70,14 @@ export function BudgetOverviewHeader({
 
         {/* Actions */}
         <div className="flex items-center gap-2">
-          <div className="flex items-center bg-slate-100 rounded-lg p-0.5">
+          <div className="flex items-center bg-slate-100 dark:bg-neutral-800 rounded-lg p-0.5">
             <Button
               variant="ghost"
               size="sm"
               onClick={() => onViewModeChange('stacked')}
               className={cn(
                 'gap-1.5 h-8',
-                viewMode === 'stacked' && 'bg-white shadow-sm'
+                viewMode === 'stacked' && 'bg-white dark:bg-neutral-900 shadow-sm'
               )}
             >
               <Layers className="w-4 h-4" />
@@ -89,7 +89,7 @@ export function BudgetOverviewHeader({
               onClick={() => onViewModeChange('grid')}
               className={cn(
                 'gap-1.5 h-8',
-                viewMode === 'grid' && 'bg-white shadow-sm'
+                viewMode === 'grid' && 'bg-white dark:bg-neutral-900 shadow-sm'
               )}
             >
               <Grid3X3 className="w-4 h-4" />
@@ -119,23 +119,23 @@ export function BudgetOverviewHeader({
       </div>
 
       {/* Stats Row - Premium Design */}
-      <div className="flex items-center gap-6 p-4 bg-white border border-slate-200 rounded-xl">
+      <div className="flex items-center gap-6 p-4 bg-white dark:bg-neutral-950 border border-slate-200 dark:border-neutral-800 rounded-xl">
         <div className="flex items-baseline gap-2">
-          <span className="text-xs uppercase tracking-wide text-slate-400 font-medium">Budget</span>
-          <span className="text-lg font-bold text-slate-900 tabular-nums">
+          <span className="text-xs uppercase tracking-wide text-slate-400 dark:text-neutral-400 font-medium">Budget</span>
+          <span className="text-lg font-bold text-slate-900 dark:text-neutral-100 tabular-nums">
             {formatCurrency(rootNode.budget)}
           </span>
         </div>
-        <div className="w-px h-8 bg-slate-200" />
+        <div className="w-px h-8 bg-slate-200 dark:bg-neutral-800" />
         <div className="flex items-baseline gap-2">
-          <span className="text-xs uppercase tracking-wide text-slate-400 font-medium">Allocated</span>
-          <span className="text-lg font-bold text-slate-700 tabular-nums">
+          <span className="text-xs uppercase tracking-wide text-slate-400 dark:text-neutral-400 font-medium">Allocated</span>
+          <span className="text-lg font-bold text-slate-700 dark:text-neutral-300 tabular-nums">
             {formatCurrency(allocated)}
           </span>
         </div>
-        <div className="w-px h-8 bg-slate-200" />
+        <div className="w-px h-8 bg-slate-200 dark:bg-neutral-800" />
         <div className="flex items-baseline gap-2">
-          <span className="text-xs uppercase tracking-wide text-slate-400 font-medium">
+          <span className="text-xs uppercase tracking-wide text-slate-400 dark:text-neutral-400 font-medium">
             {isOverBudget ? 'Over' : 'Remaining'}
           </span>
           <span className={cn(
@@ -145,19 +145,19 @@ export function BudgetOverviewHeader({
             {formatCurrency(Math.abs(remaining))}
           </span>
         </div>
-        <div className="w-px h-8 bg-slate-200" />
+        <div className="w-px h-8 bg-slate-200 dark:bg-neutral-800" />
         <div className="flex items-center gap-3 flex-1">
-          <div className="flex-1 max-w-xs h-2 bg-slate-100 rounded-full overflow-hidden">
+          <div className="flex-1 max-w-xs h-2 bg-slate-100 dark:bg-neutral-800 rounded-full overflow-hidden">
             <div
               className={cn(
                 'h-full rounded-full transition-all duration-300',
                 percentage > 1 ? 'bg-red-500' :
-                percentage > 0.95 ? 'bg-amber-500' : 'bg-slate-800'
+                percentage > 0.95 ? 'bg-amber-500' : 'bg-slate-800 dark:bg-slate-200'
               )}
               style={{ width: `${Math.min(percentage * 100, 100)}%` }}
             />
           </div>
-          <span className="text-slate-700 font-bold tabular-nums">
+          <span className="text-slate-700 dark:text-neutral-300 font-bold tabular-nums">
             {formatPercentage(percentage)}
           </span>
         </div>

@@ -1,15 +1,13 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { cn } from '@/lib/utils';
 import { BudgetNode } from '../types';
 import { formatCurrency } from '../utils/budget-calculations';
+import { useGapCopilot } from '../hooks/useGapCopilot';
 import {
   AISuggestion,
-  GapAnalysis,
   SuggestionAction,
-  analyzeGaps,
-  generateSuggestions,
   PRIORITY_COLORS,
 } from './types';
 import {
@@ -39,6 +37,7 @@ import {
 import { toast } from 'sonner';
 
 interface AISuggestionPanelProps {
+  budgetId?: string;
   data: BudgetNode;
   onApplySuggestion?: (suggestion: AISuggestion) => Promise<void>;
   onApplyAction?: (action: SuggestionAction) => void;
@@ -71,11 +70,11 @@ function SuggestionCard({
   return (
     <div
       className={cn(
-        'rounded-xl border bg-white overflow-hidden transition-all',
-        suggestion.priority === 'urgent' && 'border-red-200 shadow-red-100/50 shadow-lg',
-        suggestion.priority === 'high' && 'border-amber-200',
-        suggestion.priority === 'medium' && 'border-blue-200',
-        suggestion.priority === 'low' && 'border-slate-200'
+        'rounded-xl border bg-white dark:bg-neutral-950 overflow-hidden transition-all',
+        suggestion.priority === 'urgent' && 'border-red-200 dark:border-red-800 shadow-red-100/50 dark:shadow-red-900/30 shadow-lg',
+        suggestion.priority === 'high' && 'border-amber-200 dark:border-amber-800',
+        suggestion.priority === 'medium' && 'border-blue-200 dark:border-blue-800',
+        suggestion.priority === 'low' && 'border-slate-200 dark:border-neutral-800'
       )}
     >
       {/* Header */}
@@ -85,10 +84,10 @@ function SuggestionCard({
           <div
             className={cn(
               'p-2 rounded-lg',
-              suggestion.priority === 'urgent' && 'bg-red-100 text-red-600',
-              suggestion.priority === 'high' && 'bg-amber-100 text-amber-600',
-              suggestion.priority === 'medium' && 'bg-blue-100 text-blue-600',
-              suggestion.priority === 'low' && 'bg-slate-100 text-slate-600'
+              suggestion.priority === 'urgent' && 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400',
+              suggestion.priority === 'high' && 'bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400',
+              suggestion.priority === 'medium' && 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400',
+              suggestion.priority === 'low' && 'bg-slate-100 dark:bg-neutral-800 text-slate-600 dark:text-neutral-400'
             )}
           >
             {SUGGESTION_ICONS[suggestion.type]}
@@ -97,14 +96,14 @@ function SuggestionCard({
           {/* Content */}
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1">
-              <h4 className="font-semibold text-slate-800 truncate">
+              <h4 className="font-semibold text-slate-800 dark:text-neutral-100 truncate">
                 {suggestion.title}
               </h4>
               <Badge className={cn('text-xs', PRIORITY_COLORS[suggestion.priority])}>
                 {suggestion.priority}
               </Badge>
             </div>
-            <p className="text-sm text-slate-600 line-clamp-2">
+            <p className="text-sm text-slate-600 dark:text-neutral-400 line-clamp-2">
               {suggestion.description}
             </p>
           </div>
@@ -115,17 +114,17 @@ function SuggestionCard({
           <div className="flex items-center gap-2">
             <Zap className="w-3.5 h-3.5 text-amber-500" />
             <span className="text-sm">
-              <span className="font-medium text-slate-800">
+              <span className="font-medium text-slate-800 dark:text-neutral-100">
                 {formatCurrency(suggestion.impact.amount)}
               </span>
-              <span className="text-slate-500"> impact</span>
+              <span className="text-slate-500 dark:text-neutral-400"> impact</span>
             </span>
           </div>
 
           <div className="flex-1">
             <div className="flex items-center justify-between text-xs mb-1">
-              <span className="text-slate-500">Confidence</span>
-              <span className="font-medium">{suggestion.confidence}%</span>
+              <span className="text-slate-500 dark:text-neutral-400">Confidence</span>
+              <span className="font-medium dark:text-neutral-200">{suggestion.confidence}%</span>
             </div>
             <Progress value={suggestion.confidence} className="h-1.5" />
           </div>
@@ -171,43 +170,43 @@ function SuggestionCard({
       {/* Expanded Details */}
       <Collapsible open={isExpanded} onOpenChange={setIsExpanded}>
         <CollapsibleContent>
-          <div className="px-4 pb-4 border-t border-slate-100 pt-3 space-y-3">
+          <div className="px-4 pb-4 border-t border-slate-100 dark:border-neutral-800 pt-3 space-y-3">
             {/* Reasoning */}
             <div>
-              <h5 className="text-xs uppercase tracking-wider text-slate-400 font-semibold mb-1">
+              <h5 className="text-xs uppercase tracking-wider text-slate-400 dark:text-neutral-500 font-semibold mb-1">
                 AI Reasoning
               </h5>
-              <p className="text-sm text-slate-600 bg-slate-50 p-3 rounded-lg">
+              <p className="text-sm text-slate-600 dark:text-neutral-400 bg-slate-50 dark:bg-neutral-900 p-3 rounded-lg">
                 {suggestion.reasoning}
               </p>
             </div>
 
             {/* Actions Detail */}
             <div>
-              <h5 className="text-xs uppercase tracking-wider text-slate-400 font-semibold mb-2">
+              <h5 className="text-xs uppercase tracking-wider text-slate-400 dark:text-neutral-500 font-semibold mb-2">
                 Changes to Apply
               </h5>
               <div className="space-y-2">
                 {suggestion.actions.map((action, index) => (
                   <div
                     key={index}
-                    className="flex items-center justify-between p-2 bg-slate-50 rounded-lg text-sm"
+                    className="flex items-center justify-between p-2 bg-slate-50 dark:bg-neutral-900 rounded-lg text-sm"
                   >
-                    <span className="text-slate-600">{action.nodeId}</span>
+                    <span className="text-slate-600 dark:text-neutral-400">{action.nodeId}</span>
                     <div className="flex items-center gap-2">
-                      <span className="text-slate-400 tabular-nums">
+                      <span className="text-slate-400 dark:text-neutral-500 tabular-nums">
                         {formatCurrency(action.currentValue)}
                       </span>
-                      <span className="text-slate-400">→</span>
-                      <span className="font-medium text-slate-800 tabular-nums">
+                      <span className="text-slate-400 dark:text-neutral-500">→</span>
+                      <span className="font-medium text-slate-800 dark:text-neutral-100 tabular-nums">
                         {formatCurrency(action.newValue)}
                       </span>
                       <span
                         className={cn(
                           'text-xs px-1.5 py-0.5 rounded',
                           action.change > 0
-                            ? 'bg-green-100 text-green-700'
-                            : 'bg-red-100 text-red-700'
+                            ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400'
+                            : 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400'
                         )}
                       >
                         {action.change > 0 ? '+' : ''}
@@ -226,67 +225,97 @@ function SuggestionCard({
 }
 
 export function AISuggestionPanel({
+  budgetId,
   data,
   onApplySuggestion,
   onApplyAction,
   className,
 }: AISuggestionPanelProps) {
-  const [dismissedIds, setDismissedIds] = useState<Set<string>>(new Set());
   const [applyingId, setApplyingId] = useState<string | null>(null);
-  const [isGenerating, setIsGenerating] = useState(false);
 
-  // Analyze gaps and generate suggestions
-  const gaps = useMemo(() => analyzeGaps(data), [data]);
-  const suggestions = useMemo(() => generateSuggestions(gaps, data), [gaps, data]);
+  // Use the gap copilot hook for API integration
+  const {
+    gaps,
+    gapSummary,
+    isAnalyzing,
+    suggestions,
+    isGeneratingSuggestions,
+    generateSuggestions: generateSuggestionsFromApi,
+    applySuggestion: applySuggestionViaApi,
+    dismissSuggestion: dismissSuggestionViaApi,
+    analyzeGaps: analyzeGapsViaApi,
+  } = useGapCopilot({
+    budgetId: budgetId || '',
+    budgetNode: data,
+  });
 
-  // Filter out dismissed suggestions
-  const activeSuggestions = useMemo(
-    () => suggestions.filter((s) => !dismissedIds.has(s.id)),
-    [suggestions, dismissedIds]
-  );
+  // Initial analysis on mount
+  useEffect(() => {
+    if (budgetId || data) {
+      analyzeGapsViaApi();
+    }
+  }, [budgetId, analyzeGapsViaApi]);
 
-  const handleApply = async (suggestion: AISuggestion) => {
+  // Generate suggestions after gaps are analyzed
+  useEffect(() => {
+    if (gaps.length > 0 && suggestions.length === 0 && !isGeneratingSuggestions) {
+      generateSuggestionsFromApi();
+    }
+  }, [gaps, suggestions.length, isGeneratingSuggestions, generateSuggestionsFromApi]);
+
+  const handleApply = useCallback(async (suggestion: AISuggestion) => {
     setApplyingId(suggestion.id);
     try {
+      // Try API first if budgetId is provided
+      if (budgetId) {
+        const success = await applySuggestionViaApi(suggestion.id);
+        if (success) {
+          toast.success(`Applied: ${suggestion.title}`);
+          setApplyingId(null);
+          return;
+        }
+      }
+
+      // Fallback to local handlers
       if (onApplySuggestion) {
         await onApplySuggestion(suggestion);
       } else if (onApplyAction) {
-        // Apply each action individually
         suggestion.actions.forEach((action) => {
           onApplyAction(action);
         });
       }
       toast.success(`Applied: ${suggestion.title}`);
-      setDismissedIds((prev) => new Set([...Array.from(prev), suggestion.id]));
     } catch (error) {
       toast.error('Failed to apply suggestion');
     } finally {
       setApplyingId(null);
     }
-  };
+  }, [budgetId, applySuggestionViaApi, onApplySuggestion, onApplyAction]);
 
-  const handleDismiss = (suggestionId: string) => {
-    setDismissedIds((prev) => new Set([...Array.from(prev), suggestionId]));
+  const handleDismiss = useCallback(async (suggestionId: string) => {
+    // Try API first if budgetId is provided
+    if (budgetId) {
+      await dismissSuggestionViaApi(suggestionId, 'User dismissed');
+    }
     toast.info('Suggestion dismissed');
-  };
+  }, [budgetId, dismissSuggestionViaApi]);
 
-  const handleRegenerateAll = async () => {
-    setIsGenerating(true);
-    setDismissedIds(new Set());
-    // Simulate AI regeneration delay
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    setIsGenerating(false);
+  const handleRegenerateAll = useCallback(async () => {
+    await analyzeGapsViaApi();
+    await generateSuggestionsFromApi({ maxSuggestions: 10 });
     toast.success('Suggestions refreshed');
-  };
+  }, [analyzeGapsViaApi, generateSuggestionsFromApi]);
 
-  if (gaps.length === 0) {
+  const isLoading = isAnalyzing || isGeneratingSuggestions;
+
+  if (gaps.length === 0 && !isLoading) {
     return (
       <div className={cn('p-6 text-center', className)}>
-        <div className="w-12 h-12 mx-auto rounded-full bg-green-100 flex items-center justify-center mb-3">
-          <Sparkles className="w-6 h-6 text-green-600" />
+        <div className="w-12 h-12 mx-auto rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center mb-3">
+          <Sparkles className="w-6 h-6 text-green-600 dark:text-green-400" />
         </div>
-        <h4 className="font-medium text-slate-800 mb-1">All Optimized</h4>
-        <p className="text-sm text-slate-500">
+        <h4 className="font-medium text-slate-800 dark:text-neutral-100 mb-1">All Optimized</h4>
+        <p className="text-sm text-slate-500 dark:text-neutral-400">
           No optimization suggestions at this time. Your budget allocation looks good!
         </p>
       </div>
@@ -298,13 +327,13 @@ export function AISuggestionPanel({
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <div className="p-2 rounded-lg bg-gradient-to-br from-amber-100 to-orange-100">
-            <Sparkles className="w-5 h-5 text-amber-600" />
+          <div className="p-2 rounded-lg bg-gradient-to-br from-amber-100 to-orange-100 dark:from-amber-900/30 dark:to-orange-900/30">
+            <Sparkles className="w-5 h-5 text-amber-600 dark:text-amber-400" />
           </div>
           <div>
-            <h3 className="font-semibold text-slate-800">AI Suggestions</h3>
-            <p className="text-xs text-slate-500">
-              {activeSuggestions.length} recommendations
+            <h3 className="font-semibold text-slate-800 dark:text-neutral-100">AI Suggestions</h3>
+            <p className="text-xs text-slate-500 dark:text-neutral-400">
+              {suggestions.length} recommendations
             </p>
           </div>
         </div>
@@ -313,9 +342,9 @@ export function AISuggestionPanel({
           variant="outline"
           size="sm"
           onClick={handleRegenerateAll}
-          disabled={isGenerating}
+          disabled={isLoading}
         >
-          {isGenerating ? (
+          {isLoading ? (
             <Loader2 className="w-4 h-4 mr-2 animate-spin" />
           ) : (
             <Sparkles className="w-4 h-4 mr-2" />
@@ -324,18 +353,44 @@ export function AISuggestionPanel({
         </Button>
       </div>
 
+      {/* Gap Summary */}
+      {gapSummary && !isLoading && (
+        <div className="p-3 bg-slate-50 dark:bg-neutral-900 rounded-lg">
+          <div className="grid grid-cols-4 gap-2 text-center text-xs">
+            <div>
+              <div className="font-semibold text-slate-800 dark:text-neutral-100">{gapSummary.nodesWithGaps}</div>
+              <div className="text-slate-500 dark:text-neutral-400">Gaps Found</div>
+            </div>
+            <div>
+              <div className="font-semibold text-red-600 dark:text-red-400">{gapSummary.bySeverity.critical}</div>
+              <div className="text-slate-500 dark:text-neutral-400">Critical</div>
+            </div>
+            <div>
+              <div className="font-semibold text-amber-600 dark:text-amber-400">{gapSummary.bySeverity.warning}</div>
+              <div className="text-slate-500 dark:text-neutral-400">Warning</div>
+            </div>
+            <div>
+              <div className="font-semibold text-slate-600 dark:text-neutral-300">{gapSummary.avgGapPercent.toFixed(1)}%</div>
+              <div className="text-slate-500 dark:text-neutral-400">Avg Gap</div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Loading State */}
-      {isGenerating && (
-        <div className="p-6 text-center bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl border border-amber-100">
+      {isLoading && (
+        <div className="p-6 text-center bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30 rounded-xl border border-amber-100 dark:border-amber-800">
           <Loader2 className="w-8 h-8 mx-auto text-amber-500 animate-spin mb-3" />
-          <p className="text-sm text-amber-700">Analyzing budget gaps...</p>
+          <p className="text-sm text-amber-700 dark:text-amber-400">
+            {isAnalyzing ? 'Analyzing budget gaps...' : 'Generating AI suggestions...'}
+          </p>
         </div>
       )}
 
       {/* Suggestions List */}
-      {!isGenerating && activeSuggestions.length > 0 && (
+      {!isLoading && suggestions.length > 0 && (
         <div className="space-y-3">
-          {activeSuggestions.map((suggestion) => (
+          {suggestions.map((suggestion) => (
             <SuggestionCard
               key={suggestion.id}
               suggestion={suggestion}
@@ -348,10 +403,10 @@ export function AISuggestionPanel({
       )}
 
       {/* Empty State */}
-      {!isGenerating && activeSuggestions.length === 0 && suggestions.length > 0 && (
-        <div className="p-6 text-center bg-slate-50 rounded-xl">
-          <AlertCircle className="w-8 h-8 mx-auto text-slate-400 mb-3" />
-          <p className="text-sm text-slate-600 mb-3">
+      {!isLoading && suggestions.length === 0 && gaps.length > 0 && (
+        <div className="p-6 text-center bg-slate-50 dark:bg-neutral-900 rounded-xl">
+          <AlertCircle className="w-8 h-8 mx-auto text-slate-400 dark:text-neutral-500 mb-3" />
+          <p className="text-sm text-slate-600 dark:text-neutral-400 mb-3">
             All suggestions have been addressed.
           </p>
           <Button variant="outline" size="sm" onClick={handleRegenerateAll}>

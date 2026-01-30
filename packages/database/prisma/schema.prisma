@@ -504,6 +504,12 @@ model BudgetAllocation {
   // Version Control relations
   changeLogs BudgetChangeLog[]
 
+  // Budget Flow relations (Task #1, #3, #4)
+  treeNodes          BudgetTreeNode[]
+  gapAnalysisResults GapAnalysisResult[]
+  budgetSuggestions  BudgetSuggestion[]
+  budgetVersions     BudgetVersion[]
+
   @@unique([seasonId, brandId, locationId, version])
   @@map("budget_allocations")
 }
@@ -3068,4 +3074,294 @@ model ForecastRunResult {
   @@unique([runId, weekNumber])
   @@index([weekStartDate])
   @@map("forecast_run_results")
+}
+
+// ============================================
+// BUDGET FLOW - TREE STRUCTURE (Task #1)
+// ============================================
+
+enum BudgetNodeType {
+  SEASON       // Level 0: Season root
+  BRAND        // Level 1: Brand breakdown
+  GENDER       // Level 2: Gender (MEN, WOMEN, KIDS)
+  CATEGORY     // Level 3: Category (Footwear, Apparel)
+  SUBCATEGORY  // Level 4: Subcategory (Running, Lifestyle)
+  PRODUCT      // Level 5: Product SKU level
+}
+
+enum CardStatus {
+  DRAFT
+  VERIFIED
+  WARNING
+  ERROR
+  LOCKED
+}
+
+model BudgetTreeNode {
+  id              String   @id @default(cuid())
+
+  // Budget reference
+  budgetId        String
+  budget          BudgetAllocation @relation(fields: [budgetId], references: [id], onDelete: Cascade)
+
+  // Hierarchy
+  parentId        String?
+  parent          BudgetTreeNode?  @relation("BudgetTreeHierarchy", fields: [parentId], references: [id])
+  children        BudgetTreeNode[] @relation("BudgetTreeHierarchy")
+  level           Int              // 0-5: Season->Brand->Gender->Category->Subcategory->Product
+
+  // Node info
+  name            String
+  nodeType        BudgetNodeType
+
+  // Budget values
+  budgetValue     Decimal  @db.Decimal(15, 2)
+  allocatedValue  Decimal  @db.Decimal(15, 2) @default(0)
+  percentage      Decimal  @db.Decimal(5, 2)  @default(0)
+
+  // Status
+  status          CardStatus @default(DRAFT)
+
+  // Optional references to master data
+  brandId         String?
+  categoryId      String?
+  subcategoryId   String?
+  gender          Gender?
+
+  // Ordering and lock
+  sortOrder       Int      @default(0)
+  isLocked        Boolean  @default(false)
+
+  // Metadata
+  metadata        Json?    // Additional node-specific data
+
+  // Audit
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([budgetId, level])
+  @@index([parentId])
+  @@index([budgetId, nodeType])
+  @@map("budget_tree_nodes")
+}
+
+// ============================================
+// GAP ANALYSIS & AI SUGGESTIONS (Task #3)
+// ============================================
+
+enum GapSeverity {
+  OK
+  INFO
+  WARNING
+  CRITICAL
+}
+
+enum GapType {
+  BALANCED
+  UNDER   // Under-allocated (gap > 0)
+  OVER    // Over-allocated (gap < 0)
+}
+
+enum BudgetSuggestionType {
+  REALLOCATE         // Transfer from under to over
+  AUTO_BALANCE       // Redistribute across nodes
+  INCREASE_BUDGET    // Increase budget for over-allocated
+  DECREASE_BUDGET    // Decrease budget for under-utilized
+  SPLIT_ALLOCATION   // Split allocation across children
+  MERGE_ALLOCATION   // Merge child allocations
+  PRIORITIZE         // Increase critical items
+  DEFER              // Defer/reduce non-critical items
+}
+
+enum BudgetSuggestionStatus {
+  PENDING
+  APPLIED
+  DISMISSED
+  EXPIRED
+}
+
+model GapAnalysisResult {
+  id              String   @id @default(cuid())
+
+  // Budget reference
+  budgetId        String
+  budget          BudgetAllocation @relation(fields: [budgetId], references: [id], onDelete: Cascade)
+
+  // Node info
+  nodeId          String
+  nodeName        String
+  nodePath        Json     // Array of parent node names
+  nodeLevel       Int
+
+  // Budget values
+  budgetValue     Decimal  @db.Decimal(15, 2)
+  allocatedValue  Decimal  @db.Decimal(15, 2)
+
+  // Gap calculation
+  gap             Decimal  @db.Decimal(15, 2)  // budget - allocated
+  gapPercent      Decimal  @db.Decimal(5, 2)   // (gap / budget) * 100
+
+  // Classification
+  severity        GapSeverity
+  type            GapType
+
+  // Additional metrics
+  childrenWithGaps Int     @default(0)
+  totalChildren    Int     @default(0)
+
+  // Analysis metadata
+  analyzedAt      DateTime @default(now())
+
+  @@index([budgetId, severity])
+  @@index([budgetId, analyzedAt])
+  @@map("gap_analysis_results")
+}
+
+model BudgetSuggestion {
+  id              String   @id @default(cuid())
+
+  // Budget reference
+  budgetId        String
+  budget          BudgetAllocation @relation(fields: [budgetId], references: [id], onDelete: Cascade)
+
+  // Suggestion details
+  type            BudgetSuggestionType
+  title           String
+  description     String   @db.Text
+  reasoning       String?  @db.Text  // AI explanation
+
+  // Impact metrics
+  impactAmount    Decimal  @db.Decimal(15, 2)
+  impactPercent   Decimal  @db.Decimal(5, 2)
+  affectedNodes   Json     // Array of { nodeId, nodeName, change }
+
+  // Confidence and priority
+  confidence      Int      // 0-100
+  priority        SuggestionPriority
+
+  // Actions to take
+  actions         Json     // Array of { nodeId, field, currentValue, newValue }
+
+  // Status tracking
+  status          BudgetSuggestionStatus @default(PENDING)
+  appliedAt       DateTime?
+  appliedById     String?
+  dismissedAt     DateTime?
+  dismissedById   String?
+  dismissReason   String?
+
+  // Audit
+  createdAt       DateTime @default(now())
+  expiresAt       DateTime?
+
+  @@index([budgetId, status])
+  @@index([budgetId, priority])
+  @@map("budget_suggestions")
+}
+
+// ============================================
+// BUDGET VERSION HISTORY (Task #4)
+// ============================================
+
+enum BudgetVersionStatus {
+  DRAFT
+  SUBMITTED
+  APPROVED
+  REJECTED
+  CURRENT    // Currently active version
+  ARCHIVED   // Old version after rollback
+}
+
+enum BudgetChangeType {
+  CREATE     // New node created
+  UPDATE     // Node value updated
+  DELETE     // Node deleted
+  REALLOC    // Reallocation between nodes
+  MERGE      // Nodes merged
+  SPLIT      // Node split
+}
+
+model BudgetVersion {
+  id              String   @id @default(cuid())
+
+  // Budget reference
+  budgetId        String
+  budget          BudgetAllocation @relation(fields: [budgetId], references: [id], onDelete: Cascade)
+
+  // Version info
+  versionNumber   Int
+  name            String
+  description     String?  @db.Text
+
+  // Status
+  status          BudgetVersionStatus @default(DRAFT)
+
+  // Snapshot of entire tree
+  snapshotData    Json     // Full tree as JSON
+
+  // Summary metrics
+  totalBudget     Decimal  @db.Decimal(15, 2)
+  totalAllocated  Decimal  @db.Decimal(15, 2)
+  nodeCount       Int      @default(0)
+
+  // Tags for filtering
+  tags            String[]
+
+  // Changes from previous version
+  changes         BudgetVersionChange[]
+
+  // Creator info
+  createdAt       DateTime @default(now())
+  createdById     String
+
+  // Submission info
+  submittedAt     DateTime?
+  submittedById   String?
+
+  // Approval info
+  approvedAt      DateTime?
+  approvedById    String?
+  approvalComments String?
+
+  // Rejection info
+  rejectedAt      DateTime?
+  rejectedById    String?
+  rejectionReason String?
+
+  @@unique([budgetId, versionNumber])
+  @@index([budgetId, status])
+  @@index([createdAt])
+  @@map("budget_versions")
+}
+
+model BudgetVersionChange {
+  id              String   @id @default(cuid())
+
+  // Version reference
+  versionId       String
+  version         BudgetVersion @relation(fields: [versionId], references: [id], onDelete: Cascade)
+
+  // Node info
+  nodeId          String
+  nodeName        String
+  nodePath        Json     // Array of parent names
+
+  // Change details
+  changeType      BudgetChangeType
+  field           String   // 'budget', 'allocated', 'percentage', 'status'
+
+  // Values
+  oldValue        String?
+  newValue        String?
+
+  // Numeric diff (for budget/allocated changes)
+  diff            Decimal? @db.Decimal(15, 2)
+  diffPercent     Decimal? @db.Decimal(5, 2)
+
+  // Audit
+  changedAt       DateTime @default(now())
+
+  @@index([versionId])
+  @@index([nodeId])
+  @@map("budget_version_changes")
 }

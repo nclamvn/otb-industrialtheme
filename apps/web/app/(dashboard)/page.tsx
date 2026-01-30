@@ -304,14 +304,14 @@ export default async function DashboardPage() {
         items={data.contextItems}
       />
 
-      {/* Key KPIs - DAFC Styled */}
+      {/* Key KPIs - Unified Budget Card Design */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <DAFCKPICard
           title="Total Sales"
           value={formatCurrency(stats.totalSales)}
           subtitle={`${stats.totalUnits.toLocaleString()} units sold`}
           icon="DollarSign"
-          variant="gold"
+          variant="blue"
           trend={{ value: 12.5, label: 'vs last season' }}
           sparklineData={[10, 12, 11, 14, 13, 15, 15.5]}
         />
@@ -320,7 +320,7 @@ export default async function DashboardPage() {
           value={`${Math.round((stats.budgetUtilized / stats.totalBudget) * 100)}%`}
           subtitle={formatCurrency(stats.budgetUtilized)}
           icon="Target"
-          variant="green"
+          variant="purple"
           trend={{ value: 8.2, label: 'this month' }}
           sparklineData={[5, 6, 7, 7.5, 8, 8.2]}
         />
@@ -329,7 +329,7 @@ export default async function DashboardPage() {
           value={`${stats.avgMargin}%`}
           subtitle="Across all categories"
           icon="Percent"
-          variant="gold"
+          variant="green"
           trend={{ value: 2.3, label: 'vs target' }}
         />
         <DAFCKPICard
@@ -337,34 +337,34 @@ export default async function DashboardPage() {
           value={`${stats.sellThrough}%`}
           subtitle="Current season performance"
           icon="ShoppingCart"
-          variant="green"
+          variant="amber"
           trend={{ value: -1.5, label: 'vs last week' }}
           status="warning"
         />
       </div>
 
-      {/* Secondary KPIs */}
+      {/* Secondary KPIs - Unified Budget Card Design */}
       <div className="grid gap-4 md:grid-cols-4">
         <DAFCKPICard
           title={t('totalBrands')}
           value={stats.brandsCount}
           subtitle={t('activeBrands')}
           icon="Building2"
-          variant="default"
+          variant="blue"
         />
         <DAFCKPICard
           title={t('categories')}
           value={stats.categoriesCount}
           subtitle={t('productCategories')}
           icon="Package"
-          variant="default"
+          variant="purple"
         />
         <DAFCKPICard
           title={t('pendingApprovals')}
           value={stats.pendingApprovals}
           subtitle={t('itemsAwaitingReview')}
           icon="Target"
-          variant="default"
+          variant="amber"
           status={stats.pendingApprovals > 5 ? 'warning' : undefined}
         />
         <DAFCKPICard
@@ -372,7 +372,7 @@ export default async function DashboardPage() {
           value={stats.activePlans}
           subtitle={t('otbPlansInProgress')}
           icon="BarChart3"
-          variant="default"
+          variant="green"
         />
       </div>
 

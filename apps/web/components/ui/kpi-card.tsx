@@ -14,19 +14,20 @@ import {
 // KPI CARD VARIANTS
 // ═══════════════════════════════════════════════════════════════════════════════
 
+// Unified design: rounded-xl, p-4, border-l-4, shadow-sm, hover:shadow-md
 const kpiCardVariants = cva(
-  'bg-card border border-border rounded-lg relative overflow-hidden transition-all duration-200',
+  'bg-white border border-slate-200 rounded-xl relative overflow-hidden transition-all duration-200 shadow-sm hover:shadow-md border-l-4',
   {
     variants: {
       status: {
-        default: '',
-        critical: 'border-t-2 border-t-status-critical',
-        warning: 'border-t-2 border-t-status-warning',
-        success: 'border-t-2 border-t-status-success',
-        info: 'border-t-2 border-t-status-info',
+        default: 'border-l-slate-400',
+        critical: 'border-l-red-500',
+        warning: 'border-l-amber-500',
+        success: 'border-l-green-500',
+        info: 'border-l-blue-500',
         // DAFC Brand Variants
-        gold: 'border-t-3 border-t-dafc-gold',
-        green: 'border-t-3 border-t-dafc-green',
+        gold: 'border-l-amber-500',
+        green: 'border-l-green-500',
       },
       size: {
         sm: 'p-3',
@@ -92,16 +93,17 @@ export function KPICard({
     }
   };
 
+  // Unified health-based trend colors
   const getTrendColor = () => {
     if (!trend) return '';
 
     switch (trend.direction) {
       case 'up':
-        return 'text-data-positive';
+        return 'text-green-600 bg-green-50';
       case 'down':
-        return 'text-data-negative';
+        return 'text-red-600 bg-red-50';
       default:
-        return 'text-data-neutral';
+        return 'text-slate-500 bg-slate-50';
     }
   };
 
@@ -115,40 +117,44 @@ export function KPICard({
     return (
       <div className={cn(kpiCardVariants({ status, size }), className)}>
         <div className="space-y-3">
-          <div className="skeleton h-3 w-20" />
-          <div className="skeleton h-8 w-24" />
-          <div className="skeleton h-3 w-16" />
+          <div className="h-3 w-20 bg-slate-200 rounded animate-pulse" />
+          <div className="h-8 w-24 bg-slate-200 rounded animate-pulse" />
+          <div className="h-3 w-16 bg-slate-200 rounded animate-pulse" />
         </div>
       </div>
     );
   }
 
-  // Render icon
+  // Render icon - Unified: w-10 h-10 rounded-xl icon container
   const renderIcon = () => {
     if (!icon) return null;
 
     // Check if icon is a LucideIcon component
     if (typeof icon === 'function') {
       const IconComponent = icon as LucideIcon;
-      return <IconComponent className="w-4 h-4 text-content-muted" />;
+      return (
+        <div className="h-10 w-10 rounded-xl bg-slate-100 flex items-center justify-center">
+          <IconComponent className="w-5 h-5 text-slate-600" />
+        </div>
+      );
     }
 
     // Otherwise it's a ReactNode
-    return <span className="text-content-secondary">{icon}</span>;
+    return <span className="text-slate-600">{icon}</span>;
   };
 
   return (
     <div
       className={cn(
         kpiCardVariants({ status, size }),
-        onClick && 'cursor-pointer hover:border-accent/50 transition-colors',
+        onClick && 'cursor-pointer',
         className
       )}
       onClick={onClick}
     >
       {/* Header: Label + Icon */}
-      <div className="flex items-center justify-between mb-2">
-        <span className="text-xs font-medium uppercase tracking-wider text-content-secondary">
+      <div className="flex items-start justify-between mb-2">
+        <span className="text-xs font-medium uppercase tracking-wider text-slate-500">
           {label}
         </span>
         {renderIcon()}
@@ -157,7 +163,7 @@ export function KPICard({
       {/* Value */}
       <div className="mb-1">
         {typeof value === 'string' || typeof value === 'number' ? (
-          <span className="font-data text-2xl font-semibold tabular-nums text-content">
+          <span className="text-2xl font-bold tabular-nums text-slate-900">
             {value}
           </span>
         ) : (
@@ -168,16 +174,19 @@ export function KPICard({
       {/* Trend & Subtitle */}
       <div className="flex items-center gap-2">
         {trend && (
-          <div className={cn('flex items-center gap-1 text-xs font-medium font-data', getTrendColor())}>
+          <span className={cn(
+            'inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-xs font-medium',
+            getTrendColor()
+          )}>
             {getTrendIcon()}
             <span className="tabular-nums">{formatTrendValue(trend.value)}</span>
-            {trend.label && (
-              <span className="text-content-muted ml-1">{trend.label}</span>
-            )}
-          </div>
+          </span>
+        )}
+        {trend?.label && (
+          <span className="text-xs text-slate-400">{trend.label}</span>
         )}
         {subtitle && !trend && (
-          <span className="text-xs text-content-secondary">{subtitle}</span>
+          <span className="text-xs text-slate-500">{subtitle}</span>
         )}
       </div>
     </div>

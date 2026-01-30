@@ -35,6 +35,7 @@ interface DAFCAlertsPanelProps {
   className?: string;
 }
 
+// Unified severity config with border-l-4 styling
 const severityConfig: Record<AlertSeverity, {
   icon: typeof AlertTriangle;
   bgClass: string;
@@ -45,35 +46,35 @@ const severityConfig: Record<AlertSeverity, {
 }> = {
   critical: {
     icon: AlertCircle,
-    bgClass: 'bg-red-500/10',
+    bgClass: 'bg-red-50 dark:bg-red-950',
     borderClass: 'border-l-red-500',
-    iconClass: 'text-red-500',
+    iconClass: 'text-red-600',
     glowClass: 'glow-critical',
-    badgeClass: 'ind-badge-critical',
+    badgeClass: 'bg-red-50 dark:bg-red-950 text-red-700 border border-red-200',
   },
   warning: {
     icon: AlertTriangle,
-    bgClass: 'bg-amber-500/10',
+    bgClass: 'bg-amber-50 dark:bg-amber-950',
     borderClass: 'border-l-amber-500',
-    iconClass: 'text-amber-500',
+    iconClass: 'text-amber-600',
     glowClass: 'glow-warning',
-    badgeClass: 'ind-badge-warning',
+    badgeClass: 'bg-amber-50 dark:bg-amber-950 text-amber-700 border border-amber-200',
   },
   success: {
     icon: CheckCircle,
-    bgClass: 'bg-[hsl(152_73%_27%/0.1)]',
-    borderClass: 'border-l-[hsl(152_73%_27%)]',
-    iconClass: 'text-[hsl(152_73%_27%)]',
+    bgClass: 'bg-green-50 dark:bg-green-950',
+    borderClass: 'border-l-green-500',
+    iconClass: 'text-green-600',
     glowClass: 'glow-success',
-    badgeClass: 'ind-badge-success',
+    badgeClass: 'bg-green-50 dark:bg-green-950 text-green-700 border border-green-200',
   },
   info: {
     icon: Info,
-    bgClass: 'bg-blue-500/10',
+    bgClass: 'bg-blue-50 dark:bg-blue-950',
     borderClass: 'border-l-blue-500',
-    iconClass: 'text-blue-500',
+    iconClass: 'text-blue-600',
     glowClass: 'glow-info',
-    badgeClass: 'ind-badge-info',
+    badgeClass: 'bg-blue-50 dark:bg-blue-950 text-blue-700 border border-blue-200',
   },
 };
 
@@ -101,17 +102,18 @@ const AlertItem = ({
   return (
     <div
       className={cn(
-        'relative p-3 rounded-lg border-l-[3px] transition-all duration-200',
-        config.bgClass,
+        // Unified: rounded-xl, border-l-4, shadow-sm, hover:shadow-md
+        'relative p-3 rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950',
+        'border-l-4 shadow-sm hover:shadow-md transition-all duration-200',
         config.borderClass,
-        onClick && 'cursor-pointer hover:bg-opacity-20'
+        onClick && 'cursor-pointer'
       )}
       onClick={onClick}
     >
       <div className="flex items-start gap-3">
-        {/* Icon */}
+        {/* Unified: rounded-xl icon container */}
         <div className={cn(
-          'flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center',
+          'flex-shrink-0 w-8 h-8 rounded-xl flex items-center justify-center',
           config.bgClass
         )}>
           <Icon className={cn('h-4 w-4', config.iconClass)} />
@@ -120,7 +122,7 @@ const AlertItem = ({
         {/* Content */}
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2">
-            <h4 className="font-brand font-semibold text-sm text-foreground">
+            <h4 className="font-semibold text-sm text-slate-900 dark:text-neutral-100">
               {alert.title}
             </h4>
             {alert.dismissible && onDismiss && (
@@ -129,22 +131,22 @@ const AlertItem = ({
                   e.stopPropagation();
                   onDismiss();
                 }}
-                className="p-1 rounded-full hover:bg-muted transition-colors"
+                className="p-1 rounded-full hover:bg-slate-100 dark:hover:bg-neutral-800 transition-colors"
               >
-                <X className="h-3.5 w-3.5 text-muted-foreground" />
+                <X className="h-3.5 w-3.5 text-slate-400 dark:text-neutral-500" />
               </button>
             )}
           </div>
-          <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">
+          <p className="text-xs text-slate-500 dark:text-neutral-400 mt-0.5 line-clamp-2">
             {alert.description}
           </p>
           <div className="flex items-center gap-3 mt-2">
-            <span className="flex items-center gap-1 text-[10px] text-muted-foreground">
+            <span className="flex items-center gap-1 text-[10px] text-slate-400 dark:text-neutral-500">
               <Clock className="h-3 w-3" />
               {formatTimeAgo(alert.timestamp)}
             </span>
             {alert.actionLabel && (
-              <button className="text-[10px] font-semibold uppercase tracking-wide text-[hsl(30_43%_72%)] hover:text-[hsl(30_40%_55%)] transition-colors flex items-center gap-0.5">
+              <button className="text-[10px] font-semibold uppercase tracking-wide text-amber-600 hover:text-amber-700 transition-colors flex items-center gap-0.5">
                 {alert.actionLabel}
                 <ChevronRight className="h-3 w-3" />
               </button>
@@ -187,43 +189,52 @@ export function DAFCAlertsPanel({
   };
 
   return (
-    <div className={cn('dafc-card overflow-hidden', className)}>
+    <div
+      className={cn(
+        // Unified: rounded-xl, shadow-sm, hover:shadow-md, border-l-4
+        'rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 overflow-hidden',
+        'shadow-sm hover:shadow-md transition-all duration-200',
+        'border-l-4 border-l-amber-500',
+        className
+      )}
+    >
       {/* Header */}
-      <div className="dafc-card-header">
+      <div className="p-4 border-b border-slate-100 dark:border-neutral-800">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-full bg-[hsl(30_43%_72%/0.15)] flex items-center justify-center">
-              <Bell className="h-4.5 w-4.5 text-[hsl(30_43%_72%)]" />
+            {/* Unified: w-10 h-10 rounded-xl icon container */}
+            <div className="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-950 flex items-center justify-center">
+              <Bell className="h-5 w-5 text-amber-600" />
             </div>
             <div>
-              <h3 className="font-brand font-semibold text-lg text-foreground">{title}</h3>
-              <p className="text-xs text-muted-foreground mt-0.5">
+              <h3 className="font-semibold text-sm text-slate-900 dark:text-neutral-100">{title}</h3>
+              <p className="text-xs text-slate-500 dark:text-neutral-400 mt-0.5">
                 {alerts.length} active alert{alerts.length !== 1 ? 's' : ''}
               </p>
             </div>
           </div>
 
-          {/* Severity counts */}
+          {/* Severity counts - unified badge styling */}
           <div className="flex items-center gap-2">
             {counts.critical > 0 && (
-              <span className="ind-badge ind-badge-critical">{counts.critical}</span>
+              <span className="inline-flex items-center justify-center h-5 min-w-[20px] px-1.5 rounded-full text-xs font-medium bg-red-50 dark:bg-red-950 text-red-700 border border-red-200">{counts.critical}</span>
             )}
             {counts.warning > 0 && (
-              <span className="ind-badge ind-badge-warning">{counts.warning}</span>
+              <span className="inline-flex items-center justify-center h-5 min-w-[20px] px-1.5 rounded-full text-xs font-medium bg-amber-50 dark:bg-amber-950 text-amber-700 border border-amber-200">{counts.warning}</span>
             )}
             {counts.info > 0 && (
-              <span className="ind-badge ind-badge-info">{counts.info}</span>
+              <span className="inline-flex items-center justify-center h-5 min-w-[20px] px-1.5 rounded-full text-xs font-medium bg-blue-50 dark:bg-blue-950 text-blue-700 border border-blue-200">{counts.info}</span>
             )}
           </div>
         </div>
       </div>
 
       {/* Alerts list */}
-      <div className="dafc-card-content space-y-2">
+      <div className="p-4 space-y-2">
         {visibleAlerts.length === 0 ? (
           <div className="py-8 text-center">
-            <CheckCircle className="h-8 w-8 text-[hsl(152_73%_27%)] mx-auto mb-2" />
-            <p className="text-sm text-muted-foreground">No active alerts</p>
+            <CheckCircle className="h-8 w-8 text-green-500 mx-auto mb-2" />
+            <p className="text-sm text-slate-500 dark:text-neutral-400">No active alerts</p>
           </div>
         ) : (
           <>
@@ -239,7 +250,7 @@ export function DAFCAlertsPanel({
             {hasMore && (
               <button
                 onClick={() => setShowAll(!showAll)}
-                className="w-full py-2 text-center text-xs font-semibold uppercase tracking-wide text-[hsl(30_43%_72%)] hover:text-[hsl(30_40%_55%)] transition-colors"
+                className="w-full py-2 text-center text-xs font-semibold uppercase tracking-wide text-amber-600 hover:text-amber-700 transition-colors"
               >
                 {showAll ? 'Show Less' : `Show ${sortedAlerts.length - maxVisible} More`}
               </button>

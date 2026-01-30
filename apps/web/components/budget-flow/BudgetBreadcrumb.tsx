@@ -20,7 +20,7 @@ export function BudgetBreadcrumb({ path, onNavigate, className }: BudgetBreadcru
         onClick={() => onNavigate(null)}
         className={cn(
           'flex items-center gap-1.5 px-2 py-1 rounded-lg transition-colors',
-          'text-slate-500 hover:text-slate-900 hover:bg-slate-100'
+          'text-slate-500 dark:text-neutral-400 hover:text-slate-900 dark:hover:text-neutral-100 hover:bg-slate-100 dark:hover:bg-neutral-800'
         )}
       >
         <Home className="w-4 h-4" />
@@ -31,9 +31,9 @@ export function BudgetBreadcrumb({ path, onNavigate, className }: BudgetBreadcru
         const isLast = index === path.length - 1;
         return (
           <div key={node.id} className="flex items-center">
-            <ChevronRight className="w-4 h-4 text-slate-300 mx-1" />
+            <ChevronRight className="w-4 h-4 text-slate-300 dark:text-neutral-600 mx-1" />
             {isLast ? (
-              <span className="px-2 py-1 font-medium text-slate-900">
+              <span className="px-2 py-1 font-medium text-slate-900 dark:text-neutral-100">
                 {node.name}
               </span>
             ) : (
@@ -41,7 +41,7 @@ export function BudgetBreadcrumb({ path, onNavigate, className }: BudgetBreadcru
                 onClick={() => onNavigate(node)}
                 className={cn(
                   'px-2 py-1 rounded-lg transition-colors',
-                  'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                  'text-slate-600 dark:text-neutral-400 hover:text-slate-900 dark:hover:text-neutral-100 hover:bg-slate-100 dark:hover:bg-neutral-800'
                 )}
               >
                 {node.name}

@@ -3,9 +3,19 @@
 import { useState, useRef, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { BudgetNode } from './types';
-import { getHierarchyColor, getStatusColor } from './utils/hierarchy-colors';
-import { formatCurrency, formatPercentage, calculateAllocation } from './utils/budget-calculations';
+import {
+  BudgetProgressBar,
+  BudgetStatusBadge,
+  getLevelStyles,
+  getBudgetHealth,
+  getHealthStyles,
+  formatBudgetCurrency,
+  formatBudgetPercentage,
+  BudgetCardStatus,
+  BudgetLevel,
+} from '@/components/ui/budget';
 import { BudgetAllocationVisual } from './MiniDonutChart';
+import { calculateAllocation } from './utils/budget-calculations';
 import {
   ChevronDown,
   ChevronUp,
@@ -19,6 +29,7 @@ import {
   ExternalLink,
 } from 'lucide-react';
 import Link from 'next/link';
+import { motion, AnimatePresence } from 'framer-motion';
 
 // Color palette for chart segments
 const CHART_COLORS = [
@@ -36,6 +47,18 @@ interface ExpandableCardProps {
   node: BudgetNode;
   onDrillDown?: (node: BudgetNode) => void;
   onBudgetUpdate?: (nodeId: string, newBudget: number) => void;
+}
+
+// Map BudgetNode status to BudgetCardStatus
+function mapStatus(status: string): BudgetCardStatus {
+  const statusMap: Record<string, BudgetCardStatus> = {
+    draft: 'draft',
+    verified: 'verified',
+    warning: 'warning',
+    error: 'error',
+    locked: 'locked',
+  };
+  return statusMap[status] || 'draft';
 }
 
 // Inline Editable Budget Input Component
@@ -78,7 +101,7 @@ function EditableBudget({
   return (
     <div className="flex items-center gap-2">
       <div className="relative">
-        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-medium">$</span>
+        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-neutral-500 font-medium">$</span>
         <input
           ref={inputRef}
           type="text"
@@ -87,9 +110,9 @@ function EditableBudget({
           onKeyDown={handleKeyDown}
           onClick={(e) => e.stopPropagation()}
           className={cn(
-            'pl-7 pr-3 py-2 w-40 rounded-lg',
-            'border-2 border-amber-300 bg-white',
-            'text-xl font-bold tabular-nums text-slate-900',
+            'pl-7 pr-3 py-2 w-40 rounded-xl',
+            'border-2 border-amber-300 bg-white dark:bg-neutral-950',
+            'text-xl font-bold tabular-nums text-slate-900 dark:text-neutral-100',
             'focus:outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-100',
             className
           )}
@@ -97,13 +120,13 @@ function EditableBudget({
       </div>
       <button
         onClick={(e) => { e.stopPropagation(); handleSave(); }}
-        className="p-2 rounded-lg bg-emerald-500 text-white hover:bg-emerald-600 transition-colors"
+        className="p-2 rounded-xl bg-green-500 text-white hover:bg-green-600 transition-colors"
       >
         <Check className="w-4 h-4" />
       </button>
       <button
         onClick={(e) => { e.stopPropagation(); onCancel(); }}
-        className="p-2 rounded-lg bg-slate-200 text-slate-600 hover:bg-slate-300 transition-colors"
+        className="p-2 rounded-xl bg-slate-200 dark:bg-neutral-800 text-slate-600 dark:text-neutral-300 hover:bg-slate-300 dark:hover:bg-neutral-700 transition-colors"
       >
         <X className="w-4 h-4" />
       </button>
@@ -126,9 +149,10 @@ function EditableChildRow({
   color?: string;
 }) {
   const [isEditing, setIsEditing] = useState(false);
-  const childStatus = getStatusColor(child.status);
   const childAllocation = calculateAllocation(child);
   const shareOfParent = child.budget / parentBudget;
+  const health = getBudgetHealth(childAllocation.percentage);
+  const healthStyles = getHealthStyles(health);
 
   const handleSave = (newValue: number) => {
     onBudgetUpdate?.(child.id, newValue);
@@ -139,8 +163,8 @@ function EditableChildRow({
     <div
       className={cn(
         'group p-4 rounded-xl transition-all duration-200',
-        'bg-slate-50/50 hover:bg-amber-50/50',
-        'border border-transparent hover:border-amber-200',
+        'bg-slate-50/50 dark:bg-neutral-900/50 hover:bg-amber-50/50 dark:hover:bg-amber-950/50',
+        'border border-transparent hover:border-amber-200 dark:hover:border-amber-800',
         !isEditing && 'cursor-pointer'
       )}
       onClick={() => !isEditing && onDrillDown?.(child)}
@@ -148,15 +172,15 @@ function EditableChildRow({
       <div className="flex items-center gap-3 mb-2">
         {/* Color indicator - matches chart */}
         <div
-          className="w-1 h-8 rounded-full"
+          className="w-1 h-8 rounded-full flex-shrink-0"
           style={{ backgroundColor: color || '#64748b' }}
         />
 
         {/* Name + Status */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <span className="font-medium text-slate-800">{child.name}</span>
-            <span className={cn('w-1.5 h-1.5 rounded-full', childStatus.dot)} />
+            <span className="font-medium text-slate-800 dark:text-neutral-200 truncate">{child.name}</span>
+            <BudgetStatusBadge status={mapStatus(child.status)} />
           </div>
         </div>
 
@@ -170,10 +194,10 @@ function EditableChildRow({
         ) : (
           <div className="flex items-center gap-2">
             <div className="text-right">
-              <div className="font-bold text-slate-900 tabular-nums">
-                {formatCurrency(child.budget)}
+              <div className="font-bold text-slate-900 dark:text-neutral-100 tabular-nums">
+                {formatBudgetCurrency(child.budget)}
               </div>
-              <div className="text-xs text-slate-500 tabular-nums">
+              <div className="text-xs text-slate-500 dark:text-neutral-400 tabular-nums">
                 {(shareOfParent * 100).toFixed(1)}%
               </div>
             </div>
@@ -182,7 +206,7 @@ function EditableChildRow({
                 e.stopPropagation();
                 setIsEditing(true);
               }}
-              className="p-1.5 rounded-lg text-slate-400 hover:text-amber-600 hover:bg-amber-50 opacity-0 group-hover:opacity-100 transition-all"
+              className="p-1.5 rounded-xl text-slate-400 dark:text-neutral-500 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950 opacity-0 group-hover:opacity-100 transition-all"
             >
               <Pencil className="w-3.5 h-3.5" />
             </button>
@@ -190,23 +214,19 @@ function EditableChildRow({
         )}
       </div>
 
-      {/* Mini Progress Bar */}
+      {/* Mini Progress Bar using design system */}
       <div className="ml-4 flex items-center gap-3">
-        <div className="flex-1 h-1.5 bg-slate-200/50 rounded-full overflow-hidden">
+        <div className="flex-1 h-2 bg-slate-200 dark:bg-neutral-800 rounded-full overflow-hidden">
           <div
-            className={cn(
-              'h-full rounded-full transition-all',
-              childAllocation.percentage > 1 ? 'bg-red-400' :
-              childAllocation.percentage > 0.95 ? 'bg-amber-400' : 'bg-slate-500'
-            )}
+            className={cn('h-full rounded-full transition-all duration-500', healthStyles.bar)}
             style={{ width: `${Math.min(childAllocation.percentage * 100, 100)}%` }}
           />
         </div>
         <span className={cn(
           'text-xs tabular-nums font-medium min-w-[60px] text-right',
-          childAllocation.isOverBudget ? 'text-red-500' : 'text-slate-500'
+          healthStyles.text
         )}>
-          {formatPercentage(childAllocation.percentage)} used
+          {formatBudgetPercentage(childAllocation.percentage)} used
         </span>
       </div>
     </div>
@@ -216,9 +236,13 @@ function EditableChildRow({
 export function ExpandableCard({ node, onDrillDown, onBudgetUpdate }: ExpandableCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isEditingMain, setIsEditingMain] = useState(false);
-  const colors = getHierarchyColor(node.level);
-  const statusColors = getStatusColor(node.status);
+
+  // Use unified design system
+  const level = Math.min(Math.max(node.level, 1), 5) as BudgetLevel;
+  const levelStyles = getLevelStyles(level);
   const { allocated, remaining, percentage, isOverBudget } = calculateAllocation(node);
+  const health = getBudgetHealth(percentage);
+  const healthStyles = getHealthStyles(health);
   const hasChildren = node.children && node.children.length > 0;
 
   const handleMainBudgetSave = (newValue: number) => {
@@ -230,8 +254,11 @@ export function ExpandableCard({ node, onDrillDown, onBudgetUpdate }: Expandable
     <div
       className={cn(
         'transition-all duration-300 ease-out',
-        'bg-white border rounded-2xl overflow-hidden',
-        isExpanded ? 'border-amber-300 shadow-lg shadow-amber-100/50' : 'border-slate-200',
+        'border overflow-hidden',
+        'rounded-xl', // Unified: rounded-xl (12px)
+        'shadow-sm hover:shadow-md', // Unified: shadow-sm default, shadow-md hover
+        levelStyles.bg,
+        isExpanded ? 'border-amber-300 shadow-lg shadow-amber-100/50 dark:shadow-amber-900/30' : 'border-slate-200 dark:border-neutral-800',
         'hover:border-amber-200'
       )}
     >
@@ -239,26 +266,22 @@ export function ExpandableCard({ node, onDrillDown, onBudgetUpdate }: Expandable
       <div
         onClick={() => !isEditingMain && setIsExpanded(!isExpanded)}
         className={cn(
-          'w-full text-left p-6 transition-all duration-200',
-          isExpanded ? 'bg-gradient-to-br from-amber-50/80 to-white' : 'bg-white hover:bg-amber-50/30',
+          'w-full text-left p-4 transition-all duration-200', // Unified: p-4 (16px)
+          'border-l-4', // Unified: border-l-4 (4px)
+          levelStyles.band,
+          isExpanded ? 'bg-gradient-to-br from-amber-50/80 to-white dark:from-amber-950/50 dark:to-neutral-950' : 'bg-white dark:bg-neutral-950 hover:bg-amber-50/30 dark:hover:bg-amber-950/30',
           !isEditingMain && 'cursor-pointer'
         )}
       >
         <div className="flex items-start gap-4">
-          {/* Left Color Band */}
-          <div className={cn('w-1.5 self-stretch rounded-full flex-shrink-0 min-h-[70px]', colors.accent)} />
-
           <div className="flex-1 min-w-0">
             {/* Top Row: Name + Status */}
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
-                <span className={cn('text-lg font-semibold', colors.text)}>
+                <span className="text-lg font-semibold text-slate-900 dark:text-neutral-100">
                   {node.name}
                 </span>
-                <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-slate-50">
-                  <span className={cn('w-1.5 h-1.5 rounded-full', statusColors.dot)} />
-                  <span className={cn('text-xs font-medium', statusColors.badge)}>{node.status}</span>
-                </div>
+                <BudgetStatusBadge status={mapStatus(node.status)} />
               </div>
 
               <div className="flex items-center gap-2">
@@ -269,7 +292,7 @@ export function ExpandableCard({ node, onDrillDown, onBudgetUpdate }: Expandable
                       e.stopPropagation();
                       setIsEditingMain(true);
                     }}
-                    className="p-2 rounded-lg text-slate-400 hover:text-amber-600 hover:bg-amber-50 transition-all"
+                    className="p-2 rounded-xl text-slate-400 dark:text-neutral-500 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950 transition-all"
                   >
                     <Pencil className="w-4 h-4" />
                   </button>
@@ -279,12 +302,12 @@ export function ExpandableCard({ node, onDrillDown, onBudgetUpdate }: Expandable
                 {hasChildren && (
                   <div className={cn(
                     'w-8 h-8 rounded-full flex items-center justify-center transition-colors',
-                    isExpanded ? 'bg-amber-100' : 'bg-slate-100'
+                    isExpanded ? 'bg-amber-100 dark:bg-amber-900' : 'bg-slate-100 dark:bg-neutral-800'
                   )}>
                     {isExpanded ? (
-                      <ChevronUp className="w-4 h-4 text-amber-600" />
+                      <ChevronUp className="w-5 h-5 text-amber-600 dark:text-amber-400" />
                     ) : (
-                      <ChevronDown className="w-4 h-4 text-slate-500" />
+                      <ChevronDown className="w-5 h-5 text-slate-500 dark:text-neutral-400" />
                     )}
                   </div>
                 )}
@@ -302,42 +325,34 @@ export function ExpandableCard({ node, onDrillDown, onBudgetUpdate }: Expandable
                 />
               </div>
             ) : (
-              <div className={cn('text-3xl font-bold tracking-tight tabular-nums mb-3', colors.text)}>
-                {formatCurrency(node.budget)}
+              <div className="text-3xl font-bold tracking-tight tabular-nums mb-3 text-slate-900 dark:text-neutral-100">
+                {formatBudgetCurrency(node.budget)}
               </div>
             )}
 
-            {/* Progress Bar + Stats */}
+            {/* Progress Bar using design system */}
             <div className="space-y-2">
-              <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+              <div className="h-2 bg-slate-200 dark:bg-neutral-800 rounded-full overflow-hidden">
                 <div
-                  className={cn(
-                    'h-full rounded-full transition-all duration-500',
-                    percentage > 1 ? 'bg-gradient-to-r from-red-400 to-red-500' :
-                    percentage > 0.95 ? 'bg-gradient-to-r from-amber-400 to-amber-500' :
-                    'bg-gradient-to-r from-slate-600 to-slate-800'
-                  )}
+                  className={cn('h-full rounded-full transition-all duration-500', healthStyles.bar)}
                   style={{ width: `${Math.min(percentage * 100, 100)}%` }}
                 />
               </div>
 
               <div className="flex items-center justify-between text-sm">
-                <span className="text-slate-500">
-                  {formatPercentage(node.percentage)} of total
+                <span className="text-slate-500 dark:text-neutral-400">
+                  {formatBudgetPercentage(node.percentage)} of total
                 </span>
                 <div className="flex items-center gap-1">
                   {isOverBudget ? (
                     <TrendingUp className="w-3.5 h-3.5 text-red-500" />
                   ) : remaining === 0 ? (
-                    <Minus className="w-3.5 h-3.5 text-slate-400" />
+                    <Minus className="w-3.5 h-3.5 text-slate-400 dark:text-neutral-500" />
                   ) : (
-                    <TrendingDown className="w-3.5 h-3.5 text-emerald-500" />
+                    <TrendingDown className="w-3.5 h-3.5 text-green-500" />
                   )}
-                  <span className={cn(
-                    'font-semibold tabular-nums',
-                    isOverBudget ? 'text-red-600' : remaining === 0 ? 'text-slate-500' : 'text-emerald-600'
-                  )}>
-                    {isOverBudget ? '+' : ''}{formatCurrency(Math.abs(remaining))} {isOverBudget ? 'over' : 'remaining'}
+                  <span className={cn('font-semibold tabular-nums', healthStyles.text)}>
+                    {isOverBudget ? '+' : ''}{formatBudgetCurrency(Math.abs(remaining))} {isOverBudget ? 'over' : 'remaining'}
                   </span>
                 </div>
               </div>
@@ -347,92 +362,111 @@ export function ExpandableCard({ node, onDrillDown, onBudgetUpdate }: Expandable
       </div>
 
       {/* Expanded Content - No Children: Show SKU Proposal Link */}
-      {isExpanded && !hasChildren && (
-        <div className="px-6 pb-6 border-t border-slate-100">
-          <div className="py-6 text-center">
-            <div className="mb-4">
-              <div className="w-12 h-12 mx-auto rounded-xl bg-amber-50 flex items-center justify-center">
-                <Wand2 className="w-6 h-6 text-amber-600" />
+      <AnimatePresence>
+        {isExpanded && !hasChildren && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2, ease: 'easeInOut' }}
+          >
+            <div className={cn('px-4 pb-4 border-t border-slate-100 dark:border-neutral-800 border-l-4', levelStyles.band)}>
+              <div className="py-6 text-center">
+                <div className="mb-4">
+                  <div className="w-12 h-12 mx-auto rounded-xl bg-amber-50 dark:bg-amber-900/30 flex items-center justify-center">
+                    <Wand2 className="w-6 h-6 text-amber-600 dark:text-amber-400" />
+                  </div>
+                </div>
+                <h4 className="font-semibold text-slate-800 dark:text-neutral-200 mb-2">
+                  Ready for SKU Planning
+                </h4>
+                <p className="text-sm text-slate-500 dark:text-neutral-400 mb-4 max-w-[280px] mx-auto">
+                  This category has {formatBudgetCurrency(node.budget)} allocated. Create an SKU proposal to plan specific products.
+                </p>
+                <Link
+                  href={`/sku-proposal?category=${node.id}&budget=${node.budget}`}
+                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-amber-500 text-white font-medium hover:bg-amber-600 transition-colors"
+                >
+                  <Wand2 className="w-4 h-4" />
+                  Create SKU Proposal
+                  <ExternalLink className="w-3.5 h-3.5 opacity-70" />
+                </Link>
               </div>
             </div>
-            <h4 className="font-semibold text-slate-800 mb-2">
-              Ready for SKU Planning
-            </h4>
-            <p className="text-sm text-slate-500 mb-4 max-w-[280px] mx-auto">
-              This category has {formatCurrency(node.budget)} allocated. Create an SKU proposal to plan specific products.
-            </p>
-            <Link
-              href={`/sku-proposal?category=${node.id}&budget=${node.budget}`}
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-amber-500 text-white font-medium hover:bg-amber-600 transition-colors"
-            >
-              <Wand2 className="w-4 h-4" />
-              Create SKU Proposal
-              <ExternalLink className="w-3.5 h-3.5 opacity-70" />
-            </Link>
-          </div>
-        </div>
-      )}
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Expanded Content - Budget Breakdown */}
-      {isExpanded && hasChildren && (
-        <div className="px-6 pb-6 border-t border-slate-100">
-          {/* Visual Chart Section */}
-          <div className="py-5 border-b border-slate-100">
-            <BudgetAllocationVisual
-              items={node.children!.map((child, index) => ({
-                id: child.id,
-                name: child.name,
-                budget: child.budget,
-                color: CHART_COLORS[index % CHART_COLORS.length],
-              }))}
-              totalBudget={node.budget}
-              allocatedBudget={allocated}
-            />
-          </div>
+      <AnimatePresence>
+        {isExpanded && hasChildren && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2, ease: 'easeInOut' }}
+          >
+            <div className={cn('px-4 pb-4 border-t border-slate-100 dark:border-neutral-800 border-l-4', levelStyles.band)}>
+              {/* Visual Chart Section */}
+              <div className="py-5 border-b border-slate-100 dark:border-neutral-800">
+                <BudgetAllocationVisual
+                  items={node.children!.map((child, index) => ({
+                    id: child.id,
+                    name: child.name,
+                    budget: child.budget,
+                    color: CHART_COLORS[index % CHART_COLORS.length],
+                  }))}
+                  totalBudget={node.budget}
+                  allocatedBudget={allocated}
+                />
+              </div>
 
-          {/* Section Header */}
-          <div className="flex items-center justify-between py-4">
-            <h4 className="text-xs uppercase tracking-wider text-slate-400 font-semibold">
-              Budget Allocation
-            </h4>
-            <span className="text-xs text-slate-400">
-              {node.children!.length} items
-            </span>
-          </div>
-
-          {/* Allocation Breakdown - Editable */}
-          <div className="space-y-3">
-            {node.children!.map((child, index) => (
-              <EditableChildRow
-                key={child.id}
-                child={child}
-                parentBudget={node.budget}
-                onBudgetUpdate={onBudgetUpdate}
-                onDrillDown={onDrillDown}
-                color={CHART_COLORS[index % CHART_COLORS.length]}
-              />
-            ))}
-          </div>
-
-          {/* Summary Footer */}
-          <div className="mt-4 pt-4 border-t border-slate-100">
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-slate-500">Total Allocated</span>
-              <div className="flex items-center gap-4">
-                <span className="font-bold text-slate-900 tabular-nums">
-                  {formatCurrency(allocated)}
+              {/* Section Header */}
+              <div className="flex items-center justify-between py-4">
+                <h4 className="text-xs uppercase tracking-wider text-slate-400 dark:text-neutral-500 font-semibold">
+                  Budget Allocation
+                </h4>
+                <span className="text-xs text-slate-400 dark:text-neutral-500">
+                  {node.children!.length} items
                 </span>
-                <div className={cn(
-                  'px-2 py-1 rounded-lg text-xs font-semibold',
-                  isOverBudget ? 'bg-red-50 text-red-600' : 'bg-emerald-50 text-emerald-600'
-                )}>
-                  {isOverBudget ? 'Over budget' : `${formatCurrency(remaining)} available`}
+              </div>
+
+              {/* Allocation Breakdown - Editable */}
+              <div className="space-y-3">
+                {node.children!.map((child, index) => (
+                  <EditableChildRow
+                    key={child.id}
+                    child={child}
+                    parentBudget={node.budget}
+                    onBudgetUpdate={onBudgetUpdate}
+                    onDrillDown={onDrillDown}
+                    color={CHART_COLORS[index % CHART_COLORS.length]}
+                  />
+                ))}
+              </div>
+
+              {/* Summary Footer */}
+              <div className="mt-4 pt-4 border-t border-slate-100 dark:border-neutral-800">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-slate-500 dark:text-neutral-400">Total Allocated</span>
+                  <div className="flex items-center gap-4">
+                    <span className="font-bold text-slate-900 dark:text-neutral-100 tabular-nums">
+                      {formatBudgetCurrency(allocated)}
+                    </span>
+                    <div className={cn(
+                      'px-2 py-1 rounded-xl text-xs font-semibold',
+                      healthStyles.bg,
+                      healthStyles.text
+                    )}>
+                      {isOverBudget ? 'Over budget' : `${formatBudgetCurrency(remaining)} available`}
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-      )}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

@@ -188,7 +188,7 @@ export default function BudgetFlowPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="flex items-center gap-3 text-slate-500">
+        <div className="flex items-center gap-3 text-slate-500 dark:text-neutral-400">
           <Loader2 className="w-5 h-5 animate-spin" />
           <span>Loading budget data...</span>
         </div>
@@ -203,7 +203,7 @@ export default function BudgetFlowPage() {
           <p className="text-red-500 mb-4">{error}</p>
           <button
             onClick={handleRefresh}
-            className="px-4 py-2 bg-slate-800 text-white rounded-lg hover:bg-slate-700"
+            className="px-4 py-2 bg-slate-800 dark:bg-neutral-700 text-white rounded-lg hover:bg-slate-700 dark:hover:bg-neutral-600"
           >
             Try Again
           </button>
@@ -215,7 +215,7 @@ export default function BudgetFlowPage() {
   if (!data) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <p className="text-slate-500">No budget data available</p>
+        <p className="text-slate-500 dark:text-neutral-400">No budget data available</p>
       </div>
     );
   }
@@ -225,7 +225,7 @@ export default function BudgetFlowPage() {
       {/* Quick Access to Other Budgets */}
       <div className="px-6 pt-4 pb-2">
         <div className="flex items-center justify-between mb-3">
-          <h2 className="text-sm font-medium text-slate-500 uppercase tracking-wider">
+          <h2 className="text-sm font-medium text-slate-500 dark:text-neutral-400 uppercase tracking-wider">
             Quick Access
           </h2>
           <Link
@@ -243,17 +243,17 @@ export default function BudgetFlowPage() {
               href={`/budget-flow/${budget.id}`}
               className={cn(
                 'flex-shrink-0 px-4 py-3 rounded-xl border transition-all',
-                'bg-white hover:bg-amber-50 hover:border-amber-200',
-                'border-slate-200'
+                'bg-white dark:bg-neutral-950 hover:bg-amber-50 dark:hover:bg-amber-950 hover:border-amber-200 dark:hover:border-amber-800',
+                'border-slate-200 dark:border-neutral-800'
               )}
             >
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center">
-                  <Layers className="w-5 h-5 text-slate-600" />
+                <div className="w-10 h-10 rounded-lg bg-slate-100 dark:bg-neutral-800 flex items-center justify-center">
+                  <Layers className="w-5 h-5 text-slate-600 dark:text-neutral-300" />
                 </div>
                 <div>
-                  <div className="font-medium text-slate-800">{budget.brand}</div>
-                  <div className="text-sm text-slate-500">
+                  <div className="font-medium text-slate-800 dark:text-neutral-100">{budget.brand}</div>
+                  <div className="text-sm text-slate-500 dark:text-neutral-400">
                     {formatCurrency(budget.budget)}
                   </div>
                 </div>
@@ -264,9 +264,9 @@ export default function BudgetFlowPage() {
       </div>
 
       {/* Demo Budget Flow View */}
-      <div className="border-t border-slate-200 mt-2">
-        <div className="px-6 py-3 bg-amber-50/50 border-b border-amber-100">
-          <p className="text-sm text-amber-700">
+      <div className="border-t border-slate-200 dark:border-neutral-800 mt-2">
+        <div className="px-6 py-3 bg-amber-50/50 dark:bg-amber-950/30 border-b border-amber-100 dark:border-amber-900">
+          <p className="text-sm text-amber-700 dark:text-amber-400">
             <strong>Demo Mode:</strong> Showing sample budget data. Click a budget above to view real allocation details.
           </p>
         </div>

@@ -60,7 +60,7 @@ export function GapAnalyzer({ data, onNodeSelect, className }: GapAnalyzerProps)
       case 'under':
         return <TrendingDown className="w-4 h-4 text-amber-500" />;
       default:
-        return <Minus className="w-4 h-4 text-slate-400" />;
+        return <Minus className="w-4 h-4 text-slate-400 dark:text-neutral-500" />;
     }
   };
 
@@ -80,11 +80,11 @@ export function GapAnalyzer({ data, onNodeSelect, className }: GapAnalyzerProps)
   if (gaps.length === 0) {
     return (
       <div className={cn('p-6 text-center', className)}>
-        <div className="w-12 h-12 mx-auto rounded-full bg-green-100 flex items-center justify-center mb-3">
-          <CheckCircle className="w-6 h-6 text-green-600" />
+        <div className="w-12 h-12 mx-auto rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center mb-3">
+          <CheckCircle className="w-6 h-6 text-green-600 dark:text-green-400" />
         </div>
-        <h4 className="font-medium text-slate-800 mb-1">All Balanced</h4>
-        <p className="text-sm text-slate-500">
+        <h4 className="font-medium text-slate-800 dark:text-neutral-100 mb-1">All Balanced</h4>
+        <p className="text-sm text-slate-500 dark:text-neutral-400">
           No significant gaps detected in budget allocation.
         </p>
       </div>
@@ -107,26 +107,26 @@ export function GapAnalyzer({ data, onNodeSelect, className }: GapAnalyzerProps)
           <div className="text-2xl font-bold text-blue-600">{summary.info}</div>
           <div className="text-xs text-blue-600">Info</div>
         </div>
-        <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
-          <div className="text-2xl font-bold text-slate-600">{gaps.length}</div>
-          <div className="text-xs text-slate-600">Total</div>
+        <div className="p-3 rounded-xl bg-slate-50 dark:bg-neutral-900 border border-slate-100 dark:border-neutral-800">
+          <div className="text-2xl font-bold text-slate-600 dark:text-neutral-300">{gaps.length}</div>
+          <div className="text-xs text-slate-600 dark:text-neutral-400">Total</div>
         </div>
       </div>
 
       {/* Over/Under Summary */}
-      <div className="flex gap-4 p-3 rounded-xl bg-slate-50">
+      <div className="flex gap-4 p-3 rounded-xl bg-slate-50 dark:bg-neutral-900">
         <div className="flex-1 flex items-center gap-2">
           <TrendingUp className="w-4 h-4 text-red-500" />
-          <span className="text-sm text-slate-600">Over Budget:</span>
-          <span className="font-semibold text-red-600">
+          <span className="text-sm text-slate-600 dark:text-neutral-400">Over Budget:</span>
+          <span className="font-semibold text-red-600 dark:text-red-400">
             {formatCurrency(summary.totalOver)}
           </span>
         </div>
-        <div className="w-px bg-slate-200" />
+        <div className="w-px bg-slate-200 dark:bg-neutral-700" />
         <div className="flex-1 flex items-center gap-2">
           <TrendingDown className="w-4 h-4 text-amber-500" />
-          <span className="text-sm text-slate-600">Under Budget:</span>
-          <span className="font-semibold text-amber-600">
+          <span className="text-sm text-slate-600 dark:text-neutral-400">Under Budget:</span>
+          <span className="font-semibold text-amber-600 dark:text-amber-400">
             {formatCurrency(summary.totalUnder)}
           </span>
         </div>
@@ -134,7 +134,7 @@ export function GapAnalyzer({ data, onNodeSelect, className }: GapAnalyzerProps)
 
       {/* Gap List */}
       <div className="space-y-2">
-        <h4 className="text-xs uppercase tracking-wider text-slate-400 font-semibold">
+        <h4 className="text-xs uppercase tracking-wider text-slate-400 dark:text-neutral-500 font-semibold">
           Gap Details
         </h4>
 
@@ -159,15 +159,15 @@ export function GapAnalyzer({ data, onNodeSelect, className }: GapAnalyzerProps)
                       {getSeverityIcon(gap.severity)}
                     </span>
                     <div>
-                      <div className="font-medium text-slate-800">
+                      <div className="font-medium text-slate-800 dark:text-neutral-100">
                         {gap.nodeName}
                       </div>
-                      <div className="text-xs text-slate-500">
+                      <div className="text-xs text-slate-500 dark:text-neutral-400">
                         {gap.nodePath.slice(0, -1).join(' → ')}
                       </div>
                     </div>
                   </div>
-                  <ChevronRight className="w-4 h-4 text-slate-400" />
+                  <ChevronRight className="w-4 h-4 text-slate-400 dark:text-neutral-500" />
                 </div>
 
                 <div className="flex items-center justify-between">
@@ -188,19 +188,19 @@ export function GapAnalyzer({ data, onNodeSelect, className }: GapAnalyzerProps)
                       {gap.type === 'over' ? '+' : '-'}
                       {formatCurrency(Math.abs(gap.gap))}
                     </div>
-                    <div className="text-xs text-slate-500 tabular-nums">
+                    <div className="text-xs text-slate-500 dark:text-neutral-400 tabular-nums">
                       {Math.abs(gap.gapPercent).toFixed(1)}% variance
                     </div>
                   </div>
                 </div>
 
                 {/* Budget vs Allocated mini-bar */}
-                <div className="mt-2 pt-2 border-t border-slate-200/50">
-                  <div className="flex justify-between text-xs text-slate-500 mb-1">
+                <div className="mt-2 pt-2 border-t border-slate-200/50 dark:border-neutral-700/50">
+                  <div className="flex justify-between text-xs text-slate-500 dark:text-neutral-400 mb-1">
                     <span>Budget: {formatCurrency(gap.budget)}</span>
                     <span>Allocated: {formatCurrency(gap.allocated)}</span>
                   </div>
-                  <div className="h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                  <div className="h-1.5 bg-slate-200 dark:bg-neutral-700 rounded-full overflow-hidden">
                     <div
                       className={cn(
                         'h-full rounded-full',

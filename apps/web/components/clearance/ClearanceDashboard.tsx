@@ -2,9 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
+import { cn } from '@/lib/utils';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { TrendingDown, AlertTriangle, Plus, Play, Loader2 } from 'lucide-react';
+import { TrendingDown, AlertTriangle, Plus, Play, Loader2, FileText } from 'lucide-react';
 import { MarkdownPlanCard } from './MarkdownPlanCard';
 import { OptimizationResults } from './OptimizationResults';
 import { SimulationTool } from './SimulationTool';
@@ -209,45 +210,90 @@ export function ClearanceDashboard({ brandId, seasonId }: Props) {
 
       {/* Summary Cards */}
       <div className="grid grid-cols-4 gap-4">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm text-muted-foreground">{t('totalPlans')}</CardTitle>
-          </CardHeader>
-          <CardContent><div className="text-2xl font-bold">{summary.totalPlans}</div></CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm text-muted-foreground">{t('active')}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center gap-2">
+        <div
+          className={cn(
+            'relative overflow-hidden rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950',
+            'shadow-sm hover:shadow-md transition-all duration-200',
+            'border-l-4 border-l-blue-500 p-4'
+          )}
+        >
+          <div className="flex items-start justify-between">
+            <div>
+              <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">
+                {t('totalPlans')}
+              </p>
+              <p className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums">
+                {summary.totalPlans}
+              </p>
+            </div>
+            <div className="h-10 w-10 rounded-xl bg-blue-50 dark:bg-blue-950 flex items-center justify-center">
+              <FileText className="h-5 w-5 text-blue-500" />
+            </div>
+          </div>
+        </div>
+        <div
+          className={cn(
+            'relative overflow-hidden rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950',
+            'shadow-sm hover:shadow-md transition-all duration-200',
+            'border-l-4 border-l-green-500 p-4'
+          )}
+        >
+          <div className="flex items-start justify-between">
+            <div>
+              <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">
+                {t('active')}
+              </p>
+              <p className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums">
+                {summary.activePlans}
+              </p>
+            </div>
+            <div className="h-10 w-10 rounded-xl bg-green-50 dark:bg-green-950 flex items-center justify-center">
               <Play className="h-5 w-5 text-green-500" />
-              <span className="text-2xl font-bold">{summary.activePlans}</span>
             </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm text-muted-foreground">{t('draft')}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center gap-2">
-              <TrendingDown className="h-5 w-5 text-orange-500" />
-              <span className="text-2xl font-bold">{summary.draftPlans}</span>
+          </div>
+        </div>
+        <div
+          className={cn(
+            'relative overflow-hidden rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950',
+            'shadow-sm hover:shadow-md transition-all duration-200',
+            'border-l-4 border-l-purple-500 p-4'
+          )}
+        >
+          <div className="flex items-start justify-between">
+            <div>
+              <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">
+                {t('draft')}
+              </p>
+              <p className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums">
+                {summary.draftPlans}
+              </p>
             </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm text-muted-foreground">{t('urgentAction')}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center gap-2">
-              <AlertTriangle className="h-5 w-5 text-red-500" />
-              <span className="text-2xl font-bold text-red-600">{summary.immediateAction}</span>
+            <div className="h-10 w-10 rounded-xl bg-purple-50 dark:bg-purple-950 flex items-center justify-center">
+              <TrendingDown className="h-5 w-5 text-purple-500" />
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
+        <div
+          className={cn(
+            'relative overflow-hidden rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950',
+            'shadow-sm hover:shadow-md transition-all duration-200',
+            'border-l-4 border-l-amber-500 p-4'
+          )}
+        >
+          <div className="flex items-start justify-between">
+            <div>
+              <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">
+                {t('urgentAction')}
+              </p>
+              <p className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums">
+                {summary.immediateAction}
+              </p>
+            </div>
+            <div className="h-10 w-10 rounded-xl bg-amber-50 dark:bg-amber-950 flex items-center justify-center">
+              <AlertTriangle className="h-5 w-5 text-amber-500" />
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Plans List */}

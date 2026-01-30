@@ -23,7 +23,8 @@ import {
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { cn } from '@/lib/utils';
+import { formatBudgetCurrency } from '@/components/ui/budget';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -158,14 +159,15 @@ export default function BudgetPage() {
     }
   };
 
+  // Unified status badge colors
   const getStatusBadge = (status: string) => {
     const colors: Record<string, string> = {
-      DRAFT: 'bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-300',
-      SUBMITTED: 'bg-blue-100 text-blue-800',
-      UNDER_REVIEW: 'bg-yellow-100 text-yellow-800',
-      APPROVED: 'bg-green-100 text-green-800',
-      REJECTED: 'bg-red-100 text-red-800',
-      REVISED: 'bg-purple-100 text-purple-800',
+      DRAFT: 'bg-slate-50 text-slate-700 border border-slate-200 dark:bg-neutral-800 dark:text-neutral-300 dark:border-neutral-700',
+      SUBMITTED: 'bg-blue-50 text-blue-700 border border-blue-200 dark:bg-blue-950 dark:text-blue-300 dark:border-blue-800',
+      UNDER_REVIEW: 'bg-amber-50 text-amber-700 border border-amber-200 dark:bg-amber-950 dark:text-amber-300 dark:border-amber-800',
+      APPROVED: 'bg-green-50 text-green-700 border border-green-200 dark:bg-green-950 dark:text-green-300 dark:border-green-800',
+      REJECTED: 'bg-red-50 text-red-700 border border-red-200 dark:bg-red-950 dark:text-red-300 dark:border-red-800',
+      REVISED: 'bg-purple-50 text-purple-700 border border-purple-200 dark:bg-purple-950 dark:text-purple-300 dark:border-purple-800',
     };
 
     return (
@@ -278,67 +280,111 @@ export default function BudgetPage() {
         </Link>
       </PageHeader>
 
-      {/* Summary Cards - Modern Watermark Design */}
+      {/* Summary Cards - Unified Design: rounded-xl, border-l-4, shadow-sm hover:shadow-md */}
       <div className="grid gap-4 md:grid-cols-4">
-        <Card className="relative overflow-hidden">
-          <DollarSign className="absolute -bottom-4 -right-4 h-32 w-32 text-primary/5" />
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">{t('totalBudgetCard')}</CardTitle>
-          </CardHeader>
-          <CardContent className="relative">
-            <div className="text-3xl font-bold tracking-tight">
-              ${summary.totalBudget.toLocaleString()}
+        {/* Total Budget Card */}
+        <div
+          className={cn(
+            'rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 overflow-hidden',
+            'shadow-sm hover:shadow-md transition-all duration-200',
+            'border-l-4 border-l-slate-800'
+          )}
+        >
+          <div className="p-4">
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">{t('totalBudgetCard')}</p>
+                <div className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums">
+                  {formatBudgetCurrency(summary.totalBudget)}
+                </div>
+                <p className="text-xs text-slate-500 dark:text-neutral-400 mt-2">
+                  {t('allocations', { count: summary.count })}
+                </p>
+              </div>
+              <div className="h-10 w-10 rounded-xl bg-slate-100 dark:bg-neutral-800 flex items-center justify-center">
+                <DollarSign className="h-5 w-5 text-slate-600" />
+              </div>
             </div>
-            <p className="text-sm text-muted-foreground mt-1">
-              {t('allocations', { count: summary.count })}
-            </p>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
-        <Card className="relative overflow-hidden">
-          <CheckCircle className="absolute -bottom-4 -right-4 h-32 w-32 text-green-500/10" />
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">{t('approved')}</CardTitle>
-          </CardHeader>
-          <CardContent className="relative">
-            <div className="text-3xl font-bold tracking-tight text-green-600">
-              ${summary.approvedBudget.toLocaleString()}
+        {/* Approved Card */}
+        <div
+          className={cn(
+            'rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 overflow-hidden',
+            'shadow-sm hover:shadow-md transition-all duration-200',
+            'border-l-4 border-l-green-500'
+          )}
+        >
+          <div className="p-4">
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">{t('approved')}</p>
+                <div className="text-2xl font-bold text-green-600 mt-1 tabular-nums">
+                  {formatBudgetCurrency(summary.approvedBudget)}
+                </div>
+                <p className="text-xs text-slate-500 dark:text-neutral-400 mt-2">
+                  {t('ofTotal', { percent: ((summary.approvedBudget / summary.totalBudget) * 100 || 0).toFixed(1) })}
+                </p>
+              </div>
+              <div className="h-10 w-10 rounded-xl bg-green-50 dark:bg-green-950 flex items-center justify-center">
+                <CheckCircle className="h-5 w-5 text-green-600" />
+              </div>
             </div>
-            <p className="text-sm text-muted-foreground mt-1">
-              {t('ofTotal', { percent: ((summary.approvedBudget / summary.totalBudget) * 100 || 0).toFixed(1) })}
-            </p>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
-        <Card className="relative overflow-hidden">
-          <Clock className="absolute -bottom-4 -right-4 h-32 w-32 text-yellow-500/10" />
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">{t('pending')}</CardTitle>
-          </CardHeader>
-          <CardContent className="relative">
-            <div className="text-3xl font-bold tracking-tight text-yellow-600">
-              ${summary.pendingBudget.toLocaleString()}
+        {/* Pending Card */}
+        <div
+          className={cn(
+            'rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 overflow-hidden',
+            'shadow-sm hover:shadow-md transition-all duration-200',
+            'border-l-4 border-l-amber-500'
+          )}
+        >
+          <div className="p-4">
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">{t('pending')}</p>
+                <div className="text-2xl font-bold text-amber-600 mt-1 tabular-nums">
+                  {formatBudgetCurrency(summary.pendingBudget)}
+                </div>
+                <p className="text-xs text-slate-500 dark:text-neutral-400 mt-2">{t('awaitingApproval')}</p>
+              </div>
+              <div className="h-10 w-10 rounded-xl bg-amber-50 dark:bg-amber-950 flex items-center justify-center">
+                <Clock className="h-5 w-5 text-amber-600" />
+              </div>
             </div>
-            <p className="text-sm text-muted-foreground mt-1">{t('awaitingApproval')}</p>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
-        <Card className="relative overflow-hidden">
-          <XCircle className="absolute -bottom-4 -right-4 h-32 w-32 text-gray-500/10" />
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">{t('draft')}</CardTitle>
-          </CardHeader>
-          <CardContent className="relative">
-            <div className="text-3xl font-bold tracking-tight text-gray-600">
-              ${(
-                summary.totalBudget -
-                summary.approvedBudget -
-                summary.pendingBudget
-              ).toLocaleString()}
+        {/* Draft Card */}
+        <div
+          className={cn(
+            'rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 overflow-hidden',
+            'shadow-sm hover:shadow-md transition-all duration-200',
+            'border-l-4 border-l-slate-400'
+          )}
+        >
+          <div className="p-4">
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">{t('draft')}</p>
+                <div className="text-2xl font-bold text-slate-600 mt-1 tabular-nums">
+                  {formatBudgetCurrency(
+                    summary.totalBudget -
+                    summary.approvedBudget -
+                    summary.pendingBudget
+                  )}
+                </div>
+                <p className="text-xs text-slate-500 dark:text-neutral-400 mt-2">{t('notSubmitted')}</p>
+              </div>
+              <div className="h-10 w-10 rounded-xl bg-slate-100 dark:bg-neutral-800 flex items-center justify-center">
+                <XCircle className="h-5 w-5 text-slate-500" />
+              </div>
             </div>
-            <p className="text-sm text-muted-foreground mt-1">{t('notSubmitted')}</p>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
 
       {/* Filters and View Toggle */}

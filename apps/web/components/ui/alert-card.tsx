@@ -16,16 +16,17 @@ import {
 // VARIANTS
 // ═══════════════════════════════════════════════════════════════════════════════
 
+// Unified design: rounded-xl, p-4, border-l-4, shadow-sm
 const alertVariants = cva(
-  'relative flex gap-3 p-4 rounded-lg border',
+  'relative flex gap-3 p-4 rounded-xl border border-slate-200 bg-white shadow-sm border-l-4',
   {
     variants: {
       variant: {
-        critical: 'bg-status-critical-muted border-status-critical/30 text-status-critical-text',
-        warning: 'bg-status-warning-muted border-status-warning/30 text-status-warning-text',
-        success: 'bg-status-success-muted border-status-success/30 text-status-success-text',
-        info: 'bg-status-info-muted border-status-info/30 text-status-info-text',
-        default: 'bg-surface border-border text-content',
+        critical: 'bg-red-50/50 border-l-red-500 text-red-900',
+        warning: 'bg-amber-50/50 border-l-amber-500 text-amber-900',
+        success: 'bg-green-50/50 border-l-green-500 text-green-900',
+        info: 'bg-blue-50/50 border-l-blue-500 text-blue-900',
+        default: 'bg-white border-l-slate-400 text-slate-900',
       },
     },
     defaultVariants: {
@@ -176,11 +177,12 @@ interface InlineAlertProps {
 export function InlineAlert({ variant = 'info', message, className }: InlineAlertProps) {
   const Icon = ALERT_ICONS[variant];
 
+  // Unified color classes
   const colorClasses = {
-    critical: 'text-status-critical-text',
-    warning: 'text-status-warning-text',
-    success: 'text-status-success-text',
-    info: 'text-status-info-text',
+    critical: 'text-red-600',
+    warning: 'text-amber-600',
+    success: 'text-green-600',
+    info: 'text-blue-600',
   }[variant];
 
   return (

@@ -494,72 +494,137 @@ export default function AutoOTBPlanningPage() {
             <CardContent className="space-y-6">
               {/* Summary Cards */}
               <div className="grid md:grid-cols-6 gap-4">
-                <Card className="relative overflow-hidden">
-                  <DollarSign className="absolute -bottom-4 -right-4 h-32 w-32 text-blue-500/10" />
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-sm font-medium text-muted-foreground">{t('totalOTB')}</CardTitle>
-                  </CardHeader>
-                  <CardContent className="relative">
-                    <div className="text-3xl font-bold tracking-tight text-blue-600">
-                      {formatCurrency(selectedPlan.generatedData.summary.totalOTB)}
+                <div
+                  className={cn(
+                    'relative overflow-hidden rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950',
+                    'shadow-sm hover:shadow-md transition-all duration-200',
+                    'border-l-4 border-l-blue-500 p-4'
+                  )}
+                >
+                  <div className="flex items-start gap-3">
+                    <div className="h-10 w-10 rounded-xl bg-blue-50 dark:bg-blue-950 flex items-center justify-center">
+                      <DollarSign className="h-5 w-5 text-blue-500" />
                     </div>
-                  </CardContent>
-                </Card>
-                <Card className="relative overflow-hidden">
-                  <BarChart3 className="absolute -bottom-4 -right-4 h-32 w-32 text-green-500/10" />
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-sm font-medium text-muted-foreground">{t('salesPlan')}</CardTitle>
-                  </CardHeader>
-                  <CardContent className="relative">
-                    <div className="text-3xl font-bold tracking-tight text-green-600">
-                      {formatCurrency(selectedPlan.generatedData.summary.totalSalesPlan)}
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">
+                        {t('totalOTB')}
+                      </p>
+                      <p className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums">
+                        {formatCurrency(selectedPlan.generatedData.summary.totalOTB)}
+                      </p>
                     </div>
-                  </CardContent>
-                </Card>
-                <Card className="relative overflow-hidden">
-                  <Package className="absolute -bottom-4 -right-4 h-32 w-32 text-purple-500/10" />
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-sm font-medium text-muted-foreground">{t('receiptPlan')}</CardTitle>
-                  </CardHeader>
-                  <CardContent className="relative">
-                    <div className="text-3xl font-bold tracking-tight text-purple-600">
-                      {formatCurrency(selectedPlan.generatedData.summary.totalReceiptPlan)}
+                  </div>
+                </div>
+
+                <div
+                  className={cn(
+                    'relative overflow-hidden rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950',
+                    'shadow-sm hover:shadow-md transition-all duration-200',
+                    'border-l-4 border-l-green-500 p-4'
+                  )}
+                >
+                  <div className="flex items-start gap-3">
+                    <div className="h-10 w-10 rounded-xl bg-green-50 dark:bg-green-950 flex items-center justify-center">
+                      <BarChart3 className="h-5 w-5 text-green-500" />
                     </div>
-                  </CardContent>
-                </Card>
-                <Card className="relative overflow-hidden">
-                  <Archive className="absolute -bottom-4 -right-4 h-32 w-32 text-orange-500/10" />
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-sm font-medium text-muted-foreground">{t('openingStock')}</CardTitle>
-                  </CardHeader>
-                  <CardContent className="relative">
-                    <div className="text-3xl font-bold tracking-tight text-orange-600">
-                      {formatCurrency(selectedPlan.generatedData.summary.openingStock)}
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">
+                        {t('salesPlan')}
+                      </p>
+                      <p className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums">
+                        {formatCurrency(selectedPlan.generatedData.summary.totalSalesPlan)}
+                      </p>
                     </div>
-                  </CardContent>
-                </Card>
-                <Card className="relative overflow-hidden">
-                  <Archive className="absolute -bottom-4 -right-4 h-32 w-32 text-cyan-500/10" />
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-sm font-medium text-muted-foreground">{t('closingStock')}</CardTitle>
-                  </CardHeader>
-                  <CardContent className="relative">
-                    <div className="text-3xl font-bold tracking-tight text-cyan-600">
-                      {formatCurrency(selectedPlan.generatedData.summary.targetClosingStock)}
+                  </div>
+                </div>
+
+                <div
+                  className={cn(
+                    'relative overflow-hidden rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950',
+                    'shadow-sm hover:shadow-md transition-all duration-200',
+                    'border-l-4 border-l-purple-500 p-4'
+                  )}
+                >
+                  <div className="flex items-start gap-3">
+                    <div className="h-10 w-10 rounded-xl bg-purple-50 dark:bg-purple-950 flex items-center justify-center">
+                      <Package className="h-5 w-5 text-purple-500" />
                     </div>
-                  </CardContent>
-                </Card>
-                <Card className="relative overflow-hidden">
-                  <TrendingUp className="absolute -bottom-4 -right-4 h-32 w-32 text-emerald-500/10" />
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-sm font-medium text-muted-foreground">{t('growthVsLY')}</CardTitle>
-                  </CardHeader>
-                  <CardContent className="relative">
-                    <div className="text-3xl font-bold tracking-tight text-emerald-600">
-                      {selectedPlan.generatedData.summary.growthVsLY}
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">
+                        {t('receiptPlan')}
+                      </p>
+                      <p className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums">
+                        {formatCurrency(selectedPlan.generatedData.summary.totalReceiptPlan)}
+                      </p>
                     </div>
-                  </CardContent>
-                </Card>
+                  </div>
+                </div>
+
+                <div
+                  className={cn(
+                    'relative overflow-hidden rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950',
+                    'shadow-sm hover:shadow-md transition-all duration-200',
+                    'border-l-4 border-l-amber-500 p-4'
+                  )}
+                >
+                  <div className="flex items-start gap-3">
+                    <div className="h-10 w-10 rounded-xl bg-amber-50 dark:bg-amber-950 flex items-center justify-center">
+                      <Archive className="h-5 w-5 text-amber-500" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">
+                        {t('openingStock')}
+                      </p>
+                      <p className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums">
+                        {formatCurrency(selectedPlan.generatedData.summary.openingStock)}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div
+                  className={cn(
+                    'relative overflow-hidden rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950',
+                    'shadow-sm hover:shadow-md transition-all duration-200',
+                    'border-l-4 border-l-blue-500 p-4'
+                  )}
+                >
+                  <div className="flex items-start gap-3">
+                    <div className="h-10 w-10 rounded-xl bg-blue-50 dark:bg-blue-950 flex items-center justify-center">
+                      <Archive className="h-5 w-5 text-blue-500" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">
+                        {t('closingStock')}
+                      </p>
+                      <p className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums">
+                        {formatCurrency(selectedPlan.generatedData.summary.targetClosingStock)}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div
+                  className={cn(
+                    'relative overflow-hidden rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950',
+                    'shadow-sm hover:shadow-md transition-all duration-200',
+                    'border-l-4 border-l-green-500 p-4'
+                  )}
+                >
+                  <div className="flex items-start gap-3">
+                    <div className="h-10 w-10 rounded-xl bg-green-50 dark:bg-green-950 flex items-center justify-center">
+                      <TrendingUp className="h-5 w-5 text-green-500" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">
+                        {t('growthVsLY')}
+                      </p>
+                      <p className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums">
+                        {selectedPlan.generatedData.summary.growthVsLY}
+                      </p>
+                    </div>
+                  </div>
+                </div>
               </div>
 
               {/* Monthly Breakdown */}

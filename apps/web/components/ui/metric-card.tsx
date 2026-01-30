@@ -56,16 +56,29 @@ export function MetricCard({
   onClick,
   loading = false,
 }: MetricCardProps) {
+  // Map status to unified border colors
+  const statusBorderMap: Record<string, string> = {
+    critical: 'border-l-red-500',
+    warning: 'border-l-amber-500',
+    success: 'border-l-green-500',
+    info: 'border-l-blue-500',
+  };
+
   if (loading) {
     return (
-      <div className={cn('bg-surface border border-border rounded-lg p-4', className)}>
+      <div className={cn(
+        // Unified: rounded-xl, shadow-sm, border-l-4
+        'bg-white border border-slate-200 rounded-xl p-4 border-l-4 border-l-slate-400',
+        'shadow-sm',
+        className
+      )}>
         <div className="space-y-3">
           <div className="flex justify-between">
-            <div className="skeleton h-3 w-24" />
-            <div className="skeleton h-5 w-5 rounded" />
+            <div className="h-3 w-24 bg-slate-200 rounded animate-pulse" />
+            <div className="h-10 w-10 bg-slate-200 rounded-xl animate-pulse" />
           </div>
-          <div className="skeleton h-8 w-32" />
-          <div className="skeleton h-3 w-20" />
+          <div className="h-8 w-32 bg-slate-200 rounded animate-pulse" />
+          <div className="h-3 w-20 bg-slate-200 rounded animate-pulse" />
         </div>
       </div>
     );
@@ -74,26 +87,34 @@ export function MetricCard({
   return (
     <div
       className={cn(
-        'bg-surface border border-border rounded-lg p-4',
-        status && `border-t-2 border-t-status-${status}`,
-        onClick && 'cursor-pointer hover:border-accent/50 transition-colors',
+        // Unified: rounded-xl, p-4, shadow-sm, hover:shadow-md, border-l-4
+        'bg-white border border-slate-200 rounded-xl p-4',
+        'shadow-sm hover:shadow-md transition-all duration-200',
+        'border-l-4',
+        status ? statusBorderMap[status] : 'border-l-slate-400',
+        onClick && 'cursor-pointer',
         className
       )}
       onClick={onClick}
     >
       {/* Header */}
-      <div className="flex items-center justify-between mb-3">
+      <div className="flex items-start justify-between mb-3">
         <div className="flex items-center gap-2">
-          <span className="text-xs font-medium uppercase tracking-wider text-content-secondary">
+          <span className="text-xs font-medium uppercase tracking-wider text-slate-500">
             {title}
           </span>
           {status && <StatusBadge status={status} size="sm" showIcon={false} />}
         </div>
-        {Icon && <Icon className="w-4 h-4 text-content-muted" />}
+        {/* Unified: w-10 h-10 rounded-xl icon container */}
+        {Icon && (
+          <div className="h-10 w-10 rounded-xl bg-slate-100 flex items-center justify-center">
+            <Icon className="w-5 h-5 text-slate-600" />
+          </div>
+        )}
       </div>
 
       {/* Value */}
-      <div className={cn('font-data text-2xl font-semibold tabular-nums text-content mb-2', valueClassName)}>
+      <div className={cn('text-2xl font-bold tabular-nums text-slate-900 mb-2', valueClassName)}>
         {value}
       </div>
 
@@ -121,12 +142,12 @@ export function MetricCard({
                 size="sm"
               />
               {trend.label && (
-                <span className="text-xs text-content-muted">{trend.label}</span>
+                <span className="text-xs text-slate-400">{trend.label}</span>
               )}
             </>
           )}
           {!trend && subtitle && (
-            <span className="text-xs text-content-secondary">{subtitle}</span>
+            <span className="text-xs text-slate-500">{subtitle}</span>
           )}
         </div>
       )}
@@ -178,9 +199,9 @@ interface CompactMetricProps {
 export function CompactMetric({ label, value, trend, className }: CompactMetricProps) {
   return (
     <div className={cn('flex flex-col', className)}>
-      <span className="text-[10px] text-content-muted uppercase tracking-wider">{label}</span>
+      <span className="text-[10px] text-slate-400 uppercase tracking-wider">{label}</span>
       <div className="flex items-center gap-2">
-        <span className="font-data text-sm font-semibold tabular-nums">{value}</span>
+        <span className="text-sm font-semibold tabular-nums text-slate-900">{value}</span>
         {trend !== undefined && (
           <TrendValue value={trend} size="sm" showIcon={false} />
         )}

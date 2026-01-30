@@ -1,15 +1,18 @@
 'use client';
 
 import Link from 'next/link';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { formatDistanceToNow } from 'date-fns';
 import { useTranslations } from 'next-intl';
 import { Clock, FileText, DollarSign, Package, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import {
+  BudgetStatusBadge,
+  formatBudgetCurrency,
+  BudgetCardStatus,
+} from '@/components/ui/budget';
 
 export interface PendingApproval {
   id: string;
@@ -37,20 +40,19 @@ const typeIcons = {
   sku: Package,
 };
 
-const priorityColors = {
-  high: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
-  medium: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400',
-  low: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
+// Map type to unified border colors
+const typeBorderColors = {
+  budget: 'border-l-slate-800',
+  otb: 'border-l-slate-600',
+  sku: 'border-l-slate-400',
 };
 
-function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(amount);
-}
+// Map priority to unified status
+const priorityToStatus: Record<string, BudgetCardStatus> = {
+  high: 'error',
+  medium: 'warning',
+  low: 'verified',
+};
 
 function getInitials(name: string): string {
   return name
@@ -72,108 +74,115 @@ export function PendingApprovals({ approvals, viewAllHref }: PendingApprovalsPro
   };
 
   return (
-    <Card>
-      <CardHeader className="pb-3">
+    <div
+      className={cn(
+        // Unified: rounded-xl, shadow-sm, hover:shadow-md, border
+        'rounded-xl border border-slate-200 bg-white overflow-hidden',
+        'shadow-sm'
+      )}
+    >
+      {/* Header */}
+      <div className="p-4 border-b border-slate-100">
         <div className="flex items-center justify-between">
           <div>
-            <CardTitle className="flex items-center gap-2">
+            <h3 className="text-sm font-semibold text-slate-900 flex items-center gap-2">
               {t('pendingApprovals')}
               {approvals.length > 0 && (
-                <Badge variant="destructive" className="text-xs">
+                <span className="inline-flex items-center justify-center h-5 min-w-[20px] px-1.5 rounded-full text-xs font-medium bg-red-50 text-red-700 border border-red-200">
                   {approvals.length}
-                </Badge>
+                </span>
               )}
-            </CardTitle>
-            <CardDescription>{t('itemsWaitingReview')}</CardDescription>
+            </h3>
+            <p className="text-xs text-slate-500 mt-0.5">{t('itemsWaitingReview')}</p>
           </div>
           {viewAllHref && (
             <Button variant="ghost" size="sm" asChild>
-              <Link href={viewAllHref}>
+              <Link href={viewAllHref} className="text-xs">
                 {t('viewAll')}
                 <ChevronRight className="h-4 w-4 ml-1" />
               </Link>
             </Button>
           )}
         </div>
-      </CardHeader>
-      <CardContent>
-        <ScrollArea className="h-[300px] pr-4">
-          <div className="space-y-3">
-            {approvals.map((approval) => {
-              const Icon = typeIcons[approval.type];
+      </div>
 
-              return (
-                <Link
-                  key={approval.id}
-                  href={approval.href}
-                  className="block p-3 rounded-lg border hover:bg-muted/50 transition-colors"
-                >
-                  <div className="flex items-start gap-3">
-                    <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                      <Icon className="h-5 w-5 text-primary" />
+      {/* Content */}
+      <ScrollArea className="h-[300px]">
+        <div className="p-2 space-y-2">
+          {approvals.map((approval) => {
+            const Icon = typeIcons[approval.type];
+
+            return (
+              <Link
+                key={approval.id}
+                href={approval.href}
+                className={cn(
+                  // Unified: rounded-xl, p-4, border-l-4, shadow-sm, hover:shadow-md
+                  'block p-3 rounded-xl border border-slate-200',
+                  'border-l-4 shadow-sm hover:shadow-md transition-all duration-200',
+                  'hover:bg-slate-50',
+                  typeBorderColors[approval.type]
+                )}
+              >
+                <div className="flex items-start gap-3">
+                  {/* Unified: w-10 h-10 rounded-xl icon container */}
+                  <div className="h-10 w-10 rounded-xl bg-slate-100 flex items-center justify-center shrink-0">
+                    <Icon className="h-5 w-5 text-slate-600" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="min-w-0">
+                        <p className="text-sm font-semibold text-slate-900 truncate">{approval.title}</p>
+                        <p className="text-xs text-slate-500 truncate">
+                          {approval.description}
+                        </p>
+                      </div>
+                      <span className="shrink-0 text-xs px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200">
+                        {typeLabels[approval.type]}
+                      </span>
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="min-w-0">
-                          <p className="text-sm font-medium truncate">{approval.title}</p>
-                          <p className="text-xs text-muted-foreground truncate">
-                            {approval.description}
-                          </p>
-                        </div>
-                        <Badge variant="outline" className="shrink-0 text-xs">
-                          {typeLabels[approval.type]}
-                        </Badge>
-                      </div>
 
-                      <div className="flex items-center justify-between mt-2 pt-2 border-t">
-                        <div className="flex items-center gap-2">
-                          <Avatar className="h-5 w-5">
-                            <AvatarFallback className="text-[10px]">
-                              {getInitials(approval.submittedBy.name)}
-                            </AvatarFallback>
-                          </Avatar>
-                          <span className="text-xs text-muted-foreground">
-                            {approval.submittedBy.name}
-                          </span>
-                        </div>
-                        {approval.amount !== undefined && (
-                          <span className="text-sm font-semibold text-primary">
-                            {formatCurrency(approval.amount)}
-                          </span>
-                        )}
-                      </div>
-
-                      <div className="flex items-center justify-between mt-2">
-                        <span className="text-xs text-muted-foreground flex items-center gap-1">
-                          <Clock className="h-3 w-3" />
-                          {formatDistanceToNow(approval.submittedAt, { addSuffix: true })}
+                    <div className="flex items-center justify-between mt-2 pt-2 border-t border-slate-100">
+                      <div className="flex items-center gap-2">
+                        <Avatar className="h-5 w-5">
+                          <AvatarFallback className="text-[10px] bg-slate-200 text-slate-600">
+                            {getInitials(approval.submittedBy.name)}
+                          </AvatarFallback>
+                        </Avatar>
+                        <span className="text-xs text-slate-500">
+                          {approval.submittedBy.name}
                         </span>
-                        {approval.priority && (
-                          <span
-                            className={cn(
-                              'text-xs px-2 py-0.5 rounded-full',
-                              priorityColors[approval.priority]
-                            )}
-                          >
-                            {approval.priority} priority
-                          </span>
-                        )}
                       </div>
+                      {approval.amount !== undefined && (
+                        <span className="text-sm font-bold text-slate-900 tabular-nums">
+                          {formatBudgetCurrency(approval.amount)}
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="flex items-center justify-between mt-2">
+                      <span className="text-xs text-slate-400 flex items-center gap-1">
+                        <Clock className="h-3 w-3" />
+                        {formatDistanceToNow(approval.submittedAt, { addSuffix: true })}
+                      </span>
+                      {approval.priority && (
+                        <BudgetStatusBadge status={priorityToStatus[approval.priority]} />
+                      )}
                     </div>
                   </div>
-                </Link>
-              );
-            })}
-            {approvals.length === 0 && (
-              <div className="text-center py-8 text-muted-foreground">
-                <FileText className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                <p className="text-sm">{t('noPendingApprovals')}</p>
-                <p className="text-xs">{t('allCaughtUp')}</p>
-              </div>
-            )}
-          </div>
-        </ScrollArea>
-      </CardContent>
-    </Card>
+                </div>
+              </Link>
+            );
+          })}
+          {approvals.length === 0 && (
+            <div className="text-center py-8 text-slate-400">
+              <FileText className="h-8 w-8 mx-auto mb-2 opacity-50" />
+              <p className="text-sm">{t('noPendingApprovals')}</p>
+              <p className="text-xs">{t('allCaughtUp')}</p>
+            </div>
+          )}
+        </div>
+      </ScrollArea>
+    </div>
   );
 }

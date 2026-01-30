@@ -14,6 +14,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { KPIGrid, KPIAlertConfig, KPITargetForm } from '@/components/kpi';
+import { cn } from '@/lib/utils';
 import { GaugeChart } from '@/components/charts/gauge-chart';
 import {
   Target,
@@ -328,54 +329,94 @@ export default function KPIDashboardPage() {
 
       {/* Summary Cards */}
       <div className="grid gap-4 md:grid-cols-4">
-        <Card className="relative overflow-hidden">
-          <CheckCircle className="absolute -bottom-4 -right-4 h-32 w-32 text-green-500/10" />
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">{t('onTrack')}</CardTitle>
-          </CardHeader>
-          <CardContent className="relative">
-            <div className="text-3xl font-bold tracking-tight text-green-600">
-              {onTrack}
+        <div
+          className={cn(
+            'relative overflow-hidden rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950',
+            'shadow-sm hover:shadow-md transition-all duration-200',
+            'border-l-4 border-l-green-500 p-4'
+          )}
+        >
+          <div className="flex items-start justify-between">
+            <div>
+              <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">
+                {t('onTrack')}
+              </p>
+              <p className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums">
+                {onTrack}
+              </p>
+              <p className="text-sm text-muted-foreground mt-1">{t('kpisOnTrack', { count: onTrack })}</p>
             </div>
-            <p className="text-sm text-muted-foreground mt-1">{t('kpisOnTrack', { count: onTrack })}</p>
-          </CardContent>
-        </Card>
-        <Card className="relative overflow-hidden">
-          <AlertTriangle className="absolute -bottom-4 -right-4 h-32 w-32 text-yellow-500/10" />
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">{t('atRisk')}</CardTitle>
-          </CardHeader>
-          <CardContent className="relative">
-            <div className="text-3xl font-bold tracking-tight text-yellow-600">
-              {atRisk}
+            <div className="h-10 w-10 rounded-xl bg-green-50 dark:bg-green-950 flex items-center justify-center">
+              <CheckCircle className="h-5 w-5 text-green-500" />
             </div>
-            <p className="text-sm text-muted-foreground mt-1">{t('kpisAtRisk', { count: atRisk })}</p>
-          </CardContent>
-        </Card>
-        <Card className="relative overflow-hidden">
-          <XCircle className="absolute -bottom-4 -right-4 h-32 w-32 text-red-500/10" />
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">{t('offTrack')}</CardTitle>
-          </CardHeader>
-          <CardContent className="relative">
-            <div className="text-3xl font-bold tracking-tight text-red-600">
-              {offTrack}
+          </div>
+        </div>
+        <div
+          className={cn(
+            'relative overflow-hidden rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950',
+            'shadow-sm hover:shadow-md transition-all duration-200',
+            'border-l-4 border-l-amber-500 p-4'
+          )}
+        >
+          <div className="flex items-start justify-between">
+            <div>
+              <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">
+                {t('atRisk')}
+              </p>
+              <p className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums">
+                {atRisk}
+              </p>
+              <p className="text-sm text-muted-foreground mt-1">{t('kpisAtRisk', { count: atRisk })}</p>
             </div>
-            <p className="text-sm text-muted-foreground mt-1">{t('kpisOffTrack', { count: offTrack })}</p>
-          </CardContent>
-        </Card>
-        <Card className="relative overflow-hidden">
-          <Bell className="absolute -bottom-4 -right-4 h-32 w-32 text-blue-500/10" />
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">{t('activeAlerts')}</CardTitle>
-          </CardHeader>
-          <CardContent className="relative">
-            <div className="text-3xl font-bold tracking-tight text-blue-600">
-              {activeAlerts}
+            <div className="h-10 w-10 rounded-xl bg-amber-50 dark:bg-amber-950 flex items-center justify-center">
+              <AlertTriangle className="h-5 w-5 text-amber-500" />
             </div>
-            <p className="text-sm text-muted-foreground mt-1">{t('alertsActive', { count: activeAlerts })}</p>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
+        <div
+          className={cn(
+            'relative overflow-hidden rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950',
+            'shadow-sm hover:shadow-md transition-all duration-200',
+            'border-l-4 border-l-red-500 p-4'
+          )}
+        >
+          <div className="flex items-start justify-between">
+            <div>
+              <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">
+                {t('offTrack')}
+              </p>
+              <p className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums">
+                {offTrack}
+              </p>
+              <p className="text-sm text-muted-foreground mt-1">{t('kpisOffTrack', { count: offTrack })}</p>
+            </div>
+            <div className="h-10 w-10 rounded-xl bg-red-50 dark:bg-red-950 flex items-center justify-center">
+              <XCircle className="h-5 w-5 text-red-500" />
+            </div>
+          </div>
+        </div>
+        <div
+          className={cn(
+            'relative overflow-hidden rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950',
+            'shadow-sm hover:shadow-md transition-all duration-200',
+            'border-l-4 border-l-blue-500 p-4'
+          )}
+        >
+          <div className="flex items-start justify-between">
+            <div>
+              <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">
+                {t('activeAlerts')}
+              </p>
+              <p className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums">
+                {activeAlerts}
+              </p>
+              <p className="text-sm text-muted-foreground mt-1">{t('alertsActive', { count: activeAlerts })}</p>
+            </div>
+            <div className="h-10 w-10 rounded-xl bg-blue-50 dark:bg-blue-950 flex items-center justify-center">
+              <Bell className="h-5 w-5 text-blue-500" />
+            </div>
+          </div>
+        </div>
       </div>
 
       <Tabs defaultValue="overview" className="space-y-4">
@@ -522,10 +563,10 @@ export default function KPIDashboardPage() {
                     <div
                       className={`h-10 w-10 rounded-full flex items-center justify-center ${
                         alert.severity === 'CRITICAL'
-                          ? 'bg-red-100'
+                          ? 'bg-red-100 dark:bg-red-950'
                           : alert.severity === 'WARNING'
-                          ? 'bg-yellow-100'
-                          : 'bg-blue-100'
+                          ? 'bg-yellow-100 dark:bg-yellow-950'
+                          : 'bg-blue-100 dark:bg-blue-950'
                       }`}
                     >
                       {alert.severity === 'CRITICAL' ? (
