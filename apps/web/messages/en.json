@@ -2219,5 +2219,50 @@
       "topPerformers": "Top Performers",
       "bottomPerformers": "Bottom Performers"
     }
+  },
+  "sizeAllocation": {
+    "title": "Size Allocation",
+    "description": "Manage Choice A/B/C quantities by size",
+    "choice": {
+      "A": "Choice A",
+      "B": "Choice B",
+      "C": "Choice C",
+      "descA": "Primary allocation - highest priority",
+      "descB": "Secondary allocation - backup option",
+      "descC": "Tertiary allocation - optional"
+    },
+    "overview": "Choice Allocation Overview",
+    "distribution": "Distribution",
+    "totalUnits": "Total Units",
+    "totalValue": "Total Value",
+    "size": "Size",
+    "total": "Total",
+    "percentage": "%",
+    "status": {
+      "draft": "Draft",
+      "allocated": "Allocated",
+      "confirmed": "Confirmed"
+    },
+    "actions": {
+      "edit": "Edit Quantities",
+      "lock": "Lock Allocation",
+      "unlock": "Unlock",
+      "applyTemplate": "Apply Template",
+      "save": "Save",
+      "cancel": "Cancel"
+    },
+    "template": {
+      "title": "Size Template",
+      "select": "Select Template",
+      "mensClothing": "Men's Clothing",
+      "womensClothing": "Women's Clothing",
+      "numericShoes": "Numeric (Shoes)",
+      "oneSize": "One Size"
+    },
+    "validation": {
+      "locked": "This allocation is locked",
+      "totalMismatch": "Total quantities do not match",
+      "negativeValue": "Quantities cannot be negative"
+    }
   }
 }

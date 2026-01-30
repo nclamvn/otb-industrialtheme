@@ -2219,5 +2219,50 @@
       "topPerformers": "Hiệu suất cao",
       "bottomPerformers": "Hiệu suất thấp"
     }
+  },
+  "sizeAllocation": {
+    "title": "Phân bổ Size",
+    "description": "Quản lý số lượng Choice A/B/C theo size",
+    "choice": {
+      "A": "Choice A",
+      "B": "Choice B",
+      "C": "Choice C",
+      "descA": "Phân bổ chính - ưu tiên cao nhất",
+      "descB": "Phân bổ phụ - lựa chọn dự phòng",
+      "descC": "Phân bổ thứ ba - tùy chọn"
+    },
+    "overview": "Tổng quan phân bổ Choice",
+    "distribution": "Phân phối",
+    "totalUnits": "Tổng số lượng",
+    "totalValue": "Tổng giá trị",
+    "size": "Size",
+    "total": "Tổng",
+    "percentage": "%",
+    "status": {
+      "draft": "Bản nháp",
+      "allocated": "Đã phân bổ",
+      "confirmed": "Đã xác nhận"
+    },
+    "actions": {
+      "edit": "Sửa số lượng",
+      "lock": "Khóa phân bổ",
+      "unlock": "Mở khóa",
+      "applyTemplate": "Áp dụng mẫu",
+      "save": "Lưu",
+      "cancel": "Hủy"
+    },
+    "template": {
+      "title": "Mẫu Size",
+      "select": "Chọn mẫu",
+      "mensClothing": "Quần áo nam",
+      "womensClothing": "Quần áo nữ",
+      "numericShoes": "Size số (Giày)",
+      "oneSize": "Một size"
+    },
+    "validation": {
+      "locked": "Phân bổ này đã bị khóa",
+      "totalMismatch": "Tổng số lượng không khớp",
+      "negativeValue": "Số lượng không được âm"
+    }
   }
 }
