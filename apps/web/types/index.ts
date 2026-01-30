@@ -144,6 +144,7 @@ export interface Subcategory {
   name: string;
   code: string;
   description?: string | null;
+  l4Detail?: string | null; // Level 4 category detail (e.g., "Shoulder Bags", "Totes")
   isActive: boolean;
   sortOrder: number;
   categoryId: string;
@@ -157,6 +158,7 @@ export interface SalesLocation {
   name: string;
   code: string;
   type: string;
+  storeGroup?: string | null; // REX, TTP, DAFC - for W25 store grouping
   address?: string | null;
   isActive: boolean;
   sortOrder: number;
@@ -423,6 +425,14 @@ export interface SKUItem {
   imageUploadedAt?: Date | null;
   isNew: boolean;
   isActive: boolean;
+
+  // W25 Fields
+  fullSeasonRatio?: number | null;    // FSR - Full Season Ratio (0-1)
+  carryForward?: boolean;             // CF flag
+  carryForwardFrom?: string | null;   // Source season (SS24, FW24, CORE, etc.)
+  themeGroup?: string | null;         // Theme grouping
+  l4Category?: string | null;         // Level 4 category detail
+
   createdAt: Date;
   updatedAt: Date;
 }

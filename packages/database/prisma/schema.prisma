@@ -353,6 +353,7 @@ model Subcategory {
   name        String
   code        String
   description String?
+  l4Detail    String? // Level 4 category detail (e.g., "Shoulder Bags", "Totes")
   isActive    Boolean @default(true)
   sortOrder   Int     @default(0)
 
@@ -381,13 +382,14 @@ model Subcategory {
 // ============================================
 
 model SalesLocation {
-  id        String  @id @default(cuid())
-  name      String
-  code      String  @unique
-  type      String  @default("STORE")
-  address   String?
-  isActive  Boolean @default(true)
-  sortOrder Int     @default(0)
+  id         String  @id @default(cuid())
+  name       String
+  code       String  @unique
+  type       String  @default("STORE")
+  storeGroup String? // REX, TTP, DAFC - for W25 store grouping
+  address    String?
+  isActive   Boolean @default(true)
+  sortOrder  Int     @default(0)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -772,6 +774,15 @@ model SKUItem {
   // Status flags
   isNew    Boolean @default(true)
   isActive Boolean @default(true)
+
+  // W25 Fields
+  fullSeasonRatio  Decimal? @db.Decimal(5, 2) // FSR - Full Season Ratio (0.00-1.00)
+  itemNo           String?                    // Item number from Excel
+  composition      String?                    // Material composition
+  carryForward     Boolean  @default(false)   // CF flag
+  carryForwardFrom String?                    // Source season (SS24, FW24, etc.)
+  themeGroup       String?                    // Theme grouping
+  l4Category       String?                    // Level 4 category detail
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

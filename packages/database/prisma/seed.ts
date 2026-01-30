@@ -120,43 +120,47 @@ async function main() {
     }
   }
 
-  // 4. Create Locations
+  // 4. Create Locations with Store Groups (REX, TTP, DAFC)
   console.log('Creating locations...');
   const locations = await Promise.all([
+    // REX Group - HCMC Stores
     prisma.salesLocation.upsert({
       where: { code: 'HCM-VL' },
-      update: {},
-      create: { name: 'Vincom Le Thanh Ton', code: 'HCM-VL', type: 'STORE', address: 'District 1, HCMC', sortOrder: 1 },
+      update: { storeGroup: 'REX' },
+      create: { name: 'Vincom Le Thanh Ton', code: 'HCM-VL', type: 'STORE', storeGroup: 'REX', address: 'District 1, HCMC', sortOrder: 1 },
     }),
     prisma.salesLocation.upsert({
       where: { code: 'HCM-SC' },
-      update: {},
-      create: { name: 'Saigon Centre', code: 'HCM-SC', type: 'STORE', address: 'District 1, HCMC', sortOrder: 2 },
+      update: { storeGroup: 'REX' },
+      create: { name: 'Saigon Centre', code: 'HCM-SC', type: 'STORE', storeGroup: 'REX', address: 'District 1, HCMC', sortOrder: 2 },
     }),
+    // TTP Group - Premium Locations
     prisma.salesLocation.upsert({
       where: { code: 'HCM-TK' },
-      update: {},
-      create: { name: 'Takashimaya', code: 'HCM-TK', type: 'STORE', address: 'District 1, HCMC', sortOrder: 3 },
+      update: { storeGroup: 'TTP' },
+      create: { name: 'Takashimaya', code: 'HCM-TK', type: 'STORE', storeGroup: 'TTP', address: 'District 1, HCMC', sortOrder: 3 },
     }),
     prisma.salesLocation.upsert({
       where: { code: 'HN-TM' },
-      update: {},
-      create: { name: 'Trang Tien Plaza', code: 'HN-TM', type: 'STORE', address: 'Hoan Kiem, Hanoi', sortOrder: 4 },
+      update: { storeGroup: 'TTP' },
+      create: { name: 'Trang Tien Plaza', code: 'HN-TM', type: 'STORE', storeGroup: 'TTP', address: 'Hoan Kiem, Hanoi', sortOrder: 4 },
     }),
+    // DAFC Group - Expansion Locations
     prisma.salesLocation.upsert({
       where: { code: 'HN-LM' },
-      update: {},
-      create: { name: 'Lotte Mall Hanoi', code: 'HN-LM', type: 'STORE', address: 'Ba Dinh, Hanoi', sortOrder: 5 },
+      update: { storeGroup: 'DAFC' },
+      create: { name: 'Lotte Mall Hanoi', code: 'HN-LM', type: 'STORE', storeGroup: 'DAFC', address: 'Ba Dinh, Hanoi', sortOrder: 5 },
     }),
     prisma.salesLocation.upsert({
       where: { code: 'DN-VM' },
-      update: {},
-      create: { name: 'Vincom Da Nang', code: 'DN-VM', type: 'STORE', address: 'Hai Chau, Da Nang', sortOrder: 6 },
+      update: { storeGroup: 'DAFC' },
+      create: { name: 'Vincom Da Nang', code: 'DN-VM', type: 'STORE', storeGroup: 'DAFC', address: 'Hai Chau, Da Nang', sortOrder: 6 },
     }),
+    // Online Channel
     prisma.salesLocation.upsert({
       where: { code: 'ONLINE' },
-      update: {},
-      create: { name: 'E-Commerce', code: 'ONLINE', type: 'ONLINE', sortOrder: 10 },
+      update: { storeGroup: 'DAFC' },
+      create: { name: 'E-Commerce', code: 'ONLINE', type: 'ONLINE', storeGroup: 'DAFC', sortOrder: 10 },
     }),
   ]);
 
@@ -367,16 +371,16 @@ async function main() {
     },
   });
 
-  // Create sample SKU items
+  // Create sample SKU items with W25 fields
   const skuItems = [
-    { code: 'FERR-BAG-001', name: 'Gancini Tote Medium', cat: 'BAGS', sub: 'BAGS-TOTE', gender: Gender.WOMEN, retail: 2150, cost: 860, qty: 25 },
-    { code: 'FERR-BAG-002', name: 'Studio Box Crossbody', cat: 'BAGS', sub: 'BAGS-CROS', gender: Gender.WOMEN, retail: 1650, cost: 660, qty: 30 },
-    { code: 'FERR-BAG-003', name: 'Trifolio Shoulder Bag', cat: 'BAGS', sub: 'BAGS-SHOU', gender: Gender.WOMEN, retail: 1890, cost: 756, qty: 20 },
-    { code: 'FERR-SHO-001', name: 'Gancini Loafer', cat: 'SHOES', sub: 'SHOES-LOAF', gender: Gender.MEN, retail: 850, cost: 340, qty: 40 },
-    { code: 'FERR-SHO-002', name: 'Vara Bow Pump', cat: 'SHOES', sub: 'SHOES-HEEL', gender: Gender.WOMEN, retail: 750, cost: 300, qty: 35 },
-    { code: 'FERR-SHO-003', name: 'Reversible Belt', cat: 'ACC', sub: 'ACC-BELT', gender: Gender.MEN, retail: 450, cost: 180, qty: 50 },
-    { code: 'FERR-SLG-001', name: 'Gancini Wallet', cat: 'SLG', sub: 'SLG-WALL', gender: Gender.UNISEX, retail: 550, cost: 220, qty: 45 },
-    { code: 'FERR-SLG-002', name: 'Card Holder', cat: 'SLG', sub: 'SLG-CARD', gender: Gender.UNISEX, retail: 295, cost: 118, qty: 60 },
+    { code: 'FERR-BAG-001', name: 'Gancini Tote Medium', cat: 'BAGS', sub: 'BAGS-TOTE', gender: Gender.WOMEN, retail: 2150, cost: 860, qty: 25, cf: true, cfFrom: 'SS24', theme: 'SIGNATURE', l4: 'Medium Tote', fsr: 0.85 },
+    { code: 'FERR-BAG-002', name: 'Studio Box Crossbody', cat: 'BAGS', sub: 'BAGS-CROS', gender: Gender.WOMEN, retail: 1650, cost: 660, qty: 30, cf: false, cfFrom: null, theme: 'SEASONAL_TREND', l4: 'Crossbody', fsr: 0.72 },
+    { code: 'FERR-BAG-003', name: 'Trifolio Shoulder Bag', cat: 'BAGS', sub: 'BAGS-SHOU', gender: Gender.WOMEN, retail: 1890, cost: 756, qty: 20, cf: true, cfFrom: 'FW24', theme: 'CORE_CLASSIC', l4: 'Shoulder Bag', fsr: 0.90 },
+    { code: 'FERR-SHO-001', name: 'Gancini Loafer', cat: 'SHOES', sub: 'SHOES-LOAF', gender: Gender.MEN, retail: 850, cost: 340, qty: 40, cf: true, cfFrom: 'CORE', theme: 'ESSENTIAL', l4: 'Penny Loafer', fsr: 0.95 },
+    { code: 'FERR-SHO-002', name: 'Vara Bow Pump', cat: 'SHOES', sub: 'SHOES-HEEL', gender: Gender.WOMEN, retail: 750, cost: 300, qty: 35, cf: true, cfFrom: 'SS24', theme: 'SIGNATURE', l4: 'Block Heel', fsr: 0.88 },
+    { code: 'FERR-SHO-003', name: 'Reversible Belt', cat: 'ACC', sub: 'ACC-BELT', gender: Gender.MEN, retail: 450, cost: 180, qty: 50, cf: false, cfFrom: null, theme: 'ESSENTIAL', l4: 'Dress Belt', fsr: 0.65 },
+    { code: 'FERR-SLG-001', name: 'Gancini Wallet', cat: 'SLG', sub: 'SLG-WALL', gender: Gender.UNISEX, retail: 550, cost: 220, qty: 45, cf: true, cfFrom: 'CORE', theme: 'CORE_CLASSIC', l4: 'Bifold Wallet', fsr: 0.92 },
+    { code: 'FERR-SLG-002', name: 'Card Holder', cat: 'SLG', sub: 'SLG-CARD', gender: Gender.UNISEX, retail: 295, cost: 118, qty: 60, cf: false, cfFrom: null, theme: 'ESSENTIAL', l4: 'Slim Card Case', fsr: 0.78 },
   ];
 
   for (const sku of skuItems) {
@@ -397,6 +401,12 @@ async function main() {
         validationStatus: 'VALID',
         aiDemandScore: Math.random() * 30 + 70,
         aiDemandPrediction: Math.random() > 0.5 ? 'HIGH' : 'MEDIUM',
+        // W25 Fields
+        fullSeasonRatio: sku.fsr,
+        carryForward: sku.cf,
+        carryForwardFrom: sku.cfFrom,
+        themeGroup: sku.theme,
+        l4Category: sku.l4,
       },
     });
   }
