@@ -969,6 +969,528 @@ export const replenishmentApi = {
     apiClient.get<unknown>('/api/v1/replenishment/dashboard', params),
 };
 
+// ============================================
+// W25 FEATURE APIs
+// ============================================
+
+// Import types
+import type {
+  DeliveryWindow,
+  DeliveryAllocation,
+  DeliveryMatrixRow,
+  DeliverySummary,
+  CreateDeliveryAllocationDto,
+  UpdateDeliveryAllocationDto,
+  BatchDeliveryUpdateDto,
+  CostingBreakdown,
+  CostingSummary,
+  CostingConfig,
+  CalculateCostingDto,
+  UpdateCostingDto,
+  BatchCostingUpdateDto,
+  StorePerformanceData,
+  StoreGroupSummary,
+  StoreComparisonData,
+  StorePerformanceFilters,
+  SizeAllocation,
+  SizeProfile,
+  SizeAllocationSummary,
+  CreateSizeAllocationDto,
+  UpdateSizeAllocationDto,
+  ApplySizeProfileDto,
+  PriceRange,
+  PriceRangeDistribution,
+  PriceAnalysis,
+  PriceRangeFilters,
+  CreatePriceRangeDto,
+  UpdatePriceRangeDto,
+  CarryForwardData,
+  CarryForwardSummary,
+  ThemeGroup,
+  ThemeSummary,
+  CreateThemeGroupDto,
+  UpdateThemeGroupDto,
+  AssignSKUsToThemeDto,
+  PaginatedResponse,
+  BatchOperationResult,
+  StoreGroup,
+  CardStatus,
+} from './api-types';
+
+// Delivery Planning endpoints
+export const deliveryApi = {
+  // Delivery Windows
+  getWindows: (params?: { seasonId?: string; isActive?: boolean }) =>
+    apiClient.get<DeliveryWindow[]>('/api/v1/delivery/windows', params),
+
+  getWindow: (id: string) =>
+    apiClient.get<DeliveryWindow>(`/api/v1/delivery/windows/${id}`),
+
+  createWindow: (data: Omit<DeliveryWindow, 'id'>) =>
+    apiClient.post<DeliveryWindow>('/api/v1/delivery/windows', data),
+
+  updateWindow: (id: string, data: Partial<DeliveryWindow>) =>
+    apiClient.patch<DeliveryWindow>(`/api/v1/delivery/windows/${id}`, data),
+
+  deleteWindow: (id: string) =>
+    apiClient.delete<{ deleted: boolean }>(`/api/v1/delivery/windows/${id}`),
+
+  // Delivery Allocations
+  getAllocations: (params?: {
+    skuId?: string;
+    windowId?: string;
+    storeGroup?: StoreGroup;
+    seasonId?: string;
+    page?: number;
+    limit?: number
+  }) =>
+    apiClient.get<PaginatedResponse<DeliveryAllocation>>('/api/v1/delivery/allocations', params),
+
+  getAllocation: (id: string) =>
+    apiClient.get<DeliveryAllocation>(`/api/v1/delivery/allocations/${id}`),
+
+  createAllocation: (data: CreateDeliveryAllocationDto) =>
+    apiClient.post<DeliveryAllocation>('/api/v1/delivery/allocations', data),
+
+  updateAllocation: (id: string, data: UpdateDeliveryAllocationDto) =>
+    apiClient.patch<DeliveryAllocation>(`/api/v1/delivery/allocations/${id}`, data),
+
+  deleteAllocation: (id: string) =>
+    apiClient.delete<{ deleted: boolean }>(`/api/v1/delivery/allocations/${id}`),
+
+  batchUpdateAllocations: (data: BatchDeliveryUpdateDto) =>
+    apiClient.post<BatchOperationResult>('/api/v1/delivery/allocations/batch', data),
+
+  // Delivery Matrix View
+  getMatrix: (params?: {
+    seasonId?: string;
+    brandId?: string;
+    categoryId?: string;
+    storeGroup?: StoreGroup;
+  }) =>
+    apiClient.get<DeliveryMatrixRow[]>('/api/v1/delivery/matrix', params),
+
+  // Delivery Summary
+  getSummary: (params?: {
+    seasonId?: string;
+    brandId?: string;
+    storeGroup?: StoreGroup;
+  }) =>
+    apiClient.get<DeliverySummary>('/api/v1/delivery/summary', params),
+
+  // Store Summary by Window
+  getStoreSummary: (params?: {
+    seasonId?: string;
+    windowId?: string;
+    storeGroup?: StoreGroup;
+  }) =>
+    apiClient.get<{
+      storeGroup: StoreGroup;
+      windows: {
+        windowId: string;
+        windowName: string;
+        quantity: number;
+        value: number;
+      }[];
+      totals: { quantity: number; value: number };
+    }[]>('/api/v1/delivery/store-summary', params),
+
+  // Copy allocations from one window to another
+  copyAllocations: (data: { sourceWindowId: string; targetWindowId: string; skuIds?: string[] }) =>
+    apiClient.post<BatchOperationResult>('/api/v1/delivery/copy', data),
+
+  // Auto-distribute across windows
+  autoDistribute: (data: { skuId: string; totalQuantity: number; windowIds: string[]; method: 'EQUAL' | 'WEIGHTED' | 'FRONT_LOADED' | 'BACK_LOADED' }) =>
+    apiClient.post<DeliveryAllocation[]>('/api/v1/delivery/auto-distribute', data),
+};
+
+// Costing endpoints
+export const costingApi = {
+  // Costing Records
+  getAll: (params?: {
+    skuId?: string;
+    category?: string;
+    brandId?: string;
+    seasonId?: string;
+    minMargin?: number;
+    maxMargin?: number;
+    page?: number;
+    limit?: number;
+  }) =>
+    apiClient.get<PaginatedResponse<CostingBreakdown>>('/api/v1/costing', params),
+
+  getById: (id: string) =>
+    apiClient.get<CostingBreakdown>(`/api/v1/costing/${id}`),
+
+  getBySku: (skuId: string) =>
+    apiClient.get<CostingBreakdown>(`/api/v1/costing/sku/${skuId}`),
+
+  calculate: (data: CalculateCostingDto) =>
+    apiClient.post<CostingBreakdown>('/api/v1/costing/calculate', data),
+
+  update: (id: string, data: UpdateCostingDto) =>
+    apiClient.patch<CostingBreakdown>(`/api/v1/costing/${id}`, data),
+
+  batchUpdate: (data: BatchCostingUpdateDto) =>
+    apiClient.post<BatchOperationResult>('/api/v1/costing/batch', data),
+
+  delete: (id: string) =>
+    apiClient.delete<{ deleted: boolean }>(`/api/v1/costing/${id}`),
+
+  // Summary & Analysis
+  getSummary: (params?: { brandId?: string; seasonId?: string; categoryId?: string }) =>
+    apiClient.get<CostingSummary>('/api/v1/costing/summary', params),
+
+  getMarginAnalysis: (params?: { brandId?: string; seasonId?: string; categoryId?: string }) =>
+    apiClient.get<{
+      avgMargin: number;
+      medianMargin: number;
+      minMargin: number;
+      maxMargin: number;
+      distribution: { range: string; count: number; percentage: number }[];
+      belowTarget: { skuId: string; skuCode: string; margin: number }[];
+    }>('/api/v1/costing/margin-analysis', params),
+
+  // Costing Configs
+  getConfigs: (params?: { brandId?: string; category?: string; isActive?: boolean }) =>
+    apiClient.get<CostingConfig[]>('/api/v1/costing/configs', params),
+
+  getConfig: (id: string) =>
+    apiClient.get<CostingConfig>(`/api/v1/costing/configs/${id}`),
+
+  createConfig: (data: Omit<CostingConfig, 'id'>) =>
+    apiClient.post<CostingConfig>('/api/v1/costing/configs', data),
+
+  updateConfig: (id: string, data: Partial<CostingConfig>) =>
+    apiClient.patch<CostingConfig>(`/api/v1/costing/configs/${id}`, data),
+
+  deleteConfig: (id: string) =>
+    apiClient.delete<{ deleted: boolean }>(`/api/v1/costing/configs/${id}`),
+
+  // Export
+  exportToExcel: (params?: { brandId?: string; seasonId?: string; categoryId?: string }) =>
+    apiClient.post<{ downloadUrl: string }>('/api/v1/costing/export', params),
+
+  // Recalculate all costings with new exchange rate
+  recalculateAll: (data: { exchangeRate: number; seasonId?: string; brandId?: string }) =>
+    apiClient.post<BatchOperationResult>('/api/v1/costing/recalculate', data),
+};
+
+// Store Performance endpoints
+export const storePerformanceApi = {
+  // Performance Data
+  getAll: (params?: StorePerformanceFilters & { page?: number; limit?: number }) =>
+    apiClient.get<PaginatedResponse<StorePerformanceData>>('/api/v1/store-performance', params),
+
+  getByStore: (storeId: string, params?: { periodStart?: string; periodEnd?: string }) =>
+    apiClient.get<StorePerformanceData>(`/api/v1/store-performance/store/${storeId}`, params),
+
+  getByStoreGroup: (storeGroup: StoreGroup, params?: StorePerformanceFilters) =>
+    apiClient.get<StorePerformanceData[]>(`/api/v1/store-performance/group/${storeGroup}`, params),
+
+  // Summaries
+  getGroupSummary: (params?: StorePerformanceFilters) =>
+    apiClient.get<{
+      rex: StoreGroupSummary;
+      ttp: StoreGroupSummary;
+      dafc: StoreGroupSummary;
+    }>('/api/v1/store-performance/summary', params),
+
+  getSummaryByGroup: (storeGroup: StoreGroup, params?: StorePerformanceFilters) =>
+    apiClient.get<StoreGroupSummary>(`/api/v1/store-performance/summary/${storeGroup}`, params),
+
+  // Comparisons
+  compareStores: (storeIds: string[], params?: { metrics?: string[]; periodStart?: string; periodEnd?: string }) =>
+    apiClient.post<StoreComparisonData[]>('/api/v1/store-performance/compare', { storeIds, ...params }),
+
+  compareGroups: (params?: StorePerformanceFilters) =>
+    apiClient.get<{
+      metric: string;
+      rex: number;
+      ttp: number;
+      dafc: number;
+      benchmark: number;
+    }[]>('/api/v1/store-performance/compare-groups', params),
+
+  // Trends
+  getTrend: (storeId: string, params?: { weeks?: number; metric?: string }) =>
+    apiClient.get<{
+      week: string;
+      value: number;
+      change: number;
+      changePercent: number;
+    }[]>(`/api/v1/store-performance/trend/${storeId}`, params),
+
+  getGroupTrend: (storeGroup: StoreGroup, params?: { weeks?: number; metric?: string }) =>
+    apiClient.get<{
+      week: string;
+      value: number;
+      change: number;
+      changePercent: number;
+    }[]>(`/api/v1/store-performance/trend/group/${storeGroup}`, params),
+
+  // Rankings
+  getTopPerformers: (params?: StorePerformanceFilters & { limit?: number; metric?: string }) =>
+    apiClient.get<StorePerformanceData[]>('/api/v1/store-performance/top', params),
+
+  getBottomPerformers: (params?: StorePerformanceFilters & { limit?: number; metric?: string }) =>
+    apiClient.get<StorePerformanceData[]>('/api/v1/store-performance/bottom', params),
+
+  // SKU Performance by Store
+  getSKUPerformance: (storeId: string, params?: { brandId?: string; categoryId?: string; limit?: number }) =>
+    apiClient.get<{
+      skuId: string;
+      skuCode: string;
+      skuName: string;
+      qtySold: number;
+      salesValue: number;
+      sellThru: number;
+      rank: number;
+    }[]>(`/api/v1/store-performance/store/${storeId}/skus`, params),
+};
+
+// Size Allocation endpoints
+export const sizeAllocationApi = {
+  // Allocations
+  getAll: (params?: {
+    skuId?: string;
+    choice?: 'A' | 'B' | 'C';
+    storeGroup?: StoreGroup;
+    page?: number;
+    limit?: number;
+  }) =>
+    apiClient.get<PaginatedResponse<SizeAllocation>>('/api/v1/size-allocation', params),
+
+  getBySku: (skuId: string) =>
+    apiClient.get<SizeAllocation[]>(`/api/v1/size-allocation/sku/${skuId}`),
+
+  create: (data: CreateSizeAllocationDto) =>
+    apiClient.post<SizeAllocation>('/api/v1/size-allocation', data),
+
+  update: (id: string, data: UpdateSizeAllocationDto) =>
+    apiClient.patch<SizeAllocation>(`/api/v1/size-allocation/${id}`, data),
+
+  delete: (id: string) =>
+    apiClient.delete<{ deleted: boolean }>(`/api/v1/size-allocation/${id}`),
+
+  // Batch operations
+  batchCreate: (data: { allocations: CreateSizeAllocationDto[] }) =>
+    apiClient.post<BatchOperationResult>('/api/v1/size-allocation/batch', data),
+
+  batchUpdate: (data: { allocations: { id: string; quantity?: number; choice?: 'A' | 'B' | 'C' }[] }) =>
+    apiClient.patch<BatchOperationResult>('/api/v1/size-allocation/batch', data),
+
+  // Apply profile to SKUs
+  applyProfile: (data: ApplySizeProfileDto) =>
+    apiClient.post<BatchOperationResult>('/api/v1/size-allocation/apply-profile', data),
+
+  // Summary
+  getSummary: (params?: { skuId?: string; brandId?: string; seasonId?: string; categoryId?: string }) =>
+    apiClient.get<SizeAllocationSummary>('/api/v1/size-allocation/summary', params),
+
+  getChoiceSummary: (params?: { brandId?: string; seasonId?: string }) =>
+    apiClient.get<{
+      choice: 'A' | 'B' | 'C';
+      skuCount: number;
+      totalQuantity: number;
+      totalValue: number;
+      percentage: number;
+    }[]>('/api/v1/size-allocation/choice-summary', params),
+
+  // Size Profiles (extends existing sizeProfilesApi)
+  getProfiles: (params?: { categoryId?: string; seasonId?: string; profileType?: string; isActive?: boolean }) =>
+    apiClient.get<SizeProfile[]>('/api/v1/size-allocation/profiles', params),
+
+  getProfile: (id: string) =>
+    apiClient.get<SizeProfile>(`/api/v1/size-allocation/profiles/${id}`),
+
+  createProfile: (data: Omit<SizeProfile, 'id' | 'createdAt' | 'updatedAt'>) =>
+    apiClient.post<SizeProfile>('/api/v1/size-allocation/profiles', data),
+
+  updateProfile: (id: string, data: Partial<SizeProfile>) =>
+    apiClient.patch<SizeProfile>(`/api/v1/size-allocation/profiles/${id}`, data),
+
+  deleteProfile: (id: string) =>
+    apiClient.delete<{ deleted: boolean }>(`/api/v1/size-allocation/profiles/${id}`),
+
+  // Optimize profile based on historical data
+  optimizeProfile: (data: { categoryId: string; seasonId?: string; lookbackSeasons?: number }) =>
+    apiClient.post<SizeProfile>('/api/v1/size-allocation/profiles/optimize', data),
+};
+
+// Price Range endpoints
+export const priceRangeApi = {
+  // Price Ranges
+  getAll: (params?: PriceRangeFilters & { page?: number; limit?: number }) =>
+    apiClient.get<PaginatedResponse<PriceRange>>('/api/v1/price-ranges', params),
+
+  getById: (id: string) =>
+    apiClient.get<PriceRange>(`/api/v1/price-ranges/${id}`),
+
+  create: (data: CreatePriceRangeDto) =>
+    apiClient.post<PriceRange>('/api/v1/price-ranges', data),
+
+  update: (id: string, data: UpdatePriceRangeDto) =>
+    apiClient.patch<PriceRange>(`/api/v1/price-ranges/${id}`, data),
+
+  delete: (id: string) =>
+    apiClient.delete<{ deleted: boolean }>(`/api/v1/price-ranges/${id}`),
+
+  // Distribution Analysis
+  getDistribution: (params?: PriceRangeFilters) =>
+    apiClient.get<PriceRangeDistribution[]>('/api/v1/price-ranges/distribution', params),
+
+  getAnalysis: (params?: PriceRangeFilters) =>
+    apiClient.get<PriceAnalysis>('/api/v1/price-ranges/analysis', params),
+
+  // SKUs by Range
+  getSKUsByRange: (rangeId: string, params?: { page?: number; limit?: number }) =>
+    apiClient.get<PaginatedResponse<{
+      skuId: string;
+      skuCode: string;
+      skuName: string;
+      price: number;
+      brand: string;
+      category: string;
+    }>>(`/api/v1/price-ranges/${rangeId}/skus`, params),
+
+  // Comparison
+  compareRanges: (rangeIds: string[]) =>
+    apiClient.post<{
+      rangeId: string;
+      rangeName: string;
+      avgPrice: number;
+      skuCount: number;
+      sellThru: number;
+      margin: number;
+    }[]>('/api/v1/price-ranges/compare', { rangeIds }),
+
+  // Trend
+  getPriceTrend: (params?: PriceRangeFilters & { weeks?: number }) =>
+    apiClient.get<{
+      week: string;
+      avgPrice: number;
+      change: number;
+      changePercent: number;
+    }[]>('/api/v1/price-ranges/trend', params),
+};
+
+// Carry Forward endpoints
+export const carryForwardApi = {
+  // Carry Forward Data
+  getAll: (params?: {
+    seasonId?: string;
+    brandId?: string;
+    isCarryForward?: boolean;
+    source?: string;
+    page?: number;
+    limit?: number
+  }) =>
+    apiClient.get<PaginatedResponse<CarryForwardData>>('/api/v1/carry-forward', params),
+
+  getBySku: (skuId: string) =>
+    apiClient.get<CarryForwardData>(`/api/v1/carry-forward/sku/${skuId}`),
+
+  update: (skuId: string, data: Partial<CarryForwardData>) =>
+    apiClient.patch<CarryForwardData>(`/api/v1/carry-forward/sku/${skuId}`, data),
+
+  // Bulk update
+  batchUpdate: (data: { skuIds: string[]; isCarryForward: boolean; sourceCollection?: string }) =>
+    apiClient.post<BatchOperationResult>('/api/v1/carry-forward/batch', data),
+
+  // Summary
+  getSummary: (params?: { seasonId?: string; brandId?: string; categoryId?: string }) =>
+    apiClient.get<CarryForwardSummary>('/api/v1/carry-forward/summary', params),
+
+  // Analysis
+  getPerformanceAnalysis: (params?: { seasonId?: string; brandId?: string }) =>
+    apiClient.get<{
+      source: string;
+      avgSellThru: number;
+      avgMargin: number;
+      recommendation: string;
+      skuCount: number;
+    }[]>('/api/v1/carry-forward/analysis', params),
+
+  // Recommendations
+  getRecommendations: (params?: { seasonId?: string; brandId?: string; limit?: number }) =>
+    apiClient.get<{
+      skuId: string;
+      skuCode: string;
+      currentSource: string;
+      recommendation: 'CONTINUE' | 'PHASE_OUT' | 'INCREASE' | 'MAINTAIN';
+      reason: string;
+      confidence: number;
+    }[]>('/api/v1/carry-forward/recommendations', params),
+};
+
+// Theme Group endpoints
+export const themeApi = {
+  // Theme Groups
+  getAll: (params?: {
+    seasonId?: string;
+    brandId?: string;
+    type?: string;
+    status?: CardStatus;
+    page?: number;
+    limit?: number
+  }) =>
+    apiClient.get<PaginatedResponse<ThemeGroup>>('/api/v1/themes', params),
+
+  getById: (id: string) =>
+    apiClient.get<ThemeGroup>(`/api/v1/themes/${id}`),
+
+  create: (data: CreateThemeGroupDto) =>
+    apiClient.post<ThemeGroup>('/api/v1/themes', data),
+
+  update: (id: string, data: UpdateThemeGroupDto) =>
+    apiClient.patch<ThemeGroup>(`/api/v1/themes/${id}`, data),
+
+  delete: (id: string) =>
+    apiClient.delete<{ deleted: boolean }>(`/api/v1/themes/${id}`),
+
+  // SKU Assignment
+  assignSKUs: (data: AssignSKUsToThemeDto) =>
+    apiClient.post<BatchOperationResult>('/api/v1/themes/assign-skus', data),
+
+  removeSKUs: (themeId: string, skuIds: string[]) =>
+    apiClient.post<BatchOperationResult>(`/api/v1/themes/${themeId}/remove-skus`, { skuIds }),
+
+  getSKUs: (themeId: string, params?: { page?: number; limit?: number }) =>
+    apiClient.get<PaginatedResponse<{
+      skuId: string;
+      skuCode: string;
+      skuName: string;
+      price: number;
+      category: string;
+    }>>(`/api/v1/themes/${themeId}/skus`, params),
+
+  // Summary
+  getSummary: (params?: { seasonId?: string; brandId?: string }) =>
+    apiClient.get<ThemeSummary>('/api/v1/themes/summary', params),
+
+  // Performance by Theme
+  getPerformance: (themeId: string, params?: { weeks?: number }) =>
+    apiClient.get<{
+      week: string;
+      salesValue: number;
+      salesUnits: number;
+      sellThru: number;
+    }[]>(`/api/v1/themes/${themeId}/performance`, params),
+
+  // Compare themes
+  compare: (themeIds: string[]) =>
+    apiClient.post<{
+      themeId: string;
+      themeName: string;
+      type: string;
+      productCount: number;
+      totalValue: number;
+      avgSellThru: number;
+      avgMargin: number;
+    }[]>('/api/v1/themes/compare', { themeIds }),
+};
+
 // AI Forecasting endpoints
 export const forecastingApi = {
   // Configs
