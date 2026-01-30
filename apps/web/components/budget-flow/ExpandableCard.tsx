@@ -368,7 +368,7 @@ export function ExpandableCard({ node, onDrillDown, onBudgetUpdate }: Expandable
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.2, ease: 'easeInOut' }}
           >
-            <div className={cn('px-4 pb-4 border-t border-slate-100 dark:border-neutral-800 border-l-4', levelStyles.band)}>
+            <div className="px-4 pb-4 border-t border-slate-100 dark:border-neutral-800">
               <div className="py-6 text-center">
                 <div className="mb-4">
                   <div className="w-12 h-12 mx-auto rounded-xl bg-amber-50 dark:bg-amber-900/30 flex items-center justify-center">
@@ -404,7 +404,7 @@ export function ExpandableCard({ node, onDrillDown, onBudgetUpdate }: Expandable
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.2, ease: 'easeInOut' }}
           >
-            <div className={cn('px-4 pb-4 border-t border-slate-100 dark:border-neutral-800 border-l-4', levelStyles.band)}>
+            <div className="px-4 pb-4 border-t border-slate-100 dark:border-neutral-800">
               {/* Visual Chart Section */}
               <div className="py-5 border-b border-slate-100 dark:border-neutral-800">
                 <BudgetAllocationVisual
