@@ -13,6 +13,7 @@ import {
   Sparkles,
   FileCheck,
   Upload,
+  Wand2,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -37,6 +38,7 @@ import {
 } from '@/components/ui/table';
 import { PageHeader } from '@/components/shared/page-header';
 import { ExcelUpload, UploadResult } from '@/components/sku/excel-upload';
+import { SKUAutoGenerator, GeneratedSKU } from '@/components/sku-proposal';
 import { SKU_STATUS_LABELS, GENDER_LABELS, Category } from '@/types';
 
 interface SKUItem {
@@ -466,13 +468,19 @@ export default function SKUProposalDetailPage({
           )}
 
           {/* Tabs */}
-          <Tabs defaultValue={isEditable && proposal.items.length === 0 ? 'upload' : 'items'}>
+          <Tabs defaultValue={isEditable && proposal.items.length === 0 ? 'auto-generate' : 'items'}>
             <TabsList>
               {isEditable && (
-                <TabsTrigger value="upload" className="gap-2">
-                  <Upload className="h-4 w-4" />
-                  Upload Excel
-                </TabsTrigger>
+                <>
+                  <TabsTrigger value="auto-generate" className="gap-2">
+                    <Wand2 className="h-4 w-4" />
+                    Auto-Generate
+                  </TabsTrigger>
+                  <TabsTrigger value="upload" className="gap-2">
+                    <Upload className="h-4 w-4" />
+                    Upload Excel
+                  </TabsTrigger>
+                </>
               )}
               <TabsTrigger value="items" className="gap-2">
                 <FileCheck className="h-4 w-4" />
@@ -481,17 +489,32 @@ export default function SKUProposalDetailPage({
             </TabsList>
 
             {isEditable && (
-              <TabsContent value="upload" className="mt-4 space-y-4">
-                <ExcelUpload onUpload={handleUpload} isUploading={isUploading} />
-                {uploadResult && (
-                  <UploadResult
-                    success={uploadResult.success}
-                    itemsCreated={uploadResult.itemsCreated}
-                    warnings={uploadResult.warnings}
-                    onClose={() => setUploadResult(null)}
+              <>
+                <TabsContent value="auto-generate" className="mt-4">
+                  <SKUAutoGenerator
+                    proposalId={id}
+                    budgetInfo={{
+                      allocated: Number(proposal.otbPlan.budget.totalBudget) * 0.8,
+                      remaining: Number(proposal.otbPlan.budget.totalBudget) * 0.2,
+                    }}
+                    onSKUsGenerated={(skus: GeneratedSKU[]) => {
+                      console.log('Generated SKUs:', skus);
+                      fetchData();
+                    }}
                   />
-                )}
-              </TabsContent>
+                </TabsContent>
+                <TabsContent value="upload" className="mt-4 space-y-4">
+                  <ExcelUpload onUpload={handleUpload} isUploading={isUploading} />
+                  {uploadResult && (
+                    <UploadResult
+                      success={uploadResult.success}
+                      itemsCreated={uploadResult.itemsCreated}
+                      warnings={uploadResult.warnings}
+                      onClose={() => setUploadResult(null)}
+                    />
+                  )}
+                </TabsContent>
+              </>
             )}
 
             <TabsContent value="items" className="mt-4 space-y-4">

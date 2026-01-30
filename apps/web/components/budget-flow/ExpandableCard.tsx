@@ -14,8 +14,11 @@ import {
   Minus,
   Pencil,
   Check,
-  X
+  X,
+  Wand2,
+  ExternalLink,
 } from 'lucide-react';
+import Link from 'next/link';
 
 // Color palette for chart segments
 const CHART_COLORS = [
@@ -342,6 +345,33 @@ export function ExpandableCard({ node, onDrillDown, onBudgetUpdate }: Expandable
           </div>
         </div>
       </div>
+
+      {/* Expanded Content - No Children: Show SKU Proposal Link */}
+      {isExpanded && !hasChildren && (
+        <div className="px-6 pb-6 border-t border-slate-100">
+          <div className="py-6 text-center">
+            <div className="mb-4">
+              <div className="w-12 h-12 mx-auto rounded-xl bg-amber-50 flex items-center justify-center">
+                <Wand2 className="w-6 h-6 text-amber-600" />
+              </div>
+            </div>
+            <h4 className="font-semibold text-slate-800 mb-2">
+              Ready for SKU Planning
+            </h4>
+            <p className="text-sm text-slate-500 mb-4 max-w-[280px] mx-auto">
+              This category has {formatCurrency(node.budget)} allocated. Create an SKU proposal to plan specific products.
+            </p>
+            <Link
+              href={`/sku-proposal?category=${node.id}&budget=${node.budget}`}
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-amber-500 text-white font-medium hover:bg-amber-600 transition-colors"
+            >
+              <Wand2 className="w-4 h-4" />
+              Create SKU Proposal
+              <ExternalLink className="w-3.5 h-3.5 opacity-70" />
+            </Link>
+          </div>
+        </div>
+      )}
 
       {/* Expanded Content - Budget Breakdown */}
       {isExpanded && hasChildren && (
