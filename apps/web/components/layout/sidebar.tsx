@@ -39,6 +39,8 @@ import {
   Settings,
   Layers,
   Ticket,
+  Truck,
+  Coins,
 } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import {
@@ -70,6 +72,8 @@ const navigation = [
   { key: 'budgetFlow', href: '/budget-flow', icon: Layers },      // Budget Flow View
   { key: 'otb', href: '/otb-analysis', icon: TrendingUp },        // Step 2: OTB Analysis
   { key: 'sku', href: '/sku-proposal', icon: Package },           // Step 3: SKU Proposal
+  { key: 'deliveryPlanning', href: '/delivery-planning', icon: Truck, badge: 'New' }, // Delivery Planning
+  { key: 'costing', href: '/costing', icon: Coins, badge: 'New' }, // Costing Analysis
   { key: 'wssi', href: '/wssi', icon: CalendarDays },             // WSSI Planning
   { key: 'tickets', href: '/tickets', icon: Ticket },             // Ticket System
   { key: 'approvals', href: '/approvals', icon: CheckSquare },    // Approvals
@@ -218,7 +222,16 @@ export function Sidebar({ collapsed = false, onToggleCollapse }: SidebarProps) {
                     'h-5 w-5 flex-shrink-0',
                     isActive ? 'text-primary' : 'text-muted-foreground/70 group-hover:text-foreground dark:group-hover:text-white'
                   )} />
-                  {!collapsed && <span className="flex-1 uppercase font-semibold tracking-wide">{t(item.key)}</span>}
+                  {!collapsed && (
+                    <>
+                      <span className="flex-1 uppercase font-semibold tracking-wide">{t(item.key)}</span>
+                      {'badge' in item && item.badge && (
+                        <span className="px-1.5 py-0.5 text-[10px] font-bold bg-blue-500 text-white rounded-full">
+                          {item.badge}
+                        </span>
+                      )}
+                    </>
+                  )}
                 </Link>
               );
 
