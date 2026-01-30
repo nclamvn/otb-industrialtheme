@@ -2322,5 +2322,45 @@
       "rex": "REX",
       "ttp": "TTP"
     }
+  },
+  "costing": {
+    "title": "Bảng Tính Giá Thành",
+    "description": "Tính toán chi phí từ giá gốc đến biên lợi nhuận",
+    "unitCost": "Giá gốc",
+    "freightInsurance": "Vận chuyển + Bảo hiểm",
+    "othersTax": "Thuế khác",
+    "importTax": "Thuế nhập khẩu",
+    "landedCost": "Giá hạ cảng",
+    "landedCostVND": "Giá hạ cảng (VND)",
+    "srp": "Giá bán lẻ đề xuất",
+    "grossMargin": "Biên lợi nhuận gộp",
+    "exchangeRate": "Tỷ giá",
+    "costBreakdown": "Phân tích chi phí",
+    "marginStatus": {
+      "excellent": "Xuất sắc",
+      "good": "Tốt",
+      "acceptable": "Chấp nhận được",
+      "low": "Thấp",
+      "critical": "Nguy hiểm"
+    },
+    "categories": {
+      "accessories": "Phụ kiện",
+      "scarves": "Khăn choàng",
+      "womens": "Nữ",
+      "mens": "Nam",
+      "shoes": "Giày",
+      "bags": "Túi xách",
+      "jewellery": "Trang sức",
+      "leatherGoods": "Đồ da",
+      "rtw": "Thời trang may sẵn"
+    },
+    "summary": {
+      "totalSKUs": "Tổng SKU",
+      "avgUnitCost": "Giá gốc TB",
+      "avgLandedCost": "Giá hạ cảng TB",
+      "avgMargin": "Biên LN TB",
+      "totalLandedValue": "Tổng giá trị hạ cảng",
+      "totalRetailValue": "Tổng giá trị bán lẻ"
+    }
   }
 }

@@ -2322,5 +2322,45 @@
       "rex": "REX",
       "ttp": "TTP"
     }
+  },
+  "costing": {
+    "title": "Costing Breakdown",
+    "description": "Full cost calculation from unit cost to margin",
+    "unitCost": "Unit Cost",
+    "freightInsurance": "Freight + Insurance",
+    "othersTax": "Others Tax",
+    "importTax": "Import Tax",
+    "landedCost": "Landed Cost",
+    "landedCostVND": "Landed Cost (VND)",
+    "srp": "SRP",
+    "grossMargin": "Gross Margin",
+    "exchangeRate": "Exchange Rate",
+    "costBreakdown": "Cost Breakdown",
+    "marginStatus": {
+      "excellent": "Excellent",
+      "good": "Good",
+      "acceptable": "Acceptable",
+      "low": "Low",
+      "critical": "Critical"
+    },
+    "categories": {
+      "accessories": "Accessories",
+      "scarves": "Scarves",
+      "womens": "Women's",
+      "mens": "Men's",
+      "shoes": "Shoes",
+      "bags": "Bags",
+      "jewellery": "Jewellery",
+      "leatherGoods": "Leather Goods",
+      "rtw": "Ready-to-Wear"
+    },
+    "summary": {
+      "totalSKUs": "Total SKUs",
+      "avgUnitCost": "Avg. Unit Cost",
+      "avgLandedCost": "Avg. Landed Cost",
+      "avgMargin": "Avg. Margin",
+      "totalLandedValue": "Total Landed Value",
+      "totalRetailValue": "Total Retail Value"
+    }
   }
 }
