@@ -4,3 +4,7 @@ export { BudgetProgressBar } from './BudgetProgressBar';
 export { BudgetStatusBadge } from './BudgetStatusBadge';
 export { UnifiedBudgetCard } from './UnifiedBudgetCard';
 export { BudgetFlowCard } from './BudgetFlowCard';
+export { KPIGrid } from './KPIGrid';
+export type { KPIItem, Trend } from './KPIGrid';
+export { SeverityIndicator, getSeverityFromPercentage, getSeverityFromSellThrough, getSeverityFromOTB } from './SeverityIndicator';
+export type { Severity } from './SeverityIndicator';
