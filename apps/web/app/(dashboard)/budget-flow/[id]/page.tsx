@@ -4,9 +4,12 @@ import { useParams, useRouter } from 'next/navigation';
 import { BudgetFlowView } from '@/components/budget-flow';
 import { BudgetNode } from '@/components/budget-flow/types';
 import { useBudgetData } from '@/components/budget-flow/hooks/useBudgetData';
-import { Loader2, ArrowLeft } from 'lucide-react';
+import { Loader2, ArrowLeft, Building2, Palette } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
+import { StorePerformanceCard, useStorePerformance } from '@/components/store-performance';
+import { ThemeGroupCard, THEME_CONFIG } from '@/components/carry-forward';
+import { VarianceIndicator } from '@/components/shared/VarianceIndicator';
 
 // Mock data mapping - replace with actual API call
 const MOCK_BUDGETS: Record<string, BudgetNode> = {
@@ -279,6 +282,16 @@ export default function BudgetFlowDetailPage() {
     initialData: mockData,
   });
 
+  // Store performance data
+  const { summary: storeSummary } = useStorePerformance({});
+
+  // Demo theme data
+  const themes = [
+    { id: '1', name: 'August Drop', type: 'SEASONAL_TREND' as const, productCount: 45, totalValue: 2500000000, targetPercentage: 0.35, currentPercentage: 0.32, season: 'W25' },
+    { id: '2', name: 'Core Collection', type: 'CORE_CLASSIC' as const, productCount: 80, totalValue: 4200000000, targetPercentage: 0.45, currentPercentage: 0.48, season: 'W25' },
+    { id: '3', name: 'Limited Edition', type: 'LIMITED_EDITION' as const, productCount: 15, totalValue: 800000000, targetPercentage: 0.10, currentPercentage: 0.08, season: 'W25' },
+  ];
+
   const handleExport = () => {
     if (data) {
       exportToCSV(data);
@@ -336,6 +349,70 @@ export default function BudgetFlowDetailPage() {
         onExport={handleExport}
         onRefresh={handleRefresh}
       />
+
+      {/* Store Performance Section */}
+      <div className="px-6 py-8 space-y-6">
+        <div className="flex items-center gap-2">
+          <Building2 className="w-5 h-5 text-blue-600" />
+          <h2 className="text-lg font-semibold">Store Performance</h2>
+        </div>
+        <div className="grid grid-cols-2 gap-4">
+          <StorePerformanceCard
+            data={{
+              id: 'rex',
+              storeGroup: 'REX',
+              sellThruPercent: storeSummary.rex.avgSellThru,
+              qtyReceived: 500,
+              qtySold: Math.round(500 * storeSummary.rex.avgSellThru),
+              qtyOnHand: Math.round(500 * (1 - storeSummary.rex.avgSellThru)),
+              salesValue: storeSummary.rex.totalSalesValue,
+              salesUnits: storeSummary.rex.totalSalesUnits,
+              trend: 'up',
+            }}
+            showDetails={true}
+          />
+          <StorePerformanceCard
+            data={{
+              id: 'ttp',
+              storeGroup: 'TTP',
+              sellThruPercent: storeSummary.ttp.avgSellThru,
+              qtyReceived: 500,
+              qtySold: Math.round(500 * storeSummary.ttp.avgSellThru),
+              qtyOnHand: Math.round(500 * (1 - storeSummary.ttp.avgSellThru)),
+              salesValue: storeSummary.ttp.totalSalesValue,
+              salesUnits: storeSummary.ttp.totalSalesUnits,
+              trend: 'stable',
+            }}
+            showDetails={true}
+          />
+        </div>
+
+        {/* Theme Breakdown Section */}
+        <div className="flex items-center gap-2 mt-8">
+          <Palette className="w-5 h-5 text-purple-600" />
+          <h2 className="text-lg font-semibold">Theme Breakdown</h2>
+        </div>
+        <div className="grid grid-cols-3 gap-4">
+          {themes.map((theme) => (
+            <ThemeGroupCard
+              key={theme.id}
+              theme={theme}
+              showProgress={true}
+            />
+          ))}
+        </div>
+
+        {/* YoY Variance */}
+        <div className="p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
+          <div className="flex items-center justify-between">
+            <span className="text-slate-500">YoY Budget Variance</span>
+            <div className="flex items-center gap-2">
+              <span className="text-xl font-bold">+15.2%</span>
+              <VarianceIndicator value={0.152} />
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

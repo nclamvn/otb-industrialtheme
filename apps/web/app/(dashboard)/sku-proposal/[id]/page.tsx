@@ -14,7 +14,18 @@ import {
   FileCheck,
   Upload,
   Wand2,
+  Ruler,
+  DollarSign,
+  Building2,
 } from 'lucide-react';
+import {
+  ChoiceAllocationCard,
+  SizeAllocationTable,
+  useSizeAllocation,
+} from '@/components/size-allocation';
+import { CostingBreakdownCard, calculateCosting } from '@/components/costing';
+import { CarryForwardBadge } from '@/components/carry-forward';
+import { VarianceIndicator } from '@/components/shared/VarianceIndicator';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -486,6 +497,14 @@ export default function SKUProposalDetailPage({
                 <FileCheck className="h-4 w-4" />
                 SKU Items ({proposal.items.length})
               </TabsTrigger>
+              <TabsTrigger value="sizing" className="gap-2">
+                <Ruler className="h-4 w-4" />
+                Size Allocation
+              </TabsTrigger>
+              <TabsTrigger value="costing" className="gap-2">
+                <DollarSign className="h-4 w-4" />
+                Costing
+              </TabsTrigger>
             </TabsList>
 
             {isEditable && (
@@ -602,6 +621,127 @@ export default function SKUProposalDetailPage({
                   )}
                 </div>
               )}
+            </TabsContent>
+
+            {/* Size Allocation Tab */}
+            <TabsContent value="sizing" className="mt-4 space-y-6">
+              <div className="grid grid-cols-3 gap-4">
+                <ChoiceAllocationCard
+                  choice="A"
+                  data={{
+                    choice: 'A',
+                    sizes: [
+                      { size: 'XS', qty: 2 },
+                      { size: 'S', qty: 3 },
+                      { size: 'M', qty: 4 },
+                      { size: 'L', qty: 3 },
+                      { size: 'XL', qty: 2 },
+                    ],
+                    totalQty: 14,
+                    skuCount: 25,
+                    description: 'Full size run - standard allocation',
+                  }}
+                />
+                <ChoiceAllocationCard
+                  choice="B"
+                  data={{
+                    choice: 'B',
+                    sizes: [
+                      { size: 'S', qty: 3 },
+                      { size: 'M', qty: 5 },
+                      { size: 'L', qty: 4 },
+                      { size: 'XL', qty: 2 },
+                    ],
+                    totalQty: 14,
+                    skuCount: 18,
+                    description: 'Core sizes - no XS',
+                  }}
+                />
+                <ChoiceAllocationCard
+                  choice="C"
+                  data={{
+                    choice: 'C',
+                    sizes: [
+                      { size: 'M', qty: 6 },
+                      { size: 'L', qty: 5 },
+                      { size: 'XL', qty: 3 },
+                    ],
+                    totalQty: 14,
+                    skuCount: 12,
+                    description: 'Large sizes only',
+                  }}
+                />
+              </div>
+              <SizeAllocationTable
+                data={{
+                  skuId: 'sample-sku',
+                  choices: {
+                    A: [
+                      { size: 'XS', qty: 2 },
+                      { size: 'S', qty: 3 },
+                      { size: 'M', qty: 4 },
+                      { size: 'L', qty: 3 },
+                      { size: 'XL', qty: 2 },
+                    ],
+                    B: [
+                      { size: 'S', qty: 3 },
+                      { size: 'M', qty: 5 },
+                      { size: 'L', qty: 4 },
+                      { size: 'XL', qty: 2 },
+                    ],
+                    C: [
+                      { size: 'M', qty: 6 },
+                      { size: 'L', qty: 5 },
+                      { size: 'XL', qty: 3 },
+                    ],
+                  },
+                  selectedChoice: 'A',
+                  customQty: {},
+                }}
+                editable={isEditable}
+              />
+            </TabsContent>
+
+            {/* Costing Tab */}
+            <TabsContent value="costing" className="mt-4 space-y-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <CostingBreakdownCard
+                  costing={calculateCosting({
+                    skuId: 'SAMPLE-001',
+                    unitCost: 150,
+                    category: 'WOMENS',
+                    srp: 87900000,
+                    exchangeRate: 24000,
+                  })}
+                  showDetails={true}
+                />
+                <div className="space-y-4">
+                  <h3 className="font-semibold">Product Info</h3>
+                  <div className="p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 space-y-3">
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">Status</span>
+                      <CarryForwardBadge
+                        data={{
+                          isCarryForward: false,
+                        }}
+                        showDetails={false}
+                      />
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">YoY Variance</span>
+                      <VarianceIndicator value={0.12} />
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">Theme</span>
+                      <span className="font-medium">August (08)</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">Composition</span>
+                      <span className="font-medium">100% Cotton</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </TabsContent>
           </Tabs>
         </div>
