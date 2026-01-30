@@ -51,7 +51,7 @@ export function BudgetFlowView({
     if (!data.children) return null;
 
     return (
-      <div className="border border-slate-200 rounded-lg overflow-hidden">
+      <div className="space-y-1">
         {data.children.map((child) => (
           <StackedCard
             key={child.id}
