@@ -1989,5 +1989,62 @@
       "sizing": "Sizing",
       "approval": "Phê duyệt"
     }
+  },
+  "approval": {
+    "chain": "Chuỗi phê duyệt",
+    "level": "Cấp",
+    "levels": {
+      "gmd": "GMD",
+      "gmdFull": "Giám đốc Hàng hóa",
+      "finance": "Tài chính",
+      "financeFull": "Giám đốc Tài chính",
+      "ceo": "CEO",
+      "ceoFull": "Tổng Giám đốc"
+    },
+    "status": {
+      "pending": "Chờ xử lý",
+      "approved": "Đã duyệt",
+      "rejected": "Đã từ chối",
+      "skipped": "Đã bỏ qua",
+      "inProgress": "Đang xử lý"
+    },
+    "actions": {
+      "approve": "Phê duyệt",
+      "reject": "Từ chối",
+      "view": "Xem chi tiết"
+    },
+    "requestedBy": "Người yêu cầu",
+    "submittedAt": "Ngày gửi",
+    "deadline": "Hạn chót",
+    "waitingFor": "Đang chờ",
+    "myQueue": "Phê duyệt của tôi",
+    "pendingCount": "{count} chờ xử lý",
+    "priority": {
+      "high": "Ưu tiên cao",
+      "medium": "Trung bình",
+      "normal": "Bình thường"
+    },
+    "commentRequired": "Vui lòng nhập lý do từ chối",
+    "confirmApprove": "Xác nhận phê duyệt?",
+    "confirmReject": "Xác nhận từ chối?"
+  },
+  "notification": {
+    "title": "Thông báo",
+    "markAllRead": "Đánh dấu tất cả đã đọc",
+    "viewAll": "Xem tất cả thông báo",
+    "empty": "Không có thông báo",
+    "emptyDesc": "Bạn đã cập nhật tất cả!",
+    "today": "Hôm nay",
+    "yesterday": "Hôm qua",
+    "types": {
+      "approvalRequested": "Cần phê duyệt",
+      "approvalApproved": "Đã được duyệt",
+      "approvalRejected": "Đã bị từ chối",
+      "decisionRequired": "Cần quyết định",
+      "deadlineReminder": "Nhắc hạn chót",
+      "commentAdded": "Có bình luận mới",
+      "versionCreated": "Phiên bản mới",
+      "exportReady": "Xuất file sẵn sàng"
+    }
   }
 }

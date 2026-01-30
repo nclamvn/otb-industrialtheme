@@ -1989,5 +1989,62 @@
       "sizing": "Sizing",
       "approval": "Approval"
     }
+  },
+  "approval": {
+    "chain": "Approval Chain",
+    "level": "Level",
+    "levels": {
+      "gmd": "GMD",
+      "gmdFull": "General Merchandise Director",
+      "finance": "Finance",
+      "financeFull": "Finance Director",
+      "ceo": "CEO",
+      "ceoFull": "Chief Executive Officer"
+    },
+    "status": {
+      "pending": "Pending",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "skipped": "Skipped",
+      "inProgress": "In Progress"
+    },
+    "actions": {
+      "approve": "Approve",
+      "reject": "Reject",
+      "view": "View Details"
+    },
+    "requestedBy": "Requested by",
+    "submittedAt": "Submitted",
+    "deadline": "Deadline",
+    "waitingFor": "Waiting for",
+    "myQueue": "My Approval Queue",
+    "pendingCount": "{count} pending",
+    "priority": {
+      "high": "High Priority",
+      "medium": "Medium",
+      "normal": "Normal"
+    },
+    "commentRequired": "Please add a comment for rejection",
+    "confirmApprove": "Confirm approval?",
+    "confirmReject": "Confirm rejection?"
+  },
+  "notification": {
+    "title": "Notifications",
+    "markAllRead": "Mark all as read",
+    "viewAll": "View All Notifications",
+    "empty": "No notifications",
+    "emptyDesc": "You're all caught up!",
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "types": {
+      "approvalRequested": "Approval Required",
+      "approvalApproved": "Approved",
+      "approvalRejected": "Rejected",
+      "decisionRequired": "Decision Required",
+      "deadlineReminder": "Deadline Reminder",
+      "commentAdded": "Comment Added",
+      "versionCreated": "New Version",
+      "exportReady": "Export Ready"
+    }
   }
 }
