@@ -11,11 +11,12 @@ import { EnhancedBudgetCard } from './EnhancedBudgetCard';
 import { ExpandableCard } from './ExpandableCard';
 import { GapCopilot } from './gap-handling';
 import { VersionHistoryPanel } from './version-history';
+import { ExportDialog, flattenBudgetToCSV } from '@/components/export';
 import { useStackedCards } from './hooks/useStackedCards';
 import { useKeyboardNavigation } from './hooks/useKeyboardNavigation';
 import { formatCurrency } from './utils/budget-calculations';
 import { getHierarchyColor } from './utils/hierarchy-colors';
-import { Sparkles, History } from 'lucide-react';
+import { Sparkles, History, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface BudgetFlowViewProps {
@@ -81,6 +82,9 @@ export function BudgetFlowView({
 
   // Version History state
   const [isVersionHistoryOpen, setIsVersionHistoryOpen] = useState(false);
+
+  // Export state
+  const [isExportOpen, setIsExportOpen] = useState(false);
 
   // Filter state
   const { filters, setFilters } = useBudgetFilters();
@@ -243,7 +247,7 @@ export function BudgetFlowView({
         onViewModeChange={setViewMode}
         onExpandAll={expandAll}
         onCollapseAll={collapseAll}
-        onExport={onExport}
+        onExport={() => setIsExportOpen(true)}
         onRefresh={onRefresh}
         onBack={focusedNodeId ? handleBack : undefined}
       />
@@ -280,6 +284,18 @@ export function BudgetFlowView({
         'fixed bottom-6 right-6 flex flex-col gap-3',
         (isGapCopilotOpen || isVersionHistoryOpen) && 'hidden'
       )}>
+        {/* Export Button */}
+        <Button
+          onClick={() => setIsExportOpen(true)}
+          className={cn(
+            'h-12 w-12 rounded-full shadow-lg',
+            'bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-700 dark:hover:bg-emerald-600',
+            'flex items-center justify-center transition-all hover:scale-110'
+          )}
+        >
+          <Download className="h-5 w-5 text-white" />
+        </Button>
+
         {/* Version History Button */}
         <Button
           onClick={() => setIsVersionHistoryOpen(true)}
@@ -319,6 +335,15 @@ export function BudgetFlowView({
         data={data}
         isOpen={isVersionHistoryOpen}
         onClose={() => setIsVersionHistoryOpen(false)}
+      />
+
+      {/* Export Dialog */}
+      <ExportDialog
+        open={isExportOpen}
+        onOpenChange={setIsExportOpen}
+        data={flattenBudgetToCSV(data, data.metadata?.seasonYear || 'SS26')}
+        title="Export Budget Planning CSV"
+        filenamePrefix="budget_planning"
       />
     </div>
   );
