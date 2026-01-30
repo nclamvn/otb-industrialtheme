@@ -2362,5 +2362,49 @@
       "totalLandedValue": "Tổng giá trị hạ cảng",
       "totalRetailValue": "Tổng giá trị bán lẻ"
     }
+  },
+  "carryForward": {
+    "title": "Sản phẩm chuyển tiếp",
+    "description": "Theo dõi sản phẩm chuyển tiếp và nhóm chủ đề",
+    "new": "Mới",
+    "carryForward": "Chuyển tiếp",
+    "cfDetails": "Chi tiết chuyển tiếp",
+    "source": "Nguồn",
+    "originalSeason": "Mùa gốc",
+    "performance": "Hiệu suất",
+    "sellThrough": "Tỷ lệ bán",
+    "previousQty": "SL trước",
+    "recommended": "Đề xuất",
+    "sources": {
+      "ss24": "SS24",
+      "fw24": "FW24",
+      "ss25": "SS25",
+      "core": "Cốt lõi",
+      "new": "Mới"
+    },
+    "performanceRating": {
+      "high": "Hiệu suất cao",
+      "medium": "Trung bình",
+      "low": "Hiệu suất thấp"
+    },
+    "actions": {
+      "increase": "Tăng",
+      "maintain": "Giữ nguyên",
+      "reduce": "Giảm",
+      "discontinue": "Ngừng"
+    },
+    "themes": {
+      "title": "Nhóm chủ đề",
+      "coreClassic": "Cổ điển cốt lõi",
+      "seasonalTrend": "Xu hướng mùa",
+      "limitedEdition": "Phiên bản giới hạn",
+      "collaboration": "Hợp tác",
+      "signature": "Đặc trưng",
+      "essential": "Thiết yếu"
+    },
+    "products": "Sản phẩm",
+    "value": "Giá trị",
+    "target": "Mục tiêu",
+    "colors": "Màu sắc"
   }
 }

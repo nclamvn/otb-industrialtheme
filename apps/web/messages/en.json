@@ -2362,5 +2362,49 @@
       "totalLandedValue": "Total Landed Value",
       "totalRetailValue": "Total Retail Value"
     }
+  },
+  "carryForward": {
+    "title": "Carry Forward",
+    "description": "Track carry-forward products and theme groupings",
+    "new": "New",
+    "carryForward": "Carry Forward",
+    "cfDetails": "Carry Forward Details",
+    "source": "Source",
+    "originalSeason": "Original Season",
+    "performance": "Performance",
+    "sellThrough": "Sell-Through",
+    "previousQty": "Previous Qty",
+    "recommended": "Recommended",
+    "sources": {
+      "ss24": "SS24",
+      "fw24": "FW24",
+      "ss25": "SS25",
+      "core": "Core",
+      "new": "New"
+    },
+    "performanceRating": {
+      "high": "High Performer",
+      "medium": "Moderate",
+      "low": "Low Performer"
+    },
+    "actions": {
+      "increase": "Increase",
+      "maintain": "Maintain",
+      "reduce": "Reduce",
+      "discontinue": "Discontinue"
+    },
+    "themes": {
+      "title": "Theme Groups",
+      "coreClassic": "Core Classic",
+      "seasonalTrend": "Seasonal Trend",
+      "limitedEdition": "Limited Edition",
+      "collaboration": "Collaboration",
+      "signature": "Signature",
+      "essential": "Essential"
+    },
+    "products": "Products",
+    "value": "Value",
+    "target": "Target",
+    "colors": "Colors"
   }
 }
