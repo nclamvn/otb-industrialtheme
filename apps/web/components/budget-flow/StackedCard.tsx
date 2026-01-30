@@ -2,7 +2,7 @@
 
 import { cn } from '@/lib/utils';
 import { StackedCardProps, BudgetNode, ProductData, SizeData } from './types';
-import { getHierarchyColor, getStatusColor } from './utils/hierarchy-colors';
+import { getHierarchyColor } from './utils/hierarchy-colors';
 import { CardTab } from './CardTab';
 import { CardContent } from './CardContent';
 
@@ -19,50 +19,26 @@ export function StackedCard({
   expandedIds,
 }: StackedCardProps & { expandedIds?: Set<string> }) {
   const colors = getHierarchyColor(node.level);
-  const statusColors = getStatusColor(node.status);
   const hasChildren = node.children && node.children.length > 0;
 
   return (
     <div
-      className={cn(
-        'relative rounded-xl overflow-hidden',
-        'transition-all duration-300 ease-out',
-        'border',
-        colors.border,
-        colors.shadow,
-        colors.bg,
-        // Stacking effect when collapsed
-        !isExpanded && siblingIndex > 0 && '-mt-12',
-      )}
-      style={{
-        zIndex: totalSiblings - siblingIndex,
-        marginLeft: `${colors.indent}px`,
-      }}
+      className="transition-all duration-200"
+      style={{ marginLeft: `${colors.indent}px` }}
       data-card-id={node.id}
       data-level={node.level}
     >
-      {/* Card Header/Tab */}
+      {/* Tab Row */}
       <CardTab
         node={node}
         onClick={() => onToggle(node.id)}
         isExpanded={isExpanded}
-        depth={0}
       />
 
       {/* Expanded Content */}
       {isExpanded && (
-        <div
-          className="transition-all duration-300 ease-in-out"
-          style={{
-            animation: 'slideDown 0.3s ease-out',
-          }}
-        >
-          <CardContent
-            node={node}
-            onProductUpdate={onProductUpdate}
-            onSizeUpdate={onSizeUpdate}
-          >
-            {/* Render Children as Stacked Cards */}
+        <div className="pl-6 border-l border-slate-100 ml-2">
+          <CardContent node={node}>
             {hasChildren && (
               <StackedCardContainer
                 nodes={node.children!}
@@ -82,7 +58,6 @@ export function StackedCard({
   );
 }
 
-// Container for managing multiple stacked cards
 interface StackedCardContainerProps {
   nodes: BudgetNode[];
   parentExpanded: boolean;
@@ -107,8 +82,8 @@ export function StackedCardContainer({
   if (!parentExpanded || nodes.length === 0) return null;
 
   return (
-    <div className="space-y-3 pt-2">
-      {nodes.map((node, index) => (
+    <div>
+      {nodes.map((node) => (
         <StackedCard
           key={node.id}
           node={node}
@@ -119,8 +94,6 @@ export function StackedCardContainer({
           onSizeUpdate={onSizeUpdate}
           expandedIds={expandedIds}
           depth={depth}
-          siblingIndex={index}
-          totalSiblings={nodes.length}
         />
       ))}
     </div>
