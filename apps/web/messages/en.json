@@ -2264,5 +2264,34 @@
       "totalMismatch": "Total quantities do not match",
       "negativeValue": "Quantities cannot be negative"
     }
+  },
+  "priceRange": {
+    "title": "Price Range Analysis",
+    "description": "Analyze products by price bands",
+    "ranges": {
+      "budget": "Budget",
+      "mid": "Mid-Range",
+      "premium": "Premium",
+      "luxury": "Luxury"
+    },
+    "metrics": {
+      "totalSKUs": "Total SKUs",
+      "totalUnits": "Total Units",
+      "totalValue": "Total Value",
+      "avgPrice": "Avg Price",
+      "sellThru": "Sell-Through",
+      "margin": "Margin"
+    },
+    "distribution": {
+      "title": "Price Distribution",
+      "balanced": "Balanced",
+      "lowHeavy": "Low-Heavy",
+      "highHeavy": "High-Heavy"
+    },
+    "recommendation": "Recommendation",
+    "units": "Units",
+    "value": "Value",
+    "skus": "SKUs",
+    "noLimit": "No limit"
   }
 }

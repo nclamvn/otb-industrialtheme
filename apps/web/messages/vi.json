@@ -2264,5 +2264,34 @@
       "totalMismatch": "Tổng số lượng không khớp",
       "negativeValue": "Số lượng không được âm"
     }
+  },
+  "priceRange": {
+    "title": "Phân tích theo khoảng giá",
+    "description": "Phân tích sản phẩm theo phân khúc giá",
+    "ranges": {
+      "budget": "Phổ thông",
+      "mid": "Trung cấp",
+      "premium": "Cao cấp",
+      "luxury": "Xa xỉ"
+    },
+    "metrics": {
+      "totalSKUs": "Tổng SKU",
+      "totalUnits": "Tổng số lượng",
+      "totalValue": "Tổng giá trị",
+      "avgPrice": "Giá TB",
+      "sellThru": "Tỷ lệ bán",
+      "margin": "Biên lợi nhuận"
+    },
+    "distribution": {
+      "title": "Phân bố giá",
+      "balanced": "Cân bằng",
+      "lowHeavy": "Thiên thấp",
+      "highHeavy": "Thiên cao"
+    },
+    "recommendation": "Khuyến nghị",
+    "units": "Số lượng",
+    "value": "Giá trị",
+    "skus": "SKU",
+    "noLimit": "Không giới hạn"
   }
 }
