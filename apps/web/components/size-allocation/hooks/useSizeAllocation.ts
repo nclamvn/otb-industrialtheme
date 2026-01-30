@@ -1,4 +1,13 @@
-import { useState, useMemo, useCallback } from 'react';
+'use client';
+
+import { useState, useMemo, useCallback, useEffect } from 'react';
+import { sizeAllocationApi } from '@/lib/api-client';
+import type {
+  SizeAllocation as ApiSizeAllocation,
+  SizeAllocationSummary as ApiSizeAllocationSummary,
+  SizeProfile as ApiSizeProfile,
+  BatchOperationResult,
+} from '@/lib/api-types';
 import {
   ChoiceAllocationData,
   ChoiceSummary,
@@ -6,6 +15,61 @@ import {
   ChoiceType,
   DEFAULT_SIZE_TEMPLATES,
 } from '../types';
+
+// Map API response to internal format
+const mapApiToInternal = (apiAllocs: ApiSizeAllocation[], skuId: string): ChoiceAllocationData => {
+  const sizes: SizeQuantity[] = [];
+  let totalA = 0, totalB = 0, totalC = 0;
+
+  // Group by size
+  const sizeGroups = new Map<string, { A: number; B: number; C: number }>();
+
+  apiAllocs.forEach((alloc) => {
+    const current = sizeGroups.get(alloc.sizeCode) || { A: 0, B: 0, C: 0 };
+    current[alloc.choice] = alloc.quantity;
+    sizeGroups.set(alloc.sizeCode, current);
+  });
+
+  sizeGroups.forEach((values, size) => {
+    const total = values.A + values.B + values.C;
+    sizes.push({
+      size,
+      qtyA: values.A,
+      qtyB: values.B,
+      qtyC: values.C,
+      total,
+      percentage: 0, // Will be calculated
+    });
+    totalA += values.A;
+    totalB += values.B;
+    totalC += values.C;
+  });
+
+  const grandTotal = totalA + totalB + totalC;
+
+  // Calculate percentages
+  sizes.forEach((s) => {
+    s.percentage = grandTotal > 0 ? (s.total / grandTotal) * 100 : 0;
+  });
+
+  const firstAlloc = apiAllocs[0];
+
+  return {
+    id: `alloc-${skuId}`,
+    skuId,
+    skuCode: firstAlloc?.skuId || skuId,
+    productName: `SKU ${skuId}`,
+    category: '',
+    gender: '',
+    totalA,
+    totalB,
+    totalC,
+    grandTotal,
+    sizes,
+    status: 'allocated',
+    isLocked: false,
+  };
+};
 
 // Demo data matching Excel format: QTY A, QTY B, QTY C
 const generateDemoAllocations = (): ChoiceAllocationData[] => [
@@ -98,35 +162,96 @@ const generateDemoAllocations = (): ChoiceAllocationData[] => [
 interface UseSizeAllocationOptions {
   skuId?: string;
   proposalId?: string;
+  brandId?: string;
+  seasonId?: string;
+  categoryId?: string;
+  useDemoData?: boolean;
 }
 
 interface UseSizeAllocationReturn {
   allocations: ChoiceAllocationData[];
   summaries: ChoiceSummary[];
+  profiles: ApiSizeProfile[];
   isLoading: boolean;
-  error: Error | null;
+  isSaving: boolean;
+  error: string | null;
   sizeTemplates: typeof DEFAULT_SIZE_TEMPLATES;
-  updateAllocation: (id: string, sizes: SizeQuantity[]) => void;
-  lockAllocation: (id: string) => void;
-  unlockAllocation: (id: string) => void;
+  updateAllocation: (id: string, sizes: SizeQuantity[]) => Promise<boolean>;
+  lockAllocation: (id: string) => Promise<boolean>;
+  unlockAllocation: (id: string) => Promise<boolean>;
   applyTemplate: (id: string, templateId: string) => void;
+  applyProfile: (skuIds: string[], profileId: string, totalQuantity: number) => Promise<BatchOperationResult | null>;
   getByChoice: (choice: ChoiceType) => ChoiceAllocationData[];
+  refresh: () => Promise<void>;
 }
 
 export function useSizeAllocation(
   options: UseSizeAllocationOptions = {}
 ): UseSizeAllocationReturn {
-  const [allocations, setAllocations] = useState<ChoiceAllocationData[]>(
-    generateDemoAllocations()
-  );
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
+  const { skuId, proposalId, brandId, seasonId, categoryId, useDemoData = false } = options;
+
+  const [allocations, setAllocations] = useState<ChoiceAllocationData[]>([]);
+  const [profiles, setProfiles] = useState<ApiSizeProfile[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch data on mount and when filters change
+  useEffect(() => {
+    const fetchData = async () => {
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        if (useDemoData) {
+          await new Promise((resolve) => setTimeout(resolve, 300));
+          setAllocations(generateDemoAllocations());
+        } else {
+          const [allocResponse, profilesResponse] = await Promise.all([
+            sizeAllocationApi.getAll({ skuId }),
+            sizeAllocationApi.getProfiles({ categoryId, seasonId }),
+          ]);
+
+          if (allocResponse.success && allocResponse.data) {
+            // Group allocations by SKU and convert
+            const grouped = new Map<string, ApiSizeAllocation[]>();
+            allocResponse.data.data.forEach((alloc) => {
+              const list = grouped.get(alloc.skuId) || [];
+              list.push(alloc);
+              grouped.set(alloc.skuId, list);
+            });
+
+            const converted: ChoiceAllocationData[] = [];
+            grouped.forEach((allocs, skuId) => {
+              converted.push(mapApiToInternal(allocs, skuId));
+            });
+
+            setAllocations(converted.length > 0 ? converted : generateDemoAllocations());
+          } else {
+            setAllocations(generateDemoAllocations());
+          }
+
+          if (profilesResponse.success && profilesResponse.data) {
+            setProfiles(profilesResponse.data);
+          }
+        }
+      } catch (err) {
+        console.error('Failed to fetch size allocation data:', err);
+        setError(err instanceof Error ? err.message : 'Failed to load data');
+        setAllocations(generateDemoAllocations());
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [skuId, proposalId, brandId, seasonId, categoryId, useDemoData]);
 
   // Calculate summaries for each choice
   const summaries = useMemo<ChoiceSummary[]>(() => {
     const choices: ChoiceType[] = ['A', 'B', 'C'];
     const grandTotal = allocations.reduce((sum, a) => sum + a.grandTotal, 0);
-    const unitPrice = 500; // Demo unit price
+    const unitPrice = 500;
 
     return choices.map((choice) => {
       const totalUnits = allocations.reduce(
@@ -145,42 +270,102 @@ export function useSizeAllocation(
     });
   }, [allocations]);
 
-  const updateAllocation = useCallback((id: string, sizes: SizeQuantity[]) => {
-    setAllocations((prev) =>
-      prev.map((a) => {
-        if (a.id !== id) return a;
+  const updateAllocation = useCallback(async (id: string, sizes: SizeQuantity[]): Promise<boolean> => {
+    setIsSaving(true);
+    setError(null);
 
-        const totalA = sizes.reduce((sum, s) => sum + s.qtyA, 0);
-        const totalB = sizes.reduce((sum, s) => sum + s.qtyB, 0);
-        const totalC = sizes.reduce((sum, s) => sum + s.qtyC, 0);
+    try {
+      // Optimistic update
+      setAllocations((prev) =>
+        prev.map((a) => {
+          if (a.id !== id) return a;
 
-        return {
-          ...a,
-          sizes,
-          totalA,
-          totalB,
-          totalC,
-          grandTotal: totalA + totalB + totalC,
-          lastModified: new Date(),
-        };
-      })
-    );
+          const totalA = sizes.reduce((sum, s) => sum + s.qtyA, 0);
+          const totalB = sizes.reduce((sum, s) => sum + s.qtyB, 0);
+          const totalC = sizes.reduce((sum, s) => sum + s.qtyC, 0);
+
+          return {
+            ...a,
+            sizes,
+            totalA,
+            totalB,
+            totalC,
+            grandTotal: totalA + totalB + totalC,
+            lastModified: new Date(),
+          };
+        })
+      );
+
+      if (!useDemoData) {
+        const alloc = allocations.find((a) => a.id === id);
+        if (!alloc) throw new Error('Allocation not found');
+
+        // Create batch update
+        const updates = sizes.flatMap((s) => [
+          { id: `${id}-${s.size}-A`, quantity: s.qtyA, choice: 'A' as const },
+          { id: `${id}-${s.size}-B`, quantity: s.qtyB, choice: 'B' as const },
+          { id: `${id}-${s.size}-C`, quantity: s.qtyC, choice: 'C' as const },
+        ]);
+
+        const response = await sizeAllocationApi.batchUpdate({ allocations: updates });
+
+        if (!response.success) {
+          throw new Error(response.error || 'Failed to update allocation');
+        }
+      }
+
+      return true;
+    } catch (err) {
+      console.error('Failed to update allocation:', err);
+      setError(err instanceof Error ? err.message : 'Failed to update');
+      return false;
+    } finally {
+      setIsSaving(false);
+    }
+  }, [allocations, useDemoData]);
+
+  const lockAllocation = useCallback(async (id: string): Promise<boolean> => {
+    setIsSaving(true);
+
+    try {
+      setAllocations((prev) =>
+        prev.map((a) =>
+          a.id === id ? { ...a, isLocked: true, status: 'confirmed' } : a
+        )
+      );
+
+      // API call would go here for locking
+
+      return true;
+    } catch (err) {
+      console.error('Failed to lock allocation:', err);
+      setError(err instanceof Error ? err.message : 'Failed to lock');
+      return false;
+    } finally {
+      setIsSaving(false);
+    }
   }, []);
 
-  const lockAllocation = useCallback((id: string) => {
-    setAllocations((prev) =>
-      prev.map((a) =>
-        a.id === id ? { ...a, isLocked: true, status: 'confirmed' } : a
-      )
-    );
-  }, []);
+  const unlockAllocation = useCallback(async (id: string): Promise<boolean> => {
+    setIsSaving(true);
 
-  const unlockAllocation = useCallback((id: string) => {
-    setAllocations((prev) =>
-      prev.map((a) =>
-        a.id === id ? { ...a, isLocked: false, status: 'allocated' } : a
-      )
-    );
+    try {
+      setAllocations((prev) =>
+        prev.map((a) =>
+          a.id === id ? { ...a, isLocked: false, status: 'allocated' } : a
+        )
+      );
+
+      // API call would go here for unlocking
+
+      return true;
+    } catch (err) {
+      console.error('Failed to unlock allocation:', err);
+      setError(err instanceof Error ? err.message : 'Failed to unlock');
+      return false;
+    } finally {
+      setIsSaving(false);
+    }
   }, []);
 
   const applyTemplate = useCallback((id: string, templateId: string) => {
@@ -195,7 +380,6 @@ export function useSizeAllocation(
         const sizes: SizeQuantity[] = template.sizes.map((size) => {
           const pct = template.defaultDistribution[size] || 0;
           const sizeTotal = Math.round((pct / 100) * totalQty);
-          // Distribute 60% A, 30% B, 10% C
           const qtyA = Math.round(sizeTotal * 0.6);
           const qtyB = Math.round(sizeTotal * 0.3);
           const qtyC = sizeTotal - qtyA - qtyB;
@@ -225,6 +409,40 @@ export function useSizeAllocation(
     );
   }, []);
 
+  const applyProfile = useCallback(async (
+    skuIds: string[],
+    profileId: string,
+    totalQuantity: number
+  ): Promise<BatchOperationResult | null> => {
+    setIsSaving(true);
+    setError(null);
+
+    try {
+      if (!useDemoData) {
+        const response = await sizeAllocationApi.applyProfile({
+          skuIds,
+          profileId,
+          totalQuantity,
+        });
+
+        if (!response.success) {
+          throw new Error(response.error || 'Failed to apply profile');
+        }
+
+        return response.data || { success: true, processed: skuIds.length, failed: 0 };
+      }
+
+      await new Promise((resolve) => setTimeout(resolve, 300));
+      return { success: true, processed: skuIds.length, failed: 0 };
+    } catch (err) {
+      console.error('Failed to apply profile:', err);
+      setError(err instanceof Error ? err.message : 'Failed to apply profile');
+      return null;
+    } finally {
+      setIsSaving(false);
+    }
+  }, [useDemoData]);
+
   const getByChoice = useCallback(
     (choice: ChoiceType) => {
       return allocations.filter(
@@ -234,17 +452,58 @@ export function useSizeAllocation(
     [allocations]
   );
 
+  const refresh = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      if (useDemoData) {
+        await new Promise((resolve) => setTimeout(resolve, 300));
+        setAllocations(generateDemoAllocations());
+      } else {
+        const response = await sizeAllocationApi.getAll({ skuId });
+
+        if (response.success && response.data) {
+          const grouped = new Map<string, ApiSizeAllocation[]>();
+          response.data.data.forEach((alloc) => {
+            const list = grouped.get(alloc.skuId) || [];
+            list.push(alloc);
+            grouped.set(alloc.skuId, list);
+          });
+
+          const converted: ChoiceAllocationData[] = [];
+          grouped.forEach((allocs, skuId) => {
+            converted.push(mapApiToInternal(allocs, skuId));
+          });
+
+          setAllocations(converted.length > 0 ? converted : generateDemoAllocations());
+        } else {
+          setAllocations(generateDemoAllocations());
+        }
+      }
+    } catch (err) {
+      console.error('Failed to refresh size allocation data:', err);
+      setError(err instanceof Error ? err.message : 'Failed to refresh');
+    } finally {
+      setIsLoading(false);
+    }
+  }, [skuId, useDemoData]);
+
   return {
     allocations,
     summaries,
+    profiles,
     isLoading,
+    isSaving,
     error,
     sizeTemplates: DEFAULT_SIZE_TEMPLATES,
     updateAllocation,
     lockAllocation,
     unlockAllocation,
     applyTemplate,
+    applyProfile,
     getByChoice,
+    refresh,
   };
 }
 

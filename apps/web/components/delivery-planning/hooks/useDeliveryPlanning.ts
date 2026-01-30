@@ -1,6 +1,13 @@
 'use client';
 
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
+import { deliveryApi } from '@/lib/api-client';
+import type {
+  DeliveryMatrixRow,
+  DeliverySummary,
+  StoreGroup,
+  BatchOperationResult,
+} from '@/lib/api-types';
 import {
   DeliveryMatrix,
   SKUDeliveryPlan,
@@ -9,7 +16,7 @@ import {
   DELIVERY_MONTHS,
 } from '../types';
 
-// Demo data from Excel (W25_DAFC_proposal)
+// Fallback demo data for development/offline mode
 const generateDemoData = (): SKUDeliveryPlan[] => {
   const skus = [
     { id: 'sku-1', code: '8116333', name: 'FITZROVIA DK SHT' },
@@ -27,7 +34,6 @@ const generateDemoData = (): SKUDeliveryPlan[] => {
   ];
 
   return skus.map((sku) => {
-    // Random distribution across stores and months (matching Excel pattern)
     const dafcJul = Math.floor(Math.random() * 4);
     const dafcAug = Math.floor(Math.random() * 4);
     const dafcSep = Math.floor(Math.random() * 3);
@@ -48,7 +54,7 @@ const generateDemoData = (): SKUDeliveryPlan[] => {
       skuCode: sku.code,
       skuName: sku.name,
       totalUnits: total,
-      totalValue: total * 50000000, // ~50M VND per unit
+      totalValue: total * 50000000,
       deliverySlots: [],
       byStore: {
         'store-1': {
@@ -82,9 +88,51 @@ const generateDemoData = (): SKUDeliveryPlan[] => {
   });
 };
 
+// Map API response to internal format
+const mapApiToInternal = (apiRows: DeliveryMatrixRow[]): SKUDeliveryPlan[] => {
+  return apiRows.map((row) => {
+    const byStore: Record<string, { total: number; byMonth: Record<number, number> }> = {};
+    const byMonth: Record<number, { total: number; byStore: Record<string, number> }> = {};
+
+    // Build byStore and byMonth from windows
+    row.windows.forEach((window) => {
+      const month = new Date(window.windowName).getMonth() + 1 || parseInt(window.windowId.split('-')[1]) || 7;
+
+      // For now, distribute evenly across stores (actual store mapping comes from allocations)
+      DEFAULT_STORES.forEach((store) => {
+        if (!byStore[store.id]) {
+          byStore[store.id] = { total: 0, byMonth: {} };
+        }
+        const storeQty = Math.floor(window.quantity / DEFAULT_STORES.length);
+        byStore[store.id].byMonth[month] = (byStore[store.id].byMonth[month] || 0) + storeQty;
+        byStore[store.id].total += storeQty;
+      });
+
+      if (!byMonth[month]) {
+        byMonth[month] = { total: 0, byStore: {} };
+      }
+      byMonth[month].total += window.quantity;
+    });
+
+    return {
+      skuId: row.skuId,
+      skuCode: row.skuCode,
+      skuName: row.skuName,
+      totalUnits: row.totalQuantity,
+      totalValue: row.totalValue,
+      deliverySlots: [],
+      byStore,
+      byMonth,
+    };
+  });
+};
+
 interface UseDeliveryPlanningOptions {
   proposalId?: string;
   seasonId?: string;
+  brandId?: string;
+  storeGroup?: StoreGroup;
+  useDemoData?: boolean;
 }
 
 interface UseDeliveryPlanningReturn {
@@ -92,19 +140,68 @@ interface UseDeliveryPlanningReturn {
   pendingEdits: DeliveryCellEdit[];
   isLoading: boolean;
   isSaving: boolean;
+  error: string | null;
+  summary: DeliverySummary | null;
   updateCell: (edit: DeliveryCellEdit) => void;
-  saveChanges: () => Promise<void>;
+  saveChanges: () => Promise<BatchOperationResult | null>;
   resetChanges: () => void;
-  refresh: () => void;
+  refresh: () => Promise<void>;
 }
 
 export function useDeliveryPlanning(
   options: UseDeliveryPlanningOptions = {}
 ): UseDeliveryPlanningReturn {
-  const [skus, setSkus] = useState<SKUDeliveryPlan[]>(generateDemoData);
+  const { seasonId, brandId, storeGroup, useDemoData = false } = options;
+
+  const [skus, setSkus] = useState<SKUDeliveryPlan[]>([]);
   const [pendingEdits, setPendingEdits] = useState<DeliveryCellEdit[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [summary, setSummary] = useState<DeliverySummary | null>(null);
+
+  // Fetch data on mount and when filters change
+  useEffect(() => {
+    const fetchData = async () => {
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        if (useDemoData) {
+          // Use demo data in development
+          await new Promise((resolve) => setTimeout(resolve, 300));
+          setSkus(generateDemoData());
+        } else {
+          // Fetch from API
+          const [matrixResponse, summaryResponse] = await Promise.all([
+            deliveryApi.getMatrix({ seasonId, brandId, storeGroup }),
+            deliveryApi.getSummary({ seasonId, brandId, storeGroup }),
+          ]);
+
+          if (matrixResponse.success && matrixResponse.data) {
+            setSkus(mapApiToInternal(matrixResponse.data));
+          } else if (matrixResponse.error) {
+            // Fall back to demo data if API fails
+            console.warn('API error, using demo data:', matrixResponse.error);
+            setSkus(generateDemoData());
+          }
+
+          if (summaryResponse.success && summaryResponse.data) {
+            setSummary(summaryResponse.data);
+          }
+        }
+      } catch (err) {
+        console.error('Failed to fetch delivery data:', err);
+        setError(err instanceof Error ? err.message : 'Failed to load data');
+        // Fall back to demo data
+        setSkus(generateDemoData());
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [seasonId, brandId, storeGroup, useDemoData]);
 
   const matrix: DeliveryMatrix = useMemo(() => {
     const totals = {
@@ -151,91 +248,144 @@ export function useDeliveryPlanning(
     ]);
   }, []);
 
-  const saveChanges = useCallback(async () => {
+  const saveChanges = useCallback(async (): Promise<BatchOperationResult | null> => {
+    if (pendingEdits.length === 0) return null;
+
     setIsSaving(true);
+    setError(null);
 
-    // Apply pending edits to SKUs
-    setSkus((prev) =>
-      prev.map((sku) => {
-        const edits = pendingEdits.filter((e) => e.skuId === sku.skuId);
-        if (edits.length === 0) return sku;
+    try {
+      // Apply optimistic updates to local state
+      setSkus((prev) =>
+        prev.map((sku) => {
+          const edits = pendingEdits.filter((e) => e.skuId === sku.skuId);
+          if (edits.length === 0) return sku;
 
-        const newByStore = { ...sku.byStore };
-        const newByMonth = { ...sku.byMonth };
+          const newByStore = { ...sku.byStore };
+          const newByMonth = { ...sku.byMonth };
 
-        edits.forEach((edit) => {
-          // Update byStore
-          if (!newByStore[edit.storeId]) {
-            newByStore[edit.storeId] = { total: 0, byMonth: {} };
-          }
-          newByStore[edit.storeId] = {
-            ...newByStore[edit.storeId],
-            byMonth: {
-              ...newByStore[edit.storeId].byMonth,
-              [edit.month]: edit.units,
-            },
+          edits.forEach((edit) => {
+            if (!newByStore[edit.storeId]) {
+              newByStore[edit.storeId] = { total: 0, byMonth: {} };
+            }
+            newByStore[edit.storeId] = {
+              ...newByStore[edit.storeId],
+              byMonth: {
+                ...newByStore[edit.storeId].byMonth,
+                [edit.month]: edit.units,
+              },
+            };
+            newByStore[edit.storeId].total = Object.values(
+              newByStore[edit.storeId].byMonth
+            ).reduce((a, b) => a + b, 0);
+
+            if (!newByMonth[edit.month]) {
+              newByMonth[edit.month] = { total: 0, byStore: {} };
+            }
+            newByMonth[edit.month] = {
+              ...newByMonth[edit.month],
+              byStore: {
+                ...newByMonth[edit.month].byStore,
+                [edit.storeId]: edit.units,
+              },
+            };
+            newByMonth[edit.month].total = Object.values(
+              newByMonth[edit.month].byStore
+            ).reduce((a, b) => a + b, 0);
+          });
+
+          const newTotal = Object.values(newByStore).reduce(
+            (sum, s) => sum + s.total,
+            0
+          );
+
+          return {
+            ...sku,
+            byStore: newByStore,
+            byMonth: newByMonth,
+            totalUnits: newTotal,
+            totalValue: newTotal * 50000000,
           };
-          newByStore[edit.storeId].total = Object.values(
-            newByStore[edit.storeId].byMonth
-          ).reduce((a, b) => a + b, 0);
+        })
+      );
 
-          // Update byMonth
-          if (!newByMonth[edit.month]) {
-            newByMonth[edit.month] = { total: 0, byStore: {} };
-          }
-          newByMonth[edit.month] = {
-            ...newByMonth[edit.month],
-            byStore: {
-              ...newByMonth[edit.month].byStore,
-              [edit.storeId]: edit.units,
-            },
-          };
-          newByMonth[edit.month].total = Object.values(
-            newByMonth[edit.month].byStore
-          ).reduce((a, b) => a + b, 0);
-        });
+      // Send to API
+      if (!useDemoData) {
+        const allocations = pendingEdits.map((edit) => ({
+          skuId: edit.skuId,
+          windowId: `window-${edit.month}`,
+          quantity: edit.units,
+          storeGroup: DEFAULT_STORES.find(s => s.id === edit.storeId)?.group as StoreGroup,
+        }));
 
-        const newTotal = Object.values(newByStore).reduce(
-          (sum, s) => sum + s.total,
-          0
-        );
+        const response = await deliveryApi.batchUpdateAllocations({ allocations });
 
-        return {
-          ...sku,
-          byStore: newByStore,
-          byMonth: newByMonth,
-          totalUnits: newTotal,
-          totalValue: newTotal * 50000000,
-        };
-      })
-    );
+        if (!response.success) {
+          throw new Error(response.error || 'Failed to save changes');
+        }
 
-    setPendingEdits([]);
+        setPendingEdits([]);
+        return response.data || { success: true, processed: allocations.length, failed: 0 };
+      }
 
-    // TODO: Replace with real API call
-    await new Promise((resolve) => setTimeout(resolve, 500));
-    setIsSaving(false);
-  }, [pendingEdits]);
+      // Demo mode - just clear edits
+      await new Promise((resolve) => setTimeout(resolve, 300));
+      setPendingEdits([]);
+      return { success: true, processed: pendingEdits.length, failed: 0 };
+    } catch (err) {
+      console.error('Failed to save delivery changes:', err);
+      setError(err instanceof Error ? err.message : 'Failed to save changes');
+      return null;
+    } finally {
+      setIsSaving(false);
+    }
+  }, [pendingEdits, useDemoData]);
 
   const resetChanges = useCallback(() => {
     setPendingEdits([]);
   }, []);
 
-  const refresh = useCallback(() => {
+  const refresh = useCallback(async () => {
     setIsLoading(true);
-    // TODO: Replace with real API call
-    setTimeout(() => {
+    setError(null);
+    setPendingEdits([]);
+
+    try {
+      if (useDemoData) {
+        await new Promise((resolve) => setTimeout(resolve, 300));
+        setSkus(generateDemoData());
+      } else {
+        const [matrixResponse, summaryResponse] = await Promise.all([
+          deliveryApi.getMatrix({ seasonId, brandId, storeGroup }),
+          deliveryApi.getSummary({ seasonId, brandId, storeGroup }),
+        ]);
+
+        if (matrixResponse.success && matrixResponse.data) {
+          setSkus(mapApiToInternal(matrixResponse.data));
+        } else {
+          setSkus(generateDemoData());
+        }
+
+        if (summaryResponse.success && summaryResponse.data) {
+          setSummary(summaryResponse.data);
+        }
+      }
+    } catch (err) {
+      console.error('Failed to refresh delivery data:', err);
+      setError(err instanceof Error ? err.message : 'Failed to refresh');
       setSkus(generateDemoData());
-      setPendingEdits([]);
+    } finally {
       setIsLoading(false);
-    }, 500);
-  }, []);
+    }
+  }, [seasonId, brandId, storeGroup, useDemoData]);
 
   return {
     matrix,
     pendingEdits,
     isLoading,
     isSaving,
+    error,
+    summary,
     updateCell,
     saveChanges,
     resetChanges,

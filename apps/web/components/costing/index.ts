@@ -12,6 +12,9 @@ export * from './types';
 export { CostingBreakdownCard, default as CostingBreakdownCardDefault } from './CostingBreakdownCard';
 export { CostingTable, default as CostingTableDefault } from './CostingTable';
 
+// Hooks
+export { useCosting, default as useCostingDefault } from './hooks/useCosting';
+
 // Utils
 export {
   calculateCosting,

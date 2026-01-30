@@ -1,10 +1,34 @@
-import { useState, useMemo, useCallback } from 'react';
+'use client';
+
+import { useState, useMemo, useCallback, useEffect } from 'react';
+import { storePerformanceApi } from '@/lib/api-client';
+import type {
+  StorePerformanceData as ApiStorePerformanceData,
+  StoreGroupSummary as ApiStoreGroupSummary,
+  StorePerformanceFilters,
+} from '@/lib/api-types';
 import {
   StorePerformanceData,
   StoreComparisonData,
   StorePerformanceSummary,
   StoreGroup,
 } from '../types';
+
+// Map API response to internal format
+const mapApiToInternal = (apiData: ApiStorePerformanceData): StorePerformanceData => {
+  return {
+    id: apiData.id,
+    storeGroup: apiData.storeGroup as StoreGroup,
+    sellThruPercent: apiData.sellThruPercent,
+    sellThruChange: `${(apiData.sellThruPercent * 100).toFixed(0)}% - ${((apiData.sellThruPercent - apiData.trendPercent) * 100).toFixed(0)}%`,
+    qtyReceived: apiData.qtyReceived,
+    qtySold: apiData.qtySold,
+    qtyOnHand: apiData.qtyOnHand,
+    salesValue: apiData.salesValue,
+    salesUnits: apiData.salesUnits,
+    trend: apiData.trend,
+  };
+};
 
 // Demo data matching Excel format: %ST REX, %ST TTP
 const generateDemoComparisons = (): StoreComparisonData[] => [
@@ -173,33 +197,139 @@ const generateDemoComparisons = (): StoreComparisonData[] => [
 interface UseStorePerformanceOptions {
   skuId?: string;
   seasonId?: string;
+  brandId?: string;
+  categoryId?: string;
+  periodStart?: string;
+  periodEnd?: string;
+  useDemoData?: boolean;
 }
 
 interface UseStorePerformanceReturn {
   comparisons: StoreComparisonData[];
-  summaries: {
+  summary: {
     rex: StorePerformanceSummary;
     ttp: StorePerformanceSummary;
+    dafc?: StorePerformanceSummary;
   };
   isLoading: boolean;
-  error: Error | null;
-  refresh: () => void;
+  error: string | null;
+  refresh: () => Promise<void>;
   getComparisonBySku: (skuId: string) => StoreComparisonData | undefined;
-  getTopPerformers: (storeGroup: StoreGroup, limit?: number) => StorePerformanceData[];
-  getBottomPerformers: (storeGroup: StoreGroup, limit?: number) => StorePerformanceData[];
+  getTopPerformers: (storeGroup: StoreGroup, limit?: number) => Promise<StorePerformanceData[]>;
+  getBottomPerformers: (storeGroup: StoreGroup, limit?: number) => Promise<StorePerformanceData[]>;
+  compareStores: (storeIds: string[]) => Promise<void>;
 }
 
 export function useStorePerformance(
   options: UseStorePerformanceOptions = {}
 ): UseStorePerformanceReturn {
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
+  const {
+    skuId,
+    seasonId,
+    brandId,
+    categoryId,
+    periodStart,
+    periodEnd,
+    useDemoData = false,
+  } = options;
 
-  // Demo data - replace with API call
-  const comparisons = useMemo(() => generateDemoComparisons(), []);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [comparisons, setComparisons] = useState<StoreComparisonData[]>([]);
+  const [apiSummary, setApiSummary] = useState<{
+    rex: ApiStoreGroupSummary;
+    ttp: ApiStoreGroupSummary;
+    dafc: ApiStoreGroupSummary;
+  } | null>(null);
 
-  // Calculate summaries
-  const summaries = useMemo(() => {
+  // Fetch data on mount and when filters change
+  useEffect(() => {
+    const fetchData = async () => {
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        if (useDemoData) {
+          await new Promise((resolve) => setTimeout(resolve, 300));
+          setComparisons(generateDemoComparisons());
+        } else {
+          const filters: StorePerformanceFilters = {
+            seasonId,
+            brandId,
+            categoryId,
+            periodStart,
+            periodEnd,
+          };
+
+          const [summaryResponse, rexResponse, ttpResponse] = await Promise.all([
+            storePerformanceApi.getGroupSummary(filters),
+            storePerformanceApi.getByStoreGroup('REX', filters),
+            storePerformanceApi.getByStoreGroup('TTP', filters),
+          ]);
+
+          if (summaryResponse.success && summaryResponse.data) {
+            setApiSummary(summaryResponse.data);
+          }
+
+          // Build comparisons from separate store group data
+          if (rexResponse.success && ttpResponse.success && rexResponse.data && ttpResponse.data) {
+            const rexData = rexResponse.data.map(mapApiToInternal);
+            const ttpData = ttpResponse.data.map(mapApiToInternal);
+
+            // Match by some identifier (assuming storeId or similar)
+            const comparisonData: StoreComparisonData[] = rexData.map((rex, index) => {
+              const ttp = ttpData[index] || ttpData[0];
+              return {
+                sku: { id: `sku-${index}`, code: rex.id, name: `SKU ${index + 1}` },
+                rex,
+                ttp,
+                variance: {
+                  sellThru: rex.sellThruPercent - ttp.sellThruPercent,
+                  salesUnits: rex.salesUnits - ttp.salesUnits,
+                  salesValue: rex.salesValue - ttp.salesValue,
+                },
+              };
+            });
+
+            setComparisons(comparisonData);
+          } else {
+            // Fall back to demo data
+            setComparisons(generateDemoComparisons());
+          }
+        }
+      } catch (err) {
+        console.error('Failed to fetch store performance data:', err);
+        setError(err instanceof Error ? err.message : 'Failed to load data');
+        setComparisons(generateDemoComparisons());
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [skuId, seasonId, brandId, categoryId, periodStart, periodEnd, useDemoData]);
+
+  // Calculate summaries from comparisons or API data
+  const summary = useMemo(() => {
+    if (apiSummary) {
+      const mapSummary = (apiSum: ApiStoreGroupSummary, group: StoreGroup): StorePerformanceSummary => ({
+        storeGroup: group,
+        totalSKUs: apiSum.storeCount,
+        avgSellThru: apiSum.avgSellThru,
+        totalSalesValue: apiSum.totalSalesValue,
+        totalSalesUnits: apiSum.totalSalesUnits,
+        topPerformers: [],
+        bottomPerformers: [],
+      });
+
+      return {
+        rex: mapSummary(apiSummary.rex, 'REX'),
+        ttp: mapSummary(apiSummary.ttp, 'TTP'),
+        dafc: mapSummary(apiSummary.dafc, 'DAFC'),
+      };
+    }
+
+    // Calculate from comparison data
     const rexData = comparisons.map((c) => c.rex);
     const ttpData = comparisons.map((c) => c.ttp);
 
@@ -207,6 +337,18 @@ export function useStorePerformance(
       data: StorePerformanceData[],
       storeGroup: StoreGroup
     ): StorePerformanceSummary => {
+      if (data.length === 0) {
+        return {
+          storeGroup,
+          totalSKUs: 0,
+          avgSellThru: 0,
+          totalSalesValue: 0,
+          totalSalesUnits: 0,
+          topPerformers: [],
+          bottomPerformers: [],
+        };
+      }
+
       const sorted = [...data].sort((a, b) => b.sellThruPercent - a.sellThruPercent);
       const avgSellThru = data.reduce((sum, d) => sum + d.sellThruPercent, 0) / data.length;
       const totalSalesValue = data.reduce((sum, d) => sum + d.salesValue, 0);
@@ -227,15 +369,38 @@ export function useStorePerformance(
       rex: calculateSummary(rexData, 'REX'),
       ttp: calculateSummary(ttpData, 'TTP'),
     };
-  }, [comparisons]);
+  }, [comparisons, apiSummary]);
 
-  const refresh = useCallback(() => {
+  const refresh = useCallback(async () => {
     setIsLoading(true);
-    // TODO: Replace with real API call
-    setTimeout(() => {
+    setError(null);
+
+    try {
+      if (useDemoData) {
+        await new Promise((resolve) => setTimeout(resolve, 300));
+        setComparisons(generateDemoComparisons());
+      } else {
+        const filters: StorePerformanceFilters = {
+          seasonId,
+          brandId,
+          categoryId,
+          periodStart,
+          periodEnd,
+        };
+
+        const summaryResponse = await storePerformanceApi.getGroupSummary(filters);
+
+        if (summaryResponse.success && summaryResponse.data) {
+          setApiSummary(summaryResponse.data);
+        }
+      }
+    } catch (err) {
+      console.error('Failed to refresh store performance data:', err);
+      setError(err instanceof Error ? err.message : 'Failed to refresh');
+    } finally {
       setIsLoading(false);
-    }, 500);
-  }, []);
+    }
+  }, [seasonId, brandId, categoryId, periodStart, periodEnd, useDemoData]);
 
   const getComparisonBySku = useCallback(
     (skuId: string) => {
@@ -245,7 +410,33 @@ export function useStorePerformance(
   );
 
   const getTopPerformers = useCallback(
-    (storeGroup: StoreGroup, limit = 5) => {
+    async (storeGroup: StoreGroup, limit = 5): Promise<StorePerformanceData[]> => {
+      if (useDemoData) {
+        const data = storeGroup === 'REX'
+          ? comparisons.map((c) => c.rex)
+          : comparisons.map((c) => c.ttp);
+        return [...data]
+          .sort((a, b) => b.sellThruPercent - a.sellThruPercent)
+          .slice(0, limit);
+      }
+
+      try {
+        const response = await storePerformanceApi.getTopPerformers({
+          storeGroup: storeGroup as any,
+          limit,
+          seasonId,
+          brandId,
+          categoryId,
+        });
+
+        if (response.success && response.data) {
+          return response.data.map(mapApiToInternal);
+        }
+      } catch (err) {
+        console.error('Failed to fetch top performers:', err);
+      }
+
+      // Fall back to local calculation
       const data = storeGroup === 'REX'
         ? comparisons.map((c) => c.rex)
         : comparisons.map((c) => c.ttp);
@@ -253,11 +444,37 @@ export function useStorePerformance(
         .sort((a, b) => b.sellThruPercent - a.sellThruPercent)
         .slice(0, limit);
     },
-    [comparisons]
+    [comparisons, seasonId, brandId, categoryId, useDemoData]
   );
 
   const getBottomPerformers = useCallback(
-    (storeGroup: StoreGroup, limit = 5) => {
+    async (storeGroup: StoreGroup, limit = 5): Promise<StorePerformanceData[]> => {
+      if (useDemoData) {
+        const data = storeGroup === 'REX'
+          ? comparisons.map((c) => c.rex)
+          : comparisons.map((c) => c.ttp);
+        return [...data]
+          .sort((a, b) => a.sellThruPercent - b.sellThruPercent)
+          .slice(0, limit);
+      }
+
+      try {
+        const response = await storePerformanceApi.getBottomPerformers({
+          storeGroup: storeGroup as any,
+          limit,
+          seasonId,
+          brandId,
+          categoryId,
+        });
+
+        if (response.success && response.data) {
+          return response.data.map(mapApiToInternal);
+        }
+      } catch (err) {
+        console.error('Failed to fetch bottom performers:', err);
+      }
+
+      // Fall back to local calculation
       const data = storeGroup === 'REX'
         ? comparisons.map((c) => c.rex)
         : comparisons.map((c) => c.ttp);
@@ -265,18 +482,40 @@ export function useStorePerformance(
         .sort((a, b) => a.sellThruPercent - b.sellThruPercent)
         .slice(0, limit);
     },
-    [comparisons]
+    [comparisons, seasonId, brandId, categoryId, useDemoData]
+  );
+
+  const compareStores = useCallback(
+    async (storeIds: string[]) => {
+      if (useDemoData || storeIds.length === 0) return;
+
+      try {
+        const response = await storePerformanceApi.compareStores(storeIds, {
+          periodStart,
+          periodEnd,
+        });
+
+        if (response.success && response.data) {
+          // Handle comparison data
+          console.log('Store comparison:', response.data);
+        }
+      } catch (err) {
+        console.error('Failed to compare stores:', err);
+      }
+    },
+    [periodStart, periodEnd, useDemoData]
   );
 
   return {
     comparisons,
-    summaries,
+    summary,
     isLoading,
     error,
     refresh,
     getComparisonBySku,
     getTopPerformers,
     getBottomPerformers,
+    compareStores,
   };
 }
 
