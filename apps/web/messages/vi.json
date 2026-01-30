@@ -1904,5 +1904,40 @@
     "loading": "Đang tải biểu đồ...",
     "containerTooSmall": "Container quá nhỏ để hiển thị biểu đồ",
     "minimumSize": "(Cần ít nhất {minWidth}x{minHeight}px, hiện tại {width}x{height}px)"
+  },
+  "kpi": {
+    "units": "Số lượng",
+    "avgPrice": "Giá TB",
+    "margin": "Biên lợi",
+    "lyUnits": "SL năm trước",
+    "variance": "Chênh lệch",
+    "sizes": "Size",
+    "topSize": "Size chính",
+    "sellThru": "Sell-Thru",
+    "woc": "WoC",
+    "stRate": "Tỷ lệ ST",
+    "otb": "OTB",
+    "committed": "Đã cam kết",
+    "available": "Còn lại",
+    "receipt": "Nhận hàng",
+    "gap": "Chênh lệch",
+    "orders": "Đơn hàng",
+    "leadTime": "Thời gian giao",
+    "turnRate": "Vòng quay",
+    "gmroi": "GMROI",
+    "allocated": "Đã phân bổ",
+    "remaining": "Còn lại",
+    "gapPercent": "% Chênh lệch",
+    "lyVariance": "So với năm trước",
+    "confidence": "Độ tin cậy",
+    "skus": "SKUs",
+    "children": "Mục con",
+    "growth": "Tăng trưởng"
+  },
+  "severity": {
+    "ok": "Tốt",
+    "info": "Thông tin",
+    "warning": "Cảnh báo",
+    "critical": "Nghiêm trọng"
   }
 }

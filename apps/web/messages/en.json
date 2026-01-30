@@ -1904,5 +1904,40 @@
     "loading": "Loading chart...",
     "containerTooSmall": "Container too small to display chart",
     "minimumSize": "(Minimum {minWidth}x{minHeight}px, current {width}x{height}px)"
+  },
+  "kpi": {
+    "units": "Units",
+    "avgPrice": "Avg Price",
+    "margin": "Margin",
+    "lyUnits": "LY Units",
+    "variance": "Variance",
+    "sizes": "Sizes",
+    "topSize": "Top Size",
+    "sellThru": "Sell-Thru",
+    "woc": "WoC",
+    "stRate": "ST Rate",
+    "otb": "OTB",
+    "committed": "Committed",
+    "available": "Available",
+    "receipt": "Receipt",
+    "gap": "Gap",
+    "orders": "Orders",
+    "leadTime": "Lead Time",
+    "turnRate": "Turn Rate",
+    "gmroi": "GMROI",
+    "allocated": "Allocated",
+    "remaining": "Remaining",
+    "gapPercent": "Gap %",
+    "lyVariance": "LY Variance",
+    "confidence": "Confidence",
+    "skus": "SKUs",
+    "children": "Children",
+    "growth": "Growth"
+  },
+  "severity": {
+    "ok": "OK",
+    "info": "Info",
+    "warning": "Warning",
+    "critical": "Critical"
   }
 }
