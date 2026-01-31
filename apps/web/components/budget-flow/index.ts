@@ -19,3 +19,5 @@ export { BudgetBreadcrumb } from './BudgetBreadcrumb';
 export { BudgetFilters, useBudgetFilters, filterBudgetNodes } from './BudgetFilters';
 export { BudgetOverviewHeader } from './BudgetOverviewHeader';
 export { BudgetFlowView } from './BudgetFlowView';
+export { WorkflowTracker, WorkflowStatusBadge } from './WorkflowTracker';
+export type { WorkflowStatus, WorkflowStep, WorkflowTrackerProps } from './WorkflowTracker';

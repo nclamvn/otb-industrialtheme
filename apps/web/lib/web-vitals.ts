@@ -4,7 +4,8 @@
  * Tracks Core Web Vitals and sends to analytics
  */
 
-import { onCLS, onFCP, onFID, onINP, onLCP, onTTFB, Metric } from 'web-vitals';
+import { onCLS, onFCP, onINP, onLCP, onTTFB, Metric } from 'web-vitals';
+// Note: FID (First Input Delay) has been deprecated and replaced by INP (Interaction to Next Paint)
 
 // ============================================
 // TYPES
@@ -124,7 +125,8 @@ export function reportWebVitals() {
   // Core Web Vitals
   onCLS(sendToAnalytics);
   onLCP(sendToAnalytics);
-  onFID(sendToAnalytics);
+  // onFID has been deprecated, using onINP instead
+  onINP(sendToAnalytics);
   onINP(sendToAnalytics);
 
   // Other Web Vitals

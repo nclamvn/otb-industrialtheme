@@ -1,3 +1,5 @@
+export const runtime = 'nodejs';
+
 import { streamText } from 'ai';
 import { openai, DEFAULT_MODEL } from '@/lib/ai/config';
 import { getSystemPrompt, getContextPrompt, getDataPrompt, ChatContext } from '@/lib/ai/prompts';

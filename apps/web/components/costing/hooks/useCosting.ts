@@ -107,7 +107,7 @@ export function useCosting(options: UseCostingOptions = {}): UseCostingReturn {
           const response = await costingApi.getAll({
             brandId,
             seasonId,
-            categoryId,
+            category: categoryId,
           });
 
           if (response.success && response.data) {
@@ -301,7 +301,7 @@ export function useCosting(options: UseCostingOptions = {}): UseCostingReturn {
         const response = await costingApi.getAll({
           brandId,
           seasonId,
-          categoryId,
+          category: categoryId,
         });
 
         if (response.success && response.data) {

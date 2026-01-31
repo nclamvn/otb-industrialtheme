@@ -1,3 +1,5 @@
+export const runtime = 'nodejs';
+
 /**
  * Automation Run API
  * Triggers automation processes (auto-approval, auto-reorder)

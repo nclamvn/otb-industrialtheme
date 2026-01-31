@@ -1,3 +1,5 @@
+export const runtime = 'nodejs';
+
 // Single ERP Connection API
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';

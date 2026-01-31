@@ -1,3 +1,5 @@
+export const runtime = 'nodejs';
+
 // app/api/v1/reports/export/[type]/route.ts
 // Universal Excel/CSV Export API for Power BI
 

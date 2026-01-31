@@ -5,7 +5,7 @@
  * Maps to Excel columns: %ST REX, %ST TTP
  */
 
-export type StoreGroup = 'REX' | 'TTP' | 'ALL';
+export type StoreGroup = 'REX' | 'TTP' | 'DAFC' | 'OTHER' | 'ALL';
 
 export interface StorePerformanceData {
   id: string;
@@ -74,6 +74,18 @@ export const STORE_GROUP_CONFIG: Record<StoreGroup, {
     color: 'text-purple-700 dark:text-purple-300',
     bgColor: 'bg-purple-50 dark:bg-purple-900/20',
     borderColor: 'border-purple-500',
+  },
+  DAFC: {
+    label: 'DAFC',
+    color: 'text-emerald-700 dark:text-emerald-300',
+    bgColor: 'bg-emerald-50 dark:bg-emerald-900/20',
+    borderColor: 'border-emerald-500',
+  },
+  OTHER: {
+    label: 'Other',
+    color: 'text-gray-700 dark:text-gray-300',
+    bgColor: 'bg-gray-50 dark:bg-gray-800',
+    borderColor: 'border-gray-500',
   },
   ALL: {
     label: 'All Stores',

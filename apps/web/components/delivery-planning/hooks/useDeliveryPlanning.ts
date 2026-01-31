@@ -315,7 +315,7 @@ export function useDeliveryPlanning(
           skuId: edit.skuId,
           windowId: `window-${edit.month}`,
           quantity: edit.units,
-          storeGroup: DEFAULT_STORES.find(s => s.id === edit.storeId)?.group as StoreGroup,
+          storeGroup: DEFAULT_STORES.find(s => s.id === edit.storeId)?.storeGroup as StoreGroup,
         }));
 
         const response = await deliveryApi.batchUpdateAllocations({ allocations });

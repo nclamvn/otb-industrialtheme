@@ -65,7 +65,7 @@ export class RequestBatcher<T> {
     if (batch.length === 0) return;
 
     const keys = batch.map((r) => r.key);
-    const uniqueKeys = [...new Set(keys)];
+    const uniqueKeys = Array.from(new Set(keys));
 
     try {
       const results = await this.batchFn(uniqueKeys);
@@ -250,7 +250,8 @@ export class SWRCache<T> {
 
   invalidatePattern(pattern: string | RegExp) {
     const regex = typeof pattern === 'string' ? new RegExp(pattern) : pattern;
-    for (const key of this.cache.keys()) {
+    const keysArray = Array.from(this.cache.keys());
+    for (const key of keysArray) {
       if (regex.test(key)) {
         this.cache.delete(key);
       }

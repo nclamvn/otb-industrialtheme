@@ -1,3 +1,5 @@
+export const runtime = 'nodejs';
+
 // Cron endpoint for automated anomaly detection
 // Can be called by Vercel Cron, external scheduler, or manually
 import { NextRequest, NextResponse } from 'next/server';

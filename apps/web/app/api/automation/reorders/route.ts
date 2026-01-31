@@ -1,3 +1,5 @@
+export const runtime = 'nodejs';
+
 /**
  * Reorder Suggestions API
  * Manage auto-reorder suggestions

@@ -26,32 +26,32 @@ const TableSkeleton = () => (
 // ============================================
 
 export const DynamicAreaChart = dynamic(
-  () => import('@/components/charts/area-chart').then((mod) => mod.default || mod.AreaChart),
+  () => import('@/components/charts/area-chart').then((mod) => mod.AreaChart),
   { loading: LoadingSpinner, ssr: false }
 );
 
 export const DynamicBarChart = dynamic(
-  () => import('@/components/charts/bar-chart').then((mod) => mod.default || mod.BarChart),
+  () => import('@/components/charts/bar-chart').then((mod) => mod.BarChart),
   { loading: LoadingSpinner, ssr: false }
 );
 
 export const DynamicLineChart = dynamic(
-  () => import('@/components/charts/line-chart').then((mod) => mod.default || mod.LineChart),
+  () => import('@/components/charts/line-chart').then((mod) => mod.LineChart),
   { loading: LoadingSpinner, ssr: false }
 );
 
 export const DynamicHeatmap = dynamic(
-  () => import('@/components/charts/heatmap').then((mod) => mod.default || mod.Heatmap),
+  () => import('@/components/charts/heatmap').then((mod) => mod.Heatmap),
   { loading: LoadingSpinner, ssr: false }
 );
 
 export const DynamicWaterfallChart = dynamic(
-  () => import('@/components/charts/waterfall-chart').then((mod) => mod.default || mod.WaterfallChart),
+  () => import('@/components/charts/waterfall-chart').then((mod) => mod.WaterfallChart),
   { loading: LoadingSpinner, ssr: false }
 );
 
 export const DynamicForecastChart = dynamic(
-  () => import('@/components/charts/forecast-chart').then((mod) => mod.default || mod.ForecastChart),
+  () => import('@/components/charts/forecast-chart').then((mod) => mod.ForecastChart),
   { loading: LoadingSpinner, ssr: false }
 );
 
@@ -79,12 +79,12 @@ export const DynamicAISuggestionPanel = dynamic(
 // ============================================
 
 export const DynamicExcelImporter = dynamic(
-  () => import('@/components/excel/excel-importer').then((mod) => mod.default || mod.ExcelImporter),
+  () => import('@/components/excel/excel-importer').then((mod) => mod.ExcelImporter),
   { loading: LoadingSpinner, ssr: false }
 );
 
 export const DynamicImportPreview = dynamic(
-  () => import('@/components/excel/import-preview').then((mod) => mod.default || mod.ImportPreview),
+  () => import('@/components/excel/import-preview').then((mod) => mod.ImportPreview),
   { loading: LoadingSpinner, ssr: false }
 );
 
@@ -93,7 +93,7 @@ export const DynamicImportPreview = dynamic(
 // ============================================
 
 export const DynamicDataTable = dynamic(
-  () => import('@/components/ui/data-table').then((mod) => mod.default || mod.DataTable),
+  () => import('@/components/ui/data-table').then((mod) => mod.DataTable),
   { loading: TableSkeleton }
 );
 
@@ -102,21 +102,21 @@ export const DynamicDataTable = dynamic(
 // ============================================
 
 export const DynamicAnalyticsDashboard = dynamic(
-  () => import('@/components/analytics').then((mod) => mod.default || mod),
+  () => import('@/components/analytics').then((mod) => mod.DashboardCard),
   { loading: LoadingSpinner }
 );
 
 export const DynamicDeliveryPlanning = dynamic(
-  () => import('@/components/delivery-planning').then((mod) => mod.default || mod),
+  () => import('@/components/delivery-planning').then((mod) => mod.DeliveryMatrix),
   { loading: LoadingSpinner }
 );
 
 export const DynamicCostingManagement = dynamic(
-  () => import('@/components/costing').then((mod) => mod.default || mod),
+  () => import('@/components/costing').then((mod) => mod.CostingBreakdownCard),
   { loading: LoadingSpinner }
 );
 
 export const DynamicClearanceOptimization = dynamic(
-  () => import('@/components/clearance').then((mod) => mod.default || mod),
+  () => import('@/components/clearance').then((mod) => mod.ClearanceDashboard),
   { loading: LoadingSpinner }
 );

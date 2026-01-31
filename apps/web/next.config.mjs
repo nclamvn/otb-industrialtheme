@@ -210,6 +210,21 @@ const nextConfig = {
       });
     }
 
+    // Don't bundle server-only modules for client
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        net: false,
+        tls: false,
+        crypto: false,
+        path: false,
+        os: false,
+        stream: false,
+        child_process: false,
+      };
+    }
+
     return config;
   },
 
@@ -240,6 +255,15 @@ const nextConfig = {
       '@visx/shape',
       '@visx/tooltip',
       'framer-motion',
+    ],
+    // Mark server-only packages - prevent bundling in client
+    serverComponentsExternalPackages: [
+      'handlebars',
+      'bcryptjs',
+      'bcrypt',
+      '@prisma/client',
+      'prisma',
+      'nodemailer',
     ],
   },
 

@@ -1,3 +1,5 @@
+export const runtime = 'nodejs';
+
 // ERP Sync API
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';

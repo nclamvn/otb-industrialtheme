@@ -627,76 +627,54 @@ export default function SKUProposalDetailPage({
             <TabsContent value="sizing" className="mt-4 space-y-6">
               <div className="grid grid-cols-3 gap-4">
                 <ChoiceAllocationCard
-                  choice="A"
-                  data={{
+                  summary={{
                     choice: 'A',
-                    sizes: [
-                      { size: 'XS', qty: 2 },
-                      { size: 'S', qty: 3 },
-                      { size: 'M', qty: 4 },
-                      { size: 'L', qty: 3 },
-                      { size: 'XL', qty: 2 },
-                    ],
-                    totalQty: 14,
+                    totalUnits: 350,
+                    totalValue: 52500000,
+                    percentage: 45,
                     skuCount: 25,
-                    description: 'Full size run - standard allocation',
                   }}
                 />
                 <ChoiceAllocationCard
-                  choice="B"
-                  data={{
+                  summary={{
                     choice: 'B',
-                    sizes: [
-                      { size: 'S', qty: 3 },
-                      { size: 'M', qty: 5 },
-                      { size: 'L', qty: 4 },
-                      { size: 'XL', qty: 2 },
-                    ],
-                    totalQty: 14,
+                    totalUnits: 252,
+                    totalValue: 37800000,
+                    percentage: 32,
                     skuCount: 18,
-                    description: 'Core sizes - no XS',
                   }}
                 />
                 <ChoiceAllocationCard
-                  choice="C"
-                  data={{
+                  summary={{
                     choice: 'C',
-                    sizes: [
-                      { size: 'M', qty: 6 },
-                      { size: 'L', qty: 5 },
-                      { size: 'XL', qty: 3 },
-                    ],
-                    totalQty: 14,
+                    totalUnits: 168,
+                    totalValue: 25200000,
+                    percentage: 23,
                     skuCount: 12,
-                    description: 'Large sizes only',
                   }}
                 />
               </div>
               <SizeAllocationTable
                 data={{
+                  id: 'alloc-1',
                   skuId: 'sample-sku',
-                  choices: {
-                    A: [
-                      { size: 'XS', qty: 2 },
-                      { size: 'S', qty: 3 },
-                      { size: 'M', qty: 4 },
-                      { size: 'L', qty: 3 },
-                      { size: 'XL', qty: 2 },
-                    ],
-                    B: [
-                      { size: 'S', qty: 3 },
-                      { size: 'M', qty: 5 },
-                      { size: 'L', qty: 4 },
-                      { size: 'XL', qty: 2 },
-                    ],
-                    C: [
-                      { size: 'M', qty: 6 },
-                      { size: 'L', qty: 5 },
-                      { size: 'XL', qty: 3 },
-                    ],
-                  },
-                  selectedChoice: 'A',
-                  customQty: {},
+                  skuCode: 'REX-M-TOP-001',
+                  productName: 'Basic Cotton T-Shirt',
+                  category: 'Tops',
+                  gender: 'Male',
+                  totalA: 14,
+                  totalB: 14,
+                  totalC: 14,
+                  grandTotal: 42,
+                  sizes: [
+                    { size: 'XS', qtyA: 2, qtyB: 0, qtyC: 0, total: 2, percentage: 4.8 },
+                    { size: 'S', qtyA: 3, qtyB: 3, qtyC: 0, total: 6, percentage: 14.3 },
+                    { size: 'M', qtyA: 4, qtyB: 5, qtyC: 6, total: 15, percentage: 35.7 },
+                    { size: 'L', qtyA: 3, qtyB: 4, qtyC: 5, total: 12, percentage: 28.6 },
+                    { size: 'XL', qtyA: 2, qtyB: 2, qtyC: 3, total: 7, percentage: 16.7 },
+                  ],
+                  status: 'draft',
+                  isLocked: false,
                 }}
                 editable={isEditable}
               />

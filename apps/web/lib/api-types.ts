@@ -258,6 +258,7 @@ export interface StoreComparisonData {
 }
 
 export interface StorePerformanceFilters {
+  [key: string]: string | number | boolean | undefined;
   storeGroup?: StoreGroup;
   locationId?: string;
   brandId?: string;
@@ -425,6 +426,7 @@ export interface PriceAnalysis {
 }
 
 export interface PriceRangeFilters {
+  [key: string]: string | number | boolean | undefined;
   brandId?: string;
   categoryId?: string;
   seasonId?: string;

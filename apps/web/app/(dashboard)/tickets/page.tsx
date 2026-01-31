@@ -156,7 +156,6 @@ export default function TicketsPage() {
       <PageHeader
         title={t('title')}
         description="Manage approval tickets for OTB plans, SKU proposals, and sizing changes"
-        icon={<TicketIcon className="h-6 w-6" />}
       />
 
       <TicketList

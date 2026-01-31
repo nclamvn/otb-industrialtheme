@@ -1,3 +1,5 @@
+export const runtime = 'nodejs';
+
 // API Keys Management API
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';

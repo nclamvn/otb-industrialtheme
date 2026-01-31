@@ -465,17 +465,17 @@ export default function AnalyticsPage() {
           <div className="grid grid-cols-4 gap-4">
             <div className="p-4 rounded-xl border bg-white dark:bg-slate-800">
               <div className="text-sm text-slate-500">Price Bands</div>
-              <div className="text-2xl font-bold">{priceAnalysis.data.length}</div>
+              <div className="text-2xl font-bold">{priceAnalysis.ranges.length}</div>
             </div>
             <div className="p-4 rounded-xl border bg-white dark:bg-slate-800">
               <div className="text-sm text-slate-500">Avg Sell-Through</div>
               <div className="text-2xl font-bold text-green-600">
-                {(priceAnalysis.totals.avgSellThru * 100).toFixed(1)}%
+                {(priceAnalysis.ranges.reduce((sum, r) => sum + r.sellThruPercent, 0) / (priceAnalysis.ranges.length || 1)).toFixed(1)}%
               </div>
             </div>
             <div className="p-4 rounded-xl border bg-white dark:bg-slate-800">
               <div className="text-sm text-slate-500">Total Units</div>
-              <div className="text-2xl font-bold">{priceAnalysis.totals.totalUnits.toLocaleString()}</div>
+              <div className="text-2xl font-bold">{priceAnalysis.totalUnits.toLocaleString()}</div>
             </div>
             <div className="p-4 rounded-xl border bg-white dark:bg-slate-800">
               <div className="text-sm text-slate-500">YoY Trend</div>
@@ -486,7 +486,7 @@ export default function AnalyticsPage() {
             </div>
           </div>
 
-          <PriceRangePanel brandId="ferragamo" seasonId="ss25" />
+          <PriceRangePanel analysis={priceAnalysis} />
         </TabsContent>
 
         <TabsContent value="forecast" className="space-y-4">

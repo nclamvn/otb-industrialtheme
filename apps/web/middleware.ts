@@ -1,12 +1,15 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { auth } from '@/lib/auth';
+import { getToken } from 'next-auth/jwt';
+
+// DO NOT import auth() here - it uses bcrypt which doesn't work in Edge Runtime!
+// Use getToken() instead which is Edge-compatible
 
 // Paths that don't need any middleware processing
 const skipPaths = ['/api', '/_next', '/favicon.ico', '/manifest.json', '/sw.js', '/icons', '/offline', '/logo.png'];
 
 // Auth-excluded paths (no authentication needed)
-const authExcludedPaths = ['/login', '/forgot-password', '/reset-password', '/register', '/offline'];
+const authExcludedPaths = ['/login', '/forgot-password', '/reset-password', '/register', '/offline', '/auth'];
 
 // Check if path should skip middleware entirely
 function shouldSkip(pathname: string): boolean {
@@ -37,10 +40,13 @@ export async function middleware(request: NextRequest) {
     return response;
   }
 
-  // For protected routes, check auth first
-  const session = await auth();
+  // For protected routes, check auth using Edge-compatible getToken
+  const token = await getToken({
+    req: request,
+    secret: process.env.NEXTAUTH_SECRET,
+  });
 
-  if (!session) {
+  if (!token) {
     // Not authenticated, redirect to login
     const loginUrl = new URL('/login', request.url);
     loginUrl.searchParams.set('callbackUrl', pathname);

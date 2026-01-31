@@ -1,3 +1,5 @@
+export const runtime = 'nodejs';
+
 /**
  * Automation Rules API
  * Manage automation rules for auto-approval and auto-reorder
