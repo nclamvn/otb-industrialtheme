@@ -1,10 +1,13 @@
 'use client';
 
+import { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { BudgetFlowView } from '@/components/budget-flow';
+import { BudgetFlowView, WorkflowTracker, WorkflowStatusBadge } from '@/components/budget-flow';
+import { PlanningGapDashboard } from '@/components/budget-flow/gap-handling';
 import { BudgetNode } from '@/components/budget-flow/types';
+import type { WorkflowStatus } from '@/components/budget-flow/WorkflowTracker';
 import { useBudgetData } from '@/components/budget-flow/hooks/useBudgetData';
-import { Loader2, ArrowLeft, Building2, Palette } from 'lucide-react';
+import { Loader2, ArrowLeft, Building2, Palette, TrendingUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { StorePerformanceCard, useStorePerformance } from '@/components/store-performance';
@@ -274,6 +277,10 @@ export default function BudgetFlowDetailPage() {
   const router = useRouter();
   const budgetId = params.id as string;
 
+  // Workflow status state
+  const [workflowStatus, setWorkflowStatus] = useState<WorkflowStatus>('pending_md_review');
+  const [showGapDashboard, setShowGapDashboard] = useState(false);
+
   // Get mock data for this budget ID
   const mockData = MOCK_BUDGETS[budgetId];
 
@@ -340,8 +347,45 @@ export default function BudgetFlowDetailPage() {
           </Link>
           <span>/</span>
           <span className="text-slate-900 dark:text-neutral-100 font-medium">{data.name}</span>
+          <span className="ml-auto">
+            <WorkflowStatusBadge status={workflowStatus} />
+          </span>
         </nav>
       </div>
+
+      {/* Workflow Tracker */}
+      <div className="px-6 py-4">
+        <div className="p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900">
+          <h3 className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-4">Approval Workflow</h3>
+          <WorkflowTracker
+            currentStatus={workflowStatus}
+            onStepClick={(stepId) => console.log('Step clicked:', stepId)}
+          />
+        </div>
+      </div>
+
+      {/* Gap Dashboard Toggle */}
+      <div className="px-6 pb-2">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setShowGapDashboard(!showGapDashboard)}
+          className="gap-2"
+        >
+          <TrendingUp className="h-4 w-4" />
+          {showGapDashboard ? 'Hide Gap Analysis' : 'Show Gap Analysis'}
+        </Button>
+      </div>
+
+      {/* Planning Gap Dashboard */}
+      {showGapDashboard && (
+        <div className="px-6 pb-4">
+          <PlanningGapDashboard
+            data={data}
+            onNodeClick={(nodeId) => console.log('Node clicked:', nodeId)}
+          />
+        </div>
+      )}
 
       <BudgetFlowView
         data={data}

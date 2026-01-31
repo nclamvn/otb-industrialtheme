@@ -12,7 +12,14 @@ import {
   ChevronRight,
   User,
   Calendar,
+  ThumbsUp,
+  ThumbsDown,
 } from 'lucide-react';
+import {
+  DecisionDialog,
+  QuickDecisionButtons,
+  DecisionType,
+} from '@/components/decisions';
 import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
@@ -83,6 +90,11 @@ export default function ApprovalsPage() {
   const [summary, setSummary] = useState<Summary>({ budget: 0, otb: 0, sku: 0, total: 0 });
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('all');
+
+  // Decision dialog state
+  const [selectedWorkflow, setSelectedWorkflow] = useState<ApprovalWorkflow | null>(null);
+  const [isDecisionDialogOpen, setIsDecisionDialogOpen] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const fetchData = useCallback(async () => {
     try {
@@ -205,6 +217,34 @@ export default function ApprovalsPage() {
               : w.type === 'SKU_APPROVAL'
         );
 
+  // Handle decision submission
+  const handleDecision = async (decision: DecisionType, comment: string) => {
+    if (!selectedWorkflow) return;
+
+    setIsProcessing(true);
+    try {
+      // API call would go here
+      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API call
+
+      toast.success(
+        decision === 'approve'
+          ? `${getEntityName(selectedWorkflow)} approved successfully`
+          : decision === 'reject'
+          ? `${getEntityName(selectedWorkflow)} rejected`
+          : `Changes requested for ${getEntityName(selectedWorkflow)}`
+      );
+
+      // Refresh data
+      fetchData();
+    } catch (error) {
+      toast.error('Failed to process decision');
+      throw error;
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  
   return (
     <div className="space-y-6">
       <PageHeader
@@ -351,7 +391,26 @@ export default function ApprovalsPage() {
                           </div>
                         </div>
                       </div>
-                      <ChevronRight className="h-5 w-5 text-muted-foreground" />
+                      <div className="flex items-center gap-3" onClick={(e) => e.stopPropagation()}>
+                        {workflow.status === 'PENDING' || workflow.status === 'IN_PROGRESS' ? (
+                          <QuickDecisionButtons
+                            onApprove={() => {
+                              setSelectedWorkflow(workflow);
+                              handleDecision('approve', '');
+                            }}
+                            onReject={() => {
+                              setSelectedWorkflow(workflow);
+                              setIsDecisionDialogOpen(true);
+                            }}
+                            onRequestChanges={() => {
+                              setSelectedWorkflow(workflow);
+                              setIsDecisionDialogOpen(true);
+                            }}
+                            size="sm"
+                          />
+                        ) : null}
+                        <ChevronRight className="h-5 w-5 text-muted-foreground" />
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
@@ -360,6 +419,17 @@ export default function ApprovalsPage() {
           )}
         </TabsContent>
       </Tabs>
+
+      {/* Decision Dialog */}
+      <DecisionDialog
+        open={isDecisionDialogOpen}
+        onOpenChange={setIsDecisionDialogOpen}
+        title="Make Decision"
+        description="Review and make a decision on this approval request"
+        itemName={selectedWorkflow ? getEntityName(selectedWorkflow) : undefined}
+        onDecision={handleDecision}
+        isLoading={isProcessing}
+      />
     </div>
   );
 }

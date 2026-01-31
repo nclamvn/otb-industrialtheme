@@ -9,7 +9,9 @@ import {
   TicketList,
   TicketCard,
   CreateTicketDialog,
+  TicketBundling,
   useTickets,
+  useTicketBundling,
   Ticket,
   CreateTicketInput,
 } from '@/components/tickets';
@@ -89,7 +91,20 @@ export default function TicketsPage() {
     cancelTicket,
   } = useTickets();
 
+  // Ticket bundling
+  const {
+    bundles,
+    selectedTicketIds,
+    setSelectedTicketIds,
+    createBundle,
+    addToBundle,
+    removeFromBundle,
+    deleteBundle,
+    submitBundle,
+  } = useTicketBundling(tickets);
+
   const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [showBundling, setShowBundling] = useState(false);
   const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [isSendRequestOpen, setIsSendRequestOpen] = useState(false);
@@ -157,6 +172,36 @@ export default function TicketsPage() {
         title={t('title')}
         description="Manage approval tickets for OTB plans, SKU proposals, and sizing changes"
       />
+
+      {/* Bundle Toggle */}
+      <div className="flex items-center gap-2">
+        <Button
+          variant={showBundling ? 'default' : 'outline'}
+          size="sm"
+          onClick={() => setShowBundling(!showBundling)}
+        >
+          {showBundling ? 'Hide Bundling' : 'Show Bundling'}
+        </Button>
+        {bundles.length > 0 && (
+          <Badge variant="secondary">{bundles.length} bundles</Badge>
+        )}
+      </div>
+
+      {/* Ticket Bundling Section */}
+      {showBundling && (
+        <TicketBundling
+          tickets={tickets}
+          bundles={bundles}
+          selectedTicketIds={selectedTicketIds}
+          onSelectionChange={setSelectedTicketIds}
+          onCreateBundle={createBundle}
+          onAddToBundle={addToBundle}
+          onRemoveFromBundle={removeFromBundle}
+          onDeleteBundle={deleteBundle}
+          onSubmitBundle={submitBundle}
+          isLoading={isLoading}
+        />
+      )}
 
       <TicketList
         tickets={tickets}
