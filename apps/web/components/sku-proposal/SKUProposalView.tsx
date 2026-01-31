@@ -10,6 +10,7 @@ import { ProductList } from './ProductList';
 import { SizeBreakdownTable } from './SizeBreakdownTable';
 import { AddProductDialog } from './AddProductDialog';
 import { AIWarningsPanel } from './AIWarningsPanel';
+import { SKUVersionSelector } from './SKUVersionSelector';
 import {
   Save,
   Send,
@@ -199,6 +200,21 @@ export function SKUProposalView({
 
   return (
     <div className={cn('flex flex-col h-full bg-white', className)}>
+      {/* Version Selector Banner */}
+      <div className="px-4 pt-4">
+        <SKUVersionSelector
+          proposalId={proposalId || ''}
+          showFinalButton={isEditable}
+          onVersionChange={(version) => {
+            toast.success(`Switched to version v${version.versionNumber}.0`);
+          }}
+          onSetFinal={(version) => {
+            toast.success(`Final version selected: v${version.versionNumber}.0`);
+            return Promise.resolve(true);
+          }}
+        />
+      </div>
+
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b">
         <div className="flex items-center gap-4">

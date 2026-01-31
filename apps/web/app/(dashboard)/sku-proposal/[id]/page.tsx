@@ -17,10 +17,12 @@ import {
   Ruler,
   DollarSign,
   Building2,
+  History,
 } from 'lucide-react';
 import {
   ChoiceAllocationCard,
   SizeAllocationTable,
+  SizingVersionPanel,
   useSizeAllocation,
 } from '@/components/size-allocation';
 import { CostingBreakdownCard, calculateCosting } from '@/components/costing';
@@ -146,6 +148,7 @@ export default function SKUProposalDetailPage({
     itemsCreated?: number;
     warnings?: string[];
   } | null>(null);
+  const [isSizingVersionOpen, setIsSizingVersionOpen] = useState(false);
 
   const fetchData = useCallback(async () => {
     try {
@@ -625,6 +628,33 @@ export default function SKUProposalDetailPage({
 
             {/* Size Allocation Tab */}
             <TabsContent value="sizing" className="mt-4 space-y-6">
+              {/* Version Management Header */}
+              <div className="flex items-center justify-between p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-purple-100 dark:bg-purple-900/50">
+                    <History className="h-4 w-4 text-purple-600 dark:text-purple-400" />
+                  </div>
+                  <div>
+                    <p className="font-medium text-slate-800 dark:text-slate-200">Sizing Version Management</p>
+                    <p className="text-xs text-slate-500">Save drafts, compare versions, and select final sizing</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Badge variant="outline" className="text-purple-600 border-purple-300">
+                    Current: v3.0
+                  </Badge>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setIsSizingVersionOpen(true)}
+                    className="gap-2"
+                  >
+                    <History className="h-4 w-4" />
+                    Version History
+                  </Button>
+                </div>
+              </div>
+
               <div className="grid grid-cols-3 gap-4">
                 <ChoiceAllocationCard
                   summary={{
@@ -822,6 +852,20 @@ export default function SKUProposalDetailPage({
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Sizing Version Panel */}
+      <SizingVersionPanel
+        skuProposalId={id}
+        isOpen={isSizingVersionOpen}
+        onClose={() => setIsSizingVersionOpen(false)}
+        onRollback={(version) => {
+          toast.success(`Rolled back sizing to v${version.versionNumber}.0`);
+          fetchData();
+        }}
+        onSelectFinal={(version) => {
+          toast.success(`Final sizing version selected: v${version.versionNumber}.0`);
+        }}
+      />
     </div>
   );
 }

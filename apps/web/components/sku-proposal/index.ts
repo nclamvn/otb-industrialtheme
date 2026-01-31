@@ -21,3 +21,5 @@ export { SizeBreakdownTable } from './SizeBreakdownTable';
 export { AddProductDialog } from './AddProductDialog';
 export { AIWarningsPanel } from './AIWarningsPanel';
 export { SKUProposalView } from './SKUProposalView';
+export { SKUVersionSelector } from './SKUVersionSelector';
+export type { SKUVersion, SKUVersionStatus } from './SKUVersionSelector';

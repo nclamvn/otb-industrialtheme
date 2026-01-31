@@ -111,3 +111,95 @@ export const CHOICE_CONFIG: Record<ChoiceType, {
     description: 'Tertiary allocation - optional',
   },
 };
+
+// ============================================
+// Sizing Version Types
+// ============================================
+
+export type SizingVersionStatus = 'DRAFT' | 'SUBMITTED' | 'APPROVED' | 'REJECTED' | 'CURRENT' | 'FINAL';
+
+export interface SizingVersionChange {
+  id: string;
+  field: string;
+  oldValue: string | number | null;
+  newValue: string | number | null;
+  sizeName?: string;
+  skuCode?: string;
+  changeType: 'UPDATE' | 'CREATE' | 'DELETE';
+}
+
+export interface SizingVersion {
+  id: string;
+  versionNumber: number;
+  name: string;
+  description?: string;
+  status: SizingVersionStatus;
+  snapshotData: ChoiceAllocationData[];
+  totalUnits: number;
+  totalValue: number;
+  changes: SizingVersionChange[];
+  tags: string[];
+  createdAt: Date;
+  createdBy: {
+    id: string;
+    name: string;
+    avatar?: string;
+  };
+  approvedAt?: Date;
+  approvedBy?: {
+    id: string;
+    name: string;
+  };
+}
+
+export interface SizingVersionComparison {
+  leftVersion: SizingVersion;
+  rightVersion: SizingVersion;
+  changes: {
+    added: SizingVersionChange[];
+    removed: SizingVersionChange[];
+    modified: SizingVersionChange[];
+  };
+  summary: {
+    totalChanges: number;
+    unitsDiff: number;
+    valueDiff: number;
+  };
+}
+
+export const SIZING_VERSION_STATUS_CONFIG: Record<SizingVersionStatus, {
+  label: string;
+  color: string;
+  bgColor: string;
+}> = {
+  DRAFT: {
+    label: 'Draft',
+    color: 'text-slate-600',
+    bgColor: 'bg-slate-100',
+  },
+  SUBMITTED: {
+    label: 'Submitted',
+    color: 'text-blue-600',
+    bgColor: 'bg-blue-100',
+  },
+  APPROVED: {
+    label: 'Approved',
+    color: 'text-green-600',
+    bgColor: 'bg-green-100',
+  },
+  REJECTED: {
+    label: 'Rejected',
+    color: 'text-red-600',
+    bgColor: 'bg-red-100',
+  },
+  CURRENT: {
+    label: 'Current',
+    color: 'text-purple-600',
+    bgColor: 'bg-purple-100',
+  },
+  FINAL: {
+    label: 'Final',
+    color: 'text-emerald-600',
+    bgColor: 'bg-emerald-100',
+  },
+};
