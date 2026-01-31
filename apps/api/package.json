@@ -27,7 +27,16 @@
     "test:stress:soak": "ts-node test/stress/comprehensive-stress.ts soak",
     "test:stress:comprehensive": "npm run test:stress:api && npm run test:stress:db && npm run test:stress:workflow",
     "test:load": "ts-node test/stress/api-load.stress.ts",
-    "test:all": "npm run test && npm run test:security && npm run test:stress"
+    "test:all": "npm run test && npm run test:security && npm run test:stress",
+    "seed": "ts-node prisma/seed/index.ts",
+    "seed:master": "ts-node prisma/seed/index.ts master",
+    "seed:size": "ts-node prisma/seed/index.ts size",
+    "seed:planning": "ts-node prisma/seed/index.ts planning",
+    "seed:performance": "ts-node prisma/seed/index.ts performance",
+    "seed:cli": "ts-node prisma/seed/cli.ts",
+    "seed:list": "ts-node prisma/seed/cli.ts list",
+    "seed:validate": "ts-node prisma/seed/cli.ts validate",
+    "seed:reset": "ts-node prisma/seed/cli.ts reset"
   },
   "dependencies": {
     "@dafc/database": "workspace:*",
@@ -45,8 +54,12 @@
     "@nestjs/swagger": "^7.3.0",
     "@prisma/client": "^5.22.0",
     "bcryptjs": "^2.4.3",
+    "chalk": "^5.6.2",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
+    "commander": "^14.0.3",
+    "exceljs": "^4.4.0",
+    "ora": "^9.1.0",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
     "redis": "^4.7.0",
@@ -54,6 +67,9 @@
     "rxjs": "^7.8.1",
     "xlsx": "^0.18.5",
     "zod": "^3.22.4"
+  },
+  "prisma": {
+    "seed": "ts-node prisma/seed/index.ts"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.4.0",

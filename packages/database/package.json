@@ -25,8 +25,12 @@
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate dev",
     "db:seed": "ts-node --compiler-options '{\"module\":\"CommonJS\"}' prisma/seed.ts",
+    "db:seed:comprehensive": "ts-node --compiler-options '{\"module\":\"CommonJS\"}' prisma/seed-comprehensive.ts",
+    "db:seed:advanced": "ts-node --compiler-options '{\"module\":\"CommonJS\"}' prisma/seed-advanced.ts",
+    "db:seed:all": "pnpm db:seed:comprehensive && pnpm db:seed:advanced",
     "db:studio": "prisma studio",
-    "db:reset": "prisma migrate reset"
+    "db:reset": "prisma migrate reset",
+    "db:fresh": "pnpm db:reset && pnpm db:seed:all"
   },
   "dependencies": {
     "@prisma/client": "^5.22.0",

@@ -192,7 +192,7 @@ export class BudgetSuggestionsService {
       throw new NotFoundException('Suggestion not found or already processed');
     }
 
-    const actions = suggestion.actions as SuggestionActionResponse[];
+    const actions = suggestion.actions as unknown as SuggestionActionResponse[];
     let actionsToApply = actions;
 
     // Filter to specific nodes if requested

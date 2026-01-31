@@ -1,211 +1,122 @@
-// lib/dynamic-imports.tsx
-// Centralized dynamic imports for code splitting
-// Use these exports instead of direct imports for heavy components
+'use client';
 
 import dynamic from 'next/dynamic';
+import { Loader2 } from 'lucide-react';
 
-// =====================================================
-// LOADING SKELETONS
-// =====================================================
-
-const ChartSkeleton = () => (
-  <div className="animate-pulse">
-    <div className="h-64 bg-gray-200 rounded-lg"></div>
+// Loading placeholder component
+const LoadingSpinner = () => (
+  <div className="flex items-center justify-center p-8">
+    <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
   </div>
 );
 
+// Loading skeleton for tables
 const TableSkeleton = () => (
-  <div className="animate-pulse space-y-3">
-    <div className="h-10 bg-gray-200 rounded"></div>
-    <div className="h-10 bg-gray-100 rounded"></div>
-    <div className="h-10 bg-gray-200 rounded"></div>
-    <div className="h-10 bg-gray-100 rounded"></div>
-    <div className="h-10 bg-gray-200 rounded"></div>
+  <div className="space-y-3">
+    <div className="h-10 bg-muted animate-pulse rounded" />
+    <div className="h-10 bg-muted animate-pulse rounded" />
+    <div className="h-10 bg-muted animate-pulse rounded" />
+    <div className="h-10 bg-muted animate-pulse rounded" />
+    <div className="h-10 bg-muted animate-pulse rounded" />
   </div>
 );
 
-const FormSkeleton = () => (
-  <div className="animate-pulse space-y-4">
-    <div className="h-10 bg-gray-200 rounded w-1/3"></div>
-    <div className="h-12 bg-gray-100 rounded"></div>
-    <div className="h-12 bg-gray-100 rounded"></div>
-    <div className="h-12 bg-gray-100 rounded"></div>
-    <div className="h-10 bg-gray-200 rounded w-1/4"></div>
-  </div>
+// ============================================
+// CHART COMPONENTS - Heavy, lazy load
+// ============================================
+
+export const DynamicAreaChart = dynamic(
+  () => import('@/components/charts/area-chart').then((mod) => mod.default || mod.AreaChart),
+  { loading: LoadingSpinner, ssr: false }
 );
 
-const PanelSkeleton = () => (
-  <div className="animate-pulse">
-    <div className="h-6 bg-gray-200 rounded w-1/4 mb-4"></div>
-    <div className="space-y-2">
-      <div className="h-4 bg-gray-100 rounded w-3/4"></div>
-      <div className="h-4 bg-gray-100 rounded w-1/2"></div>
-      <div className="h-4 bg-gray-100 rounded w-2/3"></div>
-    </div>
-  </div>
+export const DynamicBarChart = dynamic(
+  () => import('@/components/charts/bar-chart').then((mod) => mod.default || mod.BarChart),
+  { loading: LoadingSpinner, ssr: false }
 );
 
-// =====================================================
-// CHART COMPONENTS (Heavy - recharts library)
-// =====================================================
-
-export const BudgetCharts = dynamic(
-  () => import('@/components/budget/budget-charts').then(mod => mod.BudgetCharts),
-  {
-    loading: ChartSkeleton,
-    ssr: false,
-  }
+export const DynamicLineChart = dynamic(
+  () => import('@/components/charts/line-chart').then((mod) => mod.default || mod.LineChart),
+  { loading: LoadingSpinner, ssr: false }
 );
 
-export const BudgetChart = dynamic(
-  () => import('@/components/dashboard/budget-chart').then(mod => mod.BudgetChart),
-  {
-    loading: ChartSkeleton,
-    ssr: false,
-  }
+export const DynamicHeatmap = dynamic(
+  () => import('@/components/charts/heatmap').then((mod) => mod.default || mod.Heatmap),
+  { loading: LoadingSpinner, ssr: false }
 );
 
-export const OTBTrendsChart = dynamic(
-  () => import('@/components/dashboard/otb-trends-chart').then(mod => mod.OTBTrendsChart),
-  {
-    loading: ChartSkeleton,
-    ssr: false,
-  }
+export const DynamicWaterfallChart = dynamic(
+  () => import('@/components/charts/waterfall-chart').then((mod) => mod.default || mod.WaterfallChart),
+  { loading: LoadingSpinner, ssr: false }
 );
 
-export const ForecastChart = dynamic(
-  () => import('@/components/charts/forecast-chart').then(mod => mod.ForecastChart),
-  {
-    loading: ChartSkeleton,
-    ssr: false,
-  }
+export const DynamicForecastChart = dynamic(
+  () => import('@/components/charts/forecast-chart').then((mod) => mod.default || mod.ForecastChart),
+  { loading: LoadingSpinner, ssr: false }
 );
 
-export const RadarChart = dynamic(
-  () => import('@/components/charts/radar-chart').then(mod => mod.RadarChart),
-  {
-    loading: ChartSkeleton,
-    ssr: false,
-  }
+// ============================================
+// BUDGET FLOW COMPONENTS
+// ============================================
+
+export const DynamicBudgetFlowView = dynamic(
+  () => import('@/components/budget-flow/BudgetFlowView').then((mod) => mod.default || mod),
+  { loading: LoadingSpinner }
 );
 
-export const GaugeChart = dynamic(
-  () => import('@/components/charts/gauge-chart').then(mod => mod.GaugeChart),
-  {
-    loading: ChartSkeleton,
-    ssr: false,
-  }
+export const DynamicVersionHistoryPanel = dynamic(
+  () => import('@/components/budget-flow/version-history/VersionHistoryPanel').then((mod) => mod.VersionHistoryPanel),
+  { loading: LoadingSpinner }
 );
 
-export const WaterfallChart = dynamic(
-  () => import('@/components/charts/waterfall-chart').then(mod => mod.WaterfallChart),
-  {
-    loading: ChartSkeleton,
-    ssr: false,
-  }
+export const DynamicAISuggestionPanel = dynamic(
+  () => import('@/components/budget-flow/gap-handling/AISuggestionPanel').then((mod) => mod.AISuggestionPanel),
+  { loading: LoadingSpinner }
 );
 
-export const Heatmap = dynamic(
-  () => import('@/components/charts/heatmap').then(mod => mod.Heatmap),
-  {
-    loading: ChartSkeleton,
-    ssr: false,
-  }
+// ============================================
+// EXCEL COMPONENTS - Heavy XLSX library
+// ============================================
+
+export const DynamicExcelImporter = dynamic(
+  () => import('@/components/excel/excel-importer').then((mod) => mod.default || mod.ExcelImporter),
+  { loading: LoadingSpinner, ssr: false }
 );
 
-// =====================================================
-// OTB COMPONENTS
-// =====================================================
-
-export const OTBCalculator = dynamic(
-  () => import('@/components/otb/otb-calculator').then(mod => mod.OTBCalculator),
-  {
-    loading: FormSkeleton,
-    ssr: false,
-  }
+export const DynamicImportPreview = dynamic(
+  () => import('@/components/excel/import-preview').then((mod) => mod.default || mod.ImportPreview),
+  { loading: LoadingSpinner, ssr: false }
 );
 
-export const OTBHierarchyTable = dynamic(
-  () => import('@/components/otb/otb-hierarchy-table').then(mod => mod.OTBHierarchyTable),
-  {
-    loading: TableSkeleton,
-  }
+// ============================================
+// TABLE COMPONENTS - Virtualized for large data
+// ============================================
+
+export const DynamicDataTable = dynamic(
+  () => import('@/components/ui/data-table').then((mod) => mod.default || mod.DataTable),
+  { loading: TableSkeleton }
 );
 
-export const OTBSummary = dynamic(
-  () => import('@/components/otb/otb-summary').then(mod => mod.OTBSummary),
-  {
-    loading: PanelSkeleton,
-  }
+// ============================================
+// FEATURE-SPECIFIC HEAVY COMPONENTS
+// ============================================
+
+export const DynamicAnalyticsDashboard = dynamic(
+  () => import('@/components/analytics').then((mod) => mod.default || mod),
+  { loading: LoadingSpinner }
 );
 
-// =====================================================
-// EXCEL IMPORT COMPONENTS
-// =====================================================
-
-export const ExcelImporter = dynamic(
-  () => import('@/components/excel/excel-importer').then(mod => mod.ExcelImporter),
-  {
-    loading: FormSkeleton,
-    ssr: false,
-  }
+export const DynamicDeliveryPlanning = dynamic(
+  () => import('@/components/delivery-planning').then((mod) => mod.default || mod),
+  { loading: LoadingSpinner }
 );
 
-export const ImportPreview = dynamic(
-  () => import('@/components/excel/import-preview').then(mod => mod.ImportPreview),
-  {
-    loading: TableSkeleton,
-    ssr: false,
-  }
+export const DynamicCostingManagement = dynamic(
+  () => import('@/components/costing').then((mod) => mod.default || mod),
+  { loading: LoadingSpinner }
 );
 
-// =====================================================
-// AI COMPONENTS
-// =====================================================
-
-export const CopilotPanel = dynamic(
-  () => import('@/components/ai/copilot-panel').then(mod => mod.CopilotPanel),
-  {
-    loading: PanelSkeleton,
-  }
-);
-
-export const CopilotButton = dynamic(
-  () => import('@/components/ai/copilot-button').then(mod => mod.CopilotButton),
-  {
-    ssr: false,
-  }
-);
-
-export const AIChatWidget = dynamic(
-  () => import('@/components/ai/chat-widget').then(mod => mod.AIChatWidget),
-  {
-    loading: PanelSkeleton,
-    ssr: false,
-  }
-);
-
-export const AIInsightsWidget = dynamic(
-  () => import('@/components/dashboard/ai-insights-widget').then(mod => mod.AIInsightsWidget),
-  {
-    loading: PanelSkeleton,
-  }
-);
-
-// =====================================================
-// DATA TABLE (Can be large with many rows)
-// =====================================================
-
-export const DataTable = dynamic(
-  () => import('@/components/shared/data-table').then(mod => mod.DataTable),
-  {
-    loading: TableSkeleton,
-  }
-);
-
-export const MobileTable = dynamic(
-  () => import('@/components/mobile/mobile-table').then(mod => mod.MobileTable),
-  {
-    loading: TableSkeleton,
-  }
+export const DynamicClearanceOptimization = dynamic(
+  () => import('@/components/clearance').then((mod) => mod.default || mod),
+  { loading: LoadingSpinner }
 );

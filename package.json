@@ -31,8 +31,15 @@
     "clean": "turbo run clean && rm -rf node_modules",
     "db:generate": "turbo run db:generate --filter=@dafc/database",
     "db:push": "turbo run db:push --filter=@dafc/database",
-    "db:seed": "turbo run db:seed --filter=@dafc/database",
-    "db:studio": "pnpm --filter @dafc/database exec prisma studio"
+    "db:seed": "pnpm --filter @dafc/database run db:seed",
+    "db:seed:comprehensive": "pnpm --filter @dafc/database run db:seed:comprehensive",
+    "db:seed:advanced": "pnpm --filter @dafc/database run db:seed:advanced",
+    "db:seed:all": "pnpm --filter @dafc/database run db:seed:all",
+    "db:fresh": "pnpm --filter @dafc/database run db:fresh",
+    "db:studio": "pnpm --filter @dafc/database exec prisma studio",
+    "perf:analyze": "pnpm --filter @dafc/web run analyze",
+    "perf:build": "pnpm --filter @dafc/web run build",
+    "perf:test": "pnpm --filter @dafc/api run test:stress"
   },
   "devDependencies": {
     "@playwright/test": "^1.57.0",

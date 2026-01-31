@@ -88,6 +88,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     strategy: 'jwt',
     maxAge: 24 * 60 * 60, // 24 hours
   },
+  trustHost: true,
 });
 
 declare module 'next-auth' {

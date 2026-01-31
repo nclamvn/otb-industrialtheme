@@ -38,6 +38,13 @@ import { FormulasModule } from './modules/formulas/formulas.module';
 import { ExcelToolsModule } from './modules/excel-tools/excel-tools.module';
 import { AICopilotModule } from './modules/ai-copilot/ai-copilot.module';
 
+// W25 Feature Modules
+import { DeliveryModule } from './modules/delivery/delivery.module';
+import { CostingModule } from './modules/costing/costing.module';
+import { StorePerformanceModule } from './modules/store-performance/store-performance.module';
+import { PriceRangeModule } from './modules/price-range/price-range.module';
+import { CarryForwardModule } from './modules/carry-forward/carry-forward.module';
+
 @Module({
   imports: [
     // Config
@@ -121,6 +128,13 @@ import { AICopilotModule } from './modules/ai-copilot/ai-copilot.module';
 
     // AI Copilot (Phase 3)
     AICopilotModule,
+
+    // W25 Feature Modules
+    DeliveryModule,
+    CostingModule,
+    StorePerformanceModule,
+    PriceRangeModule,
+    CarryForwardModule,
   ],
   providers: [
     // Global exception filter for Prisma errors

@@ -198,6 +198,9 @@ model User {
   aiGeneratedPlans AIGeneratedPlan[]
   predictiveAlerts PredictiveAlert[]
 
+  // W25 relations
+  settings         UserSettings?    @relation("UserSettingsUser")
+
   // Sprint 6 relations
   accounts              Account[]
   storedFiles           StoredFile[]
@@ -287,6 +290,10 @@ model Brand {
   wssiRecords    WSSIRecord[]    @relation("WSSIBrand")
   wssiThresholds WSSIThreshold[] @relation("WSSIThresholdBrand")
 
+  // W25 relations
+  costingConfigs     CostingConfig[]      @relation("CostingConfigBrand")
+  priceRangeAnalyses PriceRangeAnalysis[] @relation("PriceRangeAnalysisBrand")
+
   @@map("brands")
 }
 
@@ -344,6 +351,10 @@ model Category {
 
   // Size Profile relations
   sizeProfiles SizeProfile[] @relation("SizeProfileCategory")
+
+  // W25 relations
+  costingConfigs     CostingConfig[]      @relation("CostingConfigCategory")
+  priceRangeAnalyses PriceRangeAnalysis[] @relation("PriceRangeAnalysisCategory")
 
   @@map("categories")
 }
@@ -406,6 +417,10 @@ model SalesLocation {
   // Size Profile relations
   sizeProfiles SizeProfile[] @relation("SizeProfileLocation")
 
+  // W25 relations
+  deliveryAllocations  DeliveryAllocation[] @relation("DeliveryAllocationLocation")
+  storePerformances    StorePerformance[]   @relation("StorePerformanceLocation")
+
   @@map("sales_locations")
 }
 
@@ -446,6 +461,13 @@ model Season {
 
   // Size Profile relations
   sizeProfiles SizeProfile[] @relation("SizeProfileSeason")
+
+  // W25 relations
+  deliveryWindows       DeliveryWindow[]     @relation("DeliveryWindowSeason")
+  storePerformances     StorePerformance[]   @relation("StorePerformanceSeason")
+  priceRangeAnalyses    PriceRangeAnalysis[] @relation("PriceRangeAnalysisSeason")
+  carryForwardFrom      CarryForwardItem[]   @relation("CarryForwardFromSeason")
+  carryForwardTo        CarryForwardItem[]   @relation("CarryForwardToSeason")
 
   @@map("seasons")
 }
@@ -786,6 +808,11 @@ model SKUItem {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  // W25 Relations
+  deliveryAllocations DeliveryAllocation[] @relation("DeliveryAllocationSKU")
+  costingBreakdown    CostingBreakdown?    @relation("CostingBreakdownSKU")
+  carryForwardItems   CarryForwardItem[]   @relation("CarryForwardSKU")
 
   @@unique([proposalId, skuCode])
   @@index([proposalId, validationStatus])
@@ -3375,4 +3402,289 @@ model BudgetVersionChange {
   @@index([versionId])
   @@index([nodeId])
   @@map("budget_version_changes")
+}
+
+// ============================================
+// W25 FEATURES - DELIVERY PLANNING
+// ============================================
+
+model DeliveryWindow {
+  id          String   @id @default(cuid())
+  seasonId    String
+  season      Season   @relation("DeliveryWindowSeason", fields: [seasonId], references: [id])
+  name        String   // e.g., "Jan 2026", "Feb 2026"
+  code        String   // e.g., "JAN26", "FEB26"
+  startDate   DateTime
+  endDate     DateTime
+  isActive    Boolean  @default(true)
+  sortOrder   Int      @default(0)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  allocations DeliveryAllocation[]
+
+  @@unique([seasonId, code])
+  @@index([seasonId])
+  @@map("delivery_windows")
+}
+
+model DeliveryAllocation {
+  id              String   @id @default(cuid())
+  windowId        String
+  window          DeliveryWindow @relation(fields: [windowId], references: [id], onDelete: Cascade)
+  skuItemId       String
+  skuItem         SKUItem  @relation("DeliveryAllocationSKU", fields: [skuItemId], references: [id], onDelete: Cascade)
+  locationId      String
+  location        SalesLocation @relation("DeliveryAllocationLocation", fields: [locationId], references: [id])
+  quantity        Int
+  value           Decimal  @db.Decimal(18, 2)
+  status          String   @default("PENDING") // PENDING, CONFIRMED, SHIPPED
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([windowId, skuItemId, locationId])
+  @@index([windowId])
+  @@index([skuItemId])
+  @@index([locationId])
+  @@map("delivery_allocations")
+}
+
+// ============================================
+// W25 FEATURES - COSTING
+// ============================================
+
+model CostingBreakdown {
+  id              String   @id @default(cuid())
+  skuItemId       String   @unique
+  skuItem         SKUItem  @relation("CostingBreakdownSKU", fields: [skuItemId], references: [id], onDelete: Cascade)
+
+  // Cost components
+  unitCost        Decimal  @db.Decimal(18, 2)  // FOB cost in USD
+  freightCost     Decimal  @db.Decimal(18, 2)  @default(0)
+  insuranceCost   Decimal  @db.Decimal(18, 2)  @default(0)
+  dutyRate        Decimal  @db.Decimal(5, 2)   @default(0)
+  dutyAmount      Decimal  @db.Decimal(18, 2)  @default(0)
+  vatRate         Decimal  @db.Decimal(5, 2)   @default(10)
+  vatAmount       Decimal  @db.Decimal(18, 2)  @default(0)
+  otherCosts      Decimal  @db.Decimal(18, 2)  @default(0)
+
+  // Calculated costs
+  landedCost      Decimal  @db.Decimal(18, 2)  // Total cost in VND
+
+  // Pricing
+  srp             Decimal  @db.Decimal(18, 2)  // Suggested Retail Price in VND
+  margin          Decimal  @db.Decimal(5, 2)   // Margin percentage
+
+  // Exchange rate used
+  exchangeRate    Decimal  @db.Decimal(10, 4)  @default(24500)
+  currency        String   @default("VND")
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([skuItemId])
+  @@map("costing_breakdowns")
+}
+
+model CostingConfig {
+  id              String   @id @default(cuid())
+  brandId         String?
+  brand           Brand?   @relation("CostingConfigBrand", fields: [brandId], references: [id])
+  categoryId      String?
+  category        Category? @relation("CostingConfigCategory", fields: [categoryId], references: [id])
+
+  // Default rates
+  defaultDutyRate     Decimal  @db.Decimal(5, 2)  @default(0)
+  defaultVatRate      Decimal  @db.Decimal(5, 2)  @default(10)
+  defaultFreightRate  Decimal  @db.Decimal(5, 2)  @default(5) // % of unit cost
+  targetMargin        Decimal  @db.Decimal(5, 2)  @default(55)
+  minMargin           Decimal  @db.Decimal(5, 2)  @default(45)
+
+  isActive        Boolean  @default(true)
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([brandId, categoryId])
+  @@map("costing_configs")
+}
+
+// ============================================
+// W25 FEATURES - STORE PERFORMANCE
+// ============================================
+
+model StorePerformance {
+  id              String   @id @default(cuid())
+  locationId      String
+  location        SalesLocation @relation("StorePerformanceLocation", fields: [locationId], references: [id])
+  seasonId        String
+  season          Season   @relation("StorePerformanceSeason", fields: [seasonId], references: [id])
+  periodStart     DateTime
+  periodEnd       DateTime
+
+  // Sales metrics
+  salesQuantity   Int      @default(0)
+  salesValue      Decimal  @db.Decimal(18, 2) @default(0)
+
+  // Stock metrics
+  stockQuantity   Int      @default(0)
+  stockValue      Decimal  @db.Decimal(18, 2) @default(0)
+
+  // Calculated metrics
+  sellThru        Decimal  @db.Decimal(5, 2)  @default(0)  // Sell through %
+  weeksOfCover    Decimal  @db.Decimal(5, 2)  @default(0)  // WOC
+  margin          Decimal  @db.Decimal(5, 2)  @default(0)
+
+  // Ranking
+  rank            Int?
+  rankChange      Int?     // Change from previous period
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([locationId, seasonId, periodStart, periodEnd])
+  @@index([locationId])
+  @@index([seasonId])
+  @@index([periodStart, periodEnd])
+  @@map("store_performances")
+}
+
+// ============================================
+// W25 FEATURES - PRICE RANGE
+// ============================================
+
+enum PriceRangeCode {
+  BUDGET
+  MID
+  PREMIUM
+  LUXURY
+}
+
+model PriceRange {
+  id              String   @id @default(cuid())
+  code            PriceRangeCode
+  name            String   // "Budget", "Mid-Range", "Premium", "Luxury"
+  minPrice        Decimal  @db.Decimal(18, 2)
+  maxPrice        Decimal  @db.Decimal(18, 2)
+  color           String?  // For UI display
+  description     String?
+  isActive        Boolean  @default(true)
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("price_ranges")
+}
+
+model PriceRangeAnalysis {
+  id              String   @id @default(cuid())
+  seasonId        String
+  season          Season   @relation("PriceRangeAnalysisSeason", fields: [seasonId], references: [id])
+  brandId         String?
+  brand           Brand?   @relation("PriceRangeAnalysisBrand", fields: [brandId], references: [id])
+  categoryId      String?
+  category        Category? @relation("PriceRangeAnalysisCategory", fields: [categoryId], references: [id])
+  rangeCode       PriceRangeCode
+
+  // Distribution metrics
+  skuCount        Int      @default(0)
+  totalQuantity   Int      @default(0)
+  totalValue      Decimal  @db.Decimal(18, 2) @default(0)
+  avgPrice        Decimal  @db.Decimal(18, 2) @default(0)
+  percentage      Decimal  @db.Decimal(5, 2)  @default(0)
+
+  // Performance
+  avgSellThru     Decimal  @db.Decimal(5, 2)  @default(0)
+  avgMargin       Decimal  @db.Decimal(5, 2)  @default(0)
+
+  analyzedAt      DateTime @default(now())
+
+  @@unique([seasonId, brandId, categoryId, rangeCode])
+  @@index([seasonId])
+  @@index([brandId])
+  @@map("price_range_analyses")
+}
+
+// ============================================
+// W25 FEATURES - CARRY FORWARD
+// ============================================
+
+model CarryForwardItem {
+  id                  String   @id @default(cuid())
+  skuItemId           String
+  skuItem             SKUItem  @relation("CarryForwardSKU", fields: [skuItemId], references: [id], onDelete: Cascade)
+  fromSeasonId        String
+  fromSeason          Season   @relation("CarryForwardFromSeason", fields: [fromSeasonId], references: [id])
+  toSeasonId          String
+  toSeason            Season   @relation("CarryForwardToSeason", fields: [toSeasonId], references: [id])
+
+  // Carry forward decision
+  isCarryForward      Boolean  @default(false)
+  sourceCollection    String?  // Original collection name
+  carryForwardReason  String?
+
+  // Performance data from source
+  originalQuantity    Int      @default(0)
+  soldQuantity        Int      @default(0)
+  remainingQuantity   Int      @default(0)
+  sellThru            Decimal  @db.Decimal(5, 2) @default(0)
+
+  // New season allocation
+  newSeasonQuantity   Int      @default(0)
+
+  // Status
+  status              String   @default("PENDING") // PENDING, APPROVED, REJECTED
+
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  @@unique([skuItemId, toSeasonId])
+  @@index([fromSeasonId])
+  @@index([toSeasonId])
+  @@index([isCarryForward])
+  @@map("carry_forward_items")
+}
+
+// ============================================
+// W25 FEATURES - THEME/USER PREFERENCES
+// ============================================
+
+model UserSettings {
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  user            User     @relation("UserSettingsUser", fields: [userId], references: [id], onDelete: Cascade)
+
+  // Theme
+  theme           String   @default("light")  // light, dark, system
+  accentColor     String   @default("blue")
+
+  // Localization
+  language        String   @default("vi")  // vi, en
+  dateFormat      String   @default("DD/MM/YYYY")
+  numberFormat    String   @default("vi-VN")
+  currency        String   @default("VND")
+  timezone        String   @default("Asia/Ho_Chi_Minh")
+
+  // Default filters
+  defaultSeasonId String?
+  defaultBrandId  String?
+
+  // Notifications
+  emailNotifications  Boolean @default(true)
+  pushNotifications   Boolean @default(true)
+  notificationTypes   String[] @default([])  // Array of enabled notification types
+
+  // Table preferences
+  tablePageSize       Int     @default(20)
+  tableCompactMode    Boolean @default(false)
+
+  // Dashboard layout
+  dashboardLayout     Json?
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("user_settings")
 }

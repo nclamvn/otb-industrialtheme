@@ -8,6 +8,7 @@ import {
   BatchUpdateNodesDto,
   BudgetNodeType,
   CardStatus,
+  BudgetTreeNodeResponse,
 } from '../dto/budget-tree.dto';
 
 @Injectable()
@@ -213,7 +214,7 @@ export class BudgetTreeService {
    * Batch update multiple nodes
    */
   async batchUpdateNodes(budgetId: string, data: BatchUpdateNodesDto, userId: string) {
-    const results = [];
+    const results: BudgetTreeNodeResponse[] = [];
 
     await this.prisma.$transaction(async (tx) => {
       for (const update of data.updates) {
@@ -310,12 +311,12 @@ export class BudgetTreeService {
 
         // Level 2: Gender breakdown
         if (options.includeGenders !== false) {
-          const genders = ['MEN', 'WOMEN', 'KIDS'];
+          const genders = ['MEN', 'WOMEN', 'KIDS'] as const;
           const genderPercentages = options.defaultPercentages?.gender || { MEN: 40, WOMEN: 45, KIDS: 15 };
 
           for (let i = 0; i < genders.length; i++) {
             const gender = genders[i];
-            const percentage = genderPercentages[gender] || 33.33;
+            const percentage = (genderPercentages as Record<string, number>)[gender] || 33.33;
             const genderBudget = totalBudget * (percentage / 100);
 
             const genderNode = await tx.budgetTreeNode.create({

@@ -145,7 +145,8 @@ export class BudgetVersionsService {
 
     const data = versions.map(v => {
       const formatted = this.formatVersion(v);
-      formatted.createdBy = userMap.get(v.createdById);
+      const user = userMap.get(v.createdById);
+      formatted.createdBy = user ? { ...user, avatar: user.avatar ?? undefined } : undefined;
       return formatted;
     });
 
@@ -185,7 +186,7 @@ export class BudgetVersionsService {
     });
 
     const formatted = this.formatVersion(version);
-    formatted.createdBy = user || undefined;
+    formatted.createdBy = user ? { ...user, avatar: user.avatar ?? undefined } : undefined;
 
     return formatted;
   }

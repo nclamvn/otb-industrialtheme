@@ -1,6 +1,10 @@
 import createNextIntlPlugin from 'next-intl/plugin';
+import bundleAnalyzer from '@next/bundle-analyzer';
 
 const withNextIntl = createNextIntlPlugin('./i18n/request.ts');
+const withBundleAnalyzer = bundleAnalyzer({
+  enabled: process.env.ANALYZE === 'true',
+});
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -17,6 +21,14 @@ const nextConfig = {
 
   // Optimize production builds
   swcMinify: true,
+
+  // Compiler optimizations
+  compiler: {
+    // Remove console.log in production (keep error and warn)
+    removeConsole: process.env.NODE_ENV === 'production' ? {
+      exclude: ['error', 'warn'],
+    } : false,
+  },
 
   // Compress responses
   compress: true,
@@ -132,6 +144,9 @@ const nextConfig = {
       // Extend existing splitChunks config for heavy libraries
       config.optimization.splitChunks = {
         ...config.optimization.splitChunks,
+        chunks: 'all',
+        minSize: 20000,
+        maxSize: 244000,
         cacheGroups: {
           ...config.optimization.splitChunks?.cacheGroups,
           // Separate chunk for recharts (large library)
@@ -139,7 +154,15 @@ const nextConfig = {
             test: /[\\/]node_modules[\\/](recharts|d3-.*)[\\/]/,
             name: 'recharts',
             chunks: 'async',
-            priority: 20,
+            priority: 30,
+            reuseExistingChunk: true,
+          },
+          // Separate chunk for visx visualization
+          visx: {
+            test: /[\\/]node_modules[\\/]@visx[\\/]/,
+            name: 'visx',
+            chunks: 'async',
+            priority: 30,
             reuseExistingChunk: true,
           },
           // Separate chunk for date-fns
@@ -147,7 +170,31 @@ const nextConfig = {
             test: /[\\/]node_modules[\\/]date-fns[\\/]/,
             name: 'date-fns',
             chunks: 'async',
+            priority: 25,
+            reuseExistingChunk: true,
+          },
+          // Separate chunk for framer-motion
+          framerMotion: {
+            test: /[\\/]node_modules[\\/]framer-motion[\\/]/,
+            name: 'framer-motion',
+            chunks: 'async',
+            priority: 25,
+            reuseExistingChunk: true,
+          },
+          // Radix UI components
+          radix: {
+            test: /[\\/]node_modules[\\/]@radix-ui[\\/]/,
+            name: 'radix-ui',
+            chunks: 'async',
             priority: 20,
+            reuseExistingChunk: true,
+          },
+          // Common vendor chunk
+          vendor: {
+            test: /[\\/]node_modules[\\/]/,
+            name: 'vendor',
+            chunks: 'async',
+            priority: 10,
             reuseExistingChunk: true,
           },
         },
@@ -175,12 +222,24 @@ const nextConfig = {
     serverActions: {
       bodySizeLimit: '2mb',
     },
-    // Optimize package imports
+    // Optimize package imports - tree shake these heavy libraries
     optimizePackageImports: [
       'lucide-react',
       'date-fns',
       'recharts',
       '@radix-ui/react-icons',
+      'lodash',
+      'lodash-es',
+      '@visx/axis',
+      '@visx/group',
+      '@visx/heatmap',
+      '@visx/hierarchy',
+      '@visx/responsive',
+      '@visx/sankey',
+      '@visx/scale',
+      '@visx/shape',
+      '@visx/tooltip',
+      'framer-motion',
     ],
   },
 
@@ -192,4 +251,4 @@ const nextConfig = {
   },
 };
 
-export default withNextIntl(nextConfig);
+export default withBundleAnalyzer(withNextIntl(nextConfig));
