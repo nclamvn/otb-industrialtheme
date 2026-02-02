@@ -5,8 +5,6 @@ import { authConfig } from './auth.config';
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
-  // Skip CSRF check - using JWT sessions over HTTPS is already secure
-  skipCSRFCheck: true,
   providers: [
     Credentials({
       name: 'credentials',
