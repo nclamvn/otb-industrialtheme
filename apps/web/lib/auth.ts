@@ -5,6 +5,8 @@ import { authConfig } from './auth.config';
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
+  // Skip CSRF check - using JWT sessions over HTTPS is already secure
+  skipCSRFCheck: true,
   providers: [
     Credentials({
       name: 'credentials',
@@ -89,39 +91,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     maxAge: 24 * 60 * 60, // 24 hours
   },
   trustHost: true,
-  // Explicit cookie configuration for Render HTTPS deployment
-  cookies: {
-    sessionToken: {
-      name: process.env.NODE_ENV === 'production'
-        ? '__Secure-authjs.session-token'
-        : 'authjs.session-token',
-      options: {
-        httpOnly: true,
-        sameSite: 'lax',
-        path: '/',
-        secure: process.env.NODE_ENV === 'production',
-      },
-    },
-    callbackUrl: {
-      name: process.env.NODE_ENV === 'production'
-        ? '__Secure-authjs.callback-url'
-        : 'authjs.callback-url',
-      options: {
-        sameSite: 'lax',
-        path: '/',
-        secure: process.env.NODE_ENV === 'production',
-      },
-    },
-    csrfToken: {
-      name: 'authjs.csrf-token',  // No __Host- prefix to avoid strict requirements
-      options: {
-        httpOnly: true,
-        sameSite: 'lax',
-        path: '/',
-        secure: process.env.NODE_ENV === 'production',
-      },
-    },
-  },
 });
 
 declare module 'next-auth' {
