@@ -36,8 +36,8 @@ export default function LoginPage() {
         toast.error('Invalid email or password');
       } else {
         toast.success('Welcome back!');
-        router.push('/');
-        router.refresh();
+        // Use window.location for more reliable redirect after auth
+        window.location.href = '/';
       }
     } catch {
       toast.error('An error occurred. Please try again.');
