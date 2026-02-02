@@ -48,7 +48,7 @@ const statusConfig: Record<ApprovalStatus, {
   pending: {
     icon: Clock,
     color: 'text-slate-400 dark:text-neutral-500',
-    bgColor: 'bg-slate-100 dark:bg-neutral-800',
+    bgColor: 'bg-muted dark:bg-neutral-800',
     label: 'Pending',
   },
   approved: {
@@ -66,7 +66,7 @@ const statusConfig: Record<ApprovalStatus, {
   skipped: {
     icon: Clock,
     color: 'text-slate-400 dark:text-neutral-500',
-    bgColor: 'bg-slate-50 dark:bg-neutral-900',
+    bgColor: 'bg-muted/50 dark:bg-neutral-900',
     label: 'Skipped',
   },
 };
@@ -107,12 +107,12 @@ export function ApprovalLevelCard({
       className={cn(
         'relative rounded-lg border-2 p-4 transition-all',
         isCurrentLevel
-          ? 'border-blue-500 bg-blue-50/50 dark:bg-blue-950/20 shadow-md'
+          ? 'border-blue-500 bg-blue-50/50 dark:bg-blue-950/20 border-border/80'
           : step.status === 'approved'
           ? 'border-emerald-200 dark:border-emerald-800 bg-emerald-50/30 dark:bg-emerald-950/10'
           : step.status === 'rejected'
           ? 'border-red-200 dark:border-red-800 bg-red-50/30 dark:bg-red-950/10'
-          : 'border-slate-200 dark:border-neutral-700 bg-white dark:bg-neutral-900',
+          : 'border-border bg-card dark:bg-neutral-900',
         className
       )}
     >
@@ -128,7 +128,7 @@ export function ApprovalLevelCard({
                 ? 'bg-red-100 dark:bg-red-900/50 text-red-600 dark:text-red-400'
                 : isCurrentLevel
                 ? 'bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400'
-                : 'bg-slate-100 dark:bg-neutral-800 text-slate-400'
+                : 'bg-muted dark:bg-neutral-800 text-slate-400'
             )}
           >
             <LevelIcon className="h-5 w-5" />
@@ -158,7 +158,7 @@ export function ApprovalLevelCard({
 
       {/* Approver Info */}
       {step.approver && (
-        <div className="flex items-center gap-3 mb-3 p-3 bg-white/50 dark:bg-black/20 rounded-lg">
+        <div className="flex items-center gap-3 mb-3 p-3 bg-card/50 dark:bg-black/20 rounded-lg">
           <Avatar className="h-10 w-10">
             <AvatarImage src={step.approver.avatar} />
             <AvatarFallback>
@@ -222,7 +222,7 @@ export function ApprovalLevelCard({
 
       {/* Comment */}
       {step.comment && (
-        <div className="flex items-start gap-2 p-3 bg-slate-50 dark:bg-neutral-800 rounded-lg text-sm">
+        <div className="flex items-start gap-2 p-3 bg-muted/50 rounded-lg text-sm">
           <MessageSquare className="h-4 w-4 mt-0.5 text-slate-400" />
           <p className="text-slate-600 dark:text-neutral-300 italic">
             "{step.comment}"

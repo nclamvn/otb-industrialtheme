@@ -133,6 +133,11 @@ export interface ProposalProduct {
 
   // GAP-7: Composition field (maps to Excel COMPOSITION column)
   composition?: string;     // Material composition e.g. "95% Cotton, 5% Elastane"
+
+  // SQL Schema Fields - Product Attributes
+  rail?: string;            // e.g., "RAIL #1+2: BOUTQUET & WINE RED CHECK"
+  productType?: string;     // Product type classification
+  theme?: string;           // e.g., "AUGUST (08), WINE RED"
 }
 
 // ============================================
@@ -571,6 +576,11 @@ export interface ProductEntry {
   // GAP-6 & GAP-7: Additional Excel fields
   itemNo?: string;          // ITEM NO column
   composition?: string;     // COMPOSITION column (e.g. "95% Cotton, 5% Elastane")
+
+  // SQL Schema Fields - Product Attributes
+  rail?: string;            // Rail grouping (e.g., "RAIL #1+2: BOUTQUET & WINE RED CHECK")
+  productType?: string;     // Product type classification
+  theme?: string;           // Theme grouping (e.g., "AUGUST (08), WINE RED")
 }
 
 export interface GeneratedSKU {
@@ -592,4 +602,9 @@ export interface GeneratedSKU {
   // GAP-6 & GAP-7: Additional Excel fields
   itemNo?: string;          // ITEM NO column
   composition?: string;     // COMPOSITION column
+
+  // SQL Schema Fields - Product Attributes
+  rail?: string;            // Rail grouping
+  productType?: string;     // Product type classification
+  theme?: string;           // Theme grouping
 }

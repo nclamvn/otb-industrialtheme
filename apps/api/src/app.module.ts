@@ -45,6 +45,10 @@ import { StorePerformanceModule } from './modules/store-performance/store-perfor
 import { PriceRangeModule } from './modules/price-range/price-range.module';
 import { CarryForwardModule } from './modules/carry-forward/carry-forward.module';
 
+// Phase 3 Modules
+import { MediaModule } from './modules/media/media.module';
+import { EditEngineModule } from './modules/edit-engine/edit-engine.module';
+
 @Module({
   imports: [
     // Config
@@ -135,6 +139,10 @@ import { CarryForwardModule } from './modules/carry-forward/carry-forward.module
     StorePerformanceModule,
     PriceRangeModule,
     CarryForwardModule,
+
+    // Phase 3 - Product Media & Edit Engine
+    MediaModule,
+    EditEngineModule,
   ],
   providers: [
     // Global exception filter for Prisma errors

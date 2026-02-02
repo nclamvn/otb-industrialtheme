@@ -28,7 +28,7 @@ type OTBStatus = 'draft' | 'verified' | 'warning' | 'error';
 const statusConfig: Record<OTBStatus, { label: string; className: string }> = {
   draft: {
     label: 'Draft',
-    className: 'text-slate-600 dark:text-neutral-300 bg-slate-50 dark:bg-neutral-800 border-slate-200 dark:border-neutral-700',
+    className: 'text-slate-600 dark:text-neutral-300 bg-muted/50 border-border',
   },
   verified: {
     label: 'On Track',
@@ -164,11 +164,11 @@ interface EnhancedOTBCardProps {
 
 // Level styles for hierarchy
 const levelStyles: Record<number, { band: string; bg: string }> = {
-  1: { band: 'border-l-blue-600 dark:border-l-emerald-500', bg: 'bg-white dark:bg-neutral-950' },
-  2: { band: 'border-l-purple-600 dark:border-l-cyan-500', bg: 'bg-slate-50 dark:bg-neutral-900' },
-  3: { band: 'border-l-teal-600 dark:border-l-violet-500', bg: 'bg-white dark:bg-neutral-950' },
-  4: { band: 'border-l-amber-500 dark:border-l-orange-500', bg: 'bg-slate-50 dark:bg-neutral-900' },
-  5: { band: 'border-l-rose-500 dark:border-l-pink-500', bg: 'bg-white dark:bg-neutral-950' },
+  1: { band: 'border-l-blue-600 dark:border-l-emerald-500', bg: 'bg-card' },
+  2: { band: 'border-l-purple-600 dark:border-l-cyan-500', bg: 'bg-muted/50 dark:bg-neutral-900' },
+  3: { band: 'border-l-teal-600 dark:border-l-violet-500', bg: 'bg-card' },
+  4: { band: 'border-l-amber-500 dark:border-l-orange-500', bg: 'bg-muted/50 dark:bg-neutral-900' },
+  5: { band: 'border-l-rose-500 dark:border-l-pink-500', bg: 'bg-card' },
 };
 
 // Calculate KPIs from node data
@@ -236,11 +236,11 @@ export function EnhancedOTBCard({
     <div
       className={cn(
         'w-full text-left',
-        'border border-slate-200 dark:border-neutral-800 rounded-xl mb-2',
+        'border border-border rounded-xl mb-2',
         'border-l-4',
         levelStyle.band,
         levelStyle.bg,
-        'shadow-sm hover:shadow-md transition-all duration-200',
+        'hover:border-border/80 transition-all duration-200',
         'overflow-hidden',
       )}
     >
@@ -297,7 +297,7 @@ export function EnhancedOTBCard({
                 'p-1.5 rounded-lg transition-all',
                 showKPIs
                   ? 'bg-amber-100 dark:bg-amber-900 text-amber-700 dark:text-amber-300'
-                  : 'text-slate-400 dark:text-neutral-500 hover:text-slate-600 dark:hover:text-neutral-300 hover:bg-slate-100 dark:hover:bg-neutral-800'
+                  : 'text-slate-400 dark:text-neutral-500 hover:text-slate-600 dark:hover:text-neutral-300 hover:bg-muted dark:hover:bg-neutral-800'
               )}
               title="Toggle KPIs"
             >
@@ -320,7 +320,7 @@ export function EnhancedOTBCard({
 
       {/* KPI Panel - Collapsible */}
       {showKPIs && (
-        <div className="border-t border-slate-100 dark:border-neutral-800 bg-slate-50/50 dark:bg-neutral-900/50 p-3">
+        <div className="border-t border-slate-100 dark:border-neutral-800 bg-muted/50/50 dark:bg-neutral-900/50 p-3">
           {/* Row 1: Core OTB Metrics */}
           <div className="grid grid-cols-5 gap-3 mb-3">
             <KPIItem

@@ -88,7 +88,7 @@ export function ApprovalTimeline({ request, className }: ApprovalTimelineProps) 
             ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400'
             : step.status === 'rejected'
             ? 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400'
-            : 'bg-slate-100 dark:bg-neutral-800 text-slate-400',
+            : 'bg-muted dark:bg-neutral-800 text-slate-400',
         status: step.status,
         approver: step.approver,
         comment: step.comment,
@@ -171,7 +171,7 @@ export function ApprovalTimeline({ request, className }: ApprovalTimelineProps) 
 
               {/* Comment */}
               {'comment' in event && event.comment && (
-                <div className="mt-2 p-2 bg-slate-50 dark:bg-neutral-800 rounded text-sm text-slate-600 dark:text-neutral-300 italic">
+                <div className="mt-2 p-2 bg-muted/50 rounded text-sm text-slate-600 dark:text-neutral-300 italic">
                   "{event.comment}"
                 </div>
               )}

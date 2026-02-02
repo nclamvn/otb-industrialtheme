@@ -30,7 +30,7 @@ export function CardContent({ node, children }: CardContentProps) {
       {/* Premium progress indicator */}
       {hasAllocations && (
         <div className="flex items-center gap-4 text-xs text-slate-500 dark:text-neutral-400 mb-4 px-1">
-          <div className="flex-1 h-1.5 bg-slate-100 dark:bg-neutral-800 rounded-full overflow-hidden">
+          <div className="flex-1 h-1.5 bg-muted dark:bg-neutral-800 rounded-full overflow-hidden">
             <div
               className={cn(
                 'h-full rounded-full transition-all duration-300',

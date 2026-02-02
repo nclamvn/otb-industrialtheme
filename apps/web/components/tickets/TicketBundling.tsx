@@ -321,7 +321,7 @@ export function TicketBundling({
                 <Card
                   key={ticket.id}
                   className={cn(
-                    'transition-all cursor-pointer hover:shadow-sm',
+                    'transition-all cursor-pointer hover:border border-border',
                     isSelected && 'ring-2 ring-blue-500 bg-blue-50/50 dark:bg-blue-950/20'
                   )}
                   onClick={() => handleSelectTicket(ticket.id, !isSelected)}

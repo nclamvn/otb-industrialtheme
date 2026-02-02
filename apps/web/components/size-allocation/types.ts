@@ -175,7 +175,7 @@ export const SIZING_VERSION_STATUS_CONFIG: Record<SizingVersionStatus, {
   DRAFT: {
     label: 'Draft',
     color: 'text-slate-600',
-    bgColor: 'bg-slate-100',
+    bgColor: 'bg-muted',
   },
   SUBMITTED: {
     label: 'Submitted',

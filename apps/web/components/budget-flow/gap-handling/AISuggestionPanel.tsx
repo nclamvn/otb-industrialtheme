@@ -70,11 +70,11 @@ function SuggestionCard({
   return (
     <div
       className={cn(
-        'rounded-xl border bg-white dark:bg-neutral-950 overflow-hidden transition-all',
-        suggestion.priority === 'urgent' && 'border-red-200 dark:border-red-800 shadow-red-100/50 dark:shadow-red-900/30 shadow-lg',
+        'rounded-xl border bg-card overflow-hidden transition-all',
+        suggestion.priority === 'urgent' && 'border-red-200 dark:border-red-800 shadow-red-100/50 dark:shadow-red-900/30 border-2 border-border',
         suggestion.priority === 'high' && 'border-amber-200 dark:border-amber-800',
         suggestion.priority === 'medium' && 'border-blue-200 dark:border-blue-800',
-        suggestion.priority === 'low' && 'border-slate-200 dark:border-neutral-800'
+        suggestion.priority === 'low' && 'border-border'
       )}
     >
       {/* Header */}
@@ -87,7 +87,7 @@ function SuggestionCard({
               suggestion.priority === 'urgent' && 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400',
               suggestion.priority === 'high' && 'bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400',
               suggestion.priority === 'medium' && 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400',
-              suggestion.priority === 'low' && 'bg-slate-100 dark:bg-neutral-800 text-slate-600 dark:text-neutral-400'
+              suggestion.priority === 'low' && 'bg-muted dark:bg-neutral-800 text-slate-600 dark:text-neutral-400'
             )}
           >
             {SUGGESTION_ICONS[suggestion.type]}
@@ -176,7 +176,7 @@ function SuggestionCard({
               <h5 className="text-xs uppercase tracking-wider text-slate-400 dark:text-neutral-500 font-semibold mb-1">
                 AI Reasoning
               </h5>
-              <p className="text-sm text-slate-600 dark:text-neutral-400 bg-slate-50 dark:bg-neutral-900 p-3 rounded-lg">
+              <p className="text-sm text-slate-600 dark:text-neutral-400 bg-muted/50 dark:bg-neutral-900 p-3 rounded-lg">
                 {suggestion.reasoning}
               </p>
             </div>
@@ -190,7 +190,7 @@ function SuggestionCard({
                 {suggestion.actions.map((action, index) => (
                   <div
                     key={index}
-                    className="flex items-center justify-between p-2 bg-slate-50 dark:bg-neutral-900 rounded-lg text-sm"
+                    className="flex items-center justify-between p-2 bg-muted/50 dark:bg-neutral-900 rounded-lg text-sm"
                   >
                     <span className="text-slate-600 dark:text-neutral-400">{action.nodeId}</span>
                     <div className="flex items-center gap-2">
@@ -355,7 +355,7 @@ export function AISuggestionPanel({
 
       {/* Gap Summary */}
       {gapSummary && !isLoading && (
-        <div className="p-3 bg-slate-50 dark:bg-neutral-900 rounded-lg">
+        <div className="p-3 bg-muted/50 dark:bg-neutral-900 rounded-lg">
           <div className="grid grid-cols-4 gap-2 text-center text-xs">
             <div>
               <div className="font-semibold text-slate-800 dark:text-neutral-100">{gapSummary.nodesWithGaps}</div>
@@ -404,7 +404,7 @@ export function AISuggestionPanel({
 
       {/* Empty State */}
       {!isLoading && suggestions.length === 0 && gaps.length > 0 && (
-        <div className="p-6 text-center bg-slate-50 dark:bg-neutral-900 rounded-xl">
+        <div className="p-6 text-center bg-muted/50 dark:bg-neutral-900 rounded-xl">
           <AlertCircle className="w-8 h-8 mx-auto text-slate-400 dark:text-neutral-500 mb-3" />
           <p className="text-sm text-slate-600 dark:text-neutral-400 mb-3">
             All suggestions have been addressed.

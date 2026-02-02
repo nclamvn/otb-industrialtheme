@@ -94,7 +94,7 @@ export function NotificationPanel({
   return (
     <div className={cn('flex flex-col', className)}>
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200 dark:border-neutral-700">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-border">
         <div className="flex items-center gap-2">
           <Bell className="h-5 w-5 text-slate-600 dark:text-neutral-400" />
           <h3 className="font-semibold text-slate-900 dark:text-white">
@@ -125,7 +125,7 @@ export function NotificationPanel({
           {groupedNotifications.map((group) => (
             <div key={group.date}>
               {/* Date Header */}
-              <div className="px-4 py-2 bg-slate-50 dark:bg-neutral-800/50">
+              <div className="px-4 py-2 bg-muted/50">
                 <span className="text-xs font-medium text-slate-500 dark:text-neutral-400 uppercase">
                   {group.date}
                 </span>

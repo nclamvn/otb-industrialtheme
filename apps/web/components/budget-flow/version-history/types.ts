@@ -353,7 +353,7 @@ export function compareVersions(
 // Status colors
 export const VERSION_STATUS_COLORS = {
   draft: {
-    bg: 'bg-slate-100',
+    bg: 'bg-muted',
     text: 'text-slate-700',
     border: 'border-slate-200',
     dot: 'bg-slate-400',

@@ -35,14 +35,14 @@ export function ChoiceAllocationCard({
     <div
       className={cn(
         'rounded-xl border-2 overflow-hidden cursor-pointer',
-        'bg-white dark:bg-slate-800 shadow-sm hover:shadow-md transition-all',
+        'bg-card hover:border-border/80 transition-all',
         config.borderColor,
         className
       )}
       onClick={onClick}
     >
       {/* Header */}
-      <div className={cn('px-4 py-3 border-b border-slate-200 dark:border-slate-700', config.bgColor)}>
+      <div className={cn('px-4 py-3 border-b border-border', config.bgColor)}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Package className={cn('w-5 h-5', config.color)} />
@@ -73,7 +73,7 @@ export function ChoiceAllocationCard({
         </div>
 
         {/* Details */}
-        <div className="grid grid-cols-2 gap-3 pt-4 border-t border-slate-200 dark:border-slate-700">
+        <div className="grid grid-cols-2 gap-3 pt-4 border-t border-border">
           <div className="text-center">
             <div className="flex items-center justify-center gap-1 text-slate-500 mb-1">
               <TrendingUp className="w-4 h-4" />

@@ -42,7 +42,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   if (!active || !payload) return null;
 
   return (
-    <div className="dafc-card p-3 shadow-lg border-t-2 border-t-[hsl(30_43%_72%)]">
+    <div className="dafc-card p-3 border border-border border-t-2 border-t-[hsl(30_43%_72%)]">
       <p className="font-brand font-semibold text-sm text-foreground mb-2">{label}</p>
       <div className="space-y-1">
         {payload.map((entry: any, index: number) => (

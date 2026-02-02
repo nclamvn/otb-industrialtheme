@@ -111,7 +111,7 @@ function EditableBudget({
           onClick={(e) => e.stopPropagation()}
           className={cn(
             'pl-7 pr-3 py-2 w-40 rounded-xl',
-            'border-2 border-amber-300 bg-white dark:bg-neutral-950',
+            'border-2 border-amber-300 bg-card',
             'text-xl font-bold tabular-nums text-slate-900 dark:text-neutral-100',
             'focus:outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-100',
             className
@@ -163,7 +163,7 @@ function EditableChildRow({
     <div
       className={cn(
         'group p-4 rounded-xl transition-all duration-200',
-        'bg-slate-50/50 dark:bg-neutral-900/50 hover:bg-amber-50/50 dark:hover:bg-amber-950/50',
+        'bg-muted/50/50 dark:bg-neutral-900/50 hover:bg-amber-50/50 dark:hover:bg-amber-950/50',
         'border border-transparent hover:border-amber-200 dark:hover:border-amber-800',
         !isEditing && 'cursor-pointer'
       )}
@@ -256,9 +256,8 @@ export function ExpandableCard({ node, onDrillDown, onBudgetUpdate }: Expandable
         'transition-all duration-300 ease-out',
         'border overflow-hidden',
         'rounded-xl', // Unified: rounded-xl (12px)
-        'shadow-sm hover:shadow-md', // Unified: shadow-sm default, shadow-md hover
         levelStyles.bg,
-        isExpanded ? 'border-amber-300 shadow-lg shadow-amber-100/50 dark:shadow-amber-900/30' : 'border-slate-200 dark:border-neutral-800',
+        isExpanded ? 'border-amber-300 ring-2 ring-amber-200/50' : 'border-border',
         'hover:border-amber-200'
       )}
     >
@@ -267,7 +266,7 @@ export function ExpandableCard({ node, onDrillDown, onBudgetUpdate }: Expandable
         onClick={() => !isEditingMain && setIsExpanded(!isExpanded)}
         className={cn(
           'w-full text-left p-4 transition-all duration-200', // Unified: p-4 (16px)
-          isExpanded ? 'bg-gradient-to-br from-amber-50/80 to-white dark:from-amber-950/50 dark:to-neutral-950' : 'bg-white dark:bg-neutral-950 hover:bg-amber-50/30 dark:hover:bg-amber-950/30',
+          isExpanded ? 'bg-gradient-to-br from-amber-50/80 to-white dark:from-amber-950/50 dark:to-neutral-950' : 'bg-card hover:bg-amber-50/30 dark:hover:bg-amber-950/30',
           !isEditingMain && 'cursor-pointer'
         )}
       >
@@ -300,7 +299,7 @@ export function ExpandableCard({ node, onDrillDown, onBudgetUpdate }: Expandable
                 {hasChildren && (
                   <div className={cn(
                     'w-8 h-8 rounded-full flex items-center justify-center transition-colors',
-                    isExpanded ? 'bg-amber-100 dark:bg-amber-900' : 'bg-slate-100 dark:bg-neutral-800'
+                    isExpanded ? 'bg-amber-100 dark:bg-amber-900' : 'bg-muted dark:bg-neutral-800'
                   )}>
                     {isExpanded ? (
                       <ChevronUp className="w-5 h-5 text-amber-600 dark:text-amber-400" />

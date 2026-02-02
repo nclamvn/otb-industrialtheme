@@ -76,11 +76,16 @@ export function PendingApprovals({ approvals, viewAllHref }: PendingApprovalsPro
   return (
     <div
       className={cn(
-        // Unified: rounded-xl, shadow-sm, hover:shadow-md, border
-        'rounded-xl border border-slate-200 bg-white overflow-hidden',
-        'shadow-sm'
+        // Flat design: rounded-xl, no shadow
+        'relative rounded-xl border border-border bg-card overflow-hidden',
+        'hover:border-border/80 transition-colors'
       )}
     >
+      {/* Watermark Icon */}
+      <div className="absolute -right-4 -bottom-4 pointer-events-none">
+        <Clock className="w-24 h-24 text-slate-500 opacity-[0.08]" />
+      </div>
+
       {/* Header */}
       <div className="p-4 border-b border-slate-100">
         <div className="flex items-center justify-between">
@@ -117,16 +122,16 @@ export function PendingApprovals({ approvals, viewAllHref }: PendingApprovalsPro
                 key={approval.id}
                 href={approval.href}
                 className={cn(
-                  // Unified: rounded-xl, p-4, border-l-4, shadow-sm, hover:shadow-md
-                  'block p-3 rounded-xl border border-slate-200',
-                  'border-l-4 shadow-sm hover:shadow-md transition-all duration-200',
-                  'hover:bg-slate-50',
+                  // Flat design: rounded-xl, p-4, border-l-4, no shadow
+                  'block p-3 rounded-xl border border-border bg-card',
+                  'border-l-4 hover:border-border/80 transition-all duration-200',
+                  'hover:bg-muted/50',
                   typeBorderColors[approval.type]
                 )}
               >
                 <div className="flex items-start gap-3">
                   {/* Unified: w-10 h-10 rounded-xl icon container */}
-                  <div className="h-10 w-10 rounded-xl bg-slate-100 flex items-center justify-center shrink-0">
+                  <div className="h-10 w-10 rounded-xl bg-muted flex items-center justify-center shrink-0">
                     <Icon className="h-5 w-5 text-slate-600" />
                   </div>
                   <div className="flex-1 min-w-0">
@@ -137,7 +142,7 @@ export function PendingApprovals({ approvals, viewAllHref }: PendingApprovalsPro
                           {approval.description}
                         </p>
                       </div>
-                      <span className="shrink-0 text-xs px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200">
+                      <span className="shrink-0 text-xs px-2 py-0.5 rounded-full bg-muted text-slate-600 border border-border">
                         {typeLabels[approval.type]}
                       </span>
                     </div>

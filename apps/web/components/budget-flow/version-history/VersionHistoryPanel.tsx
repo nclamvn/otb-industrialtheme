@@ -156,14 +156,14 @@ export function VersionHistoryPanel({
     <>
       <div
         className={cn(
-          'fixed right-0 top-0 h-full bg-white dark:bg-neutral-950 border-l dark:border-neutral-800 shadow-2xl z-50 flex flex-col transition-all duration-300',
+          'fixed right-0 top-0 h-full bg-card border-l dark:border-neutral-800 shadow-2xl z-50 flex flex-col transition-all duration-300',
           isExpanded ? 'w-[800px]' : 'w-[480px]'
         )}
       >
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b dark:border-neutral-800 bg-gradient-to-r from-slate-50 to-slate-100 dark:from-neutral-900 dark:to-neutral-800">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-xl bg-slate-800 dark:bg-slate-700 shadow-lg">
+            <div className="p-2.5 rounded-xl bg-slate-800 dark:bg-slate-700 border-2 border-border">
               <History className="h-5 w-5 text-white" />
             </div>
             <div>
@@ -223,14 +223,14 @@ export function VersionHistoryPanel({
         {/* Tabs */}
         {!isLoading && (
           <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col overflow-hidden">
-            <TabsList className="grid w-full grid-cols-2 p-1 m-4 mb-0 bg-slate-100 dark:bg-neutral-800 rounded-lg">
-              <TabsTrigger value="timeline" className="flex items-center gap-2 data-[state=active]:bg-white dark:data-[state=active]:bg-neutral-900">
+            <TabsList className="grid w-full grid-cols-2 p-1 m-4 mb-0 bg-muted dark:bg-neutral-800 rounded-lg">
+              <TabsTrigger value="timeline" className="flex items-center gap-2 data-[state=active]:bg-card dark:data-[state=active]:bg-neutral-900">
                 <History className="h-4 w-4" />
                 Timeline
               </TabsTrigger>
               <TabsTrigger
                 value="compare"
-                className="flex items-center gap-2 data-[state=active]:bg-white dark:data-[state=active]:bg-neutral-900"
+                className="flex items-center gap-2 data-[state=active]:bg-card dark:data-[state=active]:bg-neutral-900"
                 disabled={!compareVersionIds}
               >
                 <GitCompare className="h-4 w-4" />

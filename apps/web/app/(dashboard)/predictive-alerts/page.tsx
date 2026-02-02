@@ -302,78 +302,74 @@ export default function PredictiveAlertsPage() {
       <div className="grid md:grid-cols-4 gap-4">
         <div
           className={cn(
-            'relative overflow-hidden rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950',
-            'shadow-sm hover:shadow-md transition-all duration-200',
+            'relative overflow-hidden rounded-xl border border-border bg-card',
+            'hover:border-border/80 transition-all duration-200',
             'border-l-4 border-l-red-500 p-4'
           )}
         >
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-red-50 dark:bg-red-950 flex items-center justify-center">
-              <AlertTriangle className="h-5 w-5 text-red-500" />
-            </div>
-            <div>
-              <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">
-                {t('critical')}
-              </p>
-              <p className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums">{summary.critical}</p>
-            </div>
+          {/* Watermark Icon */}
+          <div className="absolute -right-4 -bottom-4 pointer-events-none">
+            <AlertTriangle className="w-24 h-24 text-red-500 opacity-[0.08]" />
+          </div>
+          <div>
+            <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">
+              {t('critical')}
+            </p>
+            <p className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums pr-14">{summary.critical}</p>
           </div>
         </div>
         <div
           className={cn(
-            'relative overflow-hidden rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950',
-            'shadow-sm hover:shadow-md transition-all duration-200',
+            'relative overflow-hidden rounded-xl border border-border bg-card',
+            'hover:border-border/80 transition-all duration-200',
             'border-l-4 border-l-amber-500 p-4'
           )}
         >
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-amber-50 dark:bg-amber-950 flex items-center justify-center">
-              <AlertCircle className="h-5 w-5 text-amber-500" />
-            </div>
-            <div>
-              <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">
-                {t('warning')}
-              </p>
-              <p className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums">{summary.warning}</p>
-            </div>
+          {/* Watermark Icon */}
+          <div className="absolute -right-4 -bottom-4 pointer-events-none">
+            <AlertCircle className="w-24 h-24 text-amber-500 opacity-[0.08]" />
+          </div>
+          <div>
+            <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">
+              {t('warning')}
+            </p>
+            <p className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums pr-14">{summary.warning}</p>
           </div>
         </div>
         <div
           className={cn(
-            'relative overflow-hidden rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950',
-            'shadow-sm hover:shadow-md transition-all duration-200',
+            'relative overflow-hidden rounded-xl border border-border bg-card',
+            'hover:border-border/80 transition-all duration-200',
             'border-l-4 border-l-blue-500 p-4'
           )}
         >
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-blue-50 dark:bg-blue-950 flex items-center justify-center">
-              <Info className="h-5 w-5 text-blue-500" />
-            </div>
-            <div>
-              <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">
-                {t('info')}
-              </p>
-              <p className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums">{summary.info}</p>
-            </div>
+          {/* Watermark Icon */}
+          <div className="absolute -right-4 -bottom-4 pointer-events-none">
+            <Info className="w-24 h-24 text-blue-500 opacity-[0.08]" />
+          </div>
+          <div>
+            <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">
+              {t('info')}
+            </p>
+            <p className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums pr-14">{summary.info}</p>
           </div>
         </div>
         <div
           className={cn(
-            'relative overflow-hidden rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950',
-            'shadow-sm hover:shadow-md transition-all duration-200',
+            'relative overflow-hidden rounded-xl border border-border bg-card',
+            'hover:border-border/80 transition-all duration-200',
             'border-l-4 border-l-green-500 p-4'
           )}
         >
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-green-50 dark:bg-green-950 flex items-center justify-center">
-              <Bell className="h-5 w-5 text-green-500" />
-            </div>
-            <div>
-              <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">
-                {tCommon('all')}
-              </p>
-              <p className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums">{summary.total}</p>
-            </div>
+          {/* Watermark Icon */}
+          <div className="absolute -right-4 -bottom-4 pointer-events-none">
+            <Bell className="w-24 h-24 text-green-500 opacity-[0.08]" />
+          </div>
+          <div>
+            <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">
+              {tCommon('all')}
+            </p>
+            <p className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums pr-14">{summary.total}</p>
           </div>
         </div>
       </div>

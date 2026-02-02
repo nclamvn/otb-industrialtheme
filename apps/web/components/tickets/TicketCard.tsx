@@ -59,6 +59,16 @@ const typeIcons: Record<TicketType, typeof PieChart> = {
   sizing_change: Ruler,
 };
 
+const statusBorderColors: Record<TicketStatus, string> = {
+  draft: 'border-l-slate-400',
+  submitted: 'border-l-blue-500',
+  in_review: 'border-l-amber-500',
+  approved: 'border-l-green-500',
+  rejected: 'border-l-red-500',
+  updated: 'border-l-purple-500',
+  cancelled: 'border-l-slate-500',
+};
+
 export function TicketCard({
   ticket,
   onView,
@@ -98,9 +108,9 @@ export function TicketCard({
       <div
         className={cn(
           'flex items-center justify-between p-4 rounded-lg border',
-          'bg-white dark:bg-neutral-900',
-          'border-slate-200 dark:border-neutral-700',
-          'hover:bg-slate-50 dark:hover:bg-neutral-800 transition-colors cursor-pointer',
+          'bg-card dark:bg-neutral-900',
+          'border-border',
+          'hover:bg-muted/50 dark:hover:bg-neutral-800 transition-colors cursor-pointer',
           className
         )}
         onClick={onView}
@@ -143,18 +153,16 @@ export function TicketCard({
   }
 
   return (
-    <Card className={cn('overflow-hidden', className)}>
+    <Card className={cn('relative overflow-hidden border-l-4 hover:border-border/80 transition-all', statusBorderColors[ticket.status], className)}>
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-slate-100 dark:bg-neutral-800">
+            <div className="p-2 rounded-lg bg-muted dark:bg-neutral-800">
               <TicketIcon className="h-5 w-5 text-slate-600 dark:text-neutral-400" />
             </div>
             <div>
-              <div className="flex items-center gap-2">
-                <span className="font-mono text-sm text-slate-500 dark:text-neutral-400">
-                  {ticket.number}
-                </span>
+              <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+                {ticket.number}
                 <Badge
                   variant="outline"
                   className={cn(
@@ -166,8 +174,8 @@ export function TicketCard({
                 >
                   {priorityConfig.dot} {t(`priority.${ticket.priority}`)}
                 </Badge>
-              </div>
-              <h3 className="font-semibold text-slate-900 dark:text-white mt-1">
+              </p>
+              <h3 className="text-lg font-bold text-slate-900 dark:text-white mt-1">
                 {ticket.title}
               </h3>
             </div>
@@ -271,6 +279,9 @@ export function TicketCard({
             </Button>
           )}
         </div>
+
+        {/* Watermark icon */}
+        <TicketIcon className="absolute bottom-4 right-4 w-24 h-24 text-muted-foreground opacity-[0.08]" />
       </CardContent>
     </Card>
   );

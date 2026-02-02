@@ -629,7 +629,7 @@ export default function SKUProposalDetailPage({
             {/* Size Allocation Tab */}
             <TabsContent value="sizing" className="mt-4 space-y-6">
               {/* Version Management Header */}
-              <div className="flex items-center justify-between p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50">
+              <div className="flex items-center justify-between p-4 rounded-xl border border-border bg-muted/50">
                 <div className="flex items-center gap-3">
                   <div className="p-2 rounded-lg bg-purple-100 dark:bg-purple-900/50">
                     <History className="h-4 w-4 text-purple-600 dark:text-purple-400" />
@@ -725,7 +725,7 @@ export default function SKUProposalDetailPage({
                 />
                 <div className="space-y-4">
                   <h3 className="font-semibold">Product Info</h3>
-                  <div className="p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 space-y-3">
+                  <div className="p-4 rounded-xl border border-border bg-card space-y-3">
                     <div className="flex justify-between">
                       <span className="text-slate-500">Status</span>
                       <CarryForwardBadge

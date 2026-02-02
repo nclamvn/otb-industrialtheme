@@ -463,21 +463,21 @@ export default function AnalyticsPage() {
         {/* Price Analysis Tab */}
         <TabsContent value="price" className="space-y-6">
           <div className="grid grid-cols-4 gap-4">
-            <div className="p-4 rounded-xl border bg-white dark:bg-slate-800">
+            <div className="p-4 rounded-xl border bg-card">
               <div className="text-sm text-slate-500">Price Bands</div>
               <div className="text-2xl font-bold">{priceAnalysis.ranges.length}</div>
             </div>
-            <div className="p-4 rounded-xl border bg-white dark:bg-slate-800">
+            <div className="p-4 rounded-xl border bg-card">
               <div className="text-sm text-slate-500">Avg Sell-Through</div>
               <div className="text-2xl font-bold text-green-600">
                 {(priceAnalysis.ranges.reduce((sum, r) => sum + r.sellThruPercent, 0) / (priceAnalysis.ranges.length || 1)).toFixed(1)}%
               </div>
             </div>
-            <div className="p-4 rounded-xl border bg-white dark:bg-slate-800">
+            <div className="p-4 rounded-xl border bg-card">
               <div className="text-sm text-slate-500">Total Units</div>
               <div className="text-2xl font-bold">{priceAnalysis.totalUnits.toLocaleString()}</div>
             </div>
-            <div className="p-4 rounded-xl border bg-white dark:bg-slate-800">
+            <div className="p-4 rounded-xl border bg-card">
               <div className="text-sm text-slate-500">YoY Trend</div>
               <div className="flex items-center gap-2">
                 <span className="text-2xl font-bold">+12.5%</span>

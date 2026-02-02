@@ -70,14 +70,14 @@ export function BudgetOverviewHeader({
 
         {/* Actions */}
         <div className="flex items-center gap-2">
-          <div className="flex items-center bg-slate-100 dark:bg-neutral-800 rounded-lg p-0.5">
+          <div className="flex items-center bg-muted dark:bg-neutral-800 rounded-lg p-0.5">
             <Button
               variant="ghost"
               size="sm"
               onClick={() => onViewModeChange('stacked')}
               className={cn(
                 'gap-1.5 h-8',
-                viewMode === 'stacked' && 'bg-white dark:bg-neutral-900 shadow-sm'
+                viewMode === 'stacked' && 'bg-card dark:bg-neutral-900 border border-border'
               )}
             >
               <Layers className="w-4 h-4" />
@@ -89,7 +89,7 @@ export function BudgetOverviewHeader({
               onClick={() => onViewModeChange('grid')}
               className={cn(
                 'gap-1.5 h-8',
-                viewMode === 'grid' && 'bg-white dark:bg-neutral-900 shadow-sm'
+                viewMode === 'grid' && 'bg-card dark:bg-neutral-900 border border-border'
               )}
             >
               <Grid3X3 className="w-4 h-4" />
@@ -119,7 +119,7 @@ export function BudgetOverviewHeader({
       </div>
 
       {/* Stats Row - Premium Design */}
-      <div className="flex items-center gap-6 p-4 bg-white dark:bg-neutral-950 border border-slate-200 dark:border-neutral-800 rounded-xl">
+      <div className="flex items-center gap-6 p-4 bg-card border border-border rounded-xl">
         <div className="flex items-baseline gap-2">
           <span className="text-xs uppercase tracking-wide text-slate-400 dark:text-neutral-400 font-medium">Budget</span>
           <span className="text-lg font-bold text-slate-900 dark:text-neutral-100 tabular-nums">
@@ -147,7 +147,7 @@ export function BudgetOverviewHeader({
         </div>
         <div className="w-px h-8 bg-slate-200 dark:bg-neutral-800" />
         <div className="flex items-center gap-3 flex-1">
-          <div className="flex-1 max-w-xs h-2 bg-slate-100 dark:bg-neutral-800 rounded-full overflow-hidden">
+          <div className="flex-1 max-w-xs h-2 bg-muted dark:bg-neutral-800 rounded-full overflow-hidden">
             <div
               className={cn(
                 'h-full rounded-full transition-all duration-300',

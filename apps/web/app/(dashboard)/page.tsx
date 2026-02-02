@@ -1,5 +1,4 @@
 import { auth } from '@/lib/auth';
-import { Crown } from 'lucide-react';
 import { getTranslations } from 'next-intl/server';
 import {
   DAFCKPICard,
@@ -279,20 +278,15 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      {/* Welcome Section with DAFC Branding */}
+      {/* Welcome Section - Modern Minimal Design */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[hsl(30_43%_72%)] to-[hsl(30_40%_62%)] flex items-center justify-center shadow-sm">
-            <Crown className="h-5 w-5 text-black/80" />
-          </div>
-          <div>
-            <h1 className="text-3xl font-brand font-bold tracking-tight">
-              {t('welcome', { name: session?.user?.name?.split(' ')[0] || 'User' })}
-            </h1>
-            <p className="text-muted-foreground mt-0.5 text-sm">
-              {t('overview')}
-            </p>
-          </div>
+        <div>
+          <p className="text-xl font-bold text-muted-foreground">
+            {t('welcome', { name: session?.user?.name?.split(' ')[0] || 'User' })}
+          </p>
+          <p className="text-xs font-bold text-muted-foreground/70 mt-0.5">
+            {t('overview')}
+          </p>
         </div>
         <div className="dafc-badge dafc-badge-gold">
           <span>{stats.currentSeason.name}</span>

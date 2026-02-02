@@ -26,7 +26,7 @@ type SKUStatus = 'draft' | 'verified' | 'warning' | 'error';
 const statusConfig: Record<SKUStatus, { label: string; className: string }> = {
   draft: {
     label: 'Draft',
-    className: 'text-slate-600 dark:text-neutral-300 bg-slate-50 dark:bg-neutral-800 border-slate-200 dark:border-neutral-700',
+    className: 'text-slate-600 dark:text-neutral-300 bg-muted/50 border-border',
   },
   verified: {
     label: 'Verified',
@@ -193,10 +193,10 @@ export function EnhancedSKUCard({
     <div
       className={cn(
         'w-full text-left',
-        'border border-slate-200 dark:border-neutral-800 rounded-xl mb-2',
+        'border border-border rounded-xl mb-2',
         'border-l-4 border-l-purple-600 dark:border-l-cyan-500',
-        'bg-white dark:bg-neutral-950',
-        'shadow-sm hover:shadow-md transition-all duration-200',
+        'bg-card',
+        'hover:border-border/80 transition-all duration-200',
         'overflow-hidden',
       )}
     >
@@ -261,7 +261,7 @@ export function EnhancedSKUCard({
                 'p-1.5 rounded-lg transition-all',
                 showKPIs
                   ? 'bg-purple-100 dark:bg-cyan-900 text-purple-700 dark:text-cyan-300'
-                  : 'text-slate-400 dark:text-neutral-500 hover:text-slate-600 dark:hover:text-neutral-300 hover:bg-slate-100 dark:hover:bg-neutral-800'
+                  : 'text-slate-400 dark:text-neutral-500 hover:text-slate-600 dark:hover:text-neutral-300 hover:bg-muted dark:hover:bg-neutral-800'
               )}
               title="Toggle KPIs"
             >
@@ -284,7 +284,7 @@ export function EnhancedSKUCard({
 
       {/* KPI Panel - Collapsible */}
       {showKPIs && (
-        <div className="border-t border-slate-100 dark:border-neutral-800 bg-slate-50/50 dark:bg-neutral-900/50 p-3">
+        <div className="border-t border-slate-100 dark:border-neutral-800 bg-muted/50/50 dark:bg-neutral-900/50 p-3">
           {/* Row 1: Core Metrics */}
           <div className="grid grid-cols-5 gap-3 mb-3">
             <KPIItem

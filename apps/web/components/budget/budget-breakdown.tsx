@@ -197,7 +197,7 @@ export function BudgetBreakdown({
     if (active && payload && payload.length) {
       const data = payload[0].payload;
       return (
-        <div className="bg-background border rounded-lg shadow-lg p-3">
+        <div className="bg-background border rounded-lg border-2 border-border p-3">
           <p className="font-medium">{data.name}</p>
           <p className="text-sm text-muted-foreground">
             {formatCurrency(data.value)} ({data.percent.toFixed(1)}%)

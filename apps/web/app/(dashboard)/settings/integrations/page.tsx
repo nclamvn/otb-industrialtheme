@@ -72,7 +72,7 @@ export default function IntegrationsPage() {
           return (
             <Card
               key={category.href}
-              className={isRestricted ? 'opacity-60' : 'hover:shadow-md transition-shadow'}
+              className={isRestricted ? 'opacity-60' : 'hover:border-border/80 transition-shadow'}
             >
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <div className="flex items-center gap-3">

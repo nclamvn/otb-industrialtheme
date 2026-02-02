@@ -24,12 +24,12 @@ export function StoreComparisonPanel({
   return (
     <div
       className={cn(
-        'rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-4',
+        'rounded-xl border border-border bg-card p-4',
         className
       )}
     >
       {/* SKU Header */}
-      <div className="mb-4 pb-3 border-b border-slate-200 dark:border-slate-700">
+      <div className="mb-4 pb-3 border-b border-border">
         <div className="font-mono text-sm text-slate-500">{data.sku.code}</div>
         <div className="font-semibold text-slate-900 dark:text-white">
           {data.sku.name}
@@ -51,7 +51,7 @@ export function StoreComparisonPanel({
                 ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300'
                 : winner === 'TTP'
                   ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300'
-                  : 'bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-300'
+                  : 'bg-muted text-slate-700 dark:bg-slate-700 dark:text-slate-300'
             )}
           >
             {winner === 'REX' && <TrendingUp className="w-4 h-4" />}

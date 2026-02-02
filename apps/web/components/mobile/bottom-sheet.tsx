@@ -125,7 +125,7 @@ export function BottomSheet({
       <div
         {...handlers}
         className={cn(
-          'fixed inset-x-0 bottom-0 z-50 bg-background rounded-t-2xl shadow-xl',
+          'fixed inset-x-0 bottom-0 z-50 bg-background rounded-t-2xl border-2 border-border',
           !isDragging && 'transition-transform duration-300 ease-out',
           className
         )}

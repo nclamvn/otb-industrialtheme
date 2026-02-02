@@ -61,7 +61,7 @@ export function BudgetFilters({ filters, onFiltersChange, className }: BudgetFil
             onChange={(e) => updateFilter('search', e.target.value)}
             className={cn(
               'w-full pl-10 pr-4 py-2 rounded-lg',
-              'border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950',
+              'border border-border bg-card',
               'text-sm text-slate-900 dark:text-neutral-100 placeholder:text-slate-400 dark:placeholder:text-neutral-500',
               'focus:outline-none focus:border-amber-300 dark:focus:border-amber-500 focus:ring-2 focus:ring-amber-100 dark:focus:ring-amber-900',
               'transition-all duration-200'
@@ -84,7 +84,7 @@ export function BudgetFilters({ filters, onFiltersChange, className }: BudgetFil
             onChange={(e) => updateFilter('status', e.target.value as BudgetStatus)}
             className={cn(
               'appearance-none pl-4 pr-10 py-2 rounded-lg',
-              'border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950',
+              'border border-border bg-card',
               'text-sm font-medium text-slate-700 dark:text-neutral-300',
               'focus:outline-none focus:border-amber-300 dark:focus:border-amber-500 focus:ring-2 focus:ring-amber-100 dark:focus:ring-amber-900',
               'cursor-pointer transition-all duration-200'
@@ -132,7 +132,7 @@ export function BudgetFilters({ filters, onFiltersChange, className }: BudgetFil
 
       {/* Advanced Filters */}
       {showAdvanced && (
-        <div className="flex items-center gap-4 p-4 bg-slate-50 dark:bg-neutral-900 rounded-lg border border-slate-200 dark:border-neutral-800">
+        <div className="flex items-center gap-4 p-4 bg-muted/50 dark:bg-neutral-900 rounded-lg border border-border">
           <span className="text-sm text-slate-500 dark:text-neutral-400">Budget Range:</span>
           <div className="flex items-center gap-2">
             <input
@@ -142,7 +142,7 @@ export function BudgetFilters({ filters, onFiltersChange, className }: BudgetFil
               onChange={(e) => updateFilter('minBudget', e.target.value ? Number(e.target.value) : null)}
               className={cn(
                 'w-32 px-3 py-1.5 rounded-lg',
-                'border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950',
+                'border border-border bg-card',
                 'text-sm text-slate-900 dark:text-neutral-100 placeholder:text-slate-400 dark:placeholder:text-neutral-500',
                 'focus:outline-none focus:border-amber-300 dark:focus:border-amber-500'
               )}
@@ -155,7 +155,7 @@ export function BudgetFilters({ filters, onFiltersChange, className }: BudgetFil
               onChange={(e) => updateFilter('maxBudget', e.target.value ? Number(e.target.value) : null)}
               className={cn(
                 'w-32 px-3 py-1.5 rounded-lg',
-                'border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950',
+                'border border-border bg-card',
                 'text-sm text-slate-900 dark:text-neutral-100 placeholder:text-slate-400 dark:placeholder:text-neutral-500',
                 'focus:outline-none focus:border-amber-300 dark:focus:border-amber-500'
               )}
@@ -172,7 +172,7 @@ export function BudgetFilters({ filters, onFiltersChange, className }: BudgetFil
                   'flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium transition-colors',
                   filters.status === option.value
                     ? 'bg-slate-800 dark:bg-neutral-200 text-white dark:text-neutral-900'
-                    : 'bg-white dark:bg-neutral-950 border border-slate-200 dark:border-neutral-800 text-slate-600 dark:text-neutral-400 hover:border-slate-300 dark:hover:border-neutral-700'
+                    : 'bg-card border border-border text-slate-600 dark:text-neutral-400 hover:border-slate-300 dark:hover:border-neutral-700'
                 )}
               >
                 <span className={cn('w-2 h-2 rounded-full', option.color)} />

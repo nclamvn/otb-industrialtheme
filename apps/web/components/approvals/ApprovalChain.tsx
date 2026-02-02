@@ -114,14 +114,14 @@ export function ApprovalChain({
   return (
     <div
       className={cn(
-        'rounded-xl border bg-white dark:bg-neutral-900',
-        'border-slate-200 dark:border-neutral-700',
-        'shadow-sm',
+        'rounded-xl border bg-card dark:bg-neutral-900',
+        'border-border',
+        'border border-border',
         className
       )}
     >
       {/* Header */}
-      <div className="p-6 border-b border-slate-200 dark:border-neutral-700">
+      <div className="p-6 border-b border-border">
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-center gap-3">
             <div
@@ -235,7 +235,7 @@ export function ApprovalChain({
                       'w-8 h-8 rounded-full flex items-center justify-center',
                       step.status === 'approved'
                         ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600'
-                        : 'bg-slate-100 dark:bg-neutral-800 text-slate-400'
+                        : 'bg-muted dark:bg-neutral-800 text-slate-400'
                     )}
                   >
                     <ArrowDown className="h-4 w-4" />

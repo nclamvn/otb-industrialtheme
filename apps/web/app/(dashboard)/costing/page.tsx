@@ -104,35 +104,56 @@ export default function CostingPage() {
 
       {/* Summary Cards */}
       <div className="grid grid-cols-4 gap-4">
-        <div className="p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
-          <div className="flex items-center gap-2 text-slate-500 text-sm mb-2">
-            <Package className="w-4 h-4" />
+        {/* Total SKUs Card */}
+        <div className="relative overflow-hidden p-4 rounded-xl border border-border bg-card border-l-4 border-l-blue-500 hover:border-border/80 transition-all duration-200">
+          <div className="absolute -right-4 -bottom-4 pointer-events-none">
+            <Package className="w-24 h-24 text-blue-500 opacity-[0.08]" />
+          </div>
+          <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">
             Total SKUs
-          </div>
-          <div className="text-2xl font-bold">{summary.totalSKUs}</div>
+          </p>
+          <p className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums pr-14">
+            {summary.totalSKUs}
+          </p>
         </div>
-        <div className="p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
-          <div className="flex items-center gap-2 text-slate-500 text-sm mb-2">
-            <Calculator className="w-4 h-4" />
+
+        {/* Avg Unit Cost Card */}
+        <div className="relative overflow-hidden p-4 rounded-xl border border-border bg-card border-l-4 border-l-purple-500 hover:border-border/80 transition-all duration-200">
+          <div className="absolute -right-4 -bottom-4 pointer-events-none">
+            <Calculator className="w-24 h-24 text-purple-500 opacity-[0.08]" />
+          </div>
+          <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">
             Avg Unit Cost
-          </div>
-          <div className="text-2xl font-bold">${summary.avgUnitCost.toFixed(2)}</div>
+          </p>
+          <p className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums pr-14">
+            ${summary.avgUnitCost.toFixed(2)}
+          </p>
         </div>
-        <div className="p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
-          <div className="flex items-center gap-2 text-slate-500 text-sm mb-2">
-            <DollarSign className="w-4 h-4" />
+
+        {/* Total Landed Card */}
+        <div className="relative overflow-hidden p-4 rounded-xl border border-border bg-card border-l-4 border-l-amber-500 hover:border-border/80 transition-all duration-200">
+          <div className="absolute -right-4 -bottom-4 pointer-events-none">
+            <DollarSign className="w-24 h-24 text-amber-500 opacity-[0.08]" />
+          </div>
+          <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">
             Total Landed
-          </div>
-          <div className="text-lg font-bold">{formatCurrency(summary.totalLandedValue)}</div>
+          </p>
+          <p className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums pr-14">
+            {formatCurrency(summary.totalLandedValue)}
+          </p>
         </div>
-        <div className="p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-green-50 dark:bg-green-900/20">
-          <div className="flex items-center gap-2 text-green-600 text-sm mb-2">
-            <TrendingUp className="w-4 h-4" />
+
+        {/* Avg Margin Card */}
+        <div className="relative overflow-hidden p-4 rounded-xl border border-border bg-card border-l-4 border-l-green-500 hover:border-border/80 transition-all duration-200">
+          <div className="absolute -right-4 -bottom-4 pointer-events-none">
+            <TrendingUp className="w-24 h-24 text-green-500 opacity-[0.08]" />
+          </div>
+          <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">
             Avg Margin
-          </div>
-          <div className="text-2xl font-bold text-green-700">
+          </p>
+          <p className="text-2xl font-bold text-green-600 dark:text-green-400 mt-1 tabular-nums pr-14">
             {(summary.avgMargin * 100).toFixed(1)}%
-          </div>
+          </p>
         </div>
       </div>
 

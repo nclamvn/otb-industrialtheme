@@ -19,10 +19,10 @@ export function ExportPreview({ data, columns, className }: ExportPreviewProps) 
   }
 
   return (
-    <div className={cn('overflow-x-auto rounded-lg border border-slate-200 dark:border-neutral-700', className)}>
+    <div className={cn('overflow-x-auto rounded-lg border border-border', className)}>
       <table className="w-full text-sm">
         <thead>
-          <tr className="bg-slate-50 dark:bg-neutral-800">
+          <tr className="bg-muted/50">
             {columns.map((column) => (
               <th
                 key={column}
@@ -39,7 +39,7 @@ export function ExportPreview({ data, columns, className }: ExportPreviewProps) 
               key={index}
               className={cn(
                 'border-t border-slate-100 dark:border-neutral-800',
-                index % 2 === 0 ? 'bg-white dark:bg-neutral-900' : 'bg-slate-50/50 dark:bg-neutral-800/50'
+                index % 2 === 0 ? 'bg-card dark:bg-neutral-900' : 'bg-muted/50/50 dark:bg-neutral-800/50'
               )}
             >
               {columns.map((column) => (

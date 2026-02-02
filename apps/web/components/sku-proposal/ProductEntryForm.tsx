@@ -13,6 +13,9 @@ import {
   ChevronDown,
   ChevronUp,
   Check,
+  Layers,
+  Bookmark,
+  Shirt,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -127,7 +130,7 @@ export function ProductEntryForm({
       <Collapsible open={isExpanded} onOpenChange={onToggle}>
         {/* Header - Always Visible */}
         <CollapsibleTrigger className="w-full">
-          <CardHeader className="cursor-pointer hover:bg-slate-50 transition-colors">
+          <CardHeader className="cursor-pointer hover:bg-muted/50 transition-colors">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
                 <div className="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center">
@@ -308,6 +311,51 @@ export function ProductEntryForm({
                   placeholder="0.00"
                   min={0}
                   step={0.01}
+                  disabled={disabled}
+                />
+              </div>
+            </div>
+
+            {/* Additional Product Attributes - SQL Schema Fields */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t border-dashed">
+              {/* Rail */}
+              <div className="space-y-2">
+                <Label className="flex items-center gap-2">
+                  <Layers className="w-4 h-4" />
+                  Rail
+                </Label>
+                <Input
+                  value={product.rail || ''}
+                  onChange={(e) => updateField('rail', e.target.value)}
+                  placeholder="e.g., RAIL #1+2: BOUTQUET"
+                  disabled={disabled}
+                />
+              </div>
+
+              {/* Product Type */}
+              <div className="space-y-2">
+                <Label className="flex items-center gap-2">
+                  <Shirt className="w-4 h-4" />
+                  Product Type
+                </Label>
+                <Input
+                  value={product.productType || ''}
+                  onChange={(e) => updateField('productType', e.target.value)}
+                  placeholder="e.g., Casual, Formal"
+                  disabled={disabled}
+                />
+              </div>
+
+              {/* Theme */}
+              <div className="space-y-2">
+                <Label className="flex items-center gap-2">
+                  <Bookmark className="w-4 h-4" />
+                  Theme
+                </Label>
+                <Input
+                  value={product.theme || ''}
+                  onChange={(e) => updateField('theme', e.target.value)}
+                  placeholder="e.g., AUGUST (08), WINE RED"
                   disabled={disabled}
                 />
               </div>

@@ -37,10 +37,10 @@ export function SupplierSelector({
             onClick={() => onSelect(supplier)}
             className={cn(
               'flex items-start gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all',
-              'hover:shadow-md',
+              'hover:border-border/80',
               isSelected
                 ? 'border-blue-500 bg-blue-50 dark:bg-blue-950/20'
-                : 'border-slate-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 hover:border-slate-300 dark:hover:border-neutral-600'
+                : 'border-border bg-card dark:bg-neutral-900 hover:border-slate-300 dark:hover:border-neutral-600'
             )}
           >
             {/* Selection indicator */}

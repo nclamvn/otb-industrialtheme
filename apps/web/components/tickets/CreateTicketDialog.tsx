@@ -254,7 +254,7 @@ export function CreateTicketDialog({
                       'flex items-center justify-between p-3 rounded-lg border cursor-pointer transition-colors',
                       selectedItems.includes(item.id)
                         ? 'border-blue-500 bg-blue-50 dark:bg-blue-950/30'
-                        : 'border-slate-200 dark:border-neutral-700 hover:bg-slate-50 dark:hover:bg-neutral-800'
+                        : 'border-border hover:bg-muted/50 dark:hover:bg-neutral-800'
                     )}
                     onClick={() => handleToggleItem(item.id)}
                   >
@@ -278,7 +278,7 @@ export function CreateTicketDialog({
             )}
 
             {/* Selection Summary */}
-            <div className="flex items-center justify-between pt-2 border-t border-slate-200 dark:border-neutral-700">
+            <div className="flex items-center justify-between pt-2 border-t border-border">
               <span className="text-sm text-slate-500 dark:text-neutral-400">
                 {t('actions.selectedCount', { count: selectedItems.length })}
               </span>

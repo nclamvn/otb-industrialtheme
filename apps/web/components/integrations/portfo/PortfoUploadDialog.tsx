@@ -124,7 +124,7 @@ export function PortfoUploadDialog({
                     {t('document.type')}
                   </h4>
                 </div>
-                <div className="grid grid-cols-2 gap-4 p-4 bg-slate-50 dark:bg-neutral-800 rounded-lg">
+                <div className="grid grid-cols-2 gap-4 p-4 bg-muted/50 rounded-lg">
                   <div>
                     <span className="text-sm text-slate-500">{t('document.type')}</span>
                     <p className="font-medium">OTB Plan (SRD)</p>
@@ -163,7 +163,7 @@ export function PortfoUploadDialog({
                 </h4>
                 <ScrollArea className="h-[200px] rounded-lg border">
                   <table className="w-full text-sm">
-                    <thead className="bg-slate-50 dark:bg-neutral-800 sticky top-0">
+                    <thead className="bg-muted/50 sticky top-0">
                       <tr>
                         <th className="text-left p-3 font-medium">Collection</th>
                         <th className="text-left p-3 font-medium">Gender</th>
@@ -173,7 +173,7 @@ export function PortfoUploadDialog({
                     </thead>
                     <tbody className="divide-y divide-slate-100 dark:divide-neutral-800">
                       {document.data.allocations.map((alloc, idx) => (
-                        <tr key={idx} className="hover:bg-slate-50 dark:hover:bg-neutral-800/50">
+                        <tr key={idx} className="hover:bg-muted/50 dark:hover:bg-neutral-800/50">
                           <td className="p-3">{alloc.collection}</td>
                           <td className="p-3">{alloc.gender}</td>
                           <td className="p-3">{alloc.category}</td>
@@ -301,7 +301,7 @@ export function PortfoUploadDialog({
             </DialogHeader>
 
             <div className="space-y-6 py-4">
-              <div className="p-4 bg-slate-50 dark:bg-neutral-800 rounded-lg space-y-2">
+              <div className="p-4 bg-muted/50 rounded-lg space-y-2">
                 <div className="flex justify-between">
                   <span className="text-sm text-slate-500">Portfo ID</span>
                   <span className="font-mono font-medium">{uploadStatus.portfoId}</span>

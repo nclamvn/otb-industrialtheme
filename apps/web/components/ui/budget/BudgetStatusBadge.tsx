@@ -22,7 +22,7 @@ const statusConfig: Record<BudgetCardStatus, {
   draft: {
     icon: FileEdit,
     label: 'Draft',
-    className: 'text-slate-600 dark:text-neutral-300 bg-slate-50 dark:bg-neutral-800 border-slate-200 dark:border-neutral-700',
+    className: 'text-slate-600 dark:text-neutral-300 bg-muted/50 border-border',
   },
   warning: {
     icon: AlertTriangle,
@@ -37,7 +37,7 @@ const statusConfig: Record<BudgetCardStatus, {
   locked: {
     icon: Lock,
     label: 'Locked',
-    className: 'text-slate-500 dark:text-neutral-400 bg-slate-100 dark:bg-neutral-800 border-slate-300 dark:border-neutral-600',
+    className: 'text-slate-500 dark:text-neutral-400 bg-muted dark:bg-neutral-800 border-slate-300 dark:border-neutral-600',
   },
 };
 

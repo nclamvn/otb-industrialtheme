@@ -263,35 +263,35 @@ export default function InsightsPage() {
 
       {/* Summary Cards */}
       <div className="grid gap-4 md:grid-cols-5">
-        <Card className="relative overflow-hidden cursor-pointer hover:shadow-md transition-shadow" onClick={() => setFilter('all')}>
+        <Card className="relative overflow-hidden cursor-pointer hover:border-border/80 transition-shadow" onClick={() => setFilter('all')}>
           <Sparkles className="absolute -bottom-4 -right-4 h-32 w-32 text-gray-500/10" />
           <CardContent className="relative p-6">
             <p className="text-sm font-medium text-muted-foreground">{t('totalInsights')}</p>
             <p className="text-3xl font-bold tracking-tight">{stats.total}</p>
           </CardContent>
         </Card>
-        <Card className="relative overflow-hidden cursor-pointer hover:shadow-md transition-shadow" onClick={() => setFilter('new')}>
+        <Card className="relative overflow-hidden cursor-pointer hover:border-border/80 transition-shadow" onClick={() => setFilter('new')}>
           <Zap className="absolute -bottom-4 -right-4 h-32 w-32 text-blue-500/10" />
           <CardContent className="relative p-6">
             <p className="text-sm font-medium text-muted-foreground">{t('new')}</p>
             <p className="text-3xl font-bold tracking-tight text-blue-600">{stats.new}</p>
           </CardContent>
         </Card>
-        <Card className="relative overflow-hidden cursor-pointer hover:shadow-md transition-shadow" onClick={() => setFilter('warnings')}>
+        <Card className="relative overflow-hidden cursor-pointer hover:border-border/80 transition-shadow" onClick={() => setFilter('warnings')}>
           <Shield className="absolute -bottom-4 -right-4 h-32 w-32 text-yellow-500/10" />
           <CardContent className="relative p-6">
             <p className="text-sm font-medium text-muted-foreground">{t('warnings')}</p>
             <p className="text-3xl font-bold tracking-tight text-yellow-600">{stats.warnings}</p>
           </CardContent>
         </Card>
-        <Card className="relative overflow-hidden cursor-pointer hover:shadow-md transition-shadow" onClick={() => setFilter('opportunities')}>
+        <Card className="relative overflow-hidden cursor-pointer hover:border-border/80 transition-shadow" onClick={() => setFilter('opportunities')}>
           <Target className="absolute -bottom-4 -right-4 h-32 w-32 text-green-500/10" />
           <CardContent className="relative p-6">
             <p className="text-sm font-medium text-muted-foreground">{t('opportunities')}</p>
             <p className="text-3xl font-bold tracking-tight text-green-600">{stats.opportunities}</p>
           </CardContent>
         </Card>
-        <Card className="relative overflow-hidden cursor-pointer hover:shadow-md transition-shadow">
+        <Card className="relative overflow-hidden cursor-pointer hover:border-border/80 transition-shadow">
           <AlertTriangle className="absolute -bottom-4 -right-4 h-32 w-32 text-red-500/10" />
           <CardContent className="relative p-6">
             <p className="text-sm font-medium text-muted-foreground">{t('highImpact')}</p>

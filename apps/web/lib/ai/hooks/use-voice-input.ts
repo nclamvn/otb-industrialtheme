@@ -57,7 +57,10 @@ declare global {
 interface UseVoiceInputOptions {
   language?: string;
   onResult?: (transcript: string) => void;
+  onInterimResult?: (transcript: string) => void;
   onError?: (error: string) => void;
+  autoSubmit?: boolean;
+  onAutoSubmit?: () => void;
 }
 
 // Get SpeechRecognition class - only call on client
@@ -67,17 +70,26 @@ const getSpeechRecognitionClass = () => {
 };
 
 export function useVoiceInput(options: UseVoiceInputOptions = {}) {
-  const { language = 'en-US', onResult, onError } = options;
+  const { language = 'en-US', onResult, onInterimResult, onError, autoSubmit = false, onAutoSubmit } = options;
 
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState('');
+  const [interimTranscript, setInterimTranscript] = useState('');
   const [error, setError] = useState<string | null>(null);
   // Initialize as false to match server render, then update on client
   const [isSupported, setIsSupported] = useState(false);
+  const [audioLevel, setAudioLevel] = useState(0);
 
   const recognitionRef = useRef<SpeechRecognition | null>(null);
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const analyserRef = useRef<AnalyserNode | null>(null);
+  const animationFrameRef = useRef<number | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
   const onResultRef = useRef(onResult);
+  const onInterimResultRef = useRef(onInterimResult);
   const onErrorRef = useRef(onError);
+  const onAutoSubmitRef = useRef(onAutoSubmit);
+  const autoSubmitRef = useRef(autoSubmit);
   const languageRef = useRef(language);
 
   // Check support only on client after mount (avoids hydration mismatch)
@@ -87,12 +99,69 @@ export function useVoiceInput(options: UseVoiceInputOptions = {}) {
 
   // Update refs synchronously (no useEffect needed)
   onResultRef.current = onResult;
+  onInterimResultRef.current = onInterimResult;
   onErrorRef.current = onError;
+  onAutoSubmitRef.current = onAutoSubmit;
+  autoSubmitRef.current = autoSubmit;
   languageRef.current = language;
+
+  // Audio level monitoring for visualizer
+  const startAudioLevelMonitoring = useCallback(async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      streamRef.current = stream;
+
+      const audioContext = new AudioContext();
+      audioContextRef.current = audioContext;
+
+      const analyser = audioContext.createAnalyser();
+      analyser.fftSize = 256;
+      analyserRef.current = analyser;
+
+      const source = audioContext.createMediaStreamSource(stream);
+      source.connect(analyser);
+
+      const dataArray = new Uint8Array(analyser.frequencyBinCount);
+
+      const updateLevel = () => {
+        if (!analyserRef.current) return;
+
+        analyserRef.current.getByteFrequencyData(dataArray);
+        const average = dataArray.reduce((a, b) => a + b, 0) / dataArray.length;
+        setAudioLevel(Math.min(average / 128, 1)); // Normalize to 0-1
+
+        animationFrameRef.current = requestAnimationFrame(updateLevel);
+      };
+
+      updateLevel();
+    } catch (err) {
+      console.warn('Could not access microphone for audio level:', err);
+    }
+  }, []);
+
+  const stopAudioLevelMonitoring = useCallback(() => {
+    if (animationFrameRef.current) {
+      cancelAnimationFrame(animationFrameRef.current);
+      animationFrameRef.current = null;
+    }
+    if (audioContextRef.current) {
+      audioContextRef.current.close();
+      audioContextRef.current = null;
+    }
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(track => track.stop());
+      streamRef.current = null;
+    }
+    analyserRef.current = null;
+    setAudioLevel(0);
+  }, []);
 
   const startListening = useCallback(() => {
     const SpeechRecognitionClass = getSpeechRecognitionClass();
     if (!SpeechRecognitionClass) return;
+
+    // Start audio level monitoring for visualizer
+    startAudioLevelMonitoring();
 
     // Create new instance each time
     const recognition = new SpeechRecognitionClass();
@@ -102,22 +171,34 @@ export function useVoiceInput(options: UseVoiceInputOptions = {}) {
 
     recognition.onresult = (event) => {
       let finalTranscript = '';
-      let interimTranscript = '';
+      let interim = '';
 
       for (let i = event.resultIndex; i < event.results.length; i++) {
         const text = event.results[i][0].transcript;
         if (event.results[i].isFinal) {
           finalTranscript += text;
         } else {
-          interimTranscript += text;
+          interim += text;
         }
       }
 
-      const currentTranscript = finalTranscript || interimTranscript;
-      setTranscript(currentTranscript);
+      // Update interim transcript for real-time display
+      if (interim) {
+        setInterimTranscript(interim);
+        onInterimResultRef.current?.(interim);
+      }
 
       if (finalTranscript) {
+        setTranscript(finalTranscript);
+        setInterimTranscript('');
         onResultRef.current?.(finalTranscript);
+
+        // Auto-submit if enabled
+        if (autoSubmitRef.current && finalTranscript.trim()) {
+          setTimeout(() => {
+            onAutoSubmitRef.current?.();
+          }, 300); // Small delay for better UX
+        }
       }
     };
 
@@ -136,30 +217,38 @@ export function useVoiceInput(options: UseVoiceInputOptions = {}) {
         case 'network':
           errorMessage = 'Network error. Please check your connection.';
           break;
+        case 'aborted':
+          // User stopped manually, not an error
+          return;
         default:
           errorMessage = `Error: ${event.error}`;
       }
       setError(errorMessage);
       setIsListening(false);
+      stopAudioLevelMonitoring();
       onErrorRef.current?.(errorMessage);
     };
 
     recognition.onend = () => {
       setIsListening(false);
+      setInterimTranscript('');
       recognitionRef.current = null;
+      stopAudioLevelMonitoring();
     };
 
     recognitionRef.current = recognition;
     setIsListening(true);
     setError(null);
     setTranscript('');
+    setInterimTranscript('');
 
     try {
       recognition.start();
     } catch {
       console.warn('Speech recognition already started');
+      stopAudioLevelMonitoring();
     }
-  }, []);
+  }, [startAudioLevelMonitoring, stopAudioLevelMonitoring]);
 
   const stopListening = useCallback(() => {
     if (recognitionRef.current) {
@@ -167,18 +256,33 @@ export function useVoiceInput(options: UseVoiceInputOptions = {}) {
       recognitionRef.current = null;
     }
     setIsListening(false);
-  }, []);
+    setInterimTranscript('');
+    stopAudioLevelMonitoring();
+  }, [stopAudioLevelMonitoring]);
 
   const resetTranscript = useCallback(() => {
     setTranscript('');
+    setInterimTranscript('');
     setError(null);
   }, []);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      stopAudioLevelMonitoring();
+      if (recognitionRef.current) {
+        recognitionRef.current.abort();
+      }
+    };
+  }, [stopAudioLevelMonitoring]);
 
   return {
     isListening,
     isSupported,
     transcript,
+    interimTranscript,
     error,
+    audioLevel,
     startListening,
     stopListening,
     resetTranscript,

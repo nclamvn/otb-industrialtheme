@@ -115,7 +115,7 @@ export function BudgetCharts({ budgets, summary, className }: BudgetChartsProps)
   const CustomPieTooltip = ({ active, payload }: { active?: boolean; payload?: Array<{ name: string; value: number }> }) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-background border rounded-lg shadow-lg p-3">
+        <div className="bg-background border rounded-lg border-2 border-border p-3">
           <p className="font-medium">{payload[0].name}</p>
           <p className="text-sm text-muted-foreground">
             {formatCurrency(payload[0].value)}
@@ -131,7 +131,7 @@ export function BudgetCharts({ budgets, summary, className }: BudgetChartsProps)
     if (active && payload && payload.length) {
       const data = payload[0]?.payload;
       return (
-        <div className="bg-background border rounded-lg shadow-lg p-3">
+        <div className="bg-background border rounded-lg border-2 border-border p-3">
           <p className="font-medium mb-2">{data?.fullName || label}</p>
           {payload.map((entry, index) => (
             <p key={index} className="text-sm" style={{ color: entry.dataKey === 'seasonal' ? COLORS[0] : COLORS[1] }}>

@@ -179,7 +179,7 @@ function SuggestionItem({
               </button>
             </CollapsibleTrigger>
             <CollapsibleContent>
-              <div className="mt-2 p-2 bg-white rounded border border-blue-100 text-xs">
+              <div className="mt-2 p-2 bg-card rounded border border-blue-100 text-xs">
                 <div className="flex items-center justify-between">
                   <span className="text-slate-500">Current:</span>
                   <span className="font-medium tabular-nums">
@@ -340,7 +340,7 @@ export function AIWarningsPanel({
           {warnings.length > 0 && !isAnalyzing && (
             <Collapsible open={warningsExpanded} onOpenChange={setWarningsExpanded}>
               <CollapsibleTrigger asChild>
-                <button className="flex items-center justify-between w-full p-2 hover:bg-slate-50 rounded-lg">
+                <button className="flex items-center justify-between w-full p-2 hover:bg-muted/50 rounded-lg">
                   <div className="flex items-center gap-2">
                     <AlertTriangle className="w-4 h-4 text-amber-500" />
                     <span className="font-medium text-sm text-slate-700">
@@ -383,7 +383,7 @@ export function AIWarningsPanel({
               onOpenChange={setSuggestionsExpanded}
             >
               <CollapsibleTrigger asChild>
-                <button className="flex items-center justify-between w-full p-2 hover:bg-slate-50 rounded-lg">
+                <button className="flex items-center justify-between w-full p-2 hover:bg-muted/50 rounded-lg">
                   <div className="flex items-center gap-2">
                     <Lightbulb className="w-4 h-4 text-blue-500" />
                     <span className="font-medium text-sm text-slate-700">

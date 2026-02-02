@@ -122,7 +122,7 @@ function VersionTimelineItem({
             ? 'bg-blue-500 border-blue-500 text-white'
             : version.status === 'CURRENT' || version.status === 'FINAL'
             ? 'bg-emerald-500 border-emerald-500 text-white'
-            : 'bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-600'
+            : 'bg-card border-slate-300 dark:border-slate-600'
         )}
       >
         {version.status === 'FINAL' ? (
@@ -140,7 +140,7 @@ function VersionTimelineItem({
           'rounded-xl border p-4 transition-all',
           isSelected
             ? 'border-blue-300 bg-blue-50/50 dark:bg-blue-900/20 dark:border-blue-700'
-            : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 bg-white dark:bg-slate-800/50'
+            : 'border-border hover:border-slate-300 dark:hover:border-slate-600 bg-card/50'
         )}
       >
         {/* Header */}
@@ -367,14 +367,14 @@ export function SizingVersionPanel({
     <>
       <div
         className={cn(
-          'fixed right-0 top-0 h-full bg-white dark:bg-neutral-950 border-l dark:border-neutral-800 shadow-2xl z-50 flex flex-col transition-all duration-300',
+          'fixed right-0 top-0 h-full bg-card border-l dark:border-neutral-800 shadow-2xl z-50 flex flex-col transition-all duration-300',
           isExpanded ? 'w-[800px]' : 'w-[480px]'
         )}
       >
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b dark:border-neutral-800 bg-gradient-to-r from-purple-50 to-violet-50 dark:from-purple-900/20 dark:to-violet-900/20">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-xl bg-purple-600 shadow-lg">
+            <div className="p-2.5 rounded-xl bg-purple-600 border-2 border-border">
               <History className="h-5 w-5 text-white" />
             </div>
             <div>
@@ -462,14 +462,14 @@ export function SizingVersionPanel({
         {/* Tabs */}
         {!isLoading && (
           <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col overflow-hidden">
-            <TabsList className="grid w-full grid-cols-2 p-1 m-4 mb-0 bg-slate-100 dark:bg-neutral-800 rounded-lg">
-              <TabsTrigger value="timeline" className="flex items-center gap-2 data-[state=active]:bg-white dark:data-[state=active]:bg-neutral-900">
+            <TabsList className="grid w-full grid-cols-2 p-1 m-4 mb-0 bg-muted dark:bg-neutral-800 rounded-lg">
+              <TabsTrigger value="timeline" className="flex items-center gap-2 data-[state=active]:bg-card dark:data-[state=active]:bg-neutral-900">
                 <History className="h-4 w-4" />
                 Timeline
               </TabsTrigger>
               <TabsTrigger
                 value="compare"
-                className="flex items-center gap-2 data-[state=active]:bg-white dark:data-[state=active]:bg-neutral-900"
+                className="flex items-center gap-2 data-[state=active]:bg-card dark:data-[state=active]:bg-neutral-900"
                 disabled={!comparison}
               >
                 <GitCompare className="h-4 w-4" />
@@ -508,7 +508,7 @@ export function SizingVersionPanel({
                     ) : comparison ? (
                       <div className="space-y-4">
                         {/* Comparison Header */}
-                        <div className="flex items-center justify-between p-4 rounded-xl bg-slate-50 dark:bg-slate-800">
+                        <div className="flex items-center justify-between p-4 rounded-xl bg-muted/50">
                           <div className="text-center flex-1">
                             <p className="text-xs text-slate-500 mb-1">From</p>
                             <p className="font-medium">{comparison.leftVersion.name}</p>

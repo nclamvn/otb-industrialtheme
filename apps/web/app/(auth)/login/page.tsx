@@ -47,7 +47,7 @@ export default function LoginPage() {
   };
 
   return (
-    <Card className="w-full max-w-md mx-4 shadow-xl">
+    <Card className="w-full max-w-md mx-4 border-2">
       <CardHeader className="text-center space-y-4">
         <div className="flex justify-center">
           <Image

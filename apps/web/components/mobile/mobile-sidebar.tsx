@@ -35,6 +35,7 @@ import {
   LogOut,
   Plug,
   Key,
+  Upload,
 } from 'lucide-react';
 import {
   Collapsible,
@@ -104,9 +105,12 @@ export function MobileSidebar({ open, onClose }: MobileSidebarProps) {
     { key: 'suggestions', href: '/ai-suggestions', icon: Lightbulb },
     { key: 'autoPlan', href: '/ai-auto-plan', icon: Wand2 },
     { key: 'predictiveAlerts', href: '/predictive-alerts', icon: Bell },
+    { key: 'aiImport', href: '/import', icon: Upload },
+    { key: 'importedData', href: '/import/data', icon: Database },
   ];
 
   const bottomItems = [
+    { key: 'aiSettings', href: '/settings/ai', icon: Sparkles },
     { key: 'integrations', href: '/settings/integrations', icon: Plug },
     { key: 'apiKeys', href: '/settings/api-keys', icon: Key },
     { key: 'settings', href: '/settings', icon: Settings },

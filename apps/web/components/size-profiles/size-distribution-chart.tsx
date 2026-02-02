@@ -32,7 +32,7 @@ export function SizeDistributionChart({
     if (active && payload && payload.length) {
       const item = payload[0].payload;
       return (
-        <div className="bg-background border rounded-lg p-2 shadow-lg">
+        <div className="bg-background border rounded-lg p-2 border-2 border-border">
           <p className="font-medium">{item.fullName}</p>
           <p className="text-sm text-muted-foreground">{item.value.toFixed(1)}%</p>
         </div>

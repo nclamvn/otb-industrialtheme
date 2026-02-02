@@ -79,7 +79,7 @@ export function NotificationItem({
       onClick={handleClick}
       className={cn(
         'flex items-start gap-3 p-3 cursor-pointer transition-colors',
-        'hover:bg-slate-50 dark:hover:bg-neutral-800',
+        'hover:bg-muted/50 dark:hover:bg-neutral-800',
         !notification.isRead && 'bg-blue-50/50 dark:bg-blue-950/20',
         className
       )}

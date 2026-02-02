@@ -117,7 +117,7 @@ function VersionCard({
               ? 'bg-amber-500 border-amber-600'
               : version.isCurrent
               ? 'bg-amber-100 dark:bg-amber-900/30 border-amber-300 dark:border-amber-700'
-              : 'bg-white dark:bg-neutral-900 border-slate-300 dark:border-neutral-700'
+              : 'bg-card dark:bg-neutral-900 border-slate-300 dark:border-neutral-700'
           )}
         >
           {version.createdBy.id === 'system' ? (
@@ -147,8 +147,8 @@ function VersionCard({
         className={cn(
           'flex-1 p-4 rounded-xl border transition-all mb-4 cursor-pointer',
           isSelected
-            ? 'bg-amber-50 dark:bg-amber-950/30 border-amber-300 dark:border-amber-700 shadow-md'
-            : 'bg-white dark:bg-neutral-950 border-slate-200 dark:border-neutral-800 hover:border-amber-200 dark:hover:border-amber-700 hover:bg-amber-50/30 dark:hover:bg-amber-950/20'
+            ? 'bg-amber-50 dark:bg-amber-950/30 border-amber-300 dark:border-amber-700 border-border/80'
+            : 'bg-card border-border hover:border-amber-200 dark:hover:border-amber-700 hover:bg-amber-50/30 dark:hover:bg-amber-950/20'
         )}
       >
         {/* Header */}
@@ -160,7 +160,7 @@ function VersionCard({
                   'text-xs',
                   version.createdBy.id === 'system'
                     ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400'
-                    : 'bg-slate-100 dark:bg-neutral-800 text-slate-700 dark:text-neutral-300'
+                    : 'bg-muted dark:bg-neutral-800 text-slate-700 dark:text-neutral-300'
                 )}
               >
                 {initials}

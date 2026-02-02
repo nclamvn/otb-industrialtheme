@@ -380,7 +380,7 @@ export default function ReportBuilderPage() {
           <TabsContent value="my-reports" className="space-y-4">
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {reports.map((report) => (
-                <Card key={report.id} className="hover:shadow-md transition-shadow">
+                <Card key={report.id} className="hover:border-border/80 transition-shadow">
                   <CardHeader>
                     <div className="flex items-start justify-between">
                       <div>
@@ -567,7 +567,7 @@ export default function ReportBuilderPage() {
                   widgets: 4,
                 },
               ].map((template, i) => (
-                <Card key={i} className="cursor-pointer hover:shadow-md transition-shadow">
+                <Card key={i} className="cursor-pointer hover:border-border/80 transition-shadow">
                   <CardHeader>
                     <CardTitle className="text-base">{template.name}</CardTitle>
                     <CardDescription>{template.description}</CardDescription>

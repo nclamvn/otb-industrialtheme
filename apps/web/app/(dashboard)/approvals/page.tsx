@@ -14,12 +14,15 @@ import {
   Calendar,
   ThumbsUp,
   ThumbsDown,
+  LayoutGrid,
+  List,
 } from 'lucide-react';
 import {
   DecisionDialog,
   QuickDecisionButtons,
   DecisionType,
 } from '@/components/decisions';
+import { ApprovalKanban, generateMockTickets, ApprovalTicket } from '@/components/approvals';
 import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
@@ -90,6 +93,8 @@ export default function ApprovalsPage() {
   const [summary, setSummary] = useState<Summary>({ budget: 0, otb: 0, sku: 0, total: 0 });
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('all');
+  const [viewMode, setViewMode] = useState<'list' | 'kanban'>('kanban');
+  const [kanbanTickets] = useState<ApprovalTicket[]>(generateMockTickets());
 
   // Decision dialog state
   const [selectedWorkflow, setSelectedWorkflow] = useState<ApprovalWorkflow | null>(null);
@@ -255,97 +260,138 @@ export default function ApprovalsPage() {
       {/* Summary Cards - Unified Design */}
       <div className="grid gap-4 md:grid-cols-4">
         <div className={cn(
-          'relative overflow-hidden rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950',
-          'shadow-sm hover:shadow-md transition-all duration-200',
+          'relative overflow-hidden rounded-xl border border-border bg-card',
+          'hover:border-border/80 transition-all duration-200',
           'border-l-4 border-l-amber-500'
         )}>
+          {/* Watermark Icon */}
+          <div className="absolute -right-4 -bottom-4 pointer-events-none">
+            <Clock className="w-24 h-24 text-amber-500 opacity-[0.08]" />
+          </div>
           <div className="p-4">
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">{t('totalPending')}</p>
-                <div className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums">{summary.total}</div>
-                <p className="text-xs text-slate-500 dark:text-neutral-400 mt-1">{t('awaitingAction')}</p>
-              </div>
-              <div className="h-10 w-10 rounded-xl bg-amber-50 dark:bg-amber-950 flex items-center justify-center">
-                <Clock className="h-5 w-5 text-amber-600" />
-              </div>
+            <div>
+              <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">{t('totalPending')}</p>
+              <div className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums pr-14">{summary.total}</div>
+              <p className="text-xs text-slate-500 dark:text-neutral-400 mt-1">{t('awaitingAction')}</p>
             </div>
           </div>
         </div>
 
         <div className={cn(
-          'relative overflow-hidden rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950',
-          'shadow-sm hover:shadow-md transition-all duration-200',
+          'relative overflow-hidden rounded-xl border border-border bg-card',
+          'hover:border-border/80 transition-all duration-200',
           'border-l-4 border-l-blue-500'
         )}>
+          {/* Watermark Icon */}
+          <div className="absolute -right-4 -bottom-4 pointer-events-none">
+            <DollarSign className="w-24 h-24 text-blue-500 opacity-[0.08]" />
+          </div>
           <div className="p-4">
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">{t('budget')}</p>
-                <div className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums">{summary.budget}</div>
-                <p className="text-xs text-slate-500 dark:text-neutral-400 mt-1">{t('budgetApprovals')}</p>
-              </div>
-              <div className="h-10 w-10 rounded-xl bg-blue-50 dark:bg-blue-950 flex items-center justify-center">
-                <DollarSign className="h-5 w-5 text-blue-600" />
-              </div>
+            <div>
+              <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">{t('budget')}</p>
+              <div className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums pr-14">{summary.budget}</div>
+              <p className="text-xs text-slate-500 dark:text-neutral-400 mt-1">{t('budgetApprovals')}</p>
             </div>
           </div>
         </div>
 
         <div className={cn(
-          'relative overflow-hidden rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950',
-          'shadow-sm hover:shadow-md transition-all duration-200',
+          'relative overflow-hidden rounded-xl border border-border bg-card',
+          'hover:border-border/80 transition-all duration-200',
           'border-l-4 border-l-purple-500'
         )}>
+          {/* Watermark Icon */}
+          <div className="absolute -right-4 -bottom-4 pointer-events-none">
+            <BarChart3 className="w-24 h-24 text-purple-500 opacity-[0.08]" />
+          </div>
           <div className="p-4">
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">{t('otbPlans')}</p>
-                <div className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums">{summary.otb}</div>
-                <p className="text-xs text-slate-500 dark:text-neutral-400 mt-1">{t('otbApprovals')}</p>
-              </div>
-              <div className="h-10 w-10 rounded-xl bg-purple-50 dark:bg-purple-950 flex items-center justify-center">
-                <BarChart3 className="h-5 w-5 text-purple-600" />
-              </div>
+            <div>
+              <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">{t('otbPlans')}</p>
+              <div className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums pr-14">{summary.otb}</div>
+              <p className="text-xs text-slate-500 dark:text-neutral-400 mt-1">{t('otbApprovals')}</p>
             </div>
           </div>
         </div>
 
         <div className={cn(
-          'relative overflow-hidden rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950',
-          'shadow-sm hover:shadow-md transition-all duration-200',
+          'relative overflow-hidden rounded-xl border border-border bg-card',
+          'hover:border-border/80 transition-all duration-200',
           'border-l-4 border-l-green-500'
         )}>
+          {/* Watermark Icon */}
+          <div className="absolute -right-4 -bottom-4 pointer-events-none">
+            <FileSpreadsheet className="w-24 h-24 text-green-500 opacity-[0.08]" />
+          </div>
           <div className="p-4">
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">{t('skuProposals')}</p>
-                <div className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums">{summary.sku}</div>
-                <p className="text-xs text-slate-500 dark:text-neutral-400 mt-1">{t('skuApprovals')}</p>
-              </div>
-              <div className="h-10 w-10 rounded-xl bg-green-50 dark:bg-green-950 flex items-center justify-center">
-                <FileSpreadsheet className="h-5 w-5 text-green-600" />
-              </div>
+            <div>
+              <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">{t('skuProposals')}</p>
+              <div className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums pr-14">{summary.sku}</div>
+              <p className="text-xs text-slate-500 dark:text-neutral-400 mt-1">{t('skuApprovals')}</p>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Tabs */}
+      {/* Tabs and View Toggle */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList>
-          <TabsTrigger value="all">{t('all')} ({summary.total})</TabsTrigger>
-          <TabsTrigger value="budget">{t('budget')} ({summary.budget})</TabsTrigger>
-          <TabsTrigger value="otb">OTB ({summary.otb})</TabsTrigger>
-          <TabsTrigger value="sku">SKU ({summary.sku})</TabsTrigger>
-          <TabsTrigger value="completed">{t('completed')}</TabsTrigger>
-        </TabsList>
+        <div className="flex items-center justify-between">
+          <TabsList>
+            <TabsTrigger value="all">{t('all')} ({summary.total})</TabsTrigger>
+            <TabsTrigger value="budget">{t('budget')} ({summary.budget})</TabsTrigger>
+            <TabsTrigger value="otb">OTB ({summary.otb})</TabsTrigger>
+            <TabsTrigger value="sku">SKU ({summary.sku})</TabsTrigger>
+            <TabsTrigger value="completed">{t('completed')}</TabsTrigger>
+          </TabsList>
+
+          {/* View Toggle */}
+          <div className="flex items-center gap-1 p-1 rounded-lg bg-muted">
+            <button
+              onClick={() => setViewMode('kanban')}
+              className={cn(
+                'p-2 rounded-md transition-colors',
+                viewMode === 'kanban'
+                  ? 'bg-background shadow-sm text-foreground'
+                  : 'text-muted-foreground hover:text-foreground'
+              )}
+              title="Kanban View"
+            >
+              <LayoutGrid className="h-4 w-4" />
+            </button>
+            <button
+              onClick={() => setViewMode('list')}
+              className={cn(
+                'p-2 rounded-md transition-colors',
+                viewMode === 'list'
+                  ? 'bg-background shadow-sm text-foreground'
+                  : 'text-muted-foreground hover:text-foreground'
+              )}
+              title="List View"
+            >
+              <List className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
 
         <TabsContent value={activeTab} className="mt-6">
           {isLoading ? (
             <div className="flex items-center justify-center h-64">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
             </div>
+          ) : viewMode === 'kanban' ? (
+            /* Kanban View - UX-3 */
+            <ApprovalKanban
+              tickets={kanbanTickets}
+              onViewTicket={(ticket) => {
+                toast.info(`Viewing ticket: ${ticket.code}`);
+              }}
+              onApprove={(ticketId) => {
+                toast.success(`Approved ticket: ${ticketId}`);
+              }}
+              onReject={(ticketId) => {
+                toast.error(`Rejected ticket: ${ticketId}`);
+              }}
+              currentUserRole="ADMIN"
+            />
           ) : filteredWorkflows.length === 0 ? (
             <div className="text-center py-12 text-muted-foreground">
               <CheckCircle className="h-12 w-12 mx-auto mb-4 opacity-50" />
@@ -353,11 +399,12 @@ export default function ApprovalsPage() {
               <p className="text-sm mt-1">{t('allCaughtUp')}</p>
             </div>
           ) : (
+            /* List View */
             <div className="space-y-4">
               {filteredWorkflows.map((workflow) => (
                 <Card
                   key={workflow.id}
-                  className="hover:shadow-md transition-shadow cursor-pointer"
+                  className="hover:border-border/80 transition-shadow cursor-pointer"
                   onClick={() => router.push(getEntityUrl(workflow))}
                 >
                   <CardContent className="p-4">

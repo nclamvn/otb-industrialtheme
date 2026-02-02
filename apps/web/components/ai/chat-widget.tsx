@@ -1,12 +1,11 @@
 'use client';
 
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useRef, useEffect, useCallback, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { useLocale, useTranslations } from 'next-intl';
 import {
-  MessageSquare,
   X,
   Send,
   Sparkles,
@@ -18,6 +17,7 @@ import {
   Bot,
   StopCircle,
 } from 'lucide-react';
+import { useAIChatStore } from '@/stores/ai-chat-store';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
@@ -64,7 +64,10 @@ export function AIChatWidget({
   const pathname = usePathname();
   const locale = useLocale() as 'en' | 'vi';
   const t = useTranslations('ai');
-  const [isOpen, setIsOpen] = useState(false);
+
+  // Use global store for open/close state (controlled from header)
+  const { isOpen, close } = useAIChatStore();
+
   // Sync language with global locale for voice input
   const [language, setLanguage] = useState<'en' | 'vi'>(locale);
 
@@ -148,35 +151,15 @@ export function AIChatWidget({
 
   return (
     <TooltipProvider>
-      {/* Chat Button - Higher on mobile to avoid bottom nav overlap */}
-      <AnimatePresence>
-        {!isOpen && (
-          <motion.div
-            initial={{ scale: 0, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0, opacity: 0 }}
-            className="fixed bottom-24 md:bottom-6 right-4 md:right-6 z-50"
-          >
-            <Button
-              onClick={() => setIsOpen(true)}
-              className="h-12 w-12 md:h-10 md:w-10 rounded-full shadow-lg bg-dafc-gold hover:bg-dafc-gold-dark text-black"
-              size="icon"
-            >
-              <MessageSquare className="h-5 w-5 md:h-4 md:w-4" />
-            </Button>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Chat Window - Adjusted for mobile bottom nav */}
+      {/* Chat Window - Slides in from right, controlled by header button */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ opacity: 0, y: 20, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 20, scale: 0.95 }}
+            initial={{ opacity: 0, x: 20, scale: 0.95 }}
+            animate={{ opacity: 1, x: 0, scale: 1 }}
+            exit={{ opacity: 0, x: 20, scale: 0.95 }}
             transition={{ duration: 0.2 }}
-            className="fixed bottom-20 md:bottom-6 right-2 md:right-6 left-2 md:left-auto w-auto md:w-96 h-[60vh] md:h-[500px] bg-background border rounded-lg shadow-xl flex flex-col z-50"
+            className="fixed top-14 right-2 md:right-4 w-[calc(100%-1rem)] md:w-96 h-[calc(100vh-4.5rem)] md:h-[500px] bg-background border rounded-xl shadow-2xl flex flex-col z-[9999]"
           >
             {/* Header */}
             <div className="flex items-center justify-between px-4 py-3 border-b bg-muted/30">
@@ -240,7 +223,7 @@ export function AIChatWidget({
                   variant="ghost"
                   size="icon"
                   className="h-8 w-8"
-                  onClick={() => setIsOpen(false)}
+                  onClick={close}
                 >
                   <X className="h-4 w-4" />
                 </Button>

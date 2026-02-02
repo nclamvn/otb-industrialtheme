@@ -37,10 +37,10 @@ export function ThemeGroupCard({
   return (
     <div
       className={cn(
-        'rounded-xl border bg-white dark:bg-slate-800 overflow-hidden transition-all duration-200',
+        'rounded-xl border bg-card overflow-hidden transition-all duration-200',
         isSelected
           ? 'border-blue-500 ring-2 ring-blue-500/20'
-          : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600',
+          : 'border-border hover:border-slate-300 dark:hover:border-slate-600',
         onClick && 'cursor-pointer',
         className
       )}
@@ -80,7 +80,7 @@ export function ThemeGroupCard({
         <div className="grid grid-cols-2 gap-3">
           {/* Product Count */}
           <div className="flex items-center gap-2">
-            <div className="p-1.5 rounded-lg bg-slate-100 dark:bg-slate-700">
+            <div className="p-1.5 rounded-lg bg-muted dark:bg-slate-700">
               <Package className="w-4 h-4 text-slate-500" />
             </div>
             <div>
@@ -126,7 +126,7 @@ export function ThemeGroupCard({
                   : '0%'}
               </span>
             </div>
-            <div className="h-2 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
+            <div className="h-2 bg-muted dark:bg-slate-700 rounded-full overflow-hidden">
               <div
                 className={cn(
                   'h-full transition-all duration-500 rounded-full',
@@ -151,7 +151,7 @@ export function ThemeGroupCard({
             {theme.colorPalette.slice(0, 6).map((color, idx) => (
               <div
                 key={idx}
-                className="w-5 h-5 rounded-full border border-slate-200 dark:border-slate-600 shadow-sm"
+                className="w-5 h-5 rounded-full border border-border dark:border-slate-600 border border-border"
                 style={{ backgroundColor: color }}
                 title={color}
               />

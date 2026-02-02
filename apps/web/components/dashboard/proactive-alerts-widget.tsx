@@ -124,27 +124,30 @@ export function ProactiveAlertsWidget() {
   return (
     <div
       className={cn(
-        // Unified: rounded-xl, shadow-sm, hover:shadow-md, border-l-4
-        'rounded-xl border border-slate-200 bg-white overflow-hidden',
-        'shadow-sm hover:shadow-md transition-all duration-200',
+        // Flat design: rounded-xl, no shadow, border-l-4
+        'relative rounded-xl border border-border bg-card overflow-hidden',
+        'hover:border-border/80 transition-all duration-200',
         'border-l-4 border-l-amber-500'
       )}
     >
+      {/* Watermark Icon */}
+      <div className="absolute -right-4 -bottom-4 pointer-events-none">
+        <Bell className="w-24 h-24 text-amber-500 opacity-[0.08]" />
+      </div>
+
       {/* Header */}
       <div className="p-4 pb-3 border-b border-slate-100">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            {/* Unified: w-10 h-10 rounded-xl icon container */}
-            <div className="h-10 w-10 rounded-xl bg-amber-50 flex items-center justify-center relative">
-              <Bell className="h-5 w-5 text-amber-600" />
-              {summary.critical > 0 && (
-                <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-red-500 text-white text-[10px] flex items-center justify-center font-bold">
-                  {summary.critical}
-                </span>
-              )}
-            </div>
             <div>
-              <h3 className="text-sm font-semibold text-slate-900">Proactive Alerts</h3>
+              <h3 className="text-sm font-semibold text-slate-900 flex items-center gap-2">
+                Proactive Alerts
+                {summary.critical > 0 && (
+                  <span className="inline-flex items-center justify-center h-5 min-w-[20px] px-1.5 rounded-full text-xs font-bold bg-red-500 text-white">
+                    {summary.critical}
+                  </span>
+                )}
+              </h3>
               <p className="text-xs text-slate-500">
                 {summary.total > 0 ? `${summary.total} alerts detected` : 'No active alerts'}
               </p>
@@ -206,9 +209,9 @@ export function ProactiveAlertsWidget() {
                     key={alert.id}
                     href={getAlertUrl(alert)}
                     className={cn(
-                      // Unified: rounded-xl, border-l-4, shadow-sm, hover:shadow-md
-                      'block p-3 rounded-xl border border-slate-200 bg-white',
-                      'border-l-4 shadow-sm hover:shadow-md transition-all duration-200',
+                      // Flat design: rounded-xl, border-l-4, no shadow
+                      'block p-3 rounded-xl border border-border bg-card',
+                      'border-l-4 hover:border-border/80 transition-all duration-200',
                       config.borderColor
                     )}
                   >

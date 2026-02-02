@@ -124,9 +124,9 @@ export function OTBSummary({ data, period = 'Current Period', className }: OTBSu
   return (
     <div
       className={cn(
-        // Unified: rounded-xl, p-4, shadow-sm, hover:shadow-md, border-l-4
-        'rounded-xl border border-slate-200 bg-white overflow-hidden',
-        'shadow-sm hover:shadow-md transition-all duration-200',
+        // Unified: rounded-xl, p-4, border border-border, hover:border-border/80, border-l-4
+        'rounded-xl border border-border bg-card overflow-hidden',
+        'hover:border-border/80 transition-all duration-200',
         'border-l-4',
         currentStatus.borderColor,
         className
@@ -181,9 +181,9 @@ export function OTBSummary({ data, period = 'Current Period', className }: OTBSu
           ].map((item) => (
             <div
               key={item.label}
-              className="flex items-center gap-2 p-3 bg-slate-50 rounded-xl"
+              className="flex items-center gap-2 p-3 bg-muted/50 rounded-xl"
             >
-              <div className="h-8 w-8 rounded-lg bg-white flex items-center justify-center">
+              <div className="h-8 w-8 rounded-lg bg-card flex items-center justify-center">
                 <item.icon className="h-4 w-4 text-slate-500" />
               </div>
               <div>

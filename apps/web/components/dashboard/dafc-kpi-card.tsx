@@ -15,7 +15,6 @@ import {
   Building2,
   type LucideIcon,
 } from 'lucide-react';
-import { BudgetStatusBadge, BudgetCardStatus } from '@/components/ui/budget';
 
 const iconMap: Record<string, LucideIcon> = {
   DollarSign,
@@ -40,61 +39,59 @@ interface DAFCKPICardProps {
     value: number;
     label?: string;
   };
-  variant?: 'blue' | 'purple' | 'green' | 'amber' | 'gold' | 'default';
+  variant?: 'blue' | 'purple' | 'green' | 'amber' | 'orange' | 'gold' | 'default';
   sparklineData?: number[];
   status?: 'success' | 'warning' | 'critical' | 'info';
   className?: string;
 }
 
-// Unified level-based border colors matching design system
+// Flat design - solid colors, no gradients
 const variantStyles = {
   blue: {
     border: 'border-l-blue-500',
-    iconBg: 'bg-blue-50 dark:bg-blue-950',
-    iconColor: 'text-blue-600',
-    gradient: 'from-blue-50/50',
+    iconBg: 'bg-blue-100 dark:bg-blue-950',
+    iconColor: 'text-blue-500',
   },
   purple: {
     border: 'border-l-purple-500',
-    iconBg: 'bg-purple-50 dark:bg-purple-950',
-    iconColor: 'text-purple-600',
-    gradient: 'from-purple-50/50',
+    iconBg: 'bg-purple-100 dark:bg-purple-950',
+    iconColor: 'text-purple-500',
   },
   green: {
     border: 'border-l-green-500',
-    iconBg: 'bg-green-50 dark:bg-green-950',
-    iconColor: 'text-green-600',
-    gradient: 'from-green-50/50',
+    iconBg: 'bg-green-100 dark:bg-green-950',
+    iconColor: 'text-green-500',
   },
   amber: {
     border: 'border-l-amber-500',
-    iconBg: 'bg-amber-50 dark:bg-amber-950',
-    iconColor: 'text-amber-600',
-    gradient: 'from-amber-50/50',
+    iconBg: 'bg-amber-100 dark:bg-amber-950',
+    iconColor: 'text-amber-500',
   },
-  // Legacy aliases for backward compatibility
+  orange: {
+    border: 'border-l-orange-500',
+    iconBg: 'bg-orange-100 dark:bg-orange-950',
+    iconColor: 'text-orange-500',
+  },
   gold: {
     border: 'border-l-amber-500',
-    iconBg: 'bg-amber-50 dark:bg-amber-950',
-    iconColor: 'text-amber-600',
-    gradient: 'from-amber-50/50',
+    iconBg: 'bg-amber-100 dark:bg-amber-950',
+    iconColor: 'text-amber-500',
   },
   default: {
-    border: 'border-l-slate-600',
-    iconBg: 'bg-slate-100 dark:bg-neutral-950',
-    iconColor: 'text-slate-600',
-    gradient: 'from-slate-50/50',
+    border: 'border-l-slate-400',
+    iconBg: 'bg-muted',
+    iconColor: 'text-slate-500',
   },
 };
 
-function MiniSparkline({ data, variant }: { data: number[]; variant: 'blue' | 'purple' | 'green' | 'amber' | 'gold' | 'default' }) {
+function MiniSparkline({ data, variant }: { data: number[]; variant: keyof typeof variantStyles }) {
   if (!data || data.length < 2) return null;
 
   const max = Math.max(...data);
   const min = Math.min(...data);
   const range = max - min || 1;
-  const height = 28;
-  const width = 70;
+  const height = 24;
+  const width = 60;
   const stepX = width / (data.length - 1);
 
   const points = data
@@ -110,6 +107,7 @@ function MiniSparkline({ data, variant }: { data: number[]; variant: 'blue' | 'p
     purple: '#a855f7',
     green: '#22c55e',
     amber: '#f59e0b',
+    orange: '#f97316',
     gold: '#f59e0b',
     default: '#64748b',
   };
@@ -117,17 +115,11 @@ function MiniSparkline({ data, variant }: { data: number[]; variant: 'blue' | 'p
   const strokeColor = strokeColors[variant] || strokeColors.default;
 
   return (
-    <svg width={width} height={height} className="overflow-visible opacity-80">
-      <defs>
-        <linearGradient id={`sparkline-grad-${variant}`} x1="0%" y1="0%" x2="100%" y2="0%">
-          <stop offset="0%" stopColor={strokeColor} stopOpacity="0.3" />
-          <stop offset="100%" stopColor={strokeColor} stopOpacity="1" />
-        </linearGradient>
-      </defs>
+    <svg width={width} height={height} className="overflow-visible opacity-60">
       <polyline
         fill="none"
-        stroke={`url(#sparkline-grad-${variant})`}
-        strokeWidth="2.5"
+        stroke={strokeColor}
+        strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
         points={points}
@@ -158,93 +150,82 @@ export function DAFCKPICard({
       : Minus
     : null;
 
-  // Unified health-based trend colors
+  // Flat design trend colors
   const trendBadgeClass = trend
     ? trend.value > 0
-      ? 'text-green-700 bg-green-50 border-green-200 dark:text-green-400 dark:bg-green-950 dark:border-green-800'
+      ? 'text-green-600 bg-green-50 dark:text-green-400 dark:bg-green-950'
       : trend.value < 0
-      ? 'text-red-700 bg-red-50 border-red-200 dark:text-red-400 dark:bg-red-950 dark:border-red-800'
-      : 'text-slate-600 bg-slate-50 border-slate-200 dark:text-neutral-400 dark:bg-neutral-900 dark:border-neutral-700'
+      ? 'text-red-600 bg-red-50 dark:text-red-400 dark:bg-red-950'
+      : 'text-slate-500 bg-muted/50 dark:text-neutral-400 dark:bg-neutral-900'
     : '';
 
-  // Status glow using unified colors
-  const statusGlowClass = status
+  // Status ring (flat - no glow/shadow)
+  const statusRingClass = status
     ? {
-        success: 'ring-2 ring-green-200 dark:ring-green-800',
-        warning: 'ring-2 ring-amber-200 dark:ring-amber-800',
-        critical: 'ring-2 ring-red-200 dark:ring-red-800',
-        info: 'ring-2 ring-blue-200 dark:ring-blue-800',
+        success: 'ring-2 ring-green-500/30',
+        warning: 'ring-2 ring-amber-500/30',
+        critical: 'ring-2 ring-red-500/30',
+        info: 'ring-2 ring-blue-500/30',
       }[status]
     : '';
 
   return (
     <div
       className={cn(
-        // Unified: rounded-xl, p-4, shadow-sm, hover:shadow-md, border-l-4
-        'relative overflow-hidden rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950',
-        'shadow-sm hover:shadow-md transition-all duration-200',
+        // Flat design: no shadow, solid bg, left border accent
+        'relative overflow-hidden rounded-xl border border-border bg-card',
+        'hover:border-border/80 transition-all duration-200',
         'border-l-4',
         styles.border,
-        statusGlowClass,
+        statusRingClass,
         className
       )}
     >
-      {/* Subtle gradient overlay */}
-      <div
-        className={cn(
-          'absolute inset-0 opacity-30 pointer-events-none bg-gradient-to-br to-transparent',
-          styles.gradient
-        )}
-      />
+      {/* Watermark Icon - Large, faded into background */}
+      <div className="absolute -right-4 -bottom-4 pointer-events-none">
+        <Icon className={cn('w-24 h-24 opacity-[0.08]', styles.iconColor)} />
+      </div>
 
-      <div className="relative p-4">
-        <div className="flex items-start justify-between gap-4">
-          {/* Left content */}
-          <div className="flex-1 min-w-0 space-y-1">
-            {/* Label */}
-            <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">
-              {title}
-            </p>
+      {/* Content */}
+      <div className="relative p-3">
+        <div className="space-y-1 pr-14">
+          {/* Label */}
+          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            {title}
+          </p>
 
-            {/* Value */}
-            <div className="flex items-baseline gap-2 flex-wrap">
-              <span className="text-2xl font-bold tabular-nums text-slate-900 dark:text-neutral-100">
-                {value}
+          {/* Value + Trend */}
+          <div className="flex items-baseline gap-2 flex-wrap">
+            <span className="text-2xl font-bold tabular-nums text-foreground">
+              {value}
+            </span>
+            {trend && TrendIcon && (
+              <span className={cn(
+                'inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-xs font-medium',
+                trendBadgeClass
+              )}>
+                <TrendIcon className="h-3 w-3" />
+                {Math.abs(trend.value)}%
               </span>
-              {trend && TrendIcon && (
-                <span className={cn(
-                  'inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-xs font-medium border',
-                  trendBadgeClass
-                )}>
-                  <TrendIcon className="h-3 w-3" />
-                  {Math.abs(trend.value)}%
-                </span>
-              )}
-            </div>
-
-            {/* Subtitle */}
-            {subtitle && (
-              <p className="text-xs text-slate-500 dark:text-neutral-400 truncate">{subtitle}</p>
-            )}
-
-            {/* Trend label */}
-            {trend?.label && (
-              <p className="text-xs text-slate-400 dark:text-neutral-500">{trend.label}</p>
             )}
           </div>
 
-          {/* Right content - Icon and Sparkline */}
-          <div className="flex flex-col items-end gap-2 flex-shrink-0">
-            {/* Unified: w-10 h-10 rounded-xl icon container */}
-            <div className={cn('h-10 w-10 rounded-xl flex items-center justify-center', styles.iconBg)}>
-              <Icon className={cn('h-5 w-5', styles.iconColor)} />
-            </div>
-
-            {/* Sparkline */}
-            {sparklineData && (
+          {/* Sparkline (inline with value area) */}
+          {sparklineData && (
+            <div className="mt-1">
               <MiniSparkline data={sparklineData} variant={variant} />
-            )}
-          </div>
+            </div>
+          )}
+
+          {/* Subtitle */}
+          {subtitle && (
+            <p className="text-xs text-muted-foreground truncate">{subtitle}</p>
+          )}
+
+          {/* Trend label */}
+          {trend?.label && (
+            <p className="text-xs text-muted-foreground/70">{trend.label}</p>
+          )}
         </div>
       </div>
     </div>

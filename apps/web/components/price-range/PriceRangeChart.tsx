@@ -17,7 +17,7 @@ export function PriceRangeChart({
   const maxUnits = Math.max(...data.map((d) => d.totalUnits));
 
   return (
-    <div className={cn('rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-4', className)}>
+    <div className={cn('rounded-xl border border-border bg-card p-4', className)}>
       <h4 className="text-sm font-semibold text-slate-900 dark:text-white mb-4">
         Price Distribution
       </h4>
@@ -39,7 +39,7 @@ export function PriceRangeChart({
               </div>
 
               {/* Bar */}
-              <div className="relative h-8 bg-slate-100 dark:bg-slate-700 rounded-lg overflow-hidden">
+              <div className="relative h-8 bg-muted dark:bg-slate-700 rounded-lg overflow-hidden">
                 <div
                   className={cn(
                     'absolute left-0 top-0 h-full rounded-lg transition-all duration-500',
@@ -72,7 +72,7 @@ export function PriceRangeChart({
       </div>
 
       {/* Legend */}
-      <div className="flex flex-wrap gap-4 mt-6 pt-4 border-t border-slate-200 dark:border-slate-700">
+      <div className="flex flex-wrap gap-4 mt-6 pt-4 border-t border-border">
         {data.map((item) => (
           <div key={item.range.id} className="flex items-center gap-2">
             <div

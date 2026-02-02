@@ -162,7 +162,7 @@ export default function BudgetPage() {
   // Unified status badge colors
   const getStatusBadge = (status: string) => {
     const colors: Record<string, string> = {
-      DRAFT: 'bg-slate-50 text-slate-700 border border-slate-200 dark:bg-neutral-800 dark:text-neutral-300 dark:border-neutral-700',
+      DRAFT: 'bg-muted/50 text-slate-700 border border-border dark:bg-neutral-800 dark:text-neutral-300 dark:border-neutral-700',
       SUBMITTED: 'bg-blue-50 text-blue-700 border border-blue-200 dark:bg-blue-950 dark:text-blue-300 dark:border-blue-800',
       UNDER_REVIEW: 'bg-amber-50 text-amber-700 border border-amber-200 dark:bg-amber-950 dark:text-amber-300 dark:border-amber-800',
       APPROVED: 'bg-green-50 text-green-700 border border-green-200 dark:bg-green-950 dark:text-green-300 dark:border-green-800',
@@ -280,109 +280,97 @@ export default function BudgetPage() {
         </Link>
       </PageHeader>
 
-      {/* Summary Cards - Unified Design: rounded-xl, border-l-4, shadow-sm hover:shadow-md */}
+      {/* Summary Cards - Flat Design with Large Watermark Icons */}
       <div className="grid gap-4 md:grid-cols-4">
         {/* Total Budget Card */}
         <div
           className={cn(
-            'rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 overflow-hidden',
-            'shadow-sm hover:shadow-md transition-all duration-200',
+            'relative rounded-xl border border-border bg-card overflow-hidden',
+            'hover:border-border/80 transition-all duration-200',
             'border-l-4 border-l-slate-800'
           )}
         >
-          <div className="p-4">
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">{t('totalBudgetCard')}</p>
-                <div className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums">
-                  {formatBudgetCurrency(summary.totalBudget)}
-                </div>
-                <p className="text-xs text-slate-500 dark:text-neutral-400 mt-2">
-                  {t('allocations', { count: summary.count })}
-                </p>
-              </div>
-              <div className="h-10 w-10 rounded-xl bg-slate-100 dark:bg-neutral-800 flex items-center justify-center">
-                <DollarSign className="h-5 w-5 text-slate-600" />
-              </div>
+          {/* Watermark Icon */}
+          <div className="absolute -right-4 -bottom-4 pointer-events-none">
+            <DollarSign className="w-24 h-24 text-slate-600 opacity-[0.08]" />
+          </div>
+          <div className="relative p-4">
+            <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">{t('totalBudgetCard')}</p>
+            <div className="text-2xl font-bold text-foreground mt-1 tabular-nums">
+              {formatBudgetCurrency(summary.totalBudget)}
             </div>
+            <p className="text-xs text-muted-foreground mt-2">
+              {t('allocations', { count: summary.count })}
+            </p>
           </div>
         </div>
 
         {/* Approved Card */}
         <div
           className={cn(
-            'rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 overflow-hidden',
-            'shadow-sm hover:shadow-md transition-all duration-200',
+            'relative rounded-xl border border-border bg-card overflow-hidden',
+            'hover:border-border/80 transition-all duration-200',
             'border-l-4 border-l-green-500'
           )}
         >
-          <div className="p-4">
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">{t('approved')}</p>
-                <div className="text-2xl font-bold text-green-600 mt-1 tabular-nums">
-                  {formatBudgetCurrency(summary.approvedBudget)}
-                </div>
-                <p className="text-xs text-slate-500 dark:text-neutral-400 mt-2">
-                  {t('ofTotal', { percent: ((summary.approvedBudget / summary.totalBudget) * 100 || 0).toFixed(1) })}
-                </p>
-              </div>
-              <div className="h-10 w-10 rounded-xl bg-green-50 dark:bg-green-950 flex items-center justify-center">
-                <CheckCircle className="h-5 w-5 text-green-600" />
-              </div>
+          {/* Watermark Icon */}
+          <div className="absolute -right-4 -bottom-4 pointer-events-none">
+            <CheckCircle className="w-24 h-24 text-green-600 opacity-[0.08]" />
+          </div>
+          <div className="relative p-4">
+            <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">{t('approved')}</p>
+            <div className="text-2xl font-bold text-green-600 mt-1 tabular-nums">
+              {formatBudgetCurrency(summary.approvedBudget)}
             </div>
+            <p className="text-xs text-muted-foreground mt-2">
+              {t('ofTotal', { percent: ((summary.approvedBudget / summary.totalBudget) * 100 || 0).toFixed(1) })}
+            </p>
           </div>
         </div>
 
         {/* Pending Card */}
         <div
           className={cn(
-            'rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 overflow-hidden',
-            'shadow-sm hover:shadow-md transition-all duration-200',
+            'relative rounded-xl border border-border bg-card overflow-hidden',
+            'hover:border-border/80 transition-all duration-200',
             'border-l-4 border-l-amber-500'
           )}
         >
-          <div className="p-4">
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">{t('pending')}</p>
-                <div className="text-2xl font-bold text-amber-600 mt-1 tabular-nums">
-                  {formatBudgetCurrency(summary.pendingBudget)}
-                </div>
-                <p className="text-xs text-slate-500 dark:text-neutral-400 mt-2">{t('awaitingApproval')}</p>
-              </div>
-              <div className="h-10 w-10 rounded-xl bg-amber-50 dark:bg-amber-950 flex items-center justify-center">
-                <Clock className="h-5 w-5 text-amber-600" />
-              </div>
+          {/* Watermark Icon */}
+          <div className="absolute -right-4 -bottom-4 pointer-events-none">
+            <Clock className="w-24 h-24 text-amber-600 opacity-[0.08]" />
+          </div>
+          <div className="relative p-4">
+            <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">{t('pending')}</p>
+            <div className="text-2xl font-bold text-amber-600 mt-1 tabular-nums">
+              {formatBudgetCurrency(summary.pendingBudget)}
             </div>
+            <p className="text-xs text-muted-foreground mt-2">{t('awaitingApproval')}</p>
           </div>
         </div>
 
         {/* Draft Card */}
         <div
           className={cn(
-            'rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 overflow-hidden',
-            'shadow-sm hover:shadow-md transition-all duration-200',
+            'relative rounded-xl border border-border bg-card overflow-hidden',
+            'hover:border-border/80 transition-all duration-200',
             'border-l-4 border-l-slate-400'
           )}
         >
-          <div className="p-4">
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">{t('draft')}</p>
-                <div className="text-2xl font-bold text-slate-600 mt-1 tabular-nums">
-                  {formatBudgetCurrency(
-                    summary.totalBudget -
-                    summary.approvedBudget -
-                    summary.pendingBudget
-                  )}
-                </div>
-                <p className="text-xs text-slate-500 dark:text-neutral-400 mt-2">{t('notSubmitted')}</p>
-              </div>
-              <div className="h-10 w-10 rounded-xl bg-slate-100 dark:bg-neutral-800 flex items-center justify-center">
-                <XCircle className="h-5 w-5 text-slate-500" />
-              </div>
+          {/* Watermark Icon */}
+          <div className="absolute -right-4 -bottom-4 pointer-events-none">
+            <XCircle className="w-24 h-24 text-slate-500 opacity-[0.08]" />
+          </div>
+          <div className="relative p-4">
+            <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">{t('draft')}</p>
+            <div className="text-2xl font-bold text-slate-600 dark:text-slate-400 mt-1 tabular-nums">
+              {formatBudgetCurrency(
+                summary.totalBudget -
+                summary.approvedBudget -
+                summary.pendingBudget
+              )}
             </div>
+            <p className="text-xs text-muted-foreground mt-2">{t('notSubmitted')}</p>
           </div>
         </div>
       </div>

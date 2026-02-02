@@ -52,10 +52,10 @@ export function LanguageSwitcher({ locale: propLocale }: LanguageSwitcherProps) 
         onClick={() => switchToLocale('en')}
         disabled={isPending}
         className={cn(
-          'px-2 py-1 text-xs font-semibold rounded transition-all duration-200',
+          'px-2 py-1 text-xs rounded transition-all duration-200',
           currentLocale === 'en'
-            ? 'bg-background text-foreground shadow-sm'
-            : 'text-muted-foreground hover:text-foreground'
+            ? 'text-foreground font-bold'
+            : 'text-muted-foreground font-normal hover:font-bold hover:text-foreground'
         )}
         aria-label="Switch to English"
       >
@@ -66,10 +66,10 @@ export function LanguageSwitcher({ locale: propLocale }: LanguageSwitcherProps) 
         onClick={() => switchToLocale('vi')}
         disabled={isPending}
         className={cn(
-          'px-2 py-1 text-xs font-semibold rounded transition-all duration-200',
+          'px-2 py-1 text-xs rounded transition-all duration-200',
           currentLocale === 'vi'
-            ? 'bg-background text-foreground shadow-sm'
-            : 'text-muted-foreground hover:text-foreground'
+            ? 'text-foreground font-bold'
+            : 'text-muted-foreground font-normal hover:font-bold hover:text-foreground'
         )}
         aria-label="Switch to Vietnamese"
       >

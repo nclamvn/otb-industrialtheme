@@ -159,7 +159,7 @@ export const SUPPLIER_STATUS_CONFIG: Record<SupplierRequestStatus, {
   draft: {
     label: 'Draft',
     color: 'text-slate-600 dark:text-slate-400',
-    bgColor: 'bg-slate-100 dark:bg-slate-800',
+    bgColor: 'bg-muted',
   },
   pending: {
     label: 'Pending',

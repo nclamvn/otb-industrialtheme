@@ -51,7 +51,7 @@ export function PlanningRequestPreview({
   return (
     <div className={cn('space-y-6', className)}>
       {/* Supplier Info Card */}
-      <div className="p-4 rounded-xl border border-slate-200 dark:border-neutral-700 bg-slate-50 dark:bg-neutral-800/50">
+      <div className="p-4 rounded-xl border border-border bg-muted/50">
         <div className="flex items-start gap-4">
           <div className="p-3 rounded-lg bg-blue-100 dark:bg-blue-900/30">
             <Building2 className="h-6 w-6 text-blue-600 dark:text-blue-400" />
@@ -89,7 +89,7 @@ export function PlanningRequestPreview({
       {(deliveryDate || notes) && (
         <div className="grid grid-cols-2 gap-4">
           {deliveryDate && (
-            <div className="p-3 rounded-lg border border-slate-200 dark:border-neutral-700">
+            <div className="p-3 rounded-lg border border-border">
               <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-neutral-400 mb-1">
                 <Calendar className="h-4 w-4" />
                 <span>Requested Delivery</span>
@@ -100,7 +100,7 @@ export function PlanningRequestPreview({
             </div>
           )}
           {notes && (
-            <div className="p-3 rounded-lg border border-slate-200 dark:border-neutral-700">
+            <div className="p-3 rounded-lg border border-border">
               <div className="text-sm text-slate-500 dark:text-neutral-400 mb-1">
                 Notes
               </div>
@@ -114,7 +114,7 @@ export function PlanningRequestPreview({
       <div className="border rounded-lg overflow-hidden dark:border-neutral-700">
         <Table>
           <TableHeader>
-            <TableRow className="bg-slate-50 dark:bg-neutral-800">
+            <TableRow className="bg-muted/50">
               <TableHead className="font-semibold">Style Code</TableHead>
               <TableHead className="font-semibold">Product</TableHead>
               <TableHead className="font-semibold">Category</TableHead>

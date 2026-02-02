@@ -37,6 +37,13 @@ import {
 import { PageHeader } from '@/components/shared/page-header';
 import { DataTable } from '@/components/shared/data-table';
 import { ConfirmDialog } from '@/components/shared/confirm-dialog';
+import { VersionComparisonDialog } from '@/components/version';
+import { QuickPreviewDemo, useQuickPreview } from '@/components/preview';
+import { NavigationDemo } from '@/components/navigation';
+import { VarianceDemo } from '@/components/variance';
+import { TimelineDemo } from '@/components/timeline';
+import { MultiFormatExportDialog } from '@/components/export';
+import { InlineEditDemo } from '@/components/inline-edit';
 import { Season, Brand, OTB_STATUS_LABELS, OTB_VERSION_LABELS } from '@/types';
 
 interface OTBPlanWithRelations {
@@ -200,6 +207,8 @@ export default function OTBAnalysisPage() {
     { totalAmount: 0, totalUnits: 0, count: 0 }
   );
 
+  const { openPreview } = useQuickPreview();
+
   const columns: ColumnDef<OTBPlanWithRelations>[] = [
     {
       accessorKey: 'name',
@@ -259,6 +268,10 @@ export default function OTBAnalysisPage() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => openPreview('otb', plan.id)}>
+                <Eye className="mr-2 h-4 w-4" />
+                Quick Preview
+              </DropdownMenuItem>
               <DropdownMenuItem onClick={() => router.push(`/otb-analysis/${plan.id}`)}>
                 <Eye className="mr-2 h-4 w-4" />
                 {tCommon('view')}
@@ -300,112 +313,123 @@ export default function OTBAnalysisPage() {
         title={t('title')}
         description={t('description')}
       >
-        <Link href="/otb-analysis/new">
-          <Button>
-            <Plus className="mr-2 h-4 w-4" />
-            {t('createPlan')}
-          </Button>
-        </Link>
+        <div className="flex items-center gap-2">
+          <MultiFormatExportDialog
+            entityType="otb"
+            entityName="OTB Analysis"
+            availableSections={[
+              { id: 'summary', label: 'Summary' },
+              { id: 'details', label: 'Details' },
+              { id: 'charts', label: 'Charts' },
+            ]}
+          />
+          <VersionComparisonDialog
+            entityType="otb"
+            entityName="OTB Plan"
+          />
+          <Link href="/otb-analysis/new">
+            <Button>
+              <Plus className="mr-2 h-4 w-4" />
+              {t('createPlan')}
+            </Button>
+          </Link>
+        </div>
       </PageHeader>
 
       {/* Summary Cards */}
       <div className="grid gap-4 md:grid-cols-4">
         <div
           className={cn(
-            'relative overflow-hidden rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950',
-            'shadow-sm hover:shadow-md transition-all duration-200',
+            'relative overflow-hidden rounded-xl border border-border bg-card',
+            'hover:border-border/80 transition-all duration-200',
             'border-l-4 border-l-blue-500'
           )}
         >
+            {/* Watermark Icon */}
+          <div className="absolute -right-4 -bottom-4 pointer-events-none">
+            <Package className="w-24 h-24 text-blue-500 opacity-[0.08]" />
+          </div>
           <div className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">
-                  {t('totalPlans')}
-                </p>
-                <p className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums">
-                  {totals.count}
-                </p>
-                <p className="text-xs text-slate-500 dark:text-neutral-400 mt-1">{t('activePlans')}</p>
-              </div>
-              <div className="h-10 w-10 rounded-xl bg-blue-50 dark:bg-blue-950 flex items-center justify-center">
-                <Package className="h-5 w-5 text-blue-500" />
-              </div>
+            <div>
+              <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">
+                {t('totalPlans')}
+              </p>
+              <p className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums pr-14">
+                {totals.count}
+              </p>
+              <p className="text-xs text-slate-500 dark:text-neutral-400 mt-1">{t('activePlans')}</p>
             </div>
           </div>
         </div>
 
         <div
           className={cn(
-            'relative overflow-hidden rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950',
-            'shadow-sm hover:shadow-md transition-all duration-200',
+            'relative overflow-hidden rounded-xl border border-border bg-card',
+            'hover:border-border/80 transition-all duration-200',
             'border-l-4 border-l-purple-500'
           )}
         >
+          {/* Watermark Icon */}
+          <div className="absolute -right-4 -bottom-4 pointer-events-none">
+            <DollarSign className="w-24 h-24 text-purple-500 opacity-[0.08]" />
+          </div>
           <div className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">
-                  {t('totalAmount')}
-                </p>
-                <p className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums">
-                  ${totals.totalAmount.toLocaleString()}
-                </p>
-                <p className="text-xs text-slate-500 dark:text-neutral-400 mt-1">{t('plannedSpend')}</p>
-              </div>
-              <div className="h-10 w-10 rounded-xl bg-purple-50 dark:bg-purple-950 flex items-center justify-center">
-                <DollarSign className="h-5 w-5 text-purple-500" />
-              </div>
+            <div>
+              <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">
+                {t('totalAmount')}
+              </p>
+              <p className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums pr-14">
+                ${totals.totalAmount.toLocaleString()}
+              </p>
+              <p className="text-xs text-slate-500 dark:text-neutral-400 mt-1">{t('plannedSpend')}</p>
             </div>
           </div>
         </div>
 
         <div
           className={cn(
-            'relative overflow-hidden rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950',
-            'shadow-sm hover:shadow-md transition-all duration-200',
+            'relative overflow-hidden rounded-xl border border-border bg-card',
+            'hover:border-border/80 transition-all duration-200',
             'border-l-4 border-l-green-500'
           )}
         >
+          {/* Watermark Icon */}
+          <div className="absolute -right-4 -bottom-4 pointer-events-none">
+            <TrendingUp className="w-24 h-24 text-green-500 opacity-[0.08]" />
+          </div>
           <div className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">
-                  {t('totalUnits')}
-                </p>
-                <p className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums">
-                  {totals.totalUnits.toLocaleString()}
-                </p>
-                <p className="text-xs text-slate-500 dark:text-neutral-400 mt-1">{t('plannedUnits')}</p>
-              </div>
-              <div className="h-10 w-10 rounded-xl bg-green-50 dark:bg-green-950 flex items-center justify-center">
-                <TrendingUp className="h-5 w-5 text-green-500" />
-              </div>
+            <div>
+              <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">
+                {t('totalUnits')}
+              </p>
+              <p className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums pr-14">
+                {totals.totalUnits.toLocaleString()}
+              </p>
+              <p className="text-xs text-slate-500 dark:text-neutral-400 mt-1">{t('plannedUnits')}</p>
             </div>
           </div>
         </div>
 
         <div
           className={cn(
-            'relative overflow-hidden rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950',
-            'shadow-sm hover:shadow-md transition-all duration-200',
+            'relative overflow-hidden rounded-xl border border-border bg-card',
+            'hover:border-border/80 transition-all duration-200',
             'border-l-4 border-l-amber-500'
           )}
         >
+          {/* Watermark Icon */}
+          <div className="absolute -right-4 -bottom-4 pointer-events-none">
+            <Sparkles className="w-24 h-24 text-amber-500 opacity-[0.08]" />
+          </div>
           <div className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">
-                  {t('aiProposals')}
-                </p>
-                <p className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums">
-                  {t('ready')}
-                </p>
-                <p className="text-xs text-slate-500 dark:text-neutral-400 mt-1">{t('generateProposals')}</p>
-              </div>
-              <div className="h-10 w-10 rounded-xl bg-amber-50 dark:bg-amber-950 flex items-center justify-center">
-                <Sparkles className="h-5 w-5 text-amber-500" />
-              </div>
+            <div>
+              <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">
+                {t('aiProposals')}
+              </p>
+              <p className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums pr-14">
+                {t('ready')}
+              </p>
+              <p className="text-xs text-slate-500 dark:text-neutral-400 mt-1">{t('generateProposals')}</p>
             </div>
           </div>
         </div>
@@ -464,6 +488,21 @@ export default function OTBAnalysisPage() {
         searchPlaceholder={t('searchPlaceholder')}
         isLoading={isLoading}
       />
+
+      {/* Quick Preview Demo - UX-5 */}
+      <QuickPreviewDemo />
+
+      {/* Drill-Down Navigation Demo - UX-6 */}
+      <NavigationDemo />
+
+      {/* Variance Highlights Demo - UX-7 */}
+      <VarianceDemo />
+
+      {/* Activity Timeline Demo - UX-9 */}
+      <TimelineDemo />
+
+      {/* Inline Edit Demo - UX-11 */}
+      <InlineEditDemo />
 
       {/* Delete Confirmation */}
       <ConfirmDialog

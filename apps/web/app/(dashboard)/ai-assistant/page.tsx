@@ -17,7 +17,6 @@ import {
   Loader2,
   Bot,
   User,
-  Globe,
   Copy,
   Check,
   RefreshCw,
@@ -48,6 +47,7 @@ import {
   QUICK_ACTIONS,
 } from '@/lib/ai/hooks';
 import { useVoiceInput, VOICE_LANGUAGES } from '@/lib/ai/hooks/use-voice-input';
+import { LanguageSwitcher } from '@/components/i18n/language-switcher';
 
 // Tool icons mapping
 const TOOL_ICONS: Record<string, React.ReactNode> = {
@@ -83,7 +83,7 @@ interface Conversation {
 export default function AIAssistantPage() {
   const locale = useLocale();
   const t = useTranslations('pages.aiAssistant');
-  const [language, setLanguage] = useState<'en' | 'vi'>(locale === 'vi' ? 'vi' : 'en');
+  const language = locale === 'vi' ? 'vi' : 'en';
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [copiedId, setCopiedId] = useState<string | null>(null);
@@ -113,25 +113,55 @@ export default function AIAssistantPage() {
     },
   });
 
-  const { isListening, isSupported, startListening, stopListening, transcript } =
-    useVoiceInput({
+  const formRef = useRef<HTMLFormElement>(null);
+
+  const {
+    isListening,
+    isSupported,
+    startListening,
+    stopListening,
+    transcript,
+    interimTranscript,
+    audioLevel,
+    error: voiceError
+  } = useVoiceInput({
       language: VOICE_LANGUAGES[language],
       onResult: (text) => {
         setInput(text);
       },
+      onInterimResult: (text) => {
+        // Show interim results in real-time while speaking
+        setInput(text);
+      },
+      autoSubmit: true,
+      onAutoSubmit: () => {
+        // Submit the form automatically after voice input
+        if (formRef.current && input.trim()) {
+          formRef.current.requestSubmit();
+        }
+      },
+      onError: (error) => {
+        console.error('Voice input error:', error);
+      },
     });
 
-  // Sync language with global locale when it changes
-  useEffect(() => {
-    setLanguage(locale === 'vi' ? 'vi' : 'en');
-  }, [locale]);
-
-  // Update input when voice transcript changes
+  // Update input when voice transcript changes (final result)
   useEffect(() => {
     if (transcript) {
       setInput(transcript);
     }
   }, [transcript, setInput]);
+
+  // Show voice error briefly
+  useEffect(() => {
+    if (voiceError) {
+      // Clear error after 3 seconds
+      const timer = setTimeout(() => {
+        // Error will clear on next interaction
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [voiceError]);
 
   // Scroll to bottom when new messages arrive
   useEffect(() => {
@@ -245,17 +275,9 @@ export default function AIAssistantPage() {
                 </div>
               </ScrollArea>
 
-              {/* Sidebar Footer */}
-              <div className="p-4 border-t space-y-2">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="w-full justify-start gap-2"
-                  onClick={() => setLanguage(language === 'en' ? 'vi' : 'en')}
-                >
-                  <Globe className="h-4 w-4" />
-                  {language === 'vi' ? t('languageVi') : t('languageEn')}
-                </Button>
+              {/* Sidebar Footer - Language Toggle */}
+              <div className="p-3 border-t flex justify-center">
+                <LanguageSwitcher />
               </div>
             </motion.div>
           )}
@@ -289,9 +311,6 @@ export default function AIAssistantPage() {
                   <h1 className="font-semibold truncate">
                     {t('title')}
                   </h1>
-                  <p className="text-xs text-muted-foreground truncate">
-                    {t('subtitle')}
-                  </p>
                 </div>
               </div>
             </div>
@@ -477,91 +496,141 @@ export default function AIAssistantPage() {
           {/* Input Area */}
           <div className="p-4">
             <div className="max-w-3xl mx-auto">
-              <form onSubmit={handleSubmit} className="flex items-center gap-2">
-                {/* Voice Input Button */}
-                {isSupported && (
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
+              <form ref={formRef} onSubmit={handleSubmit}>
+                {/* Elegant Composer */}
+                <div className="flex items-center gap-1 px-2 rounded-xl border border-border bg-card transition-all">
+                  {/* Voice Input Button - Inside */}
+                  {isSupported && (
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <button
+                          type="button"
+                          onClick={isListening ? stopListening : startListening}
+                          className={cn(
+                            'p-2 rounded-lg transition-colors',
+                            isListening
+                              ? 'text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30'
+                              : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                          )}
+                        >
+                          {isListening ? (
+                            <MicOff className="h-5 w-5" />
+                          ) : (
+                            <Mic className="h-5 w-5" />
+                          )}
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        {isListening ? t('stopRecording') : t('voiceInput')}
+                      </TooltipContent>
+                    </Tooltip>
+                  )}
+
+                  {/* Text Input - No border */}
+                  <input
+                    ref={inputRef}
+                    value={input}
+                    onChange={handleInputChange}
+                    placeholder={t('inputPlaceholder')}
+                    disabled={isLoading}
+                    className="flex-1 py-3 px-2 bg-transparent text-sm placeholder:text-muted-foreground disabled:opacity-50"
+                    style={{ border: 'none', outline: 'none', boxShadow: 'none' }}
+                  />
+
+                  {/* Control Buttons - Inside */}
+                  <div className="flex items-center gap-1">
+                    {isLoading ? (
+                      <button
                         type="button"
-                        variant={isListening ? 'destructive' : 'outline'}
-                        size="icon"
-                        onClick={isListening ? stopListening : startListening}
+                        onClick={stop}
+                        className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
                       >
-                        {isListening ? (
-                          <MicOff className="h-4 w-4" />
-                        ) : (
-                          <Mic className="h-4 w-4" />
+                        <StopCircle className="h-5 w-5" />
+                      </button>
+                    ) : (
+                      <>
+                        {messages.length > 0 && (
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <button
+                                type="button"
+                                onClick={() => reload()}
+                                className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+                              >
+                                <RefreshCw className="h-5 w-5" />
+                              </button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              {t('regenerate')}
+                            </TooltipContent>
+                          </Tooltip>
                         )}
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      {isListening ? t('stopRecording') : t('voiceInput')}
-                    </TooltipContent>
-                  </Tooltip>
-                )}
-
-                {/* Text Input */}
-                <Input
-                  ref={inputRef}
-                  value={input}
-                  onChange={handleInputChange}
-                  placeholder={t('inputPlaceholder')}
-                  disabled={isLoading}
-                  className="flex-1"
-                />
-
-                {/* Control Buttons */}
-                {isLoading ? (
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="icon"
-                    onClick={stop}
-                  >
-                    <StopCircle className="h-4 w-4" />
-                  </Button>
-                ) : (
-                  <>
-                    {messages.length > 0 && (
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="icon"
-                            onClick={() => reload()}
-                          >
-                            <RefreshCw className="h-4 w-4" />
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          {t('regenerate')}
-                        </TooltipContent>
-                      </Tooltip>
+                        <button
+                          type="submit"
+                          disabled={!input.trim()}
+                          className={cn(
+                            'p-2 rounded-lg transition-colors',
+                            input.trim()
+                              ? 'text-primary hover:bg-primary/10'
+                              : 'text-muted-foreground/50 cursor-not-allowed'
+                          )}
+                        >
+                          <Send className="h-5 w-5" />
+                        </button>
+                      </>
                     )}
-                    <Button
-                      type="submit"
-                      disabled={!input.trim()}
-                      size="icon"
-                    >
-                      <Send className="h-4 w-4" />
-                    </Button>
-                  </>
-                )}
+                  </div>
+                </div>
               </form>
 
-              {/* Voice Recording Indicator */}
-              {isListening && (
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="flex items-center justify-center gap-2 mt-2 text-sm text-muted-foreground"
-                >
-                  <span className="h-2 w-2 rounded-full bg-red-500 animate-pulse" />
-                  {t('recording')}
-                </motion.div>
-              )}
+              {/* Voice Recording Indicator with Audio Visualizer */}
+              <AnimatePresence>
+                {isListening && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="flex items-center justify-center gap-3 mt-3 py-2"
+                  >
+                    {/* Audio Level Visualizer Bars */}
+                    <div className="flex items-end gap-[2px] h-5">
+                      {[...Array(5)].map((_, i) => {
+                        // Create dynamic bar heights based on audio level
+                        const baseHeight = 4;
+                        const maxHeight = 20;
+                        const variance = [0.6, 1, 0.8, 0.9, 0.7][i];
+                        const height = baseHeight + (maxHeight - baseHeight) * audioLevel * variance;
+                        return (
+                          <motion.div
+                            key={i}
+                            className="w-1 bg-red-500 rounded-full"
+                            animate={{ height }}
+                            transition={{ duration: 0.1 }}
+                          />
+                        );
+                      })}
+                    </div>
+                    <span className="text-sm text-muted-foreground">
+                      {interimTranscript ? t('listening') : t('recording')}
+                    </span>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {/* Voice Error Display */}
+              <AnimatePresence>
+                {voiceError && !isListening && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0 }}
+                    className="flex items-center justify-center gap-2 mt-2 text-sm text-red-500"
+                  >
+                    <MicOff className="h-4 w-4" />
+                    {voiceError}
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           </div>
         </div>

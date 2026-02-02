@@ -42,12 +42,12 @@ export function DeliveryStoreSummary({ data, className }: DeliveryStoreSummaryPr
           <div
             key={store.id}
             className={cn(
-              'rounded-xl border-l-4 bg-white dark:bg-slate-800 overflow-hidden transition-all hover:shadow-md',
+              'rounded-xl border-l-4 bg-card overflow-hidden transition-all hover:border-border/80',
               colors.border
             )}
           >
             {/* Header */}
-            <div className={cn('px-4 py-3 border-b border-slate-200 dark:border-slate-700', colors.bg)}>
+            <div className={cn('px-4 py-3 border-b border-border', colors.bg)}>
               <div className="flex items-center gap-2">
                 <Building2 className={cn('w-5 h-5', colors.text)} />
                 <div>
@@ -83,7 +83,7 @@ export function DeliveryStoreSummary({ data, className }: DeliveryStoreSummaryPr
               </div>
 
               {/* Monthly Breakdown */}
-              <div className="pt-3 border-t border-slate-200 dark:border-slate-700">
+              <div className="pt-3 border-t border-border">
                 <div className="flex items-center gap-2 text-xs text-slate-500 mb-3">
                   <Calendar className="w-3 h-3" />
                   Monthly Breakdown
@@ -97,13 +97,13 @@ export function DeliveryStoreSummary({ data, className }: DeliveryStoreSummaryPr
                           <span className="text-slate-600 dark:text-slate-400">{m.label}</span>
                           <span className="font-medium">{m.units.toLocaleString()}</span>
                         </div>
-                        <div className="h-1.5 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
+                        <div className="h-1.5 bg-muted dark:bg-slate-700 rounded-full overflow-hidden">
                           <div
                             className={cn(
                               'h-full rounded-full transition-all',
                               store.storeGroup === 'REX' && 'bg-blue-500',
                               store.storeGroup === 'TTP' && 'bg-purple-500',
-                              store.storeGroup === 'ALL' && 'bg-slate-500'
+                              store.storeGroup === 'ALL' && 'bg-muted/500'
                             )}
                             style={{ width: `${monthPct}%` }}
                           />

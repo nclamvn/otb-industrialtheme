@@ -360,76 +360,72 @@ export default function SizeProfilesPage() {
       <div className="grid gap-4 md:grid-cols-4">
         <div
           className={cn(
-            'relative overflow-hidden rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950',
-            'shadow-sm hover:shadow-md transition-all duration-200',
+            'relative overflow-hidden rounded-xl border border-border bg-card',
+            'hover:border-border/80 transition-all duration-200',
             'border-l-4 border-l-blue-500 p-4'
           )}
         >
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-blue-50 dark:bg-blue-950 flex items-center justify-center">
-              <ListChecks className="h-5 w-5 text-blue-500" />
-            </div>
-            <div>
-              <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">Total Profiles</p>
-              <p className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums">{profiles.length}</p>
-            </div>
+          {/* Watermark Icon */}
+          <div className="absolute -right-4 -bottom-4 pointer-events-none">
+            <ListChecks className="w-24 h-24 text-blue-500 opacity-[0.08]" />
+          </div>
+          <div>
+            <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">Total Profiles</p>
+            <p className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums pr-14">{profiles.length}</p>
           </div>
           <p className="text-sm text-slate-500 dark:text-neutral-400 mt-2">{activeProfiles} active</p>
         </div>
 
         <div
           className={cn(
-            'relative overflow-hidden rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950',
-            'shadow-sm hover:shadow-md transition-all duration-200',
+            'relative overflow-hidden rounded-xl border border-border bg-card',
+            'hover:border-border/80 transition-all duration-200',
             'border-l-4 border-l-purple-500 p-4'
           )}
         >
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-purple-50 dark:bg-purple-950 flex items-center justify-center">
-              <Sparkles className="h-5 w-5 text-purple-500" />
-            </div>
-            <div>
-              <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">System Optimal</p>
-              <p className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums">{byType['SYSTEM_OPTIMAL'] || 0}</p>
-            </div>
+          {/* Watermark Icon */}
+          <div className="absolute -right-4 -bottom-4 pointer-events-none">
+            <Sparkles className="w-24 h-24 text-purple-500 opacity-[0.08]" />
+          </div>
+          <div>
+            <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">System Optimal</p>
+            <p className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums pr-14">{byType['SYSTEM_OPTIMAL'] || 0}</p>
           </div>
           <p className="text-sm text-slate-500 dark:text-neutral-400 mt-2">AI-generated</p>
         </div>
 
         <div
           className={cn(
-            'relative overflow-hidden rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950',
-            'shadow-sm hover:shadow-md transition-all duration-200',
+            'relative overflow-hidden rounded-xl border border-border bg-card',
+            'hover:border-border/80 transition-all duration-200',
             'border-l-4 border-l-green-500 p-4'
           )}
         >
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-green-50 dark:bg-green-950 flex items-center justify-center">
-              <BarChart3 className="h-5 w-5 text-green-500" />
-            </div>
-            <div>
-              <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">Final Approved</p>
-              <p className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums">{byType['FINAL'] || 0}</p>
-            </div>
+          {/* Watermark Icon */}
+          <div className="absolute -right-4 -bottom-4 pointer-events-none">
+            <BarChart3 className="w-24 h-24 text-green-500 opacity-[0.08]" />
+          </div>
+          <div>
+            <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">Final Approved</p>
+            <p className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums pr-14">{byType['FINAL'] || 0}</p>
           </div>
           <p className="text-sm text-slate-500 dark:text-neutral-400 mt-2">Ready for use</p>
         </div>
 
         <div
           className={cn(
-            'relative overflow-hidden rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950',
-            'shadow-sm hover:shadow-md transition-all duration-200',
+            'relative overflow-hidden rounded-xl border border-border bg-card',
+            'hover:border-border/80 transition-all duration-200',
             'border-l-4 border-l-amber-500 p-4'
           )}
         >
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-amber-50 dark:bg-amber-950 flex items-center justify-center">
-              <ListChecks className="h-5 w-5 text-amber-500" />
-            </div>
-            <div>
-              <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">Size Definitions</p>
-              <p className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums">{definitions.length}</p>
-            </div>
+          {/* Watermark Icon */}
+          <div className="absolute -right-4 -bottom-4 pointer-events-none">
+            <ListChecks className="w-24 h-24 text-amber-500 opacity-[0.08]" />
+          </div>
+          <div>
+            <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">Size Definitions</p>
+            <p className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums pr-14">{definitions.length}</p>
           </div>
           <p className="text-sm text-slate-500 dark:text-neutral-400 mt-2">
             {definitions.filter((d) => d.isActive).length} active

@@ -78,7 +78,7 @@ const ContextSelector = ({
             className="fixed inset-0 z-40"
             onClick={() => setIsOpen(false)}
           />
-          <div className="absolute top-full left-0 mt-1 z-50 min-w-[180px] py-1 rounded-lg bg-card border border-border shadow-lg">
+          <div className="absolute top-full left-0 mt-1 z-50 min-w-[180px] py-1 rounded-lg bg-card border border-border">
             {item.options?.map((option) => (
               <button
                 key={option.id}
@@ -132,7 +132,7 @@ export function DAFCContextBar({
     <div
       className={cn(
         'flex items-center justify-between gap-4 p-3 rounded-xl',
-        'bg-gradient-to-r from-[hsl(30_43%_72%/0.08)] to-transparent',
+        'bg-[hsl(30_43%_72%/0.06)]',
         'border border-[hsl(30_43%_72%/0.2)]',
         className
       )}

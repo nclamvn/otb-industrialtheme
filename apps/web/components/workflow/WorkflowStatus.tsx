@@ -112,7 +112,7 @@ export function WorkflowStatus({
                     status === 'completed' && 'bg-emerald-500 border-emerald-500 text-white',
                     status === 'current' && 'bg-blue-500 border-blue-500 text-white animate-pulse',
                     status === 'blocked' && 'bg-amber-500 border-amber-500 text-white',
-                    status === 'pending' && 'bg-slate-100 dark:bg-neutral-800 border-slate-300 dark:border-neutral-600 text-slate-400'
+                    status === 'pending' && 'bg-muted dark:bg-neutral-800 border-slate-300 dark:border-neutral-600 text-slate-400'
                   )}
                 >
                   {status === 'completed' ? (
@@ -191,7 +191,7 @@ export function WorkflowStatus({
                   <TooltipTrigger asChild>
                     <div
                       className={cn(
-                        'w-8 h-8 rounded-full flex items-center justify-center border-2 bg-white dark:bg-neutral-900 transition-all',
+                        'w-8 h-8 rounded-full flex items-center justify-center border-2 bg-card dark:bg-neutral-900 transition-all',
                         status === 'completed' && 'border-emerald-500 text-emerald-500',
                         status === 'current' && 'border-blue-500 text-blue-500 ring-4 ring-blue-100 dark:ring-blue-900',
                         status === 'blocked' && 'border-amber-500 text-amber-500 ring-4 ring-amber-100 dark:ring-amber-900',

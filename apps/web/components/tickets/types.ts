@@ -140,7 +140,7 @@ export const TICKET_STATUS_CONFIG: Record<TicketStatus, {
     label: 'Draft',
     icon: 'FileEdit',
     color: 'text-slate-600 dark:text-slate-400',
-    bgColor: 'bg-slate-100 dark:bg-slate-800',
+    bgColor: 'bg-muted',
   },
   submitted: {
     label: 'Submitted',
@@ -176,7 +176,7 @@ export const TICKET_STATUS_CONFIG: Record<TicketStatus, {
     label: 'Cancelled',
     icon: 'Ban',
     color: 'text-slate-500 dark:text-slate-500',
-    bgColor: 'bg-slate-100 dark:bg-slate-900',
+    bgColor: 'bg-muted dark:bg-slate-900',
   },
 };
 
@@ -190,8 +190,8 @@ export const TICKET_PRIORITY_CONFIG: Record<TicketPriority, {
   low: {
     label: 'Low',
     color: 'text-slate-600 dark:text-slate-400',
-    bgColor: 'bg-slate-50 dark:bg-slate-900',
-    borderColor: 'border-slate-200 dark:border-slate-700',
+    bgColor: 'bg-muted/50 dark:bg-slate-900',
+    borderColor: 'border-border',
     dot: '⚪',
   },
   normal: {

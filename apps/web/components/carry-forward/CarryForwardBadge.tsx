@@ -144,7 +144,7 @@ export function CarryForwardBadge({
 
               {/* Recommended Action */}
               {data.recommendedAction && (
-                <div className="flex justify-between items-center pt-1 border-t border-slate-200 dark:border-slate-700">
+                <div className="flex justify-between items-center pt-1 border-t border-border">
                   <span className="text-slate-500">Recommended:</span>
                   <span
                     className={cn(

@@ -76,7 +76,7 @@ interface SKUVersionSelectorProps {
 }
 
 const STATUS_CONFIG: Record<SKUVersionStatus, { label: string; color: string; bgColor: string }> = {
-  DRAFT: { label: 'Draft', color: 'text-slate-600', bgColor: 'bg-slate-100' },
+  DRAFT: { label: 'Draft', color: 'text-slate-600', bgColor: 'bg-muted' },
   SUBMITTED: { label: 'Submitted', color: 'text-blue-600', bgColor: 'bg-blue-100' },
   APPROVED: { label: 'Approved', color: 'text-green-600', bgColor: 'bg-green-100' },
   REJECTED: { label: 'Rejected', color: 'text-red-600', bgColor: 'bg-red-100' },
@@ -260,7 +260,7 @@ export function SKUVersionSelector({
 
   if (isLoading) {
     return (
-      <div className={cn('flex items-center gap-2 p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50', className)}>
+      <div className={cn('flex items-center gap-2 p-3 rounded-xl border border-border bg-muted/50', className)}>
         <Loader2 className="h-4 w-4 animate-spin text-slate-400" />
         <span className="text-sm text-slate-500">Loading versions...</span>
       </div>
@@ -271,7 +271,7 @@ export function SKUVersionSelector({
 
   return (
     <>
-      <div className={cn('flex items-center gap-3 p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50', className)}>
+      <div className={cn('flex items-center gap-3 p-3 rounded-xl border border-border bg-muted/50', className)}>
         {/* Version Icon */}
         <div className="p-2 rounded-lg bg-blue-100 dark:bg-blue-900/50">
           <History className="h-4 w-4 text-blue-600 dark:text-blue-400" />

@@ -80,9 +80,9 @@ export function DeliveryMatrix({
   };
 
   return (
-    <div className={cn('rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden bg-white dark:bg-slate-900', className)}>
+    <div className={cn('rounded-xl border border-border bg-card overflow-hidden bg-card', className)}>
       {/* Header */}
-      <div className="bg-slate-50 dark:bg-slate-800 px-4 py-3 border-b border-slate-200 dark:border-slate-700">
+      <div className="bg-muted/50 px-4 py-3 border-b border-border">
         <div className="flex items-center justify-between flex-wrap gap-3">
           <h3 className="font-semibold text-slate-900 dark:text-white">Delivery Planning Matrix</h3>
           <div className="flex items-center gap-2">
@@ -123,15 +123,15 @@ export function DeliveryMatrix({
         <table className="w-full text-sm">
           <thead>
             {/* Store Header Row */}
-            <tr className="bg-slate-100 dark:bg-slate-800/50">
+            <tr className="bg-muted">
               <th
-                className="sticky left-0 z-20 bg-slate-100 dark:bg-slate-800/50 px-4 py-2 text-left font-medium border-r border-slate-200 dark:border-slate-700 min-w-[120px]"
+                className="sticky left-0 z-20 bg-muted px-4 py-2 text-left font-medium border-r border-border min-w-[120px]"
                 rowSpan={2}
               >
                 SKU
               </th>
               <th
-                className="sticky left-[120px] z-20 bg-slate-100 dark:bg-slate-800/50 px-4 py-2 text-left font-medium border-r border-slate-200 dark:border-slate-700 min-w-[180px]"
+                className="sticky left-[120px] z-20 bg-muted px-4 py-2 text-left font-medium border-r border-border min-w-[180px]"
                 rowSpan={2}
               >
                 Product
@@ -143,7 +143,7 @@ export function DeliveryMatrix({
                     key={store.id}
                     colSpan={data.months.length}
                     className={cn(
-                      'px-4 py-2 text-center font-medium border-r border-slate-200 dark:border-slate-700',
+                      'px-4 py-2 text-center font-medium border-r border-border',
                       colors.bg,
                       colors.text
                     )}
@@ -161,12 +161,12 @@ export function DeliveryMatrix({
             </tr>
 
             {/* Month Header Row */}
-            <tr className="bg-slate-50 dark:bg-slate-800/30">
+            <tr className="bg-muted/30">
               {data.stores.map((store) =>
                 data.months.map((month) => (
                   <th
                     key={`${store.id}-${month.month}`}
-                    className="px-2 py-1 text-center text-xs font-medium text-slate-600 dark:text-slate-400 border-r border-slate-200 dark:border-slate-700 min-w-[70px]"
+                    className="px-2 py-1 text-center text-xs font-medium text-slate-600 dark:text-slate-400 border-r border-border min-w-[70px]"
                   >
                     {month.label}
                   </th>
@@ -180,17 +180,17 @@ export function DeliveryMatrix({
               <tr
                 key={sku.skuId}
                 className={cn(
-                  'border-b border-slate-100 dark:border-slate-800',
-                  index % 2 === 0 ? 'bg-white dark:bg-slate-900' : 'bg-slate-50/50 dark:bg-slate-800/30'
+                  'border-b border-border',
+                  index % 2 === 0 ? 'bg-card' : 'bg-muted/30 dark:bg-slate-800/30'
                 )}
               >
                 {/* SKU Code */}
-                <td className="sticky left-0 z-10 bg-inherit px-4 py-2 font-mono text-xs border-r border-slate-200 dark:border-slate-700">
+                <td className="sticky left-0 z-10 bg-inherit px-4 py-2 font-mono text-xs border-r border-border">
                   {sku.skuCode}
                 </td>
 
                 {/* Product Name */}
-                <td className="sticky left-[120px] z-10 bg-inherit px-4 py-2 text-sm border-r border-slate-200 dark:border-slate-700 max-w-[180px] truncate">
+                <td className="sticky left-[120px] z-10 bg-inherit px-4 py-2 text-sm border-r border-border max-w-[180px] truncate">
                   {sku.skuName}
                 </td>
 
@@ -205,12 +205,12 @@ export function DeliveryMatrix({
                       <td
                         key={`${sku.skuId}-${store.id}-${month.month}`}
                         className={cn(
-                          'px-1 py-1 text-center border-r border-slate-100 dark:border-slate-800',
+                          'px-1 py-1 text-center border-r border-border',
                           isEdited && 'bg-amber-50 dark:bg-amber-900/20'
                         )}
                       >
                         {editable ? (
-                          <Input
+                          <input
                             type="number"
                             min={0}
                             value={value}
@@ -222,7 +222,7 @@ export function DeliveryMatrix({
                                 parseInt(e.target.value) || 0
                               )
                             }
-                            className="w-14 h-7 text-center text-xs mx-auto"
+                            className="w-14 h-7 text-center text-xs bg-transparent border-0 focus:outline-none focus:ring-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                           />
                         ) : (
                           <span
@@ -247,9 +247,9 @@ export function DeliveryMatrix({
             ))}
 
             {/* Totals Row */}
-            <tr className="bg-slate-100 dark:bg-slate-800 font-semibold">
+            <tr className="bg-muted font-semibold">
               <td
-                className="sticky left-0 z-10 bg-slate-100 dark:bg-slate-800 px-4 py-3 border-r border-slate-200 dark:border-slate-700"
+                className="sticky left-0 z-10 bg-muted px-4 py-3 border-r border-border"
                 colSpan={2}
               >
                 TOTAL
@@ -264,7 +264,7 @@ export function DeliveryMatrix({
                   return (
                     <td
                       key={`total-${store.id}-${month.month}`}
-                      className="px-2 py-3 text-center border-r border-slate-200 dark:border-slate-700"
+                      className="px-2 py-3 text-center border-r border-border"
                     >
                       {colTotal}
                     </td>
@@ -280,7 +280,7 @@ export function DeliveryMatrix({
       </div>
 
       {/* Footer */}
-      <div className="bg-slate-50 dark:bg-slate-800/50 px-4 py-2 border-t border-slate-200 dark:border-slate-700 text-xs text-slate-500">
+      <div className="bg-muted/50 px-4 py-2 border-t border-border text-xs text-slate-500">
         Showing {filteredSkus.length} of {data.skus.length} SKUs
         {hasChanges && (
           <span className="ml-2 text-amber-600">

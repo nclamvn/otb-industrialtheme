@@ -101,9 +101,9 @@ function CategoryItem({
     <div>
       <div
         className={cn(
-          // Unified: rounded-xl, p-4, border-l-4, shadow-sm, hover:shadow-md
-          'rounded-xl border border-slate-200 mb-2 overflow-hidden',
-          'shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer',
+          // Unified: rounded-xl, p-4, border-l-4, border border-border, hover:border-border/80
+          'rounded-xl border border-border bg-card mb-2 overflow-hidden',
+          'hover:border-border/80 transition-all duration-200 cursor-pointer',
           'border-l-4',
           status.borderColor,
           isSelected && 'ring-2 ring-amber-200 border-amber-300'
@@ -222,8 +222,8 @@ export function CategoryTree({
       {/* Header Summary - Unified card style */}
       <div
         className={cn(
-          'rounded-xl border border-slate-200 bg-white overflow-hidden mb-4',
-          'shadow-sm border-l-4 border-l-slate-800'
+          'rounded-xl border border-border bg-card overflow-hidden mb-4',
+          'border border-border border-l-4 border-l-slate-800'
         )}
       >
         <div className="p-4">

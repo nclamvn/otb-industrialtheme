@@ -216,7 +216,7 @@ export function SizeBreakdownTable({
         <div className="border rounded-lg overflow-hidden">
           <Table>
             <TableHeader>
-              <TableRow className="bg-slate-50">
+              <TableRow className="bg-muted/50">
                 <TableHead className="w-20">Size</TableHead>
                 <TableHead className="text-center">% Sales Mix</TableHead>
                 <TableHead className="text-center">% Sell-Thru</TableHead>
@@ -310,7 +310,7 @@ export function SizeBreakdownTable({
                       ) : (
                         <div
                           className={cn(
-                            'inline-flex items-center gap-1 px-2 py-1 rounded cursor-pointer hover:bg-slate-100 transition-colors',
+                            'inline-flex items-center gap-1 px-2 py-1 rounded cursor-pointer hover:bg-muted transition-colors',
                             isEditable && 'group'
                           )}
                           onClick={() =>
@@ -392,7 +392,7 @@ export function SizeBreakdownTable({
                       ) : (
                         <div
                           className={cn(
-                            'inline-flex items-center gap-1 px-2 py-1 rounded cursor-pointer hover:bg-slate-100 transition-colors',
+                            'inline-flex items-center gap-1 px-2 py-1 rounded cursor-pointer hover:bg-muted transition-colors',
                             isEditable && 'group'
                           )}
                           onClick={() =>
@@ -434,7 +434,7 @@ export function SizeBreakdownTable({
 
             {/* Footer - Totals */}
             <TableFooter>
-              <TableRow className="bg-slate-100 font-medium">
+              <TableRow className="bg-muted font-medium">
                 <TableCell>TOTAL</TableCell>
 
                 {/* Total Sales Mix */}

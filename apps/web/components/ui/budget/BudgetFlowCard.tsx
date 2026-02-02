@@ -70,7 +70,7 @@ function EditableBudget({
           onClick={(e) => e.stopPropagation()}
           className={cn(
             'pl-7 pr-3 py-1.5 w-32 rounded-lg',
-            'border-2 border-amber-300 dark:border-amber-700 bg-white dark:bg-neutral-950',
+            'border-2 border-amber-300 dark:border-amber-700 bg-card',
             'text-lg font-bold tabular-nums text-slate-900 dark:text-neutral-100',
             'focus:outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-100'
           )}
@@ -133,17 +133,24 @@ export function BudgetFlowCard({
   return (
     <div
       className={cn(
-        'rounded-xl border border-slate-200 dark:border-neutral-800 overflow-hidden transition-all duration-200',
-        'hover:shadow-md shadow-sm',
-        levelStyles.bg,
+        'relative rounded-xl border border-border bg-card overflow-hidden transition-all duration-200',
+        'hover:border-border/80',
+        'bg-card',
         isExpanded && 'ring-2 ring-amber-200 dark:ring-amber-800 border-amber-300 dark:border-amber-700'
       )}
       style={{ marginLeft: level > 1 ? `${(level - 1) * 24}px` : 0 }}
     >
+      {/* Watermark Icon - Large, faded into background */}
+      {Icon && !isEditing && (
+        <div className="absolute -right-4 -bottom-4 pointer-events-none">
+          <Icon className="w-20 h-20 text-muted-foreground opacity-[0.06]" />
+        </div>
+      )}
+
       {/* Card Header */}
       <div
         className={cn(
-          'flex items-center justify-between p-4',
+          'flex items-center justify-between p-3',
           'border-l-4',
           levelStyles.band,
           !isEditing && 'cursor-pointer'
@@ -152,19 +159,18 @@ export function BudgetFlowCard({
         role="button"
         aria-expanded={isExpanded}
       >
-        {/* Left: Icon + Name + Status */}
-        <div className="flex items-center gap-3 min-w-0 flex-1">
-          {Icon && <Icon className="w-5 h-5 text-slate-600 dark:text-neutral-300 flex-shrink-0" />}
+        {/* Left: Name + Status */}
+        <div className="flex items-center gap-2 min-w-0 flex-1">
           <div className="min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="font-semibold text-slate-900 dark:text-neutral-100 truncate">{name}</span>
+              <span className="font-semibold text-foreground truncate">{name}</span>
               <BudgetStatusBadge status={status} />
             </div>
           </div>
         </div>
 
         {/* Right: Budget + Actions */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 pr-12">
           {/* Budget Amount - Editable */}
           {isEditing ? (
             <EditableBudget
@@ -174,10 +180,10 @@ export function BudgetFlowCard({
             />
           ) : (
             <div className="text-right">
-              <div className="font-semibold text-slate-900 dark:text-neutral-100 tabular-nums">
+              <div className="font-semibold text-foreground tabular-nums">
                 {formatBudgetCurrency(budget)}
               </div>
-              <div className="text-sm text-slate-500 dark:text-neutral-400 tabular-nums">
+              <div className="text-xs text-muted-foreground tabular-nums">
                 {formatBudgetPercentage(percentage)}
               </div>
             </div>
@@ -190,7 +196,7 @@ export function BudgetFlowCard({
                 e.stopPropagation();
                 setIsEditing(true);
               }}
-              className="p-1.5 rounded-lg text-slate-400 dark:text-neutral-500 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-950 transition-all opacity-0 group-hover:opacity-100"
+              className="p-1.5 rounded-lg text-muted-foreground hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-950 transition-all opacity-0 group-hover:opacity-100"
             >
               <Pencil className="w-4 h-4" />
             </button>
@@ -198,11 +204,11 @@ export function BudgetFlowCard({
 
           {/* Expand/Collapse Chevron */}
           {hasChildren && (
-            <div className="w-6 h-6 flex items-center justify-center text-slate-400 dark:text-neutral-500">
+            <div className="w-5 h-5 flex items-center justify-center text-muted-foreground">
               {isExpanded ? (
-                <ChevronDown className="w-5 h-5" />
+                <ChevronDown className="w-4 h-4" />
               ) : (
-                <ChevronRight className="w-5 h-5" />
+                <ChevronRight className="w-4 h-4" />
               )}
             </div>
           )}
@@ -218,40 +224,40 @@ export function BudgetFlowCard({
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.2, ease: 'easeInOut' }}
           >
-            <div className={cn('px-4 pb-4 border-l-4', levelStyles.band)}>
+            <div className={cn('px-3 pb-3 border-l-4', levelStyles.band)}>
               {/* Progress Bar */}
               <BudgetProgressBar
                 budget={budget}
                 allocated={allocated}
-                className="mb-4"
+                className="mb-3"
               />
 
               {/* Children or SKU Proposal Link */}
               {children ? (
-                <div className="space-y-2 mt-4">
+                <div className="space-y-2 mt-3">
                   {children}
                 </div>
               ) : !hasChildren ? (
                 /* No children - show SKU Proposal link */
-                <div className="py-6 text-center border-t border-slate-100 dark:border-neutral-800 mt-4">
-                  <div className="mb-4">
-                    <div className="w-12 h-12 mx-auto rounded-xl bg-amber-50 dark:bg-amber-950 flex items-center justify-center">
-                      <Wand2 className="w-6 h-6 text-amber-600" />
+                <div className="py-4 text-center border-t border-border mt-3">
+                  <div className="mb-3">
+                    <div className="w-10 h-10 mx-auto rounded-xl bg-amber-100 dark:bg-amber-950 flex items-center justify-center">
+                      <Wand2 className="w-5 h-5 text-amber-600" />
                     </div>
                   </div>
-                  <h4 className="font-semibold text-slate-800 dark:text-neutral-200 mb-2">
+                  <h4 className="font-semibold text-foreground text-sm mb-1">
                     Ready for SKU Planning
                   </h4>
-                  <p className="text-sm text-slate-500 dark:text-neutral-400 mb-4 max-w-[280px] mx-auto">
-                    This category has {formatBudgetCurrency(budget)} allocated. Create an SKU proposal to plan specific products.
+                  <p className="text-xs text-muted-foreground mb-3 max-w-[250px] mx-auto">
+                    {formatBudgetCurrency(budget)} allocated. Create an SKU proposal.
                   </p>
                   <Link
                     href={`/sku-proposal?category=${id}&budget=${budget}`}
-                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-amber-500 text-white font-medium hover:bg-amber-600 transition-colors"
+                    className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-amber-500 text-white text-sm font-medium hover:bg-amber-600 transition-colors"
                   >
                     <Wand2 className="w-4 h-4" />
                     Create SKU Proposal
-                    <ExternalLink className="w-3.5 h-3.5 opacity-70" />
+                    <ExternalLink className="w-3 h-3 opacity-70" />
                   </Link>
                 </div>
               ) : null}

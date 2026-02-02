@@ -15,10 +15,18 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
-import { MoreVertical, Edit, Trash2, Copy, Check, Info } from 'lucide-react';
+import { MoreVertical, Edit, Trash2, Copy, Check, Info, Ruler } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { SizeProfile } from '@/types/size-profile';
-import { SIZE_PROFILE_TYPE_LABELS, SIZE_PROFILE_TYPE_COLORS } from '@/types/size-profile';
+import { SizeProfileType, SIZE_PROFILE_TYPE_LABELS, SIZE_PROFILE_TYPE_COLORS } from '@/types/size-profile';
+
+const profileTypeBorderColors: Record<SizeProfileType, string> = {
+  [SizeProfileType.HISTORICAL]: 'border-l-blue-500',
+  [SizeProfileType.CURRENT_TREND]: 'border-l-green-500',
+  [SizeProfileType.SYSTEM_OPTIMAL]: 'border-l-purple-500',
+  [SizeProfileType.USER_ADJUSTED]: 'border-l-amber-500',
+  [SizeProfileType.FINAL]: 'border-l-emerald-500',
+};
 
 interface SizeProfileCardProps {
   profile: SizeProfile;
@@ -46,14 +54,15 @@ export function SizeProfileCard({
     return (
       <Card
         className={cn(
-          'cursor-pointer hover:shadow-md transition-shadow',
+          'relative cursor-pointer hover:border-border/80 transition-shadow border-l-4 overflow-hidden',
+          profileTypeBorderColors[profile.profileType],
           isSelected && 'ring-2 ring-primary'
         )}
         onClick={() => onSelect?.(profile)}
       >
         <CardContent className="p-4">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium truncate">{profile.name}</span>
+            <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground truncate">{profile.name}</span>
             {isSelected && <Check className="h-4 w-4 text-primary" />}
           </div>
           <Badge
@@ -72,17 +81,19 @@ export function SizeProfileCard({
               <span className="text-xs text-muted-foreground">...</span>
             )}
           </div>
+          {/* Watermark icon */}
+          <Ruler className="absolute bottom-2 right-2 w-16 h-16 text-muted-foreground opacity-[0.08]" />
         </CardContent>
       </Card>
     );
   }
 
   return (
-    <Card className={cn(isSelected && 'ring-2 ring-primary')}>
+    <Card className={cn('relative overflow-hidden border-l-4 hover:border-border/80 transition-all', profileTypeBorderColors[profile.profileType], isSelected && 'ring-2 ring-primary')}>
       <CardHeader className="pb-2">
         <div className="flex items-start justify-between">
           <div className="flex-1">
-            <CardTitle className="text-base font-medium flex items-center gap-2">
+            <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
               {profile.name}
               {!isValidTotal && (
                 <TooltipProvider>
@@ -98,7 +109,7 @@ export function SizeProfileCard({
                   </Tooltip>
                 </TooltipProvider>
               )}
-            </CardTitle>
+            </p>
             <div className="flex flex-wrap gap-1 mt-1">
               <Badge
                 variant="outline"
@@ -191,6 +202,9 @@ export function SizeProfileCard({
             {profile.createdByName && <span>By: {profile.createdByName}</span>}
           </div>
         </div>
+
+        {/* Watermark icon */}
+        <Ruler className="absolute bottom-4 right-4 w-24 h-24 text-muted-foreground opacity-[0.08]" />
       </CardContent>
     </Card>
   );

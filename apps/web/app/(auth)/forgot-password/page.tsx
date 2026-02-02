@@ -28,9 +28,9 @@ export default function ForgotPasswordPage() {
 
   if (isSubmitted) {
     return (
-      <Card className="w-full max-w-md mx-4 shadow-xl">
+      <Card className="w-full max-w-md mx-4 border-2">
         <CardHeader className="text-center space-y-4">
-          <div className="mx-auto w-16 h-16 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center">
+          <div className="mx-auto w-16 h-16 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center border-2 border-green-200 dark:border-green-800">
             <Mail className="h-8 w-8 text-green-600 dark:text-green-400" />
           </div>
           <div>
@@ -56,9 +56,9 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <Card className="w-full max-w-md mx-4 shadow-xl">
+    <Card className="w-full max-w-md mx-4 border-2">
       <CardHeader className="text-center space-y-4">
-        <div className="mx-auto w-16 h-16 bg-primary rounded-xl flex items-center justify-center">
+        <div className="mx-auto w-16 h-16 bg-primary rounded-xl flex items-center justify-center border-2 border-primary/20">
           <span className="text-2xl font-bold text-primary-foreground">D</span>
         </div>
         <div>

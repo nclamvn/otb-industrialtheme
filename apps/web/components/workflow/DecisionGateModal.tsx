@@ -133,7 +133,7 @@ export function DecisionGateModal({
             {/* Submission Info */}
             <div className="grid grid-cols-2 gap-4">
               {data.submittedBy && (
-                <div className="flex items-center gap-3 p-4 bg-slate-50 dark:bg-neutral-800 rounded-lg">
+                <div className="flex items-center gap-3 p-4 bg-muted/50 rounded-lg">
                   <User className="h-5 w-5 text-slate-400" />
                   <div>
                     <p className="text-sm text-slate-500 dark:text-neutral-400">
@@ -155,7 +155,7 @@ export function DecisionGateModal({
               )}
 
               {data.submittedAt && (
-                <div className="flex items-center gap-3 p-4 bg-slate-50 dark:bg-neutral-800 rounded-lg">
+                <div className="flex items-center gap-3 p-4 bg-muted/50 rounded-lg">
                   <Calendar className="h-5 w-5 text-slate-400" />
                   <div>
                     <p className="text-sm text-slate-500 dark:text-neutral-400">
@@ -169,7 +169,7 @@ export function DecisionGateModal({
               )}
 
               {data.version && (
-                <div className="flex items-center gap-3 p-4 bg-slate-50 dark:bg-neutral-800 rounded-lg">
+                <div className="flex items-center gap-3 p-4 bg-muted/50 rounded-lg">
                   <Tag className="h-5 w-5 text-slate-400" />
                   <div>
                     <p className="text-sm text-slate-500 dark:text-neutral-400">
@@ -183,7 +183,7 @@ export function DecisionGateModal({
               )}
 
               {summaryData?.itemCount !== undefined && (
-                <div className="flex items-center gap-3 p-4 bg-slate-50 dark:bg-neutral-800 rounded-lg">
+                <div className="flex items-center gap-3 p-4 bg-muted/50 rounded-lg">
                   <FileText className="h-5 w-5 text-slate-400" />
                   <div>
                     <p className="text-sm text-slate-500 dark:text-neutral-400">
@@ -243,7 +243,7 @@ export function DecisionGateModal({
                     {summaryData.changes.map((change, idx) => (
                       <div
                         key={idx}
-                        className="flex items-center justify-between p-3 bg-slate-50 dark:bg-neutral-800 rounded-lg text-sm"
+                        className="flex items-center justify-between p-3 bg-muted/50 rounded-lg text-sm"
                       >
                         <span className="text-slate-600 dark:text-neutral-400">
                           {change.field}

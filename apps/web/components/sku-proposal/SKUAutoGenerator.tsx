@@ -466,7 +466,7 @@ export function SKUAutoGenerator({
             </div>
 
             {/* Summary Footer */}
-            <div className="mt-4 p-4 bg-slate-50 rounded-lg flex items-center justify-between">
+            <div className="mt-4 p-4 bg-muted/50 rounded-lg flex items-center justify-between">
               <div className="flex gap-6 text-sm">
                 <div>
                   <span className="text-slate-500">Total SKUs:</span>{' '}

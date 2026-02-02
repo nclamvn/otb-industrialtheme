@@ -73,6 +73,9 @@
     "suggestions": "Smart Suggestions",
     "autoPlan": "Auto Planning",
     "predictiveAlerts": "Predictive Alerts",
+    "aiImport": "AI Import",
+    "importedData": "Imported Data",
+    "aiSettings": "AI Settings",
     "integrations": "Integrations",
     "apiKeys": "API Keys",
     "more": "More",
@@ -326,8 +329,11 @@
   },
   "masterData": {
     "title": "Master Data",
+    "groupBrands": "Group Brands",
     "brands": "Brands",
+    "stores": "Stores",
     "categories": "Categories",
+    "subcategorySizes": "Subcategory Sizes",
     "seasons": "Seasons",
     "locations": "Locations",
     "suppliers": "Suppliers",
@@ -427,6 +433,30 @@
     "about": "About",
     "version": "Version",
     "poweredBy": "Powered by"
+  },
+  "profile": {
+    "title": "Profile",
+    "description": "Manage your personal information and account settings",
+    "personalInfo": "Personal Information",
+    "personalInfoDesc": "Update your personal details and profile picture",
+    "fullName": "Full Name",
+    "fullNamePlaceholder": "Enter your full name",
+    "email": "Email",
+    "emailPlaceholder": "Enter your email",
+    "emailNote": "Email cannot be changed. Contact admin for assistance.",
+    "department": "Department",
+    "selectDepartment": "Select department",
+    "phone": "Phone Number",
+    "phonePlaceholder": "Enter your phone number",
+    "security": "Security",
+    "securityDesc": "Manage your password and security settings",
+    "password": "Password",
+    "passwordDesc": "Last changed 30 days ago",
+    "changePassword": "Change Password",
+    "twoFactor": "Two-Factor Authentication",
+    "twoFactorDesc": "Add an extra layer of security to your account",
+    "enable": "Enable",
+    "saveSuccess": "Profile updated successfully"
   },
   "errors": {
     "generic": "An error occurred. Please try again.",
@@ -1594,7 +1624,6 @@
     },
     "aiAssistant": {
       "title": "AI Assistant",
-      "subtitle": "Powered by Claude",
       "newChat": "New Chat",
       "noConversations": "No conversations yet",
       "welcomeTitle": "Hello! I'm your AI Assistant",
@@ -1605,6 +1634,7 @@
       "inputPlaceholder": "Type a message or question...",
       "regenerate": "Regenerate",
       "recording": "Recording...",
+      "listening": "Listening...",
       "showMe": "Show me",
       "languageVi": "Tiếng Việt",
       "languageEn": "English"
@@ -1690,6 +1720,37 @@
     "suggestions": "Smart Suggestions",
     "autoPlan": "Auto Planning",
     "predictiveAlerts": "Predictive Alerts"
+  },
+  "help": {
+    "title": "Help",
+    "description": "Documentation and support resources",
+    "gettingStarted": {
+      "title": "Getting Started",
+      "description": "Learn the basics of the OTB Platform",
+      "item1": "Navigate using the sidebar menu",
+      "item2": "View dashboards and analytics",
+      "item3": "Create and manage budgets",
+      "item4": "Submit proposals for approval"
+    },
+    "shortcuts": {
+      "title": "Keyboard Shortcuts",
+      "description": "Quick navigation shortcuts",
+      "item1": "⌘K / Ctrl+K - Open search",
+      "item2": "⌘B / Ctrl+B - Toggle sidebar",
+      "item3": "Esc - Close modals",
+      "item4": "? - Show shortcuts"
+    },
+    "support": {
+      "title": "Support",
+      "description": "Get help when you need it",
+      "item1": "Use AI Assistant for quick answers",
+      "item2": "Contact your admin for access issues",
+      "item3": "Report bugs via the feedback form"
+    },
+    "needMoreHelp": {
+      "title": "Need More Help?",
+      "documentation": "Documentation"
+    }
   },
   "excelTools": {
     "dataQuality": {

@@ -102,7 +102,7 @@ export function GaugeChart({
           width={width}
           height={height}
           viewBox={`0 0 ${width} ${height}`}
-          className="drop-shadow-sm"
+          className="drop-border border-border"
         >
           {/* Gradient definitions */}
           <defs>

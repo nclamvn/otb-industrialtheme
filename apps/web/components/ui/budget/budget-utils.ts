@@ -5,11 +5,11 @@ export const getLevelStyles = (level: BudgetLevel) => {
   // Light theme: Blue → Purple → Teal → Amber → Rose
   // Dark theme: Emerald → Cyan → Violet → Orange → Pink
   const styles: Record<BudgetLevel, { band: string; bg: string }> = {
-    1: { band: 'border-l-blue-600 dark:border-l-emerald-500', bg: 'bg-white dark:bg-neutral-950' },
-    2: { band: 'border-l-purple-600 dark:border-l-cyan-500', bg: 'bg-slate-50 dark:bg-neutral-900' },
-    3: { band: 'border-l-teal-600 dark:border-l-violet-500', bg: 'bg-white dark:bg-neutral-950' },
-    4: { band: 'border-l-amber-500 dark:border-l-orange-500', bg: 'bg-slate-50 dark:bg-neutral-900' },
-    5: { band: 'border-l-rose-500 dark:border-l-pink-500', bg: 'bg-white dark:bg-neutral-950' },
+    1: { band: 'border-l-blue-600 dark:border-l-emerald-500', bg: 'bg-card' },
+    2: { band: 'border-l-purple-600 dark:border-l-cyan-500', bg: 'bg-muted/50 dark:bg-neutral-900' },
+    3: { band: 'border-l-teal-600 dark:border-l-violet-500', bg: 'bg-card' },
+    4: { band: 'border-l-amber-500 dark:border-l-orange-500', bg: 'bg-muted/50 dark:bg-neutral-900' },
+    5: { band: 'border-l-rose-500 dark:border-l-pink-500', bg: 'bg-card' },
   };
   return styles[level];
 };

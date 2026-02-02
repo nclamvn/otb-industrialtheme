@@ -11,6 +11,8 @@ import type { LucideIcon } from 'lucide-react';
 // TYPES
 // ═══════════════════════════════════════════════════════════════════════════════
 
+type AccentColor = 'blue' | 'purple' | 'green' | 'orange' | 'red' | 'amber' | 'cyan' | 'pink';
+
 interface MetricCardProps {
   title: string;
   value: string | number;
@@ -30,6 +32,9 @@ interface MetricCardProps {
   };
   icon?: LucideIcon;
 
+  // Accent color for left border and icon
+  accent?: AccentColor;
+
   // Styling
   className?: string;
   valueClassName?: string;
@@ -38,6 +43,51 @@ interface MetricCardProps {
   onClick?: () => void;
   loading?: boolean;
 }
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// ACCENT COLOR MAPS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+const accentBorderMap: Record<AccentColor, string> = {
+  blue: 'border-l-blue-500',
+  purple: 'border-l-purple-500',
+  green: 'border-l-green-500',
+  orange: 'border-l-orange-500',
+  red: 'border-l-red-500',
+  amber: 'border-l-amber-500',
+  cyan: 'border-l-cyan-500',
+  pink: 'border-l-pink-500',
+};
+
+const accentIconBgMap: Record<AccentColor, string> = {
+  blue: 'bg-blue-100 dark:bg-blue-950',
+  purple: 'bg-purple-100 dark:bg-purple-950',
+  green: 'bg-green-100 dark:bg-green-950',
+  orange: 'bg-orange-100 dark:bg-orange-950',
+  red: 'bg-red-100 dark:bg-red-950',
+  amber: 'bg-amber-100 dark:bg-amber-950',
+  cyan: 'bg-cyan-100 dark:bg-cyan-950',
+  pink: 'bg-pink-100 dark:bg-pink-950',
+};
+
+const accentIconColorMap: Record<AccentColor, string> = {
+  blue: 'text-blue-500',
+  purple: 'text-purple-500',
+  green: 'text-green-500',
+  orange: 'text-orange-500',
+  red: 'text-red-500',
+  amber: 'text-amber-500',
+  cyan: 'text-cyan-500',
+  pink: 'text-pink-500',
+};
+
+// Map status to accent color
+const statusToAccent: Record<string, AccentColor> = {
+  critical: 'red',
+  warning: 'amber',
+  success: 'green',
+  info: 'blue',
+};
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // COMPONENT
@@ -51,34 +101,25 @@ export function MetricCard({
   status,
   progress,
   icon: Icon,
+  accent,
   className,
   valueClassName,
   onClick,
   loading = false,
 }: MetricCardProps) {
-  // Map status to unified border colors
-  const statusBorderMap: Record<string, string> = {
-    critical: 'border-l-red-500',
-    warning: 'border-l-amber-500',
-    success: 'border-l-green-500',
-    info: 'border-l-blue-500',
-  };
+  // Determine accent color from status or prop
+  const accentColor: AccentColor = accent || (status ? statusToAccent[status] : 'blue');
 
   if (loading) {
     return (
       <div className={cn(
-        // Unified: rounded-xl, shadow-sm, border-l-4
-        'bg-white border border-slate-200 rounded-xl p-4 border-l-4 border-l-slate-400',
-        'shadow-sm',
+        'relative bg-card border border-border rounded-xl p-3 border-l-4 border-l-slate-300 overflow-hidden',
         className
       )}>
-        <div className="space-y-3">
-          <div className="flex justify-between">
-            <div className="h-3 w-24 bg-slate-200 rounded animate-pulse" />
-            <div className="h-10 w-10 bg-slate-200 rounded-xl animate-pulse" />
-          </div>
-          <div className="h-8 w-32 bg-slate-200 rounded animate-pulse" />
-          <div className="h-3 w-20 bg-slate-200 rounded animate-pulse" />
+        <div className="space-y-2">
+          <div className="h-3 w-20 bg-muted rounded animate-pulse" />
+          <div className="h-7 w-28 bg-muted rounded animate-pulse" />
+          <div className="h-3 w-16 bg-muted rounded animate-pulse" />
         </div>
       </div>
     );
@@ -87,70 +128,75 @@ export function MetricCard({
   return (
     <div
       className={cn(
-        // Unified: rounded-xl, p-4, shadow-sm, hover:shadow-md, border-l-4
-        'bg-white border border-slate-200 rounded-xl p-4',
-        'shadow-sm hover:shadow-md transition-all duration-200',
+        'relative bg-card border border-border rounded-xl p-3 overflow-hidden',
+        'hover:border-border/80 transition-all duration-200',
         'border-l-4',
-        status ? statusBorderMap[status] : 'border-l-slate-400',
+        accentBorderMap[accentColor],
         onClick && 'cursor-pointer',
         className
       )}
       onClick={onClick}
     >
-      {/* Header */}
-      <div className="flex items-start justify-between mb-3">
-        <div className="flex items-center gap-2">
-          <span className="text-xs font-medium uppercase tracking-wider text-slate-500">
+      {/* Watermark Icon - Large, faded into background */}
+      {Icon && (
+        <div className="absolute -right-4 -bottom-4 pointer-events-none">
+          <Icon className={cn('w-24 h-24 opacity-[0.08]', accentIconColorMap[accentColor])} />
+        </div>
+      )}
+
+      {/* Content */}
+      <div className="relative z-10">
+        {/* Title */}
+        <div className="flex items-center gap-2 mb-1">
+          <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
             {title}
           </span>
           {status && <StatusBadge status={status} size="sm" showIcon={false} />}
         </div>
-        {/* Unified: w-10 h-10 rounded-xl icon container */}
-        {Icon && (
-          <div className="h-10 w-10 rounded-xl bg-slate-100 flex items-center justify-center">
-            <Icon className="w-5 h-5 text-slate-600" />
+
+        {/* Value */}
+        <div className={cn(
+          'text-2xl font-bold tabular-nums text-foreground mb-1',
+          Icon && 'pr-14', // Make room for watermark icon
+          valueClassName
+        )}>
+          {value}
+        </div>
+
+        {/* Progress (if provided) */}
+        {progress && (
+          <div className="mb-1">
+            <ProgressBar
+              value={progress.value}
+              max={progress.max}
+              showLabel
+              label={progress.label}
+              size="sm"
+            />
+          </div>
+        )}
+
+        {/* Footer: Trend or Subtitle */}
+        {(trend || subtitle) && (
+          <div className="flex items-center gap-2 flex-wrap">
+            {trend && (
+              <>
+                <TrendValue
+                  value={trend.value}
+                  direction={trend.direction}
+                  size="sm"
+                />
+                {trend.label && (
+                  <span className="text-xs text-muted-foreground">{trend.label}</span>
+                )}
+              </>
+            )}
+            {!trend && subtitle && (
+              <span className="text-xs text-muted-foreground truncate">{subtitle}</span>
+            )}
           </div>
         )}
       </div>
-
-      {/* Value */}
-      <div className={cn('text-2xl font-bold tabular-nums text-slate-900 mb-2', valueClassName)}>
-        {value}
-      </div>
-
-      {/* Progress (if provided) */}
-      {progress && (
-        <div className="mb-2">
-          <ProgressBar
-            value={progress.value}
-            max={progress.max}
-            showLabel
-            label={progress.label}
-            size="sm"
-          />
-        </div>
-      )}
-
-      {/* Footer: Trend or Subtitle */}
-      {(trend || subtitle) && (
-        <div className="flex items-center gap-2">
-          {trend && (
-            <>
-              <TrendValue
-                value={trend.value}
-                direction={trend.direction}
-                size="sm"
-              />
-              {trend.label && (
-                <span className="text-xs text-slate-400">{trend.label}</span>
-              )}
-            </>
-          )}
-          {!trend && subtitle && (
-            <span className="text-xs text-slate-500">{subtitle}</span>
-          )}
-        </div>
-      )}
     </div>
   );
 }
@@ -179,7 +225,7 @@ export function MetricCardGrid({
   };
 
   return (
-    <div className={cn('grid gap-4', gridCols[columns], className)}>
+    <div className={cn('grid gap-3', gridCols[columns], className)}>
       {children}
     </div>
   );
@@ -199,9 +245,9 @@ interface CompactMetricProps {
 export function CompactMetric({ label, value, trend, className }: CompactMetricProps) {
   return (
     <div className={cn('flex flex-col', className)}>
-      <span className="text-[10px] text-slate-400 uppercase tracking-wider">{label}</span>
+      <span className="text-[10px] text-muted-foreground uppercase tracking-wider">{label}</span>
       <div className="flex items-center gap-2">
-        <span className="text-sm font-semibold tabular-nums text-slate-900">{value}</span>
+        <span className="text-sm font-semibold tabular-nums text-foreground">{value}</span>
         {trend !== undefined && (
           <TrendValue value={trend} size="sm" showIcon={false} />
         )}
@@ -214,4 +260,4 @@ export function CompactMetric({ label, value, trend, className }: CompactMetricP
 // EXPORTS
 // ═══════════════════════════════════════════════════════════════════════════════
 
-export type { MetricCardProps, MetricCardGridProps, CompactMetricProps };
+export type { MetricCardProps, MetricCardGridProps, CompactMetricProps, AccentColor };

@@ -61,7 +61,7 @@ function ChangeRow({
       label: 'Modified',
     },
     unchanged: {
-      bg: 'bg-slate-50 dark:bg-neutral-900',
+      bg: 'bg-muted/50 dark:bg-neutral-900',
       text: 'text-slate-500 dark:text-neutral-400',
       icon: <Equal className="w-4 h-4" />,
       label: 'Unchanged',
@@ -291,7 +291,7 @@ export function VersionComparison({
           </div>
           <div className="text-xs text-amber-600 dark:text-amber-400">Modified</div>
         </div>
-        <div className="p-3 rounded-xl bg-slate-50 dark:bg-neutral-900 border border-slate-100 dark:border-neutral-800 text-center">
+        <div className="p-3 rounded-xl bg-muted/50 dark:bg-neutral-900 border border-slate-100 dark:border-neutral-800 text-center">
           <div className="text-2xl font-bold text-slate-600 dark:text-neutral-300">
             {comparison.summary.unchanged}
           </div>
@@ -304,7 +304,7 @@ export function VersionComparison({
               ? 'bg-green-50 dark:bg-green-900/20 border-green-100 dark:border-green-800'
               : comparison.summary.totalBudgetDiff < 0
               ? 'bg-red-50 dark:bg-red-900/20 border-red-100 dark:border-red-800'
-              : 'bg-slate-50 dark:bg-neutral-900 border-slate-100 dark:border-neutral-800'
+              : 'bg-muted/50 dark:bg-neutral-900 border-slate-100 dark:border-neutral-800'
           )}
         >
           <div
@@ -337,9 +337,9 @@ export function VersionComparison({
       </div>
 
       {/* Changes Table */}
-      <div className="rounded-xl border border-slate-200 dark:border-neutral-800 overflow-hidden">
+      <div className="rounded-xl border border-border bg-card overflow-hidden">
         {/* Table Header */}
-        <div className="flex items-center py-2 px-3 bg-slate-100 dark:bg-neutral-800 border-b border-slate-200 dark:border-neutral-700 text-xs font-medium text-slate-500 dark:text-neutral-400 uppercase tracking-wider">
+        <div className="flex items-center py-2 px-3 bg-muted dark:bg-neutral-800 border-b border-border text-xs font-medium text-slate-500 dark:text-neutral-400 uppercase tracking-wider">
           <div className="w-5 mr-2"></div>
           <div className="w-8 mr-3"></div>
           <div className="flex-1">Category</div>

@@ -20,7 +20,7 @@ export function BudgetBreadcrumb({ path, onNavigate, className }: BudgetBreadcru
         onClick={() => onNavigate(null)}
         className={cn(
           'flex items-center gap-1.5 px-2 py-1 rounded-lg transition-colors',
-          'text-slate-500 dark:text-neutral-400 hover:text-slate-900 dark:hover:text-neutral-100 hover:bg-slate-100 dark:hover:bg-neutral-800'
+          'text-slate-500 dark:text-neutral-400 hover:text-slate-900 dark:hover:text-neutral-100 hover:bg-muted dark:hover:bg-neutral-800'
         )}
       >
         <Home className="w-4 h-4" />
@@ -41,7 +41,7 @@ export function BudgetBreadcrumb({ path, onNavigate, className }: BudgetBreadcru
                 onClick={() => onNavigate(node)}
                 className={cn(
                   'px-2 py-1 rounded-lg transition-colors',
-                  'text-slate-600 dark:text-neutral-400 hover:text-slate-900 dark:hover:text-neutral-100 hover:bg-slate-100 dark:hover:bg-neutral-800'
+                  'text-slate-600 dark:text-neutral-400 hover:text-slate-900 dark:hover:text-neutral-100 hover:bg-muted dark:hover:bg-neutral-800'
                 )}
               >
                 {node.name}

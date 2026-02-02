@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Sparkline } from '@/components/analytics/sparkline';
-import { TrendingUp, TrendingDown, MoreHorizontal } from 'lucide-react';
+import { TrendingUp, TrendingDown, MoreHorizontal, DollarSign, Percent, Hash, type LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface DashboardCardProps {
@@ -13,9 +13,25 @@ interface DashboardCardProps {
   sparklineData?: number[];
   status?: 'success' | 'warning' | 'error';
   format?: 'number' | 'currency' | 'percent';
+  accent?: 'blue' | 'green' | 'orange' | 'red' | 'purple';
+  icon?: LucideIcon;
   onClick?: () => void;
   className?: string;
 }
+
+const accentColors = {
+  blue: 'border-l-blue-500',
+  green: 'border-l-green-500',
+  orange: 'border-l-orange-500',
+  red: 'border-l-red-500',
+  purple: 'border-l-purple-500',
+};
+
+const defaultIcons: Record<string, LucideIcon> = {
+  currency: DollarSign,
+  percent: Percent,
+  number: Hash,
+};
 
 export function DashboardCard({
   title,
@@ -25,9 +41,12 @@ export function DashboardCard({
   sparklineData,
   status,
   format = 'number',
+  accent = 'blue',
+  icon,
   onClick,
   className,
 }: DashboardCardProps) {
+  const WatermarkIcon = icon || defaultIcons[format] || Hash;
   const formatValue = (val: string | number) => {
     if (typeof val === 'string') return val;
     switch (format) {
@@ -51,14 +70,15 @@ export function DashboardCard({
   return (
     <Card
       className={cn(
-        'relative overflow-hidden transition-all duration-200 hover:shadow-card-hover',
-        onClick && 'cursor-pointer hover:-translate-y-0.5',
+        'relative overflow-hidden transition-all duration-200 hover:border-border/80 border-l-4',
+        accentColors[accent],
+        onClick && 'cursor-pointer',
         className
       )}
       onClick={onClick}
     >
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+        <CardTitle className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
           {title}
         </CardTitle>
         <button className="p-1 rounded-md hover:bg-muted text-muted-foreground transition-colors">
@@ -69,7 +89,7 @@ export function DashboardCard({
       <CardContent>
         <div className="flex items-end justify-between">
           <div className="space-y-2">
-            <p className="text-3xl font-bold text-foreground tracking-tight font-metric">
+            <p className="text-2xl font-bold text-foreground tabular-nums">
               {formatValue(value)}
             </p>
 
@@ -103,6 +123,9 @@ export function DashboardCard({
             )} />
           </div>
         )}
+
+        {/* Watermark icon */}
+        <WatermarkIcon className="absolute bottom-4 right-4 w-24 h-24 text-muted-foreground opacity-[0.08]" />
       </CardContent>
     </Card>
   );

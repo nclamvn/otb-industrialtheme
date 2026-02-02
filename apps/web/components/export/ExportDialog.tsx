@@ -133,7 +133,7 @@ export function ExportDialog({
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-[600px] bg-white dark:bg-neutral-900">
+      <DialogContent className="sm:max-w-[600px] bg-card dark:bg-neutral-900">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-slate-900 dark:text-neutral-100">
             <Download className="w-5 h-5" />
@@ -143,7 +143,7 @@ export function ExportDialog({
 
         <div className="space-y-6 py-4">
           {/* Status Bar */}
-          <div className="flex items-center gap-3 p-3 rounded-lg bg-slate-50 dark:bg-neutral-800">
+          <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
             <StatusIcon />
             <span className="text-sm text-slate-600 dark:text-neutral-300">
               {statusText()}
@@ -168,7 +168,7 @@ export function ExportDialog({
               <div className="space-y-2">
                 <Label className="text-slate-700 dark:text-neutral-300">Date Format</Label>
                 <Select value={dateFormat} onValueChange={(v) => setDateFormat(v as ExportOptions['dateFormat'])}>
-                  <SelectTrigger className="bg-white dark:bg-neutral-800 border-slate-200 dark:border-neutral-700">
+                  <SelectTrigger className="bg-card dark:bg-neutral-800 border-border">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -181,7 +181,7 @@ export function ExportDialog({
               <div className="space-y-2">
                 <Label className="text-slate-700 dark:text-neutral-300">Delimiter</Label>
                 <Select value={delimiter} onValueChange={(v) => setDelimiter(v as ExportOptions['delimiter'])}>
-                  <SelectTrigger className="bg-white dark:bg-neutral-800 border-slate-200 dark:border-neutral-700">
+                  <SelectTrigger className="bg-card dark:bg-neutral-800 border-border">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -208,7 +208,7 @@ export function ExportDialog({
             {/* Column Selection */}
             <div className="space-y-2">
               <Label className="text-slate-700 dark:text-neutral-300">Include Columns</Label>
-              <div className="grid grid-cols-3 gap-2 p-3 rounded-lg border border-slate-200 dark:border-neutral-700 bg-slate-50/50 dark:bg-neutral-800/50">
+              <div className="grid grid-cols-3 gap-2 p-3 rounded-lg border border-border bg-muted/50/50 dark:bg-neutral-800/50">
                 {DEFAULT_COLUMNS.map((column) => (
                   <div key={column} className="flex items-center space-x-2">
                     <Checkbox

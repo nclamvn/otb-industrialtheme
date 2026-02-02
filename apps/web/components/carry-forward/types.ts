@@ -55,7 +55,7 @@ export const THEME_CONFIG: Record<ThemeType, {
   CORE_CLASSIC: {
     label: 'Core Classic',
     color: 'text-slate-700',
-    bgColor: 'bg-slate-100 dark:bg-slate-800',
+    bgColor: 'bg-muted',
     icon: '◆',
   },
   SEASONAL_TREND: {
@@ -114,7 +114,7 @@ export const CF_SOURCE_CONFIG: Record<CarryForwardSource, {
   CORE: {
     label: 'Core',
     color: 'text-slate-700',
-    bgColor: 'bg-slate-100 dark:bg-slate-800',
+    bgColor: 'bg-muted',
   },
   NEW: {
     label: 'New',

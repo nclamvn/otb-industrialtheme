@@ -51,7 +51,7 @@ export default function DeliveryPlanningPage() {
 
         <div className="flex items-center gap-3">
           {/* View Toggle */}
-          <div className="flex items-center bg-slate-100 dark:bg-slate-800 rounded-lg p-1">
+          <div className="flex items-center bg-muted rounded-lg p-1">
             <Button
               variant={viewMode === 'matrix' ? 'default' : 'ghost'}
               size="sm"
@@ -95,33 +95,56 @@ export default function DeliveryPlanningPage() {
 
       {/* Summary Stats */}
       <div className="grid grid-cols-4 gap-4">
-        <div className="p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
-          <div className="flex items-center gap-2 text-slate-500 text-sm mb-2">
-            <Package className="w-4 h-4" />
+        {/* Total SKUs Card */}
+        <div className="relative overflow-hidden p-4 rounded-xl border border-border bg-card border-l-4 border-l-blue-500 hover:border-border/80 transition-all duration-200">
+          <div className="absolute -right-4 -bottom-4 pointer-events-none">
+            <Package className="w-24 h-24 text-blue-500 opacity-[0.08]" />
+          </div>
+          <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">
             Total SKUs
-          </div>
-          <div className="text-2xl font-bold">{matrix.skus.length}</div>
+          </p>
+          <p className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums pr-14">
+            {matrix.skus.length}
+          </p>
         </div>
-        <div className="p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
-          <div className="flex items-center gap-2 text-slate-500 text-sm mb-2">
-            <Building2 className="w-4 h-4" />
+
+        {/* Stores Card */}
+        <div className="relative overflow-hidden p-4 rounded-xl border border-border bg-card border-l-4 border-l-purple-500 hover:border-border/80 transition-all duration-200">
+          <div className="absolute -right-4 -bottom-4 pointer-events-none">
+            <Building2 className="w-24 h-24 text-purple-500 opacity-[0.08]" />
+          </div>
+          <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">
             Stores
-          </div>
-          <div className="text-2xl font-bold">{matrix.stores.length}</div>
+          </p>
+          <p className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums pr-14">
+            {matrix.stores.length}
+          </p>
         </div>
-        <div className="p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
-          <div className="flex items-center gap-2 text-slate-500 text-sm mb-2">
-            <Calendar className="w-4 h-4" />
+
+        {/* Months Card */}
+        <div className="relative overflow-hidden p-4 rounded-xl border border-border bg-card border-l-4 border-l-amber-500 hover:border-border/80 transition-all duration-200">
+          <div className="absolute -right-4 -bottom-4 pointer-events-none">
+            <Calendar className="w-24 h-24 text-amber-500 opacity-[0.08]" />
+          </div>
+          <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">
             Months
-          </div>
-          <div className="text-2xl font-bold">{matrix.months.length}</div>
+          </p>
+          <p className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums pr-14">
+            {matrix.months.length}
+          </p>
         </div>
-        <div className="p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-green-50 dark:bg-green-900/20">
-          <div className="flex items-center gap-2 text-green-600 text-sm mb-2">
-            <Package className="w-4 h-4" />
-            Total Units
+
+        {/* Total Units Card */}
+        <div className="relative overflow-hidden p-4 rounded-xl border border-border bg-card border-l-4 border-l-green-500 hover:border-border/80 transition-all duration-200">
+          <div className="absolute -right-4 -bottom-4 pointer-events-none">
+            <Truck className="w-24 h-24 text-green-500 opacity-[0.08]" />
           </div>
-          <div className="text-2xl font-bold text-green-700">{matrix.totals.grand.toLocaleString()}</div>
+          <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">
+            Total Units
+          </p>
+          <p className="text-2xl font-bold text-green-600 dark:text-green-400 mt-1 tabular-nums pr-14">
+            {matrix.totals.grand.toLocaleString()}
+          </p>
         </div>
       </div>
 
@@ -139,7 +162,7 @@ export default function DeliveryPlanningPage() {
 
       {/* Pending Changes Bar */}
       {pendingEdits.length > 0 && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-3 px-4 py-3 bg-amber-100 dark:bg-amber-900/50 border border-amber-300 dark:border-amber-700 rounded-lg shadow-lg">
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-3 px-4 py-3 bg-amber-100 dark:bg-amber-900/50 border border-amber-300 dark:border-amber-700 rounded-lg border-2 border-border">
           <span className="text-amber-800 dark:text-amber-200">
             {pendingEdits.length} unsaved changes
           </span>

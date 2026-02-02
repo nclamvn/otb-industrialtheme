@@ -77,7 +77,7 @@ function ProductRow({
       <TableRow
         className={cn(
           'cursor-pointer transition-colors',
-          isExpanded && 'bg-slate-50 dark:bg-neutral-800/50',
+          isExpanded && 'bg-muted/50',
           product.hasChanges && 'bg-amber-50/50 dark:bg-amber-950/30'
         )}
         onClick={onToggleExpand}
@@ -165,7 +165,7 @@ function ProductRow({
       {/* Size Breakdown (Expanded) */}
       {isExpanded && renderSizeBreakdown && (
         <TableRow>
-          <TableCell colSpan={7} className="p-0 bg-slate-50/50 dark:bg-neutral-800/30">
+          <TableCell colSpan={7} className="p-0 bg-muted/50/50 dark:bg-neutral-800/30">
             <div className="p-4 border-t border-b border-slate-100 dark:border-neutral-700">
               {renderSizeBreakdown(product)}
             </div>
@@ -219,7 +219,7 @@ export function ProductList({
             />
             {/* Expanded content - Size breakdown */}
             {isExpanded && renderSizeBreakdown && (
-              <div className="ml-4 mb-2 p-4 border border-slate-200 dark:border-neutral-700 rounded-lg bg-slate-50/50 dark:bg-neutral-900/50">
+              <div className="ml-4 mb-2 p-4 border border-border rounded-lg bg-muted/50/50 dark:bg-neutral-900/50">
                 {renderSizeBreakdown(product)}
               </div>
             )}
@@ -231,10 +231,10 @@ export function ProductList({
 
   // Render table view
   const renderTableView = () => (
-    <div className="border border-slate-200 dark:border-neutral-700 rounded-lg overflow-hidden">
+    <div className="border border-border rounded-lg overflow-hidden">
       <Table>
         <TableHeader>
-          <TableRow className="bg-slate-50 dark:bg-neutral-800">
+          <TableRow className="bg-muted/50">
             <TableHead className="w-10"></TableHead>
             <TableHead className="text-slate-700 dark:text-neutral-300">Style Code</TableHead>
             <TableHead className="text-slate-700 dark:text-neutral-300">Product Name</TableHead>
@@ -279,13 +279,13 @@ export function ProductList({
 
         <div className="flex items-center gap-2">
           {/* View Mode Toggle */}
-          <div className="flex items-center border border-slate-200 dark:border-neutral-700 rounded-lg overflow-hidden">
+          <div className="flex items-center border border-border rounded-lg overflow-hidden">
             <button
               onClick={() => setViewMode('cards')}
               className={cn(
                 'p-2 transition-colors',
                 viewMode === 'cards'
-                  ? 'bg-slate-100 dark:bg-neutral-700 text-slate-800 dark:text-neutral-100'
+                  ? 'bg-muted dark:bg-neutral-700 text-slate-800 dark:text-neutral-100'
                   : 'text-slate-400 dark:text-neutral-500 hover:text-slate-600 dark:hover:text-neutral-300'
               )}
               title="Card View"
@@ -297,7 +297,7 @@ export function ProductList({
               className={cn(
                 'p-2 transition-colors',
                 viewMode === 'table'
-                  ? 'bg-slate-100 dark:bg-neutral-700 text-slate-800 dark:text-neutral-100'
+                  ? 'bg-muted dark:bg-neutral-700 text-slate-800 dark:text-neutral-100'
                   : 'text-slate-400 dark:text-neutral-500 hover:text-slate-600 dark:hover:text-neutral-300'
               )}
               title="Table View"
@@ -317,7 +317,7 @@ export function ProductList({
       {category.products.length > 0 ? (
         viewMode === 'cards' ? renderCardsView() : renderTableView()
       ) : (
-        <div className="border border-slate-200 dark:border-neutral-700 rounded-lg p-12 text-center bg-slate-50/50 dark:bg-neutral-900/50">
+        <div className="border border-border rounded-lg p-12 text-center bg-muted/50/50 dark:bg-neutral-900/50">
           <Package className="w-12 h-12 mx-auto text-slate-300 dark:text-neutral-600 mb-4" />
           <h4 className="font-medium text-slate-700 dark:text-neutral-300 mb-2">No products yet</h4>
           <p className="text-sm text-slate-500 dark:text-neutral-400 mb-4">
@@ -332,7 +332,7 @@ export function ProductList({
 
       {/* Summary Footer */}
       {category.products.length > 0 && (
-        <div className="flex justify-between items-center p-4 bg-slate-50 dark:bg-neutral-800 rounded-lg">
+        <div className="flex justify-between items-center p-4 bg-muted/50 rounded-lg">
           <div className="text-sm text-slate-600 dark:text-neutral-300">
             <span className="font-medium">{category.products.length}</span> products |{' '}
             <span className="font-medium">

@@ -34,7 +34,7 @@ const actionIcons: Record<TicketHistoryAction, typeof FileEdit> = {
 
 const actionColors: Record<TicketHistoryAction, { icon: string; line: string }> = {
   created: {
-    icon: 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400',
+    icon: 'bg-muted text-slate-600 dark:text-slate-400',
     line: 'bg-slate-200 dark:bg-slate-700',
   },
   submitted: {
@@ -54,7 +54,7 @@ const actionColors: Record<TicketHistoryAction, { icon: string; line: string }> 
     line: 'bg-purple-200 dark:bg-purple-800',
   },
   cancelled: {
-    icon: 'bg-slate-100 dark:bg-slate-900 text-slate-500',
+    icon: 'bg-muted dark:bg-slate-900 text-slate-500',
     line: 'bg-slate-200 dark:bg-slate-800',
   },
   commented: {
@@ -135,7 +135,7 @@ export function TicketTimeline({
 
               {/* Comment */}
               {entry.comment && (
-                <div className="mt-2 p-3 bg-slate-50 dark:bg-neutral-800 rounded-lg text-sm text-slate-600 dark:text-neutral-300 italic">
+                <div className="mt-2 p-3 bg-muted/50 rounded-lg text-sm text-slate-600 dark:text-neutral-300 italic">
                   "{entry.comment}"
                 </div>
               )}

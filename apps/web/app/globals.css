@@ -31,15 +31,15 @@
   }
 
   /* ═══════════════════════════════════════════════════════════════════════════
-     LIGHT THEME - DAFC Light Mode (High Contrast)
+     LIGHT THEME - DAFC Light Mode (High Contrast, Enhanced Saturation)
      ═══════════════════════════════════════════════════════════════════════════ */
   .light {
-    /* Canvas & Surfaces */
-    --background: 40 15% 97%;       /* #FAF9F7 - Clean white */
+    /* Canvas & Surfaces - More vibrant backgrounds */
+    --background: 40 25% 96%;       /* More saturated warm white */
     --foreground: 0 0% 8%;          /* #141414 - Deep black for text */
-    --card: 40 12% 95%;             /* #F4F3F1 - Warm surface */
+    --card: 40 22% 94%;             /* More saturated warm surface */
     --card-foreground: 0 0% 8%;
-    --popover: 0 0% 100%;           /* #FFFFFF - Pure white popover */
+    --popover: 40 20% 99%;          /* Slightly warm white popover */
     --popover-foreground: 0 0% 8%;
 
     /* DAFC Primary (Darker Gold for light mode contrast) */
@@ -50,8 +50,8 @@
     --secondary: var(--dafc-green-dark);
     --secondary-foreground: 0 0% 100%;
 
-    /* Muted & Neutral - Higher contrast */
-    --muted: 30 8% 90%;             /* #E8E6E3 */
+    /* Muted & Neutral - Higher contrast, more saturation */
+    --muted: 30 18% 88%;            /* More saturated muted */
     --muted-foreground: 0 0% 30%;   /* #4D4D4D - Darker for readability */
 
     /* Accent (Darker Gold for light mode) */
@@ -143,7 +143,7 @@
   }
 
   html {
-    font-size: 13.2px; /* 110% of 12px for better readability */
+    font-size: 14px; /* Base 14px for flat design readability */
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
@@ -211,11 +211,11 @@
   }
 
   /* ─────────────────────────────────────────────────────────────────────────
-     FOCUS STYLES
+     FOCUS STYLES (Flat Design - inset ring for better alignment)
      ───────────────────────────────────────────────────────────────────────── */
   :focus-visible {
-    @apply outline-none;
-    box-shadow: 0 0 0 3px hsl(var(--ring) / 0.3);
+    @apply outline-none ring-2 ring-inset;
+    ring-color: hsl(var(--ring));
   }
 }
 
@@ -540,8 +540,7 @@
   }
 
   .ind-input:focus {
-    @apply border-accent outline-none;
-    box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.3);
+    @apply border-accent outline-none ring-2 ring-accent/30;
   }
 
   .ind-input-sm {
@@ -660,7 +659,7 @@
      DAFC BRAND COMPONENTS
      ───────────────────────────────────────────────────────────────────────── */
 
-  /* DAFC Primary Button - Pill Shape */
+  /* DAFC Primary Button - Pill Shape (Flat Design) */
   .dafc-btn-primary {
     @apply inline-flex items-center justify-center gap-2 px-6 py-2.5
            font-brand font-semibold text-sm uppercase tracking-wider
@@ -673,19 +672,17 @@
 
   .dafc-btn-primary:hover:not(:disabled) {
     background: hsl(var(--dafc-gold-dark));
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(215, 183, 151, 0.4);
   }
 
   .dafc-btn-primary:active:not(:disabled) {
-    transform: translateY(0);
+    background: hsl(var(--dafc-gold-darker));
   }
 
   .dafc-btn-primary:disabled {
     @apply opacity-50 cursor-not-allowed;
   }
 
-  /* DAFC Secondary Button - Outlined Pill */
+  /* DAFC Secondary Button - Outlined Pill (Flat Design) */
   .dafc-btn-secondary {
     @apply inline-flex items-center justify-center gap-2 px-6 py-2.5
            font-brand font-semibold text-sm uppercase tracking-wider
@@ -697,7 +694,7 @@
   }
 
   .dafc-btn-secondary:hover:not(:disabled) {
-    background: rgba(215, 183, 151, 0.1);
+    background: rgba(215, 183, 151, 0.15);
     border-color: hsl(var(--dafc-gold-light));
     color: hsl(var(--dafc-gold-light));
   }
@@ -706,7 +703,7 @@
     @apply opacity-50 cursor-not-allowed;
   }
 
-  /* DAFC Green Button */
+  /* DAFC Green Button (Flat Design) */
   .dafc-btn-green {
     @apply inline-flex items-center justify-center gap-2 px-6 py-2.5
            font-brand font-semibold text-sm uppercase tracking-wider
@@ -719,8 +716,6 @@
 
   .dafc-btn-green:hover:not(:disabled) {
     background: hsl(var(--dafc-green-light));
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(18, 119, 73, 0.4);
   }
 
   /* DAFC Card */
@@ -799,7 +794,7 @@
   .dafc-input:focus {
     outline: none;
     border-color: hsl(var(--dafc-gold));
-    box-shadow: 0 0 0 3px rgba(215, 183, 151, 0.2);
+    @apply ring-2 ring-[rgba(215,183,151,0.3)];
   }
 
   /* DAFC Table */
@@ -829,10 +824,9 @@
     border-left: 3px solid hsl(var(--dafc-gold));
   }
 
-  /* DAFC Logo Crown */
+  /* DAFC Logo Crown (Flat Design - no shadow) */
   .dafc-crown {
     color: hsl(var(--dafc-gold));
-    filter: drop-shadow(0 2px 4px rgba(215, 183, 151, 0.3));
   }
 
   /* DAFC Gold Text */
@@ -889,21 +883,21 @@
     @apply border-t border-border-muted;
   }
 
-  /* Glow effect for important elements */
+  /* Status indicators - Flat Design (border instead of glow) */
   .glow-critical {
-    box-shadow: 0 0 8px rgba(248, 81, 73, 0.4);
+    @apply border-2 border-red-500;
   }
 
   .glow-warning {
-    box-shadow: 0 0 8px rgba(210, 153, 34, 0.4);
+    @apply border-2 border-amber-500;
   }
 
   .glow-success {
-    box-shadow: 0 0 8px rgba(63, 185, 80, 0.4);
+    @apply border-2 border-green-500;
   }
 
   .glow-info {
-    box-shadow: 0 0 8px rgba(88, 166, 255, 0.4);
+    @apply border-2 border-blue-500;
   }
 
   /* Safe area insets */

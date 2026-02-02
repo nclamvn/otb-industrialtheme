@@ -129,11 +129,11 @@ export function EnhancedBudgetCard({
     <div
       className={cn(
         'w-full text-left',
-        'border border-slate-200 dark:border-neutral-800 rounded-xl mb-2',
+        'border border-border rounded-xl mb-2',
         'border-l-4',
         levelStyles.band,
         levelStyles.bg,
-        'shadow-sm hover:shadow-md transition-all duration-200',
+        'hover:border-border/80 transition-all duration-200',
         'overflow-hidden',
       )}
     >
@@ -180,7 +180,7 @@ export function EnhancedBudgetCard({
                 'p-1.5 rounded-lg transition-all',
                 showKPIs
                   ? 'bg-amber-100 dark:bg-amber-900 text-amber-700 dark:text-amber-300'
-                  : 'text-slate-400 dark:text-neutral-500 hover:text-slate-600 dark:hover:text-neutral-300 hover:bg-slate-100 dark:hover:bg-neutral-800'
+                  : 'text-slate-400 dark:text-neutral-500 hover:text-slate-600 dark:hover:text-neutral-300 hover:bg-muted dark:hover:bg-neutral-800'
               )}
               title="Toggle KPIs"
             >
@@ -203,7 +203,7 @@ export function EnhancedBudgetCard({
 
       {/* KPI Panel - Collapsible */}
       {showKPIs && (
-        <div className="border-t border-slate-100 dark:border-neutral-800 bg-slate-50/50 dark:bg-neutral-900/50 p-3">
+        <div className="border-t border-slate-100 dark:border-neutral-800 bg-muted/50/50 dark:bg-neutral-900/50 p-3">
           {/* Row 1: Core Budget Metrics */}
           <div className="grid grid-cols-5 gap-3 mb-3">
             <KPIItem

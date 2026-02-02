@@ -161,7 +161,7 @@ export function SKUProposalDetail({
   return (
     <div className={cn('flex flex-col h-full', className)}>
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b bg-white">
+      <div className="flex items-center justify-between p-4 border-b bg-card">
         <div className="flex items-center gap-4">
           <div>
             <div className="flex items-center gap-2">
@@ -255,7 +255,7 @@ export function SKUProposalDetail({
       {/* Main Content */}
       <div className="flex-1 flex overflow-hidden">
         {/* Left Sidebar - Category Tree */}
-        <div className="w-80 border-r bg-white overflow-y-auto">
+        <div className="w-80 border-r bg-card overflow-y-auto">
           <CategoryTree
             categories={proposal.categories}
             selectedCategoryId={selectedCategory?.id || null}
@@ -264,7 +264,7 @@ export function SKUProposalDetail({
         </div>
 
         {/* Main Content - Product List */}
-        <div className="flex-1 overflow-y-auto bg-slate-50/50">
+        <div className="flex-1 overflow-y-auto bg-muted/50/50">
           <div className="p-6">
             <ProductList
               category={selectedCategory}
@@ -281,7 +281,7 @@ export function SKUProposalDetail({
 
         {/* Right Sidebar - AI Panel (Optional) */}
         {renderAIPanel && (
-          <div className="w-80 border-l bg-white overflow-y-auto">
+          <div className="w-80 border-l bg-card overflow-y-auto">
             {renderAIPanel()}
           </div>
         )}

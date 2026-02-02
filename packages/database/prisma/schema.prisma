@@ -199,7 +199,7 @@ model User {
   predictiveAlerts PredictiveAlert[]
 
   // W25 relations
-  settings         UserSettings?    @relation("UserSettingsUser")
+  settings UserSettings? @relation("UserSettingsUser")
 
   // Sprint 6 relations
   accounts              Account[]
@@ -227,6 +227,12 @@ model User {
 
   // Size Profile relations
   sizeProfilesCreated SizeProfile[] @relation("SizeProfileCreator")
+
+  // Phase 3 - Product Media & Edit Engine
+  uploadedMedia ProductMedia[] @relation("MediaUploadedBy")
+  editsMade     EditHistory[]  @relation("EditMadeBy")
+  editsApproved EditHistory[]  @relation("EditApprovedBy")
+  editsRejected EditHistory[]  @relation("EditRejectedBy")
 
   @@map("users")
 }
@@ -267,6 +273,10 @@ model Brand {
   divisionId String
   division   Division @relation(fields: [divisionId], references: [id])
 
+  // SQL Schema: group_brand_id relation
+  groupBrandId String?
+  groupBrand   GroupBrand? @relation("GroupBrandBrands", fields: [groupBrandId], references: [id])
+
   assignedUsers User[] @relation("UserBrands")
 
   createdAt DateTime @default(now())
@@ -297,6 +307,27 @@ model Brand {
   @@map("brands")
 }
 
+// GroupBrand - Maps to SQL: group_brand table
+// Parent grouping for brands (e.g., "Brand Group A" containing "BRAND_A", "BRAND_B")
+model GroupBrand {
+  id       String  @id @default(cuid())
+  code     String  @unique // e.g., "BRAND_GROUP_A"
+  name     String // e.g., "Brand Group A"
+  isActive Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  brands              Brand[]              @relation("GroupBrandBrands")
+  approvalWorkflows   ApprovalWorkflow[]   @relation("ApprovalWorkflowGroupBrand")
+  planBudgets         PlanBudget[]         @relation("PlanBudgetGroupBrand")
+  orderPlanSubmits    OrderPlanSubmit[]    @relation("OrderPlanSubmitGroupBrand")
+  orderPlanConfirms   OrderPlanConfirm[]   @relation("OrderPlanConfirmGroupBrand")
+  orderActualReceipts OrderActualReceipt[] @relation("OrderActualReceiptGroupBrand")
+
+  @@map("group_brands")
+}
+
 model Collection {
   id          String  @id @default(cuid())
   name        String
@@ -314,6 +345,9 @@ model Collection {
   otbLineItems OTBLineItem[]
   skuItems     SKUItem[]
 
+  // SQL Schema relations
+  planCollections PlanCollection[] @relation("PlanCollectionCollection")
+
   @@unique([brandId, code])
   @@map("collections")
 }
@@ -324,19 +358,21 @@ model Collection {
 
 model Category {
   id          String  @id @default(cuid())
-  name        String
-  code        String  @unique
+  name        String // e.g., "Women's RTW", "Men's RTW"
+  code        String  @unique // e.g., "WOMENS_RTW", "MENS_RTW"
   description String?
+  gender      Gender? // Link to gender (WOMEN, MEN, UNISEX, KIDS)
   isActive    Boolean @default(true)
   sortOrder   Int     @default(0)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  subcategories  Subcategory[]
-  otbLineItems   OTBLineItem[]
-  sizingAnalyses SizingAnalysis[]
-  skuItems       SKUItem[]
+  subcategories    Subcategory[]
+  subcategorySizes SubcategorySize[] // Sizes per category
+  otbLineItems     OTBLineItem[]
+  sizingAnalyses   SizingAnalysis[]
+  skuItems         SKUItem[]
 
   // Sprint 5 relations
   forecasts Forecast[]
@@ -384,8 +420,63 @@ model Subcategory {
   // Size Profile relations
   sizeProfiles SizeProfile[] @relation("SizeProfileSubcategory")
 
+  // SQL Schema relations
+  subcategorySizes  SubcategorySize[] @relation("SubcategorySizeSubcategory")
+  planSubcategories PlanSubcategory[] @relation("PlanSubcategorySubcategory")
+
   @@unique([categoryId, code])
   @@map("subcategories")
+}
+
+// SubcategorySize - Maps to SQL: subcategory_size table
+// Defines available sizes for each subcategory (e.g., 0044, 0046, 0048 for Women's RTW)
+model SubcategorySize {
+  id            String      @id @default(cuid())
+  size          String // e.g., "0044", "0046", "0048", "S", "M", "L"
+  subcategoryId String
+  subcategory   Subcategory @relation("SubcategorySizeSubcategory", fields: [subcategoryId], references: [id], onDelete: Cascade)
+  categoryId    String?
+  category      Category?   @relation(fields: [categoryId], references: [id])
+  isActive      Boolean     @default(true)
+  sortOrder     Int         @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // SQL Schema relations
+  proposalSkuSizings  ProposalSkuSizing[]  @relation("ProposalSkuSizingSize")
+  orderPlanSubmits    OrderPlanSubmit[]    @relation("OrderPlanSubmitSize")
+  orderPlanConfirms   OrderPlanConfirm[]   @relation("OrderPlanConfirmSize")
+  orderActualReceipts OrderActualReceipt[] @relation("OrderActualReceiptSize")
+
+  @@unique([subcategoryId, size])
+  @@index([subcategoryId])
+  @@index([categoryId])
+  @@map("subcategory_sizes")
+}
+
+// ============================================
+// MASTER DATA - STORES (SQL Schema Aligned)
+// ============================================
+
+// Store - Maps to SQL: store table
+// Physical store locations (REX, TTP, etc.)
+model Store {
+  id       String  @id @default(cuid())
+  code     String  @unique // e.g., "REX", "TTP"
+  name     String // e.g., "Rex Store", "TTP Store"
+  isActive Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // SQL Schema relations
+  planBudgets         PlanBudget[]         @relation("PlanBudgetStore")
+  orderPlanSubmits    OrderPlanSubmit[]    @relation("OrderPlanSubmitStore")
+  orderPlanConfirms   OrderPlanConfirm[]   @relation("OrderPlanConfirmStore")
+  orderActualReceipts OrderActualReceipt[] @relation("OrderActualReceiptStore")
+
+  @@map("stores")
 }
 
 // ============================================
@@ -418,8 +509,8 @@ model SalesLocation {
   sizeProfiles SizeProfile[] @relation("SizeProfileLocation")
 
   // W25 relations
-  deliveryAllocations  DeliveryAllocation[] @relation("DeliveryAllocationLocation")
-  storePerformances    StorePerformance[]   @relation("StorePerformanceLocation")
+  deliveryAllocations DeliveryAllocation[] @relation("DeliveryAllocationLocation")
+  storePerformances   StorePerformance[]   @relation("StorePerformanceLocation")
 
   @@map("sales_locations")
 }
@@ -429,15 +520,18 @@ model SalesLocation {
 // ============================================
 
 model Season {
-  id          String   @id @default(cuid())
-  name        String
-  code        String   @unique
-  seasonGroup String
-  year        Int
-  startDate   DateTime
-  endDate     DateTime
-  isActive    Boolean  @default(true)
-  isCurrent   Boolean  @default(false)
+  id              String   @id @default(cuid())
+  name            String // e.g., "FY2024 Spring Summer Pre"
+  code            String   @unique // e.g., "FY2024_SS_PRE"
+  seasonGroup     String // e.g., "SS", "FW" (group_season_code)
+  seasonGroupName String? // e.g., "Spring Summer", "Fall Winter"
+  seasonType      String? // e.g., "pre", "main"
+  year            Int
+  startDate       DateTime
+  endDate         DateTime
+  status          String   @default("active") // active, closed
+  isActive        Boolean  @default(true)
+  isCurrent       Boolean  @default(false)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -463,11 +557,17 @@ model Season {
   sizeProfiles SizeProfile[] @relation("SizeProfileSeason")
 
   // W25 relations
-  deliveryWindows       DeliveryWindow[]     @relation("DeliveryWindowSeason")
-  storePerformances     StorePerformance[]   @relation("StorePerformanceSeason")
-  priceRangeAnalyses    PriceRangeAnalysis[] @relation("PriceRangeAnalysisSeason")
-  carryForwardFrom      CarryForwardItem[]   @relation("CarryForwardFromSeason")
-  carryForwardTo        CarryForwardItem[]   @relation("CarryForwardToSeason")
+  deliveryWindows    DeliveryWindow[]     @relation("DeliveryWindowSeason")
+  storePerformances  StorePerformance[]   @relation("StorePerformanceSeason")
+  priceRangeAnalyses PriceRangeAnalysis[] @relation("PriceRangeAnalysisSeason")
+  carryForwardFrom   CarryForwardItem[]   @relation("CarryForwardFromSeason")
+  carryForwardTo     CarryForwardItem[]   @relation("CarryForwardToSeason")
+
+  // SQL Schema relations
+  planBudgets         PlanBudget[]         @relation("PlanBudgetSeason")
+  orderPlanSubmits    OrderPlanSubmit[]    @relation("OrderPlanSubmitSeason")
+  orderPlanConfirms   OrderPlanConfirm[]   @relation("OrderPlanConfirmSeason")
+  orderActualReceipts OrderActualReceipt[] @relation("OrderActualReceiptSeason")
 
   @@map("seasons")
 }
@@ -758,9 +858,14 @@ model SKUItem {
   subcategoryId String?
   subcategory   Subcategory? @relation(fields: [subcategoryId], references: [id])
 
+  // SQL Schema Fields - Product Attributes
+  rail        String? // e.g., "RAIL #1+2: BOUTQUET & WINE RED CHECK"
+  productType String? // Product type classification
+  theme       String? // e.g., "AUGUST (08), WINE RED"
+
   // Pricing
-  retailPrice Decimal  @db.Decimal(15, 2)
-  costPrice   Decimal  @db.Decimal(15, 2)
+  retailPrice Decimal  @db.Decimal(15, 2) // SRP - Suggested Retail Price
+  costPrice   Decimal  @db.Decimal(15, 2) // Unit cost
   margin      Decimal? @db.Decimal(5, 2)
 
   // Order
@@ -799,12 +904,12 @@ model SKUItem {
 
   // W25 Fields
   fullSeasonRatio  Decimal? @db.Decimal(5, 2) // FSR - Full Season Ratio (0.00-1.00)
-  itemNo           String?                    // Item number from Excel
-  composition      String?                    // Material composition
-  carryForward     Boolean  @default(false)   // CF flag
-  carryForwardFrom String?                    // Source season (SS24, FW24, etc.)
-  themeGroup       String?                    // Theme grouping
-  l4Category       String?                    // Level 4 category detail
+  itemNo           String? // Item number from Excel
+  composition      String? // Material composition
+  carryForward     Boolean  @default(false) // CF flag
+  carryForwardFrom String? // Source season (SS24, FW24, etc.)
+  themeGroup       String? // Theme grouping
+  l4Category       String? // Level 4 category detail
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -813,6 +918,9 @@ model SKUItem {
   deliveryAllocations DeliveryAllocation[] @relation("DeliveryAllocationSKU")
   costingBreakdown    CostingBreakdown?    @relation("CostingBreakdownSKU")
   carryForwardItems   CarryForwardItem[]   @relation("CarryForwardSKU")
+
+  // Phase 3 - Product Media
+  media ProductMedia[] @relation("SKUItemMedia")
 
   @@unique([proposalId, skuCode])
   @@index([proposalId, validationStatus])
@@ -2607,13 +2715,13 @@ model MarkdownPlan {
   status MarkdownPlanStatus @default(DRAFT)
 
   // Financial Targets
-  targetRecoveryValue   Decimal @db.Decimal(18, 2)
-  targetSellThroughPct  Decimal @db.Decimal(5, 2)
-  maxMarkdownPct        Decimal @db.Decimal(5, 2) @default(70)
+  targetRecoveryValue  Decimal @db.Decimal(18, 2)
+  targetSellThroughPct Decimal @db.Decimal(5, 2)
+  maxMarkdownPct       Decimal @default(70) @db.Decimal(5, 2)
 
   // AI Analysis
   aiOptimizedAt     DateTime?
-  aiConfidenceScore Decimal? @db.Decimal(3, 2)
+  aiConfidenceScore Decimal?  @db.Decimal(3, 2)
   aiRecommendations Json?
 
   // Results Summary
@@ -2632,10 +2740,10 @@ model MarkdownPlan {
   results MarkdownResult[]
 
   // Audit
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  createdById String?
-  approvedAt  DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  createdById  String?
+  approvedAt   DateTime?
   approvedById String?
 
   @@index([seasonId])
@@ -2688,40 +2796,40 @@ model MarkdownSKUPlan {
   plan   MarkdownPlan @relation(fields: [planId], references: [id], onDelete: Cascade)
 
   // SKU Info
-  skuId       String
-  skuCode     String
-  skuName     String
-  categoryId  String?
-  brandId     String?
+  skuId      String
+  skuCode    String
+  skuName    String
+  categoryId String?
+  brandId    String?
 
   // Current State
-  currentStock       Int
-  currentPrice       Decimal @db.Decimal(18, 2)
-  originalPrice      Decimal @db.Decimal(18, 2)
-  costPrice          Decimal @db.Decimal(18, 2)
-  currentStockValue  Decimal @db.Decimal(18, 2)
+  currentStock      Int
+  currentPrice      Decimal @db.Decimal(18, 2)
+  originalPrice     Decimal @db.Decimal(18, 2)
+  costPrice         Decimal @db.Decimal(18, 2)
+  currentStockValue Decimal @db.Decimal(18, 2)
 
   // Performance Data
-  weeksOnHand        Decimal @db.Decimal(5, 2)
-  sellThroughRate    Decimal @db.Decimal(5, 2)
-  weeksToSeasonEnd   Int
+  weeksOnHand      Decimal @db.Decimal(5, 2)
+  sellThroughRate  Decimal @db.Decimal(5, 2)
+  weeksToSeasonEnd Int
 
   // AI Analysis
-  urgencyScore       Decimal @db.Decimal(3, 2) // 0.00-1.00
+  urgencyScore       Decimal         @db.Decimal(3, 2) // 0.00-1.00
   urgencyLevel       MarkdownUrgency @default(MEDIUM)
-  demandElasticity   Decimal? @db.Decimal(4, 2) // How price affects demand
-  optimalMarkdownPct Decimal? @db.Decimal(5, 2)
+  demandElasticity   Decimal?        @db.Decimal(4, 2) // How price affects demand
+  optimalMarkdownPct Decimal?        @db.Decimal(5, 2)
 
   // Recommended Action
-  recommendedAction     MarkdownAction @default(MARKDOWN)
+  recommendedAction      MarkdownAction @default(MARKDOWN)
   recommendedMarkdownPct Decimal?       @db.Decimal(5, 2)
-  recommendedNewPrice   Decimal?       @db.Decimal(18, 2)
+  recommendedNewPrice    Decimal?       @db.Decimal(18, 2)
 
   // Projected Outcome
-  projectedUnitsSold    Int?
-  projectedRevenue      Decimal? @db.Decimal(18, 2)
-  projectedMarginLoss   Decimal? @db.Decimal(18, 2)
-  projectedDaysToSell   Int?
+  projectedUnitsSold  Int?
+  projectedRevenue    Decimal? @db.Decimal(18, 2)
+  projectedMarginLoss Decimal? @db.Decimal(18, 2)
+  projectedDaysToSell Int?
 
   // Phase Details
   phases MarkdownSKUPlanPhase[]
@@ -2748,8 +2856,8 @@ model MarkdownSKUPlanPhase {
   phase   MarkdownPhase @relation(fields: [phaseId], references: [id], onDelete: Cascade)
 
   // Phase-specific pricing
-  markdownPct      Decimal @db.Decimal(5, 2)
-  newPrice         Decimal @db.Decimal(18, 2)
+  markdownPct      Decimal  @db.Decimal(5, 2)
+  newPrice         Decimal  @db.Decimal(18, 2)
   projectedUnits   Int?
   projectedRevenue Decimal? @db.Decimal(18, 2)
 
@@ -2784,9 +2892,9 @@ model MarkdownResult {
   marginLoss      Decimal @db.Decimal(18, 2)
 
   // Performance vs Plan
-  sellThroughActual    Decimal @db.Decimal(5, 2)
-  sellThroughVariance  Decimal @db.Decimal(5, 2)
-  revenueVariancePct   Decimal @db.Decimal(5, 2)
+  sellThroughActual   Decimal @db.Decimal(5, 2)
+  sellThroughVariance Decimal @db.Decimal(5, 2)
+  revenueVariancePct  Decimal @db.Decimal(5, 2)
 
   createdAt DateTime @default(now())
 
@@ -2820,15 +2928,15 @@ model MOCTarget {
   id String @id @default(cuid())
 
   // Scope
-  brandId     String?
-  categoryId  String?
-  seasonId    String?
-  locationId  String?
+  brandId    String?
+  categoryId String?
+  seasonId   String?
+  locationId String?
 
   // MOC Settings (Month of Cover)
-  minMOC     Decimal @db.Decimal(4, 2) @default(1.5) // Minimum months of cover
-  targetMOC  Decimal @db.Decimal(4, 2) @default(2.5) // Target months of cover
-  maxMOC     Decimal @db.Decimal(4, 2) @default(4.0) // Maximum months of cover
+  minMOC    Decimal @default(1.5) @db.Decimal(4, 2) // Minimum months of cover
+  targetMOC Decimal @default(2.5) @db.Decimal(4, 2) // Target months of cover
+  maxMOC    Decimal @default(4.0) @db.Decimal(4, 2) // Maximum months of cover
 
   // Lead Time Settings
   leadTimeDays Int @default(30)
@@ -2857,10 +2965,10 @@ model MOQRule {
   categoryId String?
 
   // MOQ Settings
-  moqUnits    Int     @default(50)  // Minimum Order Quantity
-  moqValue    Decimal @db.Decimal(18, 2) @default(1000) // Minimum Order Value
-  packSize    Int     @default(1)   // Units per pack
-  cartonSize  Int?    // Units per carton
+  moqUnits   Int     @default(50) // Minimum Order Quantity
+  moqValue   Decimal @default(1000) @db.Decimal(18, 2) // Minimum Order Value
+  packSize   Int     @default(1) // Units per pack
+  cartonSize Int? // Units per carton
 
   // Pricing Tiers (stored as JSON)
   pricingTiers Json? // [{ minQty: 100, discount: 5 }, { minQty: 500, discount: 10 }]
@@ -2890,18 +2998,18 @@ model ReplenishmentAlert {
   locationId String?
 
   // Alert Type
-  alertType   String // LOW_MOC, STOCKOUT_RISK, REORDER_POINT, LEAD_TIME_WARNING
+  alertType String // LOW_MOC, STOCKOUT_RISK, REORDER_POINT, LEAD_TIME_WARNING
 
   // Current State
-  currentStock      Int
-  currentMOC        Decimal @db.Decimal(4, 2)
-  avgWeeklySales    Decimal @db.Decimal(10, 2)
-  targetMOC         Decimal @db.Decimal(4, 2)
-  safetyStock       Int
+  currentStock   Int
+  currentMOC     Decimal @db.Decimal(4, 2)
+  avgWeeklySales Decimal @db.Decimal(10, 2)
+  targetMOC      Decimal @db.Decimal(4, 2)
+  safetyStock    Int
 
   // Recommendation
   recommendedOrderQty   Int
-  recommendedOrderValue Decimal @db.Decimal(18, 2)
+  recommendedOrderValue Decimal   @db.Decimal(18, 2)
   recommendedOrderDate  DateTime
   projectedStockoutDate DateTime?
 
@@ -2931,12 +3039,12 @@ model ReplenishmentOrder {
   id String @id @default(cuid())
 
   // Order Info
-  orderNumber  String @unique
+  orderNumber  String  @unique
   supplierId   String?
   supplierName String?
 
   // Dates
-  orderDate        DateTime @default(now())
+  orderDate        DateTime  @default(now())
   expectedDelivery DateTime
   actualDelivery   DateTime?
 
@@ -2954,10 +3062,10 @@ model ReplenishmentOrder {
   alerts ReplenishmentAlert[]
 
   // Audit
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  createdById String?
-  approvedAt  DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  createdById  String?
+  approvedAt   DateTime?
   approvedById String?
 
   @@index([status])
@@ -3016,23 +3124,23 @@ model ForecastConfig {
   seasonId   String?
 
   // Method Settings
-  primaryMethod   ForecastMethod @default(ENSEMBLE)
-  lookbackWeeks   Int            @default(12)
-  forecastWeeks   Int            @default(8)
+  primaryMethod ForecastMethod @default(ENSEMBLE)
+  lookbackWeeks Int            @default(12)
+  forecastWeeks Int            @default(8)
 
   // Weights for ensemble
-  movingAvgWeight   Decimal @db.Decimal(3, 2) @default(0.25)
-  expSmoothWeight   Decimal @db.Decimal(3, 2) @default(0.35)
-  trendWeight       Decimal @db.Decimal(3, 2) @default(0.40)
+  movingAvgWeight Decimal @default(0.25) @db.Decimal(3, 2)
+  expSmoothWeight Decimal @default(0.35) @db.Decimal(3, 2)
+  trendWeight     Decimal @default(0.40) @db.Decimal(3, 2)
 
   // Smoothing Factors
-  expSmoothAlpha    Decimal @db.Decimal(3, 2) @default(0.30) // Level smoothing
-  expSmoothBeta     Decimal @db.Decimal(3, 2) @default(0.10) // Trend smoothing
-  expSmoothGamma    Decimal @db.Decimal(3, 2) @default(0.20) // Seasonal smoothing
+  expSmoothAlpha Decimal @default(0.30) @db.Decimal(3, 2) // Level smoothing
+  expSmoothBeta  Decimal @default(0.10) @db.Decimal(3, 2) // Trend smoothing
+  expSmoothGamma Decimal @default(0.20) @db.Decimal(3, 2) // Seasonal smoothing
 
   // Seasonality
-  seasonalPeriod    Int @default(52) // weeks in a year
-  seasonalAdjust    Boolean @default(true)
+  seasonalPeriod Int     @default(52) // weeks in a year
+  seasonalAdjust Boolean @default(true)
 
   isActive Boolean @default(true)
 
@@ -3052,9 +3160,9 @@ model ForecastRun {
   categoryId String?
 
   // Run Info
-  runDate    DateTime @default(now())
-  method     ForecastMethod
-  status     String @default("COMPLETED") // RUNNING, COMPLETED, FAILED
+  runDate DateTime       @default(now())
+  method  ForecastMethod
+  status  String         @default("COMPLETED") // RUNNING, COMPLETED, FAILED
 
   // Input Data Summary
   inputStartDate DateTime
@@ -3062,8 +3170,8 @@ model ForecastRun {
   dataPoints     Int
 
   // Accuracy Metrics
-  mape         Decimal? @db.Decimal(5, 2) // Mean Absolute Percentage Error
-  rmse         Decimal? @db.Decimal(10, 2) // Root Mean Square Error
+  mape               Decimal? @db.Decimal(5, 2) // Mean Absolute Percentage Error
+  rmse               Decimal? @db.Decimal(10, 2) // Root Mean Square Error
   confidenceInterval Decimal? @db.Decimal(3, 2)
 
   // Results
@@ -3092,10 +3200,10 @@ model ForecastRunResult {
   weekEndDate   DateTime
 
   // Predictions
-  forecastValue     Decimal @db.Decimal(18, 2)
-  forecastUnits     Int
-  confidenceLower   Decimal @db.Decimal(18, 2)
-  confidenceUpper   Decimal @db.Decimal(18, 2)
+  forecastValue   Decimal @db.Decimal(18, 2)
+  forecastUnits   Int
+  confidenceLower Decimal @db.Decimal(18, 2)
+  confidenceUpper Decimal @db.Decimal(18, 2)
 
   // Component Breakdown (for ensemble)
   movingAvgForecast Decimal? @db.Decimal(18, 2)
@@ -3119,12 +3227,12 @@ model ForecastRunResult {
 // ============================================
 
 enum BudgetNodeType {
-  SEASON       // Level 0: Season root
-  BRAND        // Level 1: Brand breakdown
-  GENDER       // Level 2: Gender (MEN, WOMEN, KIDS)
-  CATEGORY     // Level 3: Category (Footwear, Apparel)
-  SUBCATEGORY  // Level 4: Subcategory (Running, Lifestyle)
-  PRODUCT      // Level 5: Product SKU level
+  SEASON // Level 0: Season root
+  BRAND // Level 1: Brand breakdown
+  GENDER // Level 2: Gender (MEN, WOMEN, KIDS)
+  CATEGORY // Level 3: Category (Footwear, Apparel)
+  SUBCATEGORY // Level 4: Subcategory (Running, Lifestyle)
+  PRODUCT // Level 5: Product SKU level
 }
 
 enum CardStatus {
@@ -3136,46 +3244,46 @@ enum CardStatus {
 }
 
 model BudgetTreeNode {
-  id              String   @id @default(cuid())
+  id String @id @default(cuid())
 
   // Budget reference
-  budgetId        String
-  budget          BudgetAllocation @relation(fields: [budgetId], references: [id], onDelete: Cascade)
+  budgetId String
+  budget   BudgetAllocation @relation(fields: [budgetId], references: [id], onDelete: Cascade)
 
   // Hierarchy
-  parentId        String?
-  parent          BudgetTreeNode?  @relation("BudgetTreeHierarchy", fields: [parentId], references: [id])
-  children        BudgetTreeNode[] @relation("BudgetTreeHierarchy")
-  level           Int              // 0-5: Season->Brand->Gender->Category->Subcategory->Product
+  parentId String?
+  parent   BudgetTreeNode?  @relation("BudgetTreeHierarchy", fields: [parentId], references: [id])
+  children BudgetTreeNode[] @relation("BudgetTreeHierarchy")
+  level    Int // 0-5: Season->Brand->Gender->Category->Subcategory->Product
 
   // Node info
-  name            String
-  nodeType        BudgetNodeType
+  name     String
+  nodeType BudgetNodeType
 
   // Budget values
-  budgetValue     Decimal  @db.Decimal(15, 2)
-  allocatedValue  Decimal  @db.Decimal(15, 2) @default(0)
-  percentage      Decimal  @db.Decimal(5, 2)  @default(0)
+  budgetValue    Decimal @db.Decimal(15, 2)
+  allocatedValue Decimal @default(0) @db.Decimal(15, 2)
+  percentage     Decimal @default(0) @db.Decimal(5, 2)
 
   // Status
-  status          CardStatus @default(DRAFT)
+  status CardStatus @default(DRAFT)
 
   // Optional references to master data
-  brandId         String?
-  categoryId      String?
-  subcategoryId   String?
-  gender          Gender?
+  brandId       String?
+  categoryId    String?
+  subcategoryId String?
+  gender        Gender?
 
   // Ordering and lock
-  sortOrder       Int      @default(0)
-  isLocked        Boolean  @default(false)
+  sortOrder Int     @default(0)
+  isLocked  Boolean @default(false)
 
   // Metadata
-  metadata        Json?    // Additional node-specific data
+  metadata Json? // Additional node-specific data
 
   // Audit
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([budgetId, level])
   @@index([parentId])
@@ -3196,19 +3304,19 @@ enum GapSeverity {
 
 enum GapType {
   BALANCED
-  UNDER   // Under-allocated (gap > 0)
-  OVER    // Over-allocated (gap < 0)
+  UNDER // Under-allocated (gap > 0)
+  OVER // Over-allocated (gap < 0)
 }
 
 enum BudgetSuggestionType {
-  REALLOCATE         // Transfer from under to over
-  AUTO_BALANCE       // Redistribute across nodes
-  INCREASE_BUDGET    // Increase budget for over-allocated
-  DECREASE_BUDGET    // Decrease budget for under-utilized
-  SPLIT_ALLOCATION   // Split allocation across children
-  MERGE_ALLOCATION   // Merge child allocations
-  PRIORITIZE         // Increase critical items
-  DEFER              // Defer/reduce non-critical items
+  REALLOCATE // Transfer from under to over
+  AUTO_BALANCE // Redistribute across nodes
+  INCREASE_BUDGET // Increase budget for over-allocated
+  DECREASE_BUDGET // Decrease budget for under-utilized
+  SPLIT_ALLOCATION // Split allocation across children
+  MERGE_ALLOCATION // Merge child allocations
+  PRIORITIZE // Increase critical items
+  DEFER // Defer/reduce non-critical items
 }
 
 enum BudgetSuggestionStatus {
@@ -3219,36 +3327,36 @@ enum BudgetSuggestionStatus {
 }
 
 model GapAnalysisResult {
-  id              String   @id @default(cuid())
+  id String @id @default(cuid())
 
   // Budget reference
-  budgetId        String
-  budget          BudgetAllocation @relation(fields: [budgetId], references: [id], onDelete: Cascade)
+  budgetId String
+  budget   BudgetAllocation @relation(fields: [budgetId], references: [id], onDelete: Cascade)
 
   // Node info
-  nodeId          String
-  nodeName        String
-  nodePath        Json     // Array of parent node names
-  nodeLevel       Int
+  nodeId    String
+  nodeName  String
+  nodePath  Json // Array of parent node names
+  nodeLevel Int
 
   // Budget values
-  budgetValue     Decimal  @db.Decimal(15, 2)
-  allocatedValue  Decimal  @db.Decimal(15, 2)
+  budgetValue    Decimal @db.Decimal(15, 2)
+  allocatedValue Decimal @db.Decimal(15, 2)
 
   // Gap calculation
-  gap             Decimal  @db.Decimal(15, 2)  // budget - allocated
-  gapPercent      Decimal  @db.Decimal(5, 2)   // (gap / budget) * 100
+  gap        Decimal @db.Decimal(15, 2) // budget - allocated
+  gapPercent Decimal @db.Decimal(5, 2) // (gap / budget) * 100
 
   // Classification
-  severity        GapSeverity
-  type            GapType
+  severity GapSeverity
+  type     GapType
 
   // Additional metrics
-  childrenWithGaps Int     @default(0)
-  totalChildren    Int     @default(0)
+  childrenWithGaps Int @default(0)
+  totalChildren    Int @default(0)
 
   // Analysis metadata
-  analyzedAt      DateTime @default(now())
+  analyzedAt DateTime @default(now())
 
   @@index([budgetId, severity])
   @@index([budgetId, analyzedAt])
@@ -3256,41 +3364,41 @@ model GapAnalysisResult {
 }
 
 model BudgetSuggestion {
-  id              String   @id @default(cuid())
+  id String @id @default(cuid())
 
   // Budget reference
-  budgetId        String
-  budget          BudgetAllocation @relation(fields: [budgetId], references: [id], onDelete: Cascade)
+  budgetId String
+  budget   BudgetAllocation @relation(fields: [budgetId], references: [id], onDelete: Cascade)
 
   // Suggestion details
-  type            BudgetSuggestionType
-  title           String
-  description     String   @db.Text
-  reasoning       String?  @db.Text  // AI explanation
+  type        BudgetSuggestionType
+  title       String
+  description String               @db.Text
+  reasoning   String?              @db.Text // AI explanation
 
   // Impact metrics
-  impactAmount    Decimal  @db.Decimal(15, 2)
-  impactPercent   Decimal  @db.Decimal(5, 2)
-  affectedNodes   Json     // Array of { nodeId, nodeName, change }
+  impactAmount  Decimal @db.Decimal(15, 2)
+  impactPercent Decimal @db.Decimal(5, 2)
+  affectedNodes Json // Array of { nodeId, nodeName, change }
 
   // Confidence and priority
-  confidence      Int      // 0-100
-  priority        SuggestionPriority
+  confidence Int // 0-100
+  priority   SuggestionPriority
 
   // Actions to take
-  actions         Json     // Array of { nodeId, field, currentValue, newValue }
+  actions Json // Array of { nodeId, field, currentValue, newValue }
 
   // Status tracking
-  status          BudgetSuggestionStatus @default(PENDING)
-  appliedAt       DateTime?
-  appliedById     String?
-  dismissedAt     DateTime?
-  dismissedById   String?
-  dismissReason   String?
+  status        BudgetSuggestionStatus @default(PENDING)
+  appliedAt     DateTime?
+  appliedById   String?
+  dismissedAt   DateTime?
+  dismissedById String?
+  dismissReason String?
 
   // Audit
-  createdAt       DateTime @default(now())
-  expiresAt       DateTime?
+  createdAt DateTime  @default(now())
+  expiresAt DateTime?
 
   @@index([budgetId, status])
   @@index([budgetId, priority])
@@ -3306,59 +3414,59 @@ enum BudgetVersionStatus {
   SUBMITTED
   APPROVED
   REJECTED
-  CURRENT    // Currently active version
-  ARCHIVED   // Old version after rollback
+  CURRENT // Currently active version
+  ARCHIVED // Old version after rollback
 }
 
 enum BudgetChangeType {
-  CREATE     // New node created
-  UPDATE     // Node value updated
-  DELETE     // Node deleted
-  REALLOC    // Reallocation between nodes
-  MERGE      // Nodes merged
-  SPLIT      // Node split
+  CREATE // New node created
+  UPDATE // Node value updated
+  DELETE // Node deleted
+  REALLOC // Reallocation between nodes
+  MERGE // Nodes merged
+  SPLIT // Node split
 }
 
 model BudgetVersion {
-  id              String   @id @default(cuid())
+  id String @id @default(cuid())
 
   // Budget reference
-  budgetId        String
-  budget          BudgetAllocation @relation(fields: [budgetId], references: [id], onDelete: Cascade)
+  budgetId String
+  budget   BudgetAllocation @relation(fields: [budgetId], references: [id], onDelete: Cascade)
 
   // Version info
-  versionNumber   Int
-  name            String
-  description     String?  @db.Text
+  versionNumber Int
+  name          String
+  description   String? @db.Text
 
   // Status
-  status          BudgetVersionStatus @default(DRAFT)
+  status BudgetVersionStatus @default(DRAFT)
 
   // Snapshot of entire tree
-  snapshotData    Json     // Full tree as JSON
+  snapshotData Json // Full tree as JSON
 
   // Summary metrics
-  totalBudget     Decimal  @db.Decimal(15, 2)
-  totalAllocated  Decimal  @db.Decimal(15, 2)
-  nodeCount       Int      @default(0)
+  totalBudget    Decimal @db.Decimal(15, 2)
+  totalAllocated Decimal @db.Decimal(15, 2)
+  nodeCount      Int     @default(0)
 
   // Tags for filtering
-  tags            String[]
+  tags String[]
 
   // Changes from previous version
-  changes         BudgetVersionChange[]
+  changes BudgetVersionChange[]
 
   // Creator info
-  createdAt       DateTime @default(now())
-  createdById     String
+  createdAt   DateTime @default(now())
+  createdById String
 
   // Submission info
-  submittedAt     DateTime?
-  submittedById   String?
+  submittedAt   DateTime?
+  submittedById String?
 
   // Approval info
-  approvedAt      DateTime?
-  approvedById    String?
+  approvedAt       DateTime?
+  approvedById     String?
   approvalComments String?
 
   // Rejection info
@@ -3373,31 +3481,31 @@ model BudgetVersion {
 }
 
 model BudgetVersionChange {
-  id              String   @id @default(cuid())
+  id String @id @default(cuid())
 
   // Version reference
-  versionId       String
-  version         BudgetVersion @relation(fields: [versionId], references: [id], onDelete: Cascade)
+  versionId String
+  version   BudgetVersion @relation(fields: [versionId], references: [id], onDelete: Cascade)
 
   // Node info
-  nodeId          String
-  nodeName        String
-  nodePath        Json     // Array of parent names
+  nodeId   String
+  nodeName String
+  nodePath Json // Array of parent names
 
   // Change details
-  changeType      BudgetChangeType
-  field           String   // 'budget', 'allocated', 'percentage', 'status'
+  changeType BudgetChangeType
+  field      String // 'budget', 'allocated', 'percentage', 'status'
 
   // Values
-  oldValue        String?
-  newValue        String?
+  oldValue String?
+  newValue String?
 
   // Numeric diff (for budget/allocated changes)
-  diff            Decimal? @db.Decimal(15, 2)
-  diffPercent     Decimal? @db.Decimal(5, 2)
+  diff        Decimal? @db.Decimal(15, 2)
+  diffPercent Decimal? @db.Decimal(5, 2)
 
   // Audit
-  changedAt       DateTime @default(now())
+  changedAt DateTime @default(now())
 
   @@index([versionId])
   @@index([nodeId])
@@ -3409,18 +3517,18 @@ model BudgetVersionChange {
 // ============================================
 
 model DeliveryWindow {
-  id          String   @id @default(cuid())
-  seasonId    String
-  season      Season   @relation("DeliveryWindowSeason", fields: [seasonId], references: [id])
-  name        String   // e.g., "Jan 2026", "Feb 2026"
-  code        String   // e.g., "JAN26", "FEB26"
-  startDate   DateTime
-  endDate     DateTime
-  isActive    Boolean  @default(true)
-  sortOrder   Int      @default(0)
+  id        String   @id @default(cuid())
+  seasonId  String
+  season    Season   @relation("DeliveryWindowSeason", fields: [seasonId], references: [id])
+  name      String // e.g., "Jan 2026", "Feb 2026"
+  code      String // e.g., "JAN26", "FEB26"
+  startDate DateTime
+  endDate   DateTime
+  isActive  Boolean  @default(true)
+  sortOrder Int      @default(0)
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   allocations DeliveryAllocation[]
 
@@ -3430,19 +3538,19 @@ model DeliveryWindow {
 }
 
 model DeliveryAllocation {
-  id              String   @id @default(cuid())
-  windowId        String
-  window          DeliveryWindow @relation(fields: [windowId], references: [id], onDelete: Cascade)
-  skuItemId       String
-  skuItem         SKUItem  @relation("DeliveryAllocationSKU", fields: [skuItemId], references: [id], onDelete: Cascade)
-  locationId      String
-  location        SalesLocation @relation("DeliveryAllocationLocation", fields: [locationId], references: [id])
-  quantity        Int
-  value           Decimal  @db.Decimal(18, 2)
-  status          String   @default("PENDING") // PENDING, CONFIRMED, SHIPPED
+  id         String         @id @default(cuid())
+  windowId   String
+  window     DeliveryWindow @relation(fields: [windowId], references: [id], onDelete: Cascade)
+  skuItemId  String
+  skuItem    SKUItem        @relation("DeliveryAllocationSKU", fields: [skuItemId], references: [id], onDelete: Cascade)
+  locationId String
+  location   SalesLocation  @relation("DeliveryAllocationLocation", fields: [locationId], references: [id])
+  quantity   Int
+  value      Decimal        @db.Decimal(18, 2)
+  status     String         @default("PENDING") // PENDING, CONFIRMED, SHIPPED
 
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@unique([windowId, skuItemId, locationId])
   @@index([windowId])
@@ -3456,56 +3564,56 @@ model DeliveryAllocation {
 // ============================================
 
 model CostingBreakdown {
-  id              String   @id @default(cuid())
-  skuItemId       String   @unique
-  skuItem         SKUItem  @relation("CostingBreakdownSKU", fields: [skuItemId], references: [id], onDelete: Cascade)
+  id        String  @id @default(cuid())
+  skuItemId String  @unique
+  skuItem   SKUItem @relation("CostingBreakdownSKU", fields: [skuItemId], references: [id], onDelete: Cascade)
 
   // Cost components
-  unitCost        Decimal  @db.Decimal(18, 2)  // FOB cost in USD
-  freightCost     Decimal  @db.Decimal(18, 2)  @default(0)
-  insuranceCost   Decimal  @db.Decimal(18, 2)  @default(0)
-  dutyRate        Decimal  @db.Decimal(5, 2)   @default(0)
-  dutyAmount      Decimal  @db.Decimal(18, 2)  @default(0)
-  vatRate         Decimal  @db.Decimal(5, 2)   @default(10)
-  vatAmount       Decimal  @db.Decimal(18, 2)  @default(0)
-  otherCosts      Decimal  @db.Decimal(18, 2)  @default(0)
+  unitCost      Decimal @db.Decimal(18, 2) // FOB cost in USD
+  freightCost   Decimal @default(0) @db.Decimal(18, 2)
+  insuranceCost Decimal @default(0) @db.Decimal(18, 2)
+  dutyRate      Decimal @default(0) @db.Decimal(5, 2)
+  dutyAmount    Decimal @default(0) @db.Decimal(18, 2)
+  vatRate       Decimal @default(10) @db.Decimal(5, 2)
+  vatAmount     Decimal @default(0) @db.Decimal(18, 2)
+  otherCosts    Decimal @default(0) @db.Decimal(18, 2)
 
   // Calculated costs
-  landedCost      Decimal  @db.Decimal(18, 2)  // Total cost in VND
+  landedCost Decimal @db.Decimal(18, 2) // Total cost in VND
 
   // Pricing
-  srp             Decimal  @db.Decimal(18, 2)  // Suggested Retail Price in VND
-  margin          Decimal  @db.Decimal(5, 2)   // Margin percentage
+  srp    Decimal @db.Decimal(18, 2) // Suggested Retail Price in VND
+  margin Decimal @db.Decimal(5, 2) // Margin percentage
 
   // Exchange rate used
-  exchangeRate    Decimal  @db.Decimal(10, 4)  @default(24500)
-  currency        String   @default("VND")
+  exchangeRate Decimal @default(24500) @db.Decimal(10, 4)
+  currency     String  @default("VND")
 
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([skuItemId])
   @@map("costing_breakdowns")
 }
 
 model CostingConfig {
-  id              String   @id @default(cuid())
-  brandId         String?
-  brand           Brand?   @relation("CostingConfigBrand", fields: [brandId], references: [id])
-  categoryId      String?
-  category        Category? @relation("CostingConfigCategory", fields: [categoryId], references: [id])
+  id         String    @id @default(cuid())
+  brandId    String?
+  brand      Brand?    @relation("CostingConfigBrand", fields: [brandId], references: [id])
+  categoryId String?
+  category   Category? @relation("CostingConfigCategory", fields: [categoryId], references: [id])
 
   // Default rates
-  defaultDutyRate     Decimal  @db.Decimal(5, 2)  @default(0)
-  defaultVatRate      Decimal  @db.Decimal(5, 2)  @default(10)
-  defaultFreightRate  Decimal  @db.Decimal(5, 2)  @default(5) // % of unit cost
-  targetMargin        Decimal  @db.Decimal(5, 2)  @default(55)
-  minMargin           Decimal  @db.Decimal(5, 2)  @default(45)
+  defaultDutyRate    Decimal @default(0) @db.Decimal(5, 2)
+  defaultVatRate     Decimal @default(10) @db.Decimal(5, 2)
+  defaultFreightRate Decimal @default(5) @db.Decimal(5, 2) // % of unit cost
+  targetMargin       Decimal @default(55) @db.Decimal(5, 2)
+  minMargin          Decimal @default(45) @db.Decimal(5, 2)
 
-  isActive        Boolean  @default(true)
+  isActive Boolean @default(true)
 
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@unique([brandId, categoryId])
   @@map("costing_configs")
@@ -3516,33 +3624,33 @@ model CostingConfig {
 // ============================================
 
 model StorePerformance {
-  id              String   @id @default(cuid())
-  locationId      String
-  location        SalesLocation @relation("StorePerformanceLocation", fields: [locationId], references: [id])
-  seasonId        String
-  season          Season   @relation("StorePerformanceSeason", fields: [seasonId], references: [id])
-  periodStart     DateTime
-  periodEnd       DateTime
+  id          String        @id @default(cuid())
+  locationId  String
+  location    SalesLocation @relation("StorePerformanceLocation", fields: [locationId], references: [id])
+  seasonId    String
+  season      Season        @relation("StorePerformanceSeason", fields: [seasonId], references: [id])
+  periodStart DateTime
+  periodEnd   DateTime
 
   // Sales metrics
-  salesQuantity   Int      @default(0)
-  salesValue      Decimal  @db.Decimal(18, 2) @default(0)
+  salesQuantity Int     @default(0)
+  salesValue    Decimal @default(0) @db.Decimal(18, 2)
 
   // Stock metrics
-  stockQuantity   Int      @default(0)
-  stockValue      Decimal  @db.Decimal(18, 2) @default(0)
+  stockQuantity Int     @default(0)
+  stockValue    Decimal @default(0) @db.Decimal(18, 2)
 
   // Calculated metrics
-  sellThru        Decimal  @db.Decimal(5, 2)  @default(0)  // Sell through %
-  weeksOfCover    Decimal  @db.Decimal(5, 2)  @default(0)  // WOC
-  margin          Decimal  @db.Decimal(5, 2)  @default(0)
+  sellThru     Decimal @default(0) @db.Decimal(5, 2) // Sell through %
+  weeksOfCover Decimal @default(0) @db.Decimal(5, 2) // WOC
+  margin       Decimal @default(0) @db.Decimal(5, 2)
 
   // Ranking
-  rank            Int?
-  rankChange      Int?     // Change from previous period
+  rank       Int?
+  rankChange Int? // Change from previous period
 
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@unique([locationId, seasonId, periodStart, periodEnd])
   @@index([locationId])
@@ -3563,43 +3671,43 @@ enum PriceRangeCode {
 }
 
 model PriceRange {
-  id              String   @id @default(cuid())
-  code            PriceRangeCode
-  name            String   // "Budget", "Mid-Range", "Premium", "Luxury"
-  minPrice        Decimal  @db.Decimal(18, 2)
-  maxPrice        Decimal  @db.Decimal(18, 2)
-  color           String?  // For UI display
-  description     String?
-  isActive        Boolean  @default(true)
+  id          String         @id @default(cuid())
+  code        PriceRangeCode
+  name        String // "Budget", "Mid-Range", "Premium", "Luxury"
+  minPrice    Decimal        @db.Decimal(18, 2)
+  maxPrice    Decimal        @db.Decimal(18, 2)
+  color       String? // For UI display
+  description String?
+  isActive    Boolean        @default(true)
 
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("price_ranges")
 }
 
 model PriceRangeAnalysis {
-  id              String   @id @default(cuid())
-  seasonId        String
-  season          Season   @relation("PriceRangeAnalysisSeason", fields: [seasonId], references: [id])
-  brandId         String?
-  brand           Brand?   @relation("PriceRangeAnalysisBrand", fields: [brandId], references: [id])
-  categoryId      String?
-  category        Category? @relation("PriceRangeAnalysisCategory", fields: [categoryId], references: [id])
-  rangeCode       PriceRangeCode
+  id         String         @id @default(cuid())
+  seasonId   String
+  season     Season         @relation("PriceRangeAnalysisSeason", fields: [seasonId], references: [id])
+  brandId    String?
+  brand      Brand?         @relation("PriceRangeAnalysisBrand", fields: [brandId], references: [id])
+  categoryId String?
+  category   Category?      @relation("PriceRangeAnalysisCategory", fields: [categoryId], references: [id])
+  rangeCode  PriceRangeCode
 
   // Distribution metrics
-  skuCount        Int      @default(0)
-  totalQuantity   Int      @default(0)
-  totalValue      Decimal  @db.Decimal(18, 2) @default(0)
-  avgPrice        Decimal  @db.Decimal(18, 2) @default(0)
-  percentage      Decimal  @db.Decimal(5, 2)  @default(0)
+  skuCount      Int     @default(0)
+  totalQuantity Int     @default(0)
+  totalValue    Decimal @default(0) @db.Decimal(18, 2)
+  avgPrice      Decimal @default(0) @db.Decimal(18, 2)
+  percentage    Decimal @default(0) @db.Decimal(5, 2)
 
   // Performance
-  avgSellThru     Decimal  @db.Decimal(5, 2)  @default(0)
-  avgMargin       Decimal  @db.Decimal(5, 2)  @default(0)
+  avgSellThru Decimal @default(0) @db.Decimal(5, 2)
+  avgMargin   Decimal @default(0) @db.Decimal(5, 2)
 
-  analyzedAt      DateTime @default(now())
+  analyzedAt DateTime @default(now())
 
   @@unique([seasonId, brandId, categoryId, rangeCode])
   @@index([seasonId])
@@ -3612,33 +3720,33 @@ model PriceRangeAnalysis {
 // ============================================
 
 model CarryForwardItem {
-  id                  String   @id @default(cuid())
-  skuItemId           String
-  skuItem             SKUItem  @relation("CarryForwardSKU", fields: [skuItemId], references: [id], onDelete: Cascade)
-  fromSeasonId        String
-  fromSeason          Season   @relation("CarryForwardFromSeason", fields: [fromSeasonId], references: [id])
-  toSeasonId          String
-  toSeason            Season   @relation("CarryForwardToSeason", fields: [toSeasonId], references: [id])
+  id           String  @id @default(cuid())
+  skuItemId    String
+  skuItem      SKUItem @relation("CarryForwardSKU", fields: [skuItemId], references: [id], onDelete: Cascade)
+  fromSeasonId String
+  fromSeason   Season  @relation("CarryForwardFromSeason", fields: [fromSeasonId], references: [id])
+  toSeasonId   String
+  toSeason     Season  @relation("CarryForwardToSeason", fields: [toSeasonId], references: [id])
 
   // Carry forward decision
-  isCarryForward      Boolean  @default(false)
-  sourceCollection    String?  // Original collection name
-  carryForwardReason  String?
+  isCarryForward     Boolean @default(false)
+  sourceCollection   String? // Original collection name
+  carryForwardReason String?
 
   // Performance data from source
-  originalQuantity    Int      @default(0)
-  soldQuantity        Int      @default(0)
-  remainingQuantity   Int      @default(0)
-  sellThru            Decimal  @db.Decimal(5, 2) @default(0)
+  originalQuantity  Int     @default(0)
+  soldQuantity      Int     @default(0)
+  remainingQuantity Int     @default(0)
+  sellThru          Decimal @default(0) @db.Decimal(5, 2)
 
   // New season allocation
-  newSeasonQuantity   Int      @default(0)
+  newSeasonQuantity Int @default(0)
 
   // Status
-  status              String   @default("PENDING") // PENDING, APPROVED, REJECTED
+  status String @default("PENDING") // PENDING, APPROVED, REJECTED
 
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@unique([skuItemId, toSeasonId])
   @@index([fromSeasonId])
@@ -3648,43 +3756,662 @@ model CarryForwardItem {
 }
 
 // ============================================
+// PRODUCT MEDIA SYSTEM - PHASE 3
+// ============================================
+
+enum MediaType {
+  HERO // 1200×1600 - Primary product image
+  CARD // 600×800 - Product cards
+  THUMBNAIL // 400×400 - Quick thumbnails
+  MINI // 64×64 - Grid/table icons
+  ZOOM // Up to 4000px - Detail view
+  SWATCH // Color swatch
+  LIFESTYLE // Marketing/lifestyle shots
+  FLAT_LAY // Flat lay shots
+  DETAIL // Detail close-ups
+  VIDEO_THUMB // Video thumbnail
+}
+
+enum MediaStatus {
+  UPLOADING // File being uploaded
+  PROCESSING // Generating variants
+  READY // All variants ready
+  FAILED // Processing failed
+  ARCHIVED // Soft deleted
+}
+
+enum MediaSource {
+  UPLOAD // Manual upload
+  SUPPLIER // From supplier/brand
+  AI_GENERATED // AI generated placeholder
+  EXTERNAL // External URL
+}
+
+model ProductMedia {
+  id String @id @default(cuid())
+
+  // SKU Reference
+  skuItemId String?
+  skuItem   SKUItem? @relation("SKUItemMedia", fields: [skuItemId], references: [id], onDelete: Cascade)
+
+  // Alternative references for flexibility
+  styleCode String? // Style-level media (shared across colors)
+  colorCode String? // Color-level media
+
+  // Media Identification
+  type      MediaType   @default(HERO)
+  status    MediaStatus @default(UPLOADING)
+  source    MediaSource @default(UPLOAD)
+  sortOrder Int         @default(0)
+  isPrimary Boolean     @default(false)
+
+  // Original File Info
+  originalUrl      String
+  originalFilename String
+  originalMimeType String
+  originalSize     Int // bytes
+  originalWidth    Int?
+  originalHeight   Int?
+
+  // Processed Variants (stored as JSON for flexibility)
+  variants Json? // { hero: url, card: url, thumb: url, mini: url, zoom: url }
+
+  // Individual variant URLs (for quick access)
+  heroUrl  String? // 1200×1600
+  cardUrl  String? // 600×800
+  thumbUrl String? // 400×400
+  miniUrl  String? // 64×64
+  zoomUrl  String? // Up to 4000px
+
+  // Image Analysis (AI enrichment)
+  dominantColor String? // Hex color
+  colorPalette  Json? // Array of hex colors
+  aiTags        Json? // Auto-detected tags
+  altText       String? // Accessibility text
+  caption       String? // Optional caption
+
+  // Quality Metrics
+  qualityScore  Float? // 0-100 from AI analysis
+  isTransparent Boolean @default(false)
+  hasBackground Boolean @default(true)
+
+  // Processing Info
+  processingError  String?
+  processedAt      DateTime?
+  processingTimeMs Int?
+
+  // CDN & Storage
+  cdnProvider String? @default("cloudinary") // cloudinary, s3, etc.
+  storageKey  String? // Storage path/key
+  cdnUrl      String? // CDN base URL
+
+  // Audit
+  uploadedById String?
+  uploadedBy   User?     @relation("MediaUploadedBy", fields: [uploadedById], references: [id])
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  archivedAt   DateTime?
+
+  @@index([skuItemId])
+  @@index([styleCode])
+  @@index([colorCode])
+  @@index([type])
+  @@index([status])
+  @@index([isPrimary])
+  @@map("product_media")
+}
+
+// Edit History for Manual Edit Engine
+enum EditFieldType {
+  TEXT
+  NUMBER
+  DECIMAL
+  SELECT
+  MULTISELECT
+  DATE
+  BOOLEAN
+  JSON
+}
+
+enum EditStatus {
+  PENDING // Awaiting approval
+  APPROVED // Approved by manager
+  REJECTED // Rejected with reason
+  AUTO_APPROVED // Within auto-approve limits
+}
+
+model EditHistory {
+  id String @id @default(cuid())
+
+  // Reference to edited entity
+  entityType String // SKUItem, OTBPlan, Budget, etc.
+  entityId   String
+
+  // Field Information
+  fieldName  String
+  fieldType  EditFieldType
+  fieldLabel String? // Human-readable label
+
+  // Values
+  oldValue     String? @db.Text
+  newValue     String? @db.Text
+  oldValueJson Json? // For complex values
+  newValueJson Json?
+
+  // Variance Impact (for numeric fields)
+  varianceAmount Decimal? @db.Decimal(18, 2)
+  variancePct    Decimal? @db.Decimal(5, 2)
+
+  // Cascade Info (what other fields were affected)
+  cascadeInfo Json? // { affectedFields: [...], recalculations: [...] }
+
+  // Status & Approval
+  status           EditStatus @default(AUTO_APPROVED)
+  requiresApproval Boolean    @default(false)
+  approvalReason   String?
+
+  // Approval Details
+  approvedById    String?
+  approvedBy      User?     @relation("EditApprovedBy", fields: [approvedById], references: [id])
+  approvedAt      DateTime?
+  rejectedById    String?
+  rejectedBy      User?     @relation("EditRejectedBy", fields: [rejectedById], references: [id])
+  rejectedAt      DateTime?
+  rejectionReason String?
+
+  // Context
+  editReason String? // User-provided reason
+  editSource String? // manual, import, ai_suggestion
+  sessionId  String? // For grouping edits in a session
+
+  // Audit
+  editedById String
+  editedBy   User     @relation("EditMadeBy", fields: [editedById], references: [id])
+  createdAt  DateTime @default(now())
+
+  @@index([entityType, entityId])
+  @@index([editedById])
+  @@index([status])
+  @@index([createdAt])
+  @@index([sessionId])
+  @@map("edit_history")
+}
+
+// Edit Permission Rules
+model EditPermission {
+  id String @id @default(cuid())
+
+  // Who
+  roleId String? // UserRole enum value
+  userId String? // Specific user
+
+  // What entity/field
+  entityType   String // SKUItem, OTBPlan, etc.
+  fieldPattern String // Field name or pattern (e.g., "price*", "*")
+
+  // Conditions
+  conditions Json? // { status: ["DRAFT"], variance: { max: 0.1 } }
+
+  // Permissions
+  canView    Boolean @default(true)
+  canEdit    Boolean @default(false)
+  canApprove Boolean @default(false)
+
+  // Auto-approve limits
+  autoApproveLimit    Decimal? @db.Decimal(18, 2) // Value limit
+  autoApprovePctLimit Decimal? @db.Decimal(5, 2) // Percentage limit
+
+  // Lock settings
+  lockAfterApproval Boolean @default(true)
+  requireReason     Boolean @default(false)
+
+  isActive Boolean @default(true)
+  priority Int     @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([roleId])
+  @@index([entityType])
+  @@index([isActive])
+  @@map("edit_permissions")
+}
+
+// ============================================
 // W25 FEATURES - THEME/USER PREFERENCES
 // ============================================
 
 model UserSettings {
-  id              String   @id @default(cuid())
-  userId          String   @unique
-  user            User     @relation("UserSettingsUser", fields: [userId], references: [id], onDelete: Cascade)
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation("UserSettingsUser", fields: [userId], references: [id], onDelete: Cascade)
 
   // Theme
-  theme           String   @default("light")  // light, dark, system
-  accentColor     String   @default("blue")
+  theme       String @default("light") // light, dark, system
+  accentColor String @default("blue")
 
   // Localization
-  language        String   @default("vi")  // vi, en
-  dateFormat      String   @default("DD/MM/YYYY")
-  numberFormat    String   @default("vi-VN")
-  currency        String   @default("VND")
-  timezone        String   @default("Asia/Ho_Chi_Minh")
+  language     String @default("vi") // vi, en
+  dateFormat   String @default("DD/MM/YYYY")
+  numberFormat String @default("vi-VN")
+  currency     String @default("VND")
+  timezone     String @default("Asia/Ho_Chi_Minh")
 
   // Default filters
   defaultSeasonId String?
   defaultBrandId  String?
 
   // Notifications
-  emailNotifications  Boolean @default(true)
-  pushNotifications   Boolean @default(true)
-  notificationTypes   String[] @default([])  // Array of enabled notification types
+  emailNotifications Boolean  @default(true)
+  pushNotifications  Boolean  @default(true)
+  notificationTypes  String[] @default([]) // Array of enabled notification types
 
   // Table preferences
-  tablePageSize       Int     @default(20)
-  tableCompactMode    Boolean @default(false)
+  tablePageSize    Int     @default(20)
+  tableCompactMode Boolean @default(false)
 
   // Dashboard layout
-  dashboardLayout     Json?
+  dashboardLayout Json?
 
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("user_settings")
+}
+
+// ============================================
+// SQL SCHEMA ALIGNED MODELS - APPROVAL WORKFLOW
+// ============================================
+
+// Enum for Approval Actions
+enum ApprovalAction {
+  APPROVED
+  REJECTED
+}
+
+// Enum for Version Status (matches SQL schema)
+enum VersionStatus {
+  DRAFT
+  SUBMITTED
+  APPROVED
+}
+
+// ApprovalWorkflow - Maps to SQL: approval_workflow table
+model ApprovalWorkflow {
+  id           String     @id @default(cuid())
+  groupBrandId String
+  groupBrand   GroupBrand @relation("ApprovalWorkflowGroupBrand", fields: [groupBrandId], references: [id])
+  workflowName String // Workflow name for display
+  isActive     Boolean    @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  levels ApprovalWorkflowLevel[]
+
+  @@index([groupBrandId])
+  @@map("approval_workflows")
+}
+
+// ApprovalWorkflowLevel - Maps to SQL: approval_workflow_level table
+model ApprovalWorkflowLevel {
+  id                 String           @id @default(cuid())
+  approvalWorkflowId String
+  approvalWorkflow   ApprovalWorkflow @relation(fields: [approvalWorkflowId], references: [id], onDelete: Cascade)
+  levelOrder         Int // Step 1, 2, 3...
+  levelName          String // "Brand Manager Review", "Finance Review", "BOD Approval"
+  approverUserId     String? // Specific user or NULL for any user with role
+  isRequired         Boolean          @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  planApprovalLogs PlanApprovalLog[]
+
+  @@unique([approvalWorkflowId, levelOrder])
+  @@index([approvalWorkflowId])
+  @@map("approval_workflow_levels")
+}
+
+// PlanApprovalLog - Maps to SQL: plan_approval_log table
+model PlanApprovalLog {
+  id                      String                @id @default(cuid())
+  planHeaderId            String // Reference to the plan being approved
+  approvalWorkflowLevelId String
+  approvalWorkflowLevel   ApprovalWorkflowLevel @relation(fields: [approvalWorkflowLevelId], references: [id])
+  approverUserId          String
+  action                  ApprovalAction
+  comment                 String?               @db.Text
+  approvedAt              DateTime?
+
+  createdAt DateTime @default(now())
+
+  @@index([planHeaderId])
+  @@index([approvalWorkflowLevelId])
+  @@map("plan_approval_logs")
+}
+
+// ============================================
+// SQL SCHEMA ALIGNED MODELS - BUDGET & PLANNING
+// ============================================
+
+// PlanBudget - Maps to SQL: budget table
+// Main budget allocation per season/brand/store
+model PlanBudget {
+  id            String        @id @default(cuid())
+  budgetName    String
+  fiscalYear    Int
+  seasonId      String
+  season        Season        @relation("PlanBudgetSeason", fields: [seasonId], references: [id])
+  groupBrandId  String
+  groupBrand    GroupBrand    @relation("PlanBudgetGroupBrand", fields: [groupBrandId], references: [id])
+  storeId       String
+  store         Store         @relation("PlanBudgetStore", fields: [storeId], references: [id])
+  versionCode   String // V1, V2, V3...
+  versionStatus VersionStatus @default(DRAFT)
+  budgetAmount  Decimal       @db.Decimal(18, 2)
+  pctMix        Decimal       @db.Decimal(5, 2) // Percentage mix
+
+  createdById String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  planCollections   PlanCollection[]  @relation("PlanCollectionBudget")
+  planGenders       PlanGender[]      @relation("PlanGenderBudget")
+  planSubcategories PlanSubcategory[] @relation("PlanSubcategoryBudget")
+
+  @@index([seasonId])
+  @@index([groupBrandId])
+  @@index([storeId])
+  @@index([fiscalYear])
+  @@map("plan_budgets")
+}
+
+// PlanCollection - Maps to SQL: plan_collection table
+model PlanCollection {
+  id                 String        @id @default(cuid())
+  planCollectionName String
+  budgetId           String
+  budget             PlanBudget    @relation("PlanCollectionBudget", fields: [budgetId], references: [id], onDelete: Cascade)
+  versionCode        String // V1, V2, V3...
+  versionStatus      VersionStatus @default(DRAFT)
+  collectionId       String
+  collection         Collection    @relation("PlanCollectionCollection", fields: [collectionId], references: [id])
+
+  // Historical Performance
+  actualBuyPct   Decimal? @db.Decimal(5, 2)
+  actualSalesPct Decimal? @db.Decimal(5, 2)
+  actualStPct    Decimal? @db.Decimal(5, 2) // Sell-through %
+  actualMoc      Decimal? @db.Decimal(5, 2) // Months of cover
+
+  // Proposed Values
+  proposedBuyPct    Decimal? @db.Decimal(5, 2)
+  otbProposedAmount Decimal? @db.Decimal(18, 2)
+  pctVarVsLast      Decimal? @db.Decimal(5, 2) // % variance vs last year
+
+  createdById String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([budgetId])
+  @@index([collectionId])
+  @@map("plan_collections")
+}
+
+// PlanGender - Maps to SQL: plan_gender table
+model PlanGender {
+  id             String        @id @default(cuid())
+  planGenderName String
+  budgetId       String
+  budget         PlanBudget    @relation("PlanGenderBudget", fields: [budgetId], references: [id], onDelete: Cascade)
+  genderId       String // Reference to Gender
+  versionCode    String // V1, V2, V3...
+  versionStatus  VersionStatus @default(DRAFT)
+
+  // Historical Performance
+  actualBuyPct   Decimal? @db.Decimal(5, 2)
+  actualSalesPct Decimal? @db.Decimal(5, 2)
+  actualStPct    Decimal? @db.Decimal(5, 2) // Sell-through %
+
+  // Proposed Values
+  proposedBuyPct    Decimal? @db.Decimal(5, 2)
+  otbProposedAmount Decimal? @db.Decimal(18, 2)
+  pctVarVsLast      Decimal? @db.Decimal(5, 2) // % variance vs last year
+
+  createdById String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([budgetId])
+  @@index([genderId])
+  @@map("plan_genders")
+}
+
+// PlanSubcategory - Maps to SQL: plan_subcategory table
+model PlanSubcategory {
+  id                  String      @id @default(cuid())
+  planSubcategoryName String
+  budgetId            String
+  budget              PlanBudget  @relation("PlanSubcategoryBudget", fields: [budgetId], references: [id], onDelete: Cascade)
+  genderId            String
+  subcategoryId       String
+  subcategory         Subcategory @relation("PlanSubcategorySubcategory", fields: [subcategoryId], references: [id])
+
+  // Historical Performance
+  actualBuyPct   Decimal? @db.Decimal(5, 2)
+  actualSalesPct Decimal? @db.Decimal(5, 2)
+  actualStPct    Decimal? @db.Decimal(5, 2) // Sell-through %
+
+  // Proposed Values
+  proposedBuyPct    Decimal? @db.Decimal(5, 2)
+  otbProposedAmount Decimal? @db.Decimal(18, 2)
+  varLastYearPct    Decimal? @db.Decimal(5, 2) // Variance vs last year %
+
+  // Actual Values (after approval)
+  otbActualAmount Decimal? @db.Decimal(18, 2)
+  otbActualBuyPct Decimal? @db.Decimal(5, 2)
+
+  versionCode   String // V1, V2, V3...
+  versionStatus VersionStatus @default(DRAFT)
+  comment       String?       @db.Text
+
+  createdById String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  proposalOrderSkus ProposalOrderSku[] @relation("ProposalOrderSkuPlanSubcategory")
+
+  @@index([budgetId])
+  @@index([subcategoryId])
+  @@index([genderId])
+  @@map("plan_subcategories")
+}
+
+// ============================================
+// SQL SCHEMA ALIGNED MODELS - SKU PROPOSALS
+// ============================================
+
+// ProposalOrderSku - Maps to SQL: proposal_order_sku table
+model ProposalOrderSku {
+  id                   String          @id @default(cuid())
+  proposalOrderSkuName String
+  planSubcategoryId    String
+  planSubcategory      PlanSubcategory @relation("ProposalOrderSkuPlanSubcategory", fields: [planSubcategoryId], references: [id], onDelete: Cascade)
+  skuId                String // Reference to SKU
+  proposalQuantity     Int // Order quantity (REX, TTP from image)
+  unitCost             Decimal         @db.Decimal(18, 2)
+  srp                  Decimal         @db.Decimal(18, 2) // Suggested Retail Price
+  proposalValue        Decimal         @db.Decimal(18, 2) // TTL value
+  customerTarget       String? // "New", "Existing", "Top VIC"
+
+  versionCode   String // V1, V2, V3...
+  versionStatus VersionStatus @default(DRAFT)
+
+  createdById String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  proposalSkuSizings ProposalSkuSizing[] @relation("ProposalSkuSizingOrder")
+
+  @@index([planSubcategoryId])
+  @@index([skuId])
+  @@map("proposal_order_skus")
+}
+
+// ProposalSkuSizing - Maps to SQL: proposal_sku_sizing table
+model ProposalSkuSizing {
+  id                 String           @id @default(cuid())
+  proposalOrderSkuId String
+  proposalOrderSku   ProposalOrderSku @relation("ProposalSkuSizingOrder", fields: [proposalOrderSkuId], references: [id], onDelete: Cascade)
+  subcategorySizeId  String
+  subcategorySize    SubcategorySize  @relation("ProposalSkuSizingSize", fields: [subcategorySizeId], references: [id])
+
+  // Performance Data
+  actualSalesMixPct Decimal? @db.Decimal(5, 2)
+  actualStPct       Decimal? @db.Decimal(5, 2) // Sell-through %
+  proposalQuantity  Int
+
+  versionCode   String // V1, V2, V3...
+  versionStatus VersionStatus @default(DRAFT)
+
+  createdById String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  orderPlanSubmits OrderPlanSubmit[] @relation("OrderPlanSubmitProposalSizing")
+
+  @@unique([proposalOrderSkuId, subcategorySizeId])
+  @@index([proposalOrderSkuId])
+  @@index([subcategorySizeId])
+  @@map("proposal_sku_sizings")
+}
+
+// ============================================
+// SQL SCHEMA ALIGNED MODELS - ORDER FLOW
+// ============================================
+
+// OrderPlanSubmit - Maps to SQL: order_plan_submit table
+// Submitted order plan (snapshot of proposal after submission)
+model OrderPlanSubmit {
+  id                  String             @id @default(cuid())
+  proposalSkuSizingId String?
+  proposalSkuSizing   ProposalSkuSizing? @relation("OrderPlanSubmitProposalSizing", fields: [proposalSkuSizingId], references: [id])
+  budgetId            String
+  fiscalYear          Int
+  seasonId            String
+  season              Season             @relation("OrderPlanSubmitSeason", fields: [seasonId], references: [id])
+  groupBrandId        String
+  groupBrand          GroupBrand         @relation("OrderPlanSubmitGroupBrand", fields: [groupBrandId], references: [id])
+  budgetName          String
+  storeId             String
+  store               Store              @relation("OrderPlanSubmitStore", fields: [storeId], references: [id])
+  budgetAmount        Decimal            @db.Decimal(18, 2)
+  pctMix              Decimal            @db.Decimal(5, 2)
+  planHeaderId        String?
+  productId           String?
+  totalQuantity       Int
+  unitCost            Decimal            @db.Decimal(18, 2)
+  srp                 Decimal            @db.Decimal(18, 2)
+  totalValue          Decimal            @db.Decimal(18, 2)
+  subcategorySizeId   String?
+  subcategorySize     SubcategorySize?   @relation("OrderPlanSubmitSize", fields: [subcategorySizeId], references: [id])
+  quantity            Int
+
+  createdById String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  orderPlanConfirms OrderPlanConfirm[] @relation("OrderPlanConfirmSubmit")
+
+  @@index([budgetId])
+  @@index([seasonId])
+  @@index([groupBrandId])
+  @@index([storeId])
+  @@map("order_plan_submits")
+}
+
+// OrderPlanConfirm - Maps to SQL: order_plan_confirm table
+// Confirmed order plan (after approval)
+model OrderPlanConfirm {
+  id                String           @id @default(cuid())
+  orderPlanBudgetId String
+  orderPlanSubmit   OrderPlanSubmit  @relation("OrderPlanConfirmSubmit", fields: [orderPlanBudgetId], references: [id])
+  budgetId          String
+  fiscalYear        Int
+  seasonId          String
+  season            Season           @relation("OrderPlanConfirmSeason", fields: [seasonId], references: [id])
+  groupBrandId      String
+  groupBrand        GroupBrand       @relation("OrderPlanConfirmGroupBrand", fields: [groupBrandId], references: [id])
+  budgetName        String
+  storeId           String
+  store             Store            @relation("OrderPlanConfirmStore", fields: [storeId], references: [id])
+  budgetAmount      Decimal          @db.Decimal(18, 2)
+  pctMix            Decimal          @db.Decimal(5, 2)
+  planHeaderId      String?
+  productId         String?
+  totalQuantity     Int
+  unitCost          Decimal          @db.Decimal(18, 2)
+  srp               Decimal          @db.Decimal(18, 2)
+  totalValue        Decimal          @db.Decimal(18, 2)
+  subcategorySizeId String?
+  subcategorySize   SubcategorySize? @relation("OrderPlanConfirmSize", fields: [subcategorySizeId], references: [id])
+  quantity          Int
+
+  createdById String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  orderActualReceipts OrderActualReceipt[] @relation("OrderActualReceiptConfirm")
+
+  @@index([orderPlanBudgetId])
+  @@index([budgetId])
+  @@index([seasonId])
+  @@index([groupBrandId])
+  @@index([storeId])
+  @@map("order_plan_confirms")
+}
+
+// OrderActualReceipt - Maps to SQL: order_actual_receipt table
+// Actual goods received (after delivery)
+model OrderActualReceipt {
+  id                String           @id @default(cuid())
+  orderPlanBudgetId String
+  orderPlanConfirm  OrderPlanConfirm @relation("OrderActualReceiptConfirm", fields: [orderPlanBudgetId], references: [id])
+  budgetId          String
+  fiscalYear        Int
+  seasonId          String
+  season            Season           @relation("OrderActualReceiptSeason", fields: [seasonId], references: [id])
+  groupBrandId      String
+  groupBrand        GroupBrand       @relation("OrderActualReceiptGroupBrand", fields: [groupBrandId], references: [id])
+  budgetName        String
+  storeId           String
+  store             Store            @relation("OrderActualReceiptStore", fields: [storeId], references: [id])
+  budgetAmount      Decimal          @db.Decimal(18, 2)
+  pctMix            Decimal          @db.Decimal(5, 2)
+  planHeaderId      String?
+  productId         String?
+  totalQuantity     Int
+  unitCost          Decimal          @db.Decimal(18, 2)
+  srp               Decimal          @db.Decimal(18, 2)
+  totalValue        Decimal          @db.Decimal(18, 2)
+  subcategorySizeId String?
+  subcategorySize   SubcategorySize? @relation("OrderActualReceiptSize", fields: [subcategorySizeId], references: [id])
+  quantity          Int
+
+  createdById String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([orderPlanBudgetId])
+  @@index([budgetId])
+  @@index([seasonId])
+  @@index([groupBrandId])
+  @@index([storeId])
+  @@map("order_actual_receipts")
 }

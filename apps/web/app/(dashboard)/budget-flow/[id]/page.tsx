@@ -355,7 +355,7 @@ export default function BudgetFlowDetailPage() {
 
       {/* Workflow Tracker */}
       <div className="px-6 py-4">
-        <div className="p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900">
+        <div className="p-4 rounded-xl border border-border bg-card">
           <h3 className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-4">Approval Workflow</h3>
           <WorkflowTracker
             currentStatus={workflowStatus}
@@ -447,7 +447,7 @@ export default function BudgetFlowDetailPage() {
         </div>
 
         {/* YoY Variance */}
-        <div className="p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
+        <div className="p-4 rounded-xl border border-border bg-card">
           <div className="flex items-center justify-between">
             <span className="text-slate-500">YoY Budget Variance</span>
             <div className="flex items-center gap-2">

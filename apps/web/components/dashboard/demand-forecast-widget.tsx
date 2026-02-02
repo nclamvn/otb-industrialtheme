@@ -63,26 +63,25 @@ export function DemandForecastWidget() {
   return (
     <div
       className={cn(
-        // Unified: rounded-xl, shadow-sm, hover:shadow-md, border-l-4
-        'rounded-xl border border-slate-200 bg-white overflow-hidden',
-        'shadow-sm hover:shadow-md transition-all duration-200',
+        // Flat design: rounded-xl, no shadow, border-l-4
+        'relative rounded-xl border border-border bg-card overflow-hidden',
+        'hover:border-border/80 transition-all duration-200',
         'border-l-4 border-l-blue-500'
       )}
     >
+      {/* Watermark Icon */}
+      <div className="absolute -right-4 -bottom-4 pointer-events-none">
+        <Target className="w-24 h-24 text-blue-500 opacity-[0.08]" />
+      </div>
+
       {/* Header */}
       <div className="p-4 pb-3 border-b border-slate-100">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            {/* Unified: w-10 h-10 rounded-xl icon container */}
-            <div className="h-10 w-10 rounded-xl bg-blue-50 flex items-center justify-center">
-              <Target className="h-5 w-5 text-blue-600" />
-            </div>
-            <div>
-              <h3 className="text-sm font-semibold text-slate-900">Demand Forecast</h3>
-              <p className="text-xs text-slate-500">
-                Next 30 days prediction
-              </p>
-            </div>
+          <div>
+            <h3 className="text-sm font-semibold text-slate-900">Demand Forecast</h3>
+            <p className="text-xs text-slate-500">
+              Next 30 days prediction
+            </p>
           </div>
           {summary.criticalCount > 0 && (
             <Badge variant="destructive" className="text-xs">
@@ -97,9 +96,9 @@ export function DemandForecastWidget() {
       <div className="p-4 space-y-4">
         {/* Summary Stats - Unified rounded-xl cards */}
         <div className="grid grid-cols-2 gap-3">
-          <div className="rounded-xl bg-slate-50 p-3">
+          <div className="rounded-xl bg-muted/50 p-3">
             <div className="flex items-center gap-2">
-              <div className="h-8 w-8 rounded-lg bg-white flex items-center justify-center">
+              <div className="h-8 w-8 rounded-lg bg-card flex items-center justify-center">
                 <ShoppingCart className="h-4 w-4 text-slate-500" />
               </div>
               <span className="text-xs text-slate-500">Predicted Demand</span>
@@ -108,7 +107,7 @@ export function DemandForecastWidget() {
               {summary.totalPredicted.toLocaleString()}
             </p>
           </div>
-          <div className="rounded-xl bg-slate-50 p-3">
+          <div className="rounded-xl bg-muted/50 p-3">
             <div className="flex items-center gap-2">
               <div className={cn(
                 "h-8 w-8 rounded-lg flex items-center justify-center",

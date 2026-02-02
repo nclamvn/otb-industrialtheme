@@ -319,81 +319,77 @@ export default function SKUProposalPage() {
       {/* Summary Cards - Unified Design */}
       <div className="grid gap-4 md:grid-cols-4">
         <div className={cn(
-          'relative overflow-hidden rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950',
-          'shadow-sm hover:shadow-md transition-all duration-200',
+          'relative overflow-hidden rounded-xl border border-border bg-card',
+          'hover:border-border/80 transition-all duration-200',
           'border-l-4 border-l-blue-500'
         )}>
+          {/* Watermark Icon */}
+          <div className="absolute -right-4 -bottom-4 pointer-events-none">
+            <FileSpreadsheet className="w-24 h-24 text-blue-500 opacity-[0.08]" />
+          </div>
           <div className="p-4">
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">{t('totalProposals')}</p>
-                <div className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums">{totals.count}</div>
-                <p className="text-xs text-slate-500 dark:text-neutral-400 mt-1">{t('activeProposals')}</p>
-              </div>
-              <div className="h-10 w-10 rounded-xl bg-blue-50 dark:bg-blue-950 flex items-center justify-center">
-                <FileSpreadsheet className="h-5 w-5 text-blue-600" />
-              </div>
+            <div>
+              <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">{t('totalProposals')}</p>
+              <div className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums pr-14">{totals.count}</div>
+              <p className="text-xs text-slate-500 dark:text-neutral-400 mt-1">{t('activeProposals')}</p>
             </div>
           </div>
         </div>
 
         <div className={cn(
-          'relative overflow-hidden rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950',
-          'shadow-sm hover:shadow-md transition-all duration-200',
+          'relative overflow-hidden rounded-xl border border-border bg-card',
+          'hover:border-border/80 transition-all duration-200',
           'border-l-4 border-l-purple-500'
         )}>
+          {/* Watermark Icon */}
+          <div className="absolute -right-4 -bottom-4 pointer-events-none">
+            <Upload className="w-24 h-24 text-purple-500 opacity-[0.08]" />
+          </div>
           <div className="p-4">
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">{t('totalSkus')}</p>
-                <div className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums">{totals.totalItems.toLocaleString()}</div>
-                <p className="text-xs text-slate-500 dark:text-neutral-400 mt-1">{t('acrossProposals')}</p>
-              </div>
-              <div className="h-10 w-10 rounded-xl bg-purple-50 dark:bg-purple-950 flex items-center justify-center">
-                <Upload className="h-5 w-5 text-purple-600" />
-              </div>
+            <div>
+              <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">{t('totalSkus')}</p>
+              <div className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums pr-14">{totals.totalItems.toLocaleString()}</div>
+              <p className="text-xs text-slate-500 dark:text-neutral-400 mt-1">{t('acrossProposals')}</p>
             </div>
           </div>
         </div>
 
         <div className={cn(
-          'relative overflow-hidden rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950',
-          'shadow-sm hover:shadow-md transition-all duration-200',
+          'relative overflow-hidden rounded-xl border border-border bg-card',
+          'hover:border-border/80 transition-all duration-200',
           'border-l-4 border-l-green-500'
         )}>
+          {/* Watermark Icon */}
+          <div className="absolute -right-4 -bottom-4 pointer-events-none">
+            <CheckCircle className="w-24 h-24 text-green-500 opacity-[0.08]" />
+          </div>
           <div className="p-4">
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">{t('totalQuantity')}</p>
-                <div className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums">
-                  {totals.totalQuantity.toLocaleString()}
-                </div>
-                <p className="text-xs text-slate-500 dark:text-neutral-400 mt-1">{t('unitsOrdered')}</p>
+            <div>
+              <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">{t('totalQuantity')}</p>
+              <div className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums pr-14">
+                {totals.totalQuantity.toLocaleString()}
               </div>
-              <div className="h-10 w-10 rounded-xl bg-green-50 dark:bg-green-950 flex items-center justify-center">
-                <CheckCircle className="h-5 w-5 text-green-600" />
-              </div>
+              <p className="text-xs text-slate-500 dark:text-neutral-400 mt-1">{t('unitsOrdered')}</p>
             </div>
           </div>
         </div>
 
         <div className={cn(
-          'relative overflow-hidden rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950',
-          'shadow-sm hover:shadow-md transition-all duration-200',
+          'relative overflow-hidden rounded-xl border border-border bg-card',
+          'hover:border-border/80 transition-all duration-200',
           'border-l-4 border-l-amber-500'
         )}>
+          {/* Watermark Icon */}
+          <div className="absolute -right-4 -bottom-4 pointer-events-none">
+            <AlertTriangle className="w-24 h-24 text-amber-500 opacity-[0.08]" />
+          </div>
           <div className="p-4">
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">{t('totalValue')}</p>
-                <div className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums">
-                  ${totals.totalAmount.toLocaleString()}
-                </div>
-                <p className="text-xs text-slate-500 dark:text-neutral-400 mt-1">{t('retailValue')}</p>
+            <div>
+              <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">{t('totalValue')}</p>
+              <div className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums pr-14">
+                ${totals.totalAmount.toLocaleString()}
               </div>
-              <div className="h-10 w-10 rounded-xl bg-amber-50 dark:bg-amber-950 flex items-center justify-center">
-                <AlertTriangle className="h-5 w-5 text-amber-600" />
-              </div>
+              <p className="text-xs text-slate-500 dark:text-neutral-400 mt-1">{t('retailValue')}</p>
             </div>
           </div>
         </div>

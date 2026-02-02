@@ -90,7 +90,7 @@ export const STORE_GROUP_CONFIG: Record<StoreGroup, {
   ALL: {
     label: 'All Stores',
     color: 'text-slate-700 dark:text-slate-300',
-    bgColor: 'bg-slate-50 dark:bg-slate-800',
+    bgColor: 'bg-muted/50',
     borderColor: 'border-slate-500',
   },
 };

@@ -19,7 +19,6 @@ import {
   ShoppingCart,
   type LucideIcon,
 } from 'lucide-react';
-import { formatBudgetCurrency } from '@/components/ui/budget';
 
 // Icon mapping for server component compatibility
 const iconMap: Record<string, LucideIcon> = {
@@ -53,48 +52,42 @@ interface StatsCardProps {
   sparklineData?: number[];
 }
 
-// Unified color system matching budget card design
+// Flat design color system
 const colorClasses = {
   blue: {
-    icon: 'text-blue-600',
-    bg: 'bg-blue-50',
+    icon: 'text-blue-500',
+    bg: 'bg-blue-100 dark:bg-blue-950',
     border: 'border-l-blue-500',
-    trend: 'text-blue-600',
     sparkline: '#3b82f6',
   },
   green: {
-    icon: 'text-green-600',
-    bg: 'bg-green-50',
+    icon: 'text-green-500',
+    bg: 'bg-green-100 dark:bg-green-950',
     border: 'border-l-green-500',
-    trend: 'text-green-600',
     sparkline: '#22c55e',
   },
   orange: {
-    icon: 'text-amber-600',
-    bg: 'bg-amber-50',
+    icon: 'text-amber-500',
+    bg: 'bg-amber-100 dark:bg-amber-950',
     border: 'border-l-amber-500',
-    trend: 'text-amber-600',
     sparkline: '#f59e0b',
   },
   purple: {
-    icon: 'text-purple-600',
-    bg: 'bg-purple-50',
+    icon: 'text-purple-500',
+    bg: 'bg-purple-100 dark:bg-purple-950',
     border: 'border-l-purple-500',
-    trend: 'text-purple-600',
     sparkline: '#8b5cf6',
   },
   red: {
-    icon: 'text-red-600',
-    bg: 'bg-red-50',
+    icon: 'text-red-500',
+    bg: 'bg-red-100 dark:bg-red-950',
     border: 'border-l-red-500',
-    trend: 'text-red-600',
     sparkline: '#ef4444',
   },
   yellow: {
-    icon: 'text-yellow-600',
-    bg: 'bg-yellow-50',
+    icon: 'text-yellow-500',
+    bg: 'bg-yellow-100 dark:bg-yellow-950',
     border: 'border-l-yellow-500',
-    trend: 'text-yellow-600',
     sparkline: '#eab308',
   },
 };
@@ -118,7 +111,7 @@ function MiniSparkline({ data, color }: { data: number[]; color: string }) {
     .join(' ');
 
   return (
-    <svg width={width} height={height} className="overflow-visible">
+    <svg width={width} height={height} className="overflow-visible opacity-60">
       <polyline
         fill="none"
         stroke={color}
@@ -151,57 +144,68 @@ export function StatsCard({
       : Minus
     : null;
 
-  // Unified health-based trend colors
+  // Flat design trend colors
   const trendColor = trend
     ? trend.value > 0
-      ? 'text-green-600 bg-green-50'
+      ? 'text-green-600 bg-green-50 dark:text-green-400 dark:bg-green-950'
       : trend.value < 0
-      ? 'text-red-600 bg-red-50'
-      : 'text-slate-500 bg-slate-50'
+      ? 'text-red-600 bg-red-50 dark:text-red-400 dark:bg-red-950'
+      : 'text-slate-500 bg-muted/50 dark:text-neutral-400 dark:bg-neutral-900'
     : '';
 
   return (
     <div
       className={cn(
-        // Unified: rounded-xl, p-4, shadow-sm, hover:shadow-md, border-l-4
-        'rounded-xl border border-slate-200 bg-white overflow-hidden',
-        'shadow-sm hover:shadow-md transition-all duration-200',
+        // Flat design: no shadow, solid bg, left border accent
+        'relative rounded-xl border border-border bg-card overflow-hidden',
+        'hover:border-border/80 transition-all duration-200',
         'border-l-4',
         colors.border
       )}
     >
-      <div className="p-4">
-        <div className="flex items-start justify-between">
-          <div className="space-y-1 flex-1 min-w-0">
-            <p className="text-sm font-medium text-slate-500">{title}</p>
-            <div className="flex items-baseline gap-2 flex-wrap">
-              <span className="text-2xl font-bold text-slate-900 tabular-nums">{value}</span>
-              {trend && TrendIcon && (
-                <span className={cn(
-                  'inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-xs font-medium',
-                  trendColor
-                )}>
-                  <TrendIcon className="h-3 w-3" />
-                  {Math.abs(trend.value)}%
-                </span>
-              )}
-            </div>
-            {description && (
-              <p className="text-xs text-slate-500">{description}</p>
-            )}
-            {trend && (
-              <p className="text-xs text-slate-500">{trend.label}</p>
+      {/* Watermark Icon - Large, faded into background */}
+      <div className="absolute -right-4 -bottom-4 pointer-events-none">
+        <Icon className={cn('w-24 h-24 opacity-[0.08]', colors.icon)} />
+      </div>
+
+      {/* Content */}
+      <div className="p-3">
+        <div className="space-y-1 pr-14">
+          {/* Title */}
+          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            {title}
+          </p>
+
+          {/* Value + Trend */}
+          <div className="flex items-baseline gap-2 flex-wrap">
+            <span className="text-2xl font-bold tabular-nums text-foreground">{value}</span>
+            {trend && TrendIcon && (
+              <span className={cn(
+                'inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-xs font-medium',
+                trendColor
+              )}>
+                <TrendIcon className="h-3 w-3" />
+                {Math.abs(trend.value)}%
+              </span>
             )}
           </div>
-          <div className="flex flex-col items-end gap-2 flex-shrink-0">
-            {/* Unified: w-10 h-10 rounded-xl icon container */}
-            <div className={cn('h-10 w-10 rounded-xl flex items-center justify-center', colors.bg)}>
-              <Icon className={cn('h-5 w-5', colors.icon)} />
-            </div>
-            {sparklineData && (
+
+          {/* Sparkline */}
+          {sparklineData && (
+            <div className="mt-1">
               <MiniSparkline data={sparklineData} color={colors.sparkline} />
-            )}
-          </div>
+            </div>
+          )}
+
+          {/* Description */}
+          {description && (
+            <p className="text-xs text-muted-foreground truncate">{description}</p>
+          )}
+
+          {/* Trend label */}
+          {trend && (
+            <p className="text-xs text-muted-foreground/70">{trend.label}</p>
+          )}
         </div>
       </div>
     </div>

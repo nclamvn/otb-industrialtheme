@@ -188,7 +188,7 @@ export function PowerBIReportsGallery() {
           {reports.map((report) => (
             <Card
               key={report.id}
-              className="cursor-pointer hover:shadow-md transition-shadow"
+              className="cursor-pointer hover:border-border/80 transition-shadow"
               onClick={() => handleViewReport(report)}
             >
               <CardHeader className="pb-2">

@@ -13,6 +13,7 @@ import {
   Package,
   Database,
   ChevronDown,
+  ChevronUp,
   ChevronLeft,
   ChevronRight,
   Building2,
@@ -41,6 +42,9 @@ import {
   Ticket,
   Truck,
   Coins,
+  Store,
+  Ruler,
+  Upload,
 } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import {
@@ -66,23 +70,26 @@ import { useState } from 'react';
 import { User, CreditCard, HelpCircle } from 'lucide-react';
 
 // Main navigation items - Dashboard first, then OTB workflow
+// Note: Settings removed from here - already available in user dropdown menu
 const navigation = [
   { key: 'dashboard', href: '/', icon: LayoutDashboard },         // Overview
   { key: 'budget', href: '/budget', icon: DollarSign },           // Step 1: Financial Budget
   { key: 'budgetFlow', href: '/budget-flow', icon: Layers },      // Budget Flow View
   { key: 'otb', href: '/otb-analysis', icon: TrendingUp },        // Step 2: OTB Analysis
   { key: 'sku', href: '/sku-proposal', icon: Package },           // Step 3: SKU Proposal
-  { key: 'deliveryPlanning', href: '/delivery-planning', icon: Truck, badge: 'New' }, // Delivery Planning
-  { key: 'costing', href: '/costing', icon: Coins, badge: 'New' }, // Costing Analysis
+  { key: 'deliveryPlanning', href: '/delivery-planning', icon: Truck }, // Delivery Planning
+  { key: 'costing', href: '/costing', icon: Coins }, // Costing Analysis
   { key: 'wssi', href: '/wssi', icon: CalendarDays },             // WSSI Planning
   { key: 'tickets', href: '/tickets', icon: Ticket },             // Ticket System
   { key: 'approvals', href: '/approvals', icon: CheckSquare },    // Approvals
-  { key: 'settings', href: '/settings', icon: Settings },         // Settings
 ];
 
 const masterDataItems = [
+  { key: 'groupBrands', href: '/master-data/group-brands', icon: Layers },
   { key: 'brands', href: '/master-data/brands', icon: Building2 },
+  { key: 'stores', href: '/master-data/stores', icon: Store },
   { key: 'categories', href: '/master-data/categories', icon: FolderTree },
+  { key: 'subcategorySizes', href: '/master-data/subcategory-sizes', icon: Ruler },
   { key: 'locations', href: '/master-data/locations', icon: MapPin },
   { key: 'users', href: '/master-data/users', icon: Users },
 ];
@@ -102,6 +109,8 @@ const aiItems = [
   { key: 'suggestions', href: '/ai-suggestions', icon: Lightbulb },
   { key: 'autoPlan', href: '/ai-auto-plan', icon: Wand2 },
   { key: 'predictiveAlerts', href: '/predictive-alerts', icon: Bell },
+  { key: 'aiImport', href: '/import', icon: Upload },
+  { key: 'importedData', href: '/import/data', icon: Database },
 ];
 
 const operationsItems = [
@@ -141,11 +150,12 @@ export function Sidebar({ collapsed = false, onToggleCollapse }: SidebarProps) {
     pathname.startsWith('/analytics')
   );
   const [aiOpen, setAiOpen] = useState(
-    pathname.startsWith('/ai-') || pathname === '/predictive-alerts'
+    pathname.startsWith('/ai-') || pathname === '/predictive-alerts' || pathname === '/import'
   );
   const [operationsOpen, setOperationsOpen] = useState(
     pathname === '/clearance' || pathname === '/replenishment' || pathname === '/forecasting'
   );
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
 
   return (
     <TooltipProvider delayDuration={0}>
@@ -218,16 +228,17 @@ export function Sidebar({ collapsed = false, onToggleCollapse }: SidebarProps) {
                   {isActive && !collapsed && (
                     <span className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-6 bg-primary rounded-r-full" />
                   )}
-                  <item.icon className={cn(
-                    'h-5 w-5 flex-shrink-0',
-                    isActive ? 'text-primary' : 'text-muted-foreground/70 group-hover:text-foreground dark:group-hover:text-white'
-                  )} />
+                  <item.icon
+                    className="h-5 w-5 flex-shrink-0"
+                    style={{ color: '#B8860B' }}
+                    strokeWidth={2.5}
+                  />
                   {!collapsed && (
                     <>
                       <span className="flex-1 uppercase font-semibold tracking-wide">{t(item.key)}</span>
                       {'badge' in item && item.badge && (
                         <span className="px-1.5 py-0.5 text-[10px] font-bold bg-blue-500 text-white rounded-full">
-                          {item.badge}
+                          {item.badge as React.ReactNode}
                         </span>
                       )}
                     </>
@@ -265,10 +276,11 @@ export function Sidebar({ collapsed = false, onToggleCollapse }: SidebarProps) {
                           : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground dark:hover:text-white'
                       )}
                     >
-                      <Database className={cn(
-                        'h-5 w-5 flex-shrink-0',
-                        pathname.startsWith('/master-data') ? 'text-primary' : 'text-muted-foreground/70 group-hover:text-foreground dark:group-hover:text-white'
-                      )} />
+                      <Database
+                        className="h-5 w-5 flex-shrink-0"
+                        style={{ color: '#B8860B' }}
+                        strokeWidth={2.5}
+                      />
                     </Link>
                   </TooltipTrigger>
                   <TooltipContent side="right" sideOffset={10}>
@@ -289,10 +301,11 @@ export function Sidebar({ collapsed = false, onToggleCollapse }: SidebarProps) {
                       {pathname.startsWith('/master-data') && (
                         <span className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-6 bg-primary rounded-r-full" />
                       )}
-                      <Database className={cn(
-                        'h-5 w-5 flex-shrink-0',
-                        pathname.startsWith('/master-data') ? 'text-primary' : 'text-muted-foreground/70 group-hover:text-foreground dark:group-hover:text-white'
-                      )} />
+                      <Database
+                        className="h-5 w-5 flex-shrink-0"
+                        style={{ color: '#B8860B' }}
+                        strokeWidth={2.5}
+                      />
                       <span className="flex-1 text-left uppercase font-semibold tracking-wide">{t('masterData')}</span>
                       <ChevronDown
                         className={cn(
@@ -316,7 +329,7 @@ export function Sidebar({ collapsed = false, onToggleCollapse }: SidebarProps) {
                               : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground/80 dark:hover:text-white'
                           )}
                         >
-                          <item.icon className={cn('h-4 w-4', isActive ? 'text-primary dark:text-primary-foreground' : 'text-muted-foreground/70 group-hover:text-foreground dark:group-hover:text-white')} />
+                          <item.icon className="h-4 w-4" style={{ color: '#B8860B' }} strokeWidth={2.5} />
                           <span>{tMasterData(item.key)}</span>
                         </Link>
                       );
@@ -340,10 +353,11 @@ export function Sidebar({ collapsed = false, onToggleCollapse }: SidebarProps) {
                           : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground dark:hover:text-white'
                       )}
                     >
-                      <BarChart3 className={cn(
-                        'h-5 w-5 flex-shrink-0',
-                        pathname.startsWith('/analytics') ? 'text-primary' : 'text-muted-foreground/70 group-hover:text-foreground dark:group-hover:text-white'
-                      )} />
+                      <BarChart3
+                        className="h-5 w-5 flex-shrink-0"
+                        style={{ color: '#B8860B' }}
+                        strokeWidth={2.5}
+                      />
                     </Link>
                   </TooltipTrigger>
                   <TooltipContent side="right" sideOffset={10}>
@@ -364,10 +378,11 @@ export function Sidebar({ collapsed = false, onToggleCollapse }: SidebarProps) {
                       {pathname.startsWith('/analytics') && (
                         <span className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-6 bg-primary rounded-r-full" />
                       )}
-                      <BarChart3 className={cn(
-                        'h-5 w-5 flex-shrink-0',
-                        pathname.startsWith('/analytics') ? 'text-primary' : 'text-muted-foreground/70 group-hover:text-foreground dark:group-hover:text-white'
-                      )} />
+                      <BarChart3
+                        className="h-5 w-5 flex-shrink-0"
+                        style={{ color: '#B8860B' }}
+                        strokeWidth={2.5}
+                      />
                       <span className="flex-1 text-left uppercase font-semibold tracking-wide">{t('analytics')}</span>
                       <ChevronDown
                         className={cn(
@@ -391,7 +406,7 @@ export function Sidebar({ collapsed = false, onToggleCollapse }: SidebarProps) {
                               : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground/80 dark:hover:text-white'
                           )}
                         >
-                          <item.icon className={cn('h-4 w-4', isActive ? 'text-primary dark:text-primary-foreground' : 'text-muted-foreground/70 group-hover:text-foreground dark:group-hover:text-white')} />
+                          <item.icon className="h-4 w-4" style={{ color: '#B8860B' }} strokeWidth={2.5} />
                           <span>{tAnalytics(item.key)}</span>
                         </Link>
                       );
@@ -410,15 +425,16 @@ export function Sidebar({ collapsed = false, onToggleCollapse }: SidebarProps) {
                       href="/ai-assistant"
                       className={cn(
                         'group flex items-center justify-center px-2.5 py-1.5 rounded-lg text-sm font-medium transition-all duration-150',
-                        (pathname.startsWith('/ai-') || pathname === '/predictive-alerts')
+                        (pathname.startsWith('/ai-') || pathname === '/predictive-alerts' || pathname === '/import')
                           ? 'bg-primary/10 dark:bg-primary/20 text-primary'
                           : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground dark:hover:text-white'
                       )}
                     >
-                      <Bot className={cn(
-                        'h-5 w-5 flex-shrink-0',
-                        (pathname.startsWith('/ai-') || pathname === '/predictive-alerts') ? 'text-primary' : 'text-muted-foreground/70 group-hover:text-foreground dark:group-hover:text-white'
-                      )} />
+                      <Bot
+                        className="h-5 w-5 flex-shrink-0"
+                        style={{ color: '#B8860B' }}
+                        strokeWidth={2.5}
+                      />
                     </Link>
                   </TooltipTrigger>
                   <TooltipContent side="right" sideOffset={10}>
@@ -431,18 +447,19 @@ export function Sidebar({ collapsed = false, onToggleCollapse }: SidebarProps) {
                     <button
                       className={cn(
                         'group flex w-full items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-sm font-medium transition-all duration-150 relative',
-                        (pathname.startsWith('/ai-') || pathname === '/predictive-alerts')
+                        (pathname.startsWith('/ai-') || pathname === '/predictive-alerts' || pathname === '/import')
                           ? 'bg-primary/10 dark:bg-primary/20 text-primary'
                           : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground dark:hover:text-white'
                       )}
                     >
-                      {(pathname.startsWith('/ai-') || pathname === '/predictive-alerts') && (
+                      {(pathname.startsWith('/ai-') || pathname === '/predictive-alerts' || pathname === '/import') && (
                         <span className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-6 bg-primary rounded-r-full" />
                       )}
-                      <Bot className={cn(
-                        'h-5 w-5 flex-shrink-0',
-                        (pathname.startsWith('/ai-') || pathname === '/predictive-alerts') ? 'text-primary' : 'text-muted-foreground/70 group-hover:text-foreground dark:group-hover:text-white'
-                      )} />
+                      <Bot
+                        className="h-5 w-5 flex-shrink-0"
+                        style={{ color: '#B8860B' }}
+                        strokeWidth={2.5}
+                      />
                       <span className="flex-1 text-left uppercase font-semibold tracking-wide">AI</span>
                       <ChevronDown
                         className={cn(
@@ -466,7 +483,7 @@ export function Sidebar({ collapsed = false, onToggleCollapse }: SidebarProps) {
                               : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground/80 dark:hover:text-white'
                           )}
                         >
-                          <item.icon className={cn('h-4 w-4', isActive ? 'text-primary dark:text-primary-foreground' : 'text-muted-foreground/70 group-hover:text-foreground dark:group-hover:text-white')} />
+                          <item.icon className="h-4 w-4" style={{ color: '#B8860B' }} strokeWidth={2.5} />
                           <span>{t(item.key)}</span>
                         </Link>
                       );
@@ -490,10 +507,11 @@ export function Sidebar({ collapsed = false, onToggleCollapse }: SidebarProps) {
                           : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground dark:hover:text-white'
                       )}
                     >
-                      <TrendingDown className={cn(
-                        'h-5 w-5 flex-shrink-0',
-                        (pathname === '/clearance' || pathname === '/replenishment' || pathname === '/forecasting') ? 'text-primary' : 'text-muted-foreground/70 group-hover:text-foreground dark:group-hover:text-white'
-                      )} />
+                      <LineChart
+                        className="h-5 w-5 flex-shrink-0"
+                        style={{ color: '#B8860B' }}
+                        strokeWidth={2.5}
+                      />
                     </Link>
                   </TooltipTrigger>
                   <TooltipContent side="right" sideOffset={10}>
@@ -514,10 +532,11 @@ export function Sidebar({ collapsed = false, onToggleCollapse }: SidebarProps) {
                       {(pathname === '/clearance' || pathname === '/replenishment' || pathname === '/forecasting') && (
                         <span className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-6 bg-primary rounded-r-full" />
                       )}
-                      <TrendingDown className={cn(
-                        'h-5 w-5 flex-shrink-0',
-                        (pathname === '/clearance' || pathname === '/replenishment' || pathname === '/forecasting') ? 'text-primary' : 'text-muted-foreground/70 group-hover:text-foreground dark:group-hover:text-white'
-                      )} />
+                      <LineChart
+                        className="h-5 w-5 flex-shrink-0"
+                        style={{ color: '#B8860B' }}
+                        strokeWidth={2.5}
+                      />
                       <span className="flex-1 text-left uppercase font-semibold tracking-wide">{t('operations')}</span>
                       <ChevronDown
                         className={cn(
@@ -541,7 +560,7 @@ export function Sidebar({ collapsed = false, onToggleCollapse }: SidebarProps) {
                               : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground/80 dark:hover:text-white'
                           )}
                         >
-                          <item.icon className={cn('h-4 w-4', isActive ? 'text-primary dark:text-primary-foreground' : 'text-muted-foreground/70 group-hover:text-foreground dark:group-hover:text-white')} />
+                          <item.icon className="h-4 w-4" style={{ color: '#B8860B' }} strokeWidth={2.5} />
                           <span>{t(item.key)}</span>
                         </Link>
                       );
@@ -559,7 +578,7 @@ export function Sidebar({ collapsed = false, onToggleCollapse }: SidebarProps) {
             "border-t border-border p-3",
             collapsed ? "flex justify-center" : ""
           )}>
-            <DropdownMenu>
+            <DropdownMenu open={userMenuOpen} onOpenChange={setUserMenuOpen}>
               <DropdownMenuTrigger asChild>
                 {collapsed ? (
                   <button className="flex items-center justify-center cursor-pointer hover:opacity-80 transition-opacity">
@@ -580,7 +599,11 @@ export function Sidebar({ collapsed = false, onToggleCollapse }: SidebarProps) {
                       <p className="text-base font-medium truncate">{session.user.name}</p>
                       <p className="text-sm text-muted-foreground truncate">{session.user.email}</p>
                     </div>
-                    <ChevronDown className="h-5 w-5 text-muted-foreground" />
+                    {userMenuOpen ? (
+                      <ChevronDown className="h-5 w-5 text-muted-foreground" />
+                    ) : (
+                      <ChevronUp className="h-5 w-5 text-muted-foreground" />
+                    )}
                   </button>
                 )}
               </DropdownMenuTrigger>
@@ -610,9 +633,9 @@ export function Sidebar({ collapsed = false, onToggleCollapse }: SidebarProps) {
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild className="py-2.5 px-3 text-base">
-                  <Link href="/settings/billing" className="cursor-pointer">
-                    <CreditCard className="mr-2.5 h-5 w-5" />
-                    <span>{tSettings('billing')}</span>
+                  <Link href="/settings/ai" className="cursor-pointer">
+                    <Sparkles className="mr-2.5 h-5 w-5" />
+                    <span>Cài đặt AI</span>
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild className="py-2.5 px-3 text-base">

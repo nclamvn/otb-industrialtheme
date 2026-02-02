@@ -67,8 +67,18 @@ interface WSSIRecord {
   }>;
 }
 
-// Demo data
-function generateDemoData(): WSSIRecord[] {
+// Seeded random number generator for consistent demo data
+function seededRandom(seed: number): () => number {
+  return function() {
+    seed = (seed * 9301 + 49297) % 233280;
+    return seed / 233280;
+  };
+}
+
+// Demo data generator with seed for consistency
+function generateDemoData(seed: number = 12345): WSSIRecord[] {
+  const random = seededRandom(seed);
+
   const brands = [
     { id: '1', name: 'Nike', code: 'NK' },
     { id: '2', name: 'Adidas', code: 'AD' },
@@ -92,12 +102,12 @@ function generateDemoData(): WSSIRecord[] {
   for (let week = 1; week <= 12; week++) {
     brands.forEach((brand, brandIdx) => {
       categories.forEach((category, catIdx) => {
-        const salesPlan = 50000 + Math.random() * 100000;
-        const salesActual = salesPlan * (0.85 + Math.random() * 0.3);
+        const salesPlan = 50000 + random() * 100000;
+        const salesActual = salesPlan * (0.85 + random() * 0.3);
         const variance = ((salesActual - salesPlan) / salesPlan) * 100;
-        const intakePlan = 40000 + Math.random() * 80000;
-        const intakeActual = intakePlan * (0.9 + Math.random() * 0.2);
-        const closingStock = 200000 + Math.random() * 300000;
+        const intakePlan = 40000 + random() * 80000;
+        const intakeActual = intakePlan * (0.9 + random() * 0.2);
+        const closingStock = 200000 + random() * 300000;
         const woc = closingStock / (salesActual / 4);
 
         const alerts: WSSIRecord['alerts'] = [];
@@ -116,7 +126,7 @@ function generateDemoData(): WSSIRecord[] {
             alertType: 'SALES_VARIANCE',
             severity: 'MEDIUM',
             title: 'Sales below plan',
-            isAcknowledged: Math.random() > 0.5,
+            isAcknowledged: random() > 0.5,
           });
         }
 
@@ -152,7 +162,8 @@ function generateDemoData(): WSSIRecord[] {
   return records;
 }
 
-const demoRecords = generateDemoData();
+// Generate demo data with fixed seed - same on server and client
+const demoRecords = generateDemoData(12345);
 
 const demoBrands = [
   { id: '1', name: 'Nike', code: 'NK' },
@@ -408,89 +419,85 @@ export default function WSSIPage() {
       {/* Summary Cards - Unified Design */}
       <div className="grid gap-4 md:grid-cols-4">
         <div className={cn(
-          'relative overflow-hidden rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950',
-          'shadow-sm hover:shadow-md transition-all duration-200',
+          'relative overflow-hidden rounded-xl border border-border bg-card',
+          'hover:border-border/80 transition-all duration-200',
           'border-l-4 border-l-blue-500'
         )}>
+          {/* Watermark Icon */}
+          <div className="absolute -right-4 -bottom-4 pointer-events-none">
+            <BarChart3 className="w-24 h-24 text-blue-500 opacity-[0.08]" />
+          </div>
           <div className="p-4">
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">{t('salesVsPlan')}</p>
-                <div className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums">
-                  {summary?.totals.averageSalesVariance
-                    ? `${summary.totals.averageSalesVariance > 0 ? '+' : ''}${summary.totals.averageSalesVariance.toFixed(1)}%`
-                    : '0%'}
-                </div>
-                <p className="text-xs text-slate-500 dark:text-neutral-400 mt-1">
-                  {t('actual')}: {formatCurrency(summary?.totals.totalSalesActual || 0)}
-                </p>
+            <div>
+              <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">{t('salesVsPlan')}</p>
+              <div className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums pr-14">
+                {summary?.totals.averageSalesVariance
+                  ? `${summary.totals.averageSalesVariance > 0 ? '+' : ''}${summary.totals.averageSalesVariance.toFixed(1)}%`
+                  : '0%'}
               </div>
-              <div className="h-10 w-10 rounded-xl bg-blue-50 dark:bg-blue-950 flex items-center justify-center">
-                <BarChart3 className="h-5 w-5 text-blue-600" />
-              </div>
+              <p className="text-xs text-slate-500 dark:text-neutral-400 mt-1">
+                {t('actual')}: {formatCurrency(summary?.totals.totalSalesActual || 0)}
+              </p>
             </div>
           </div>
         </div>
 
         <div className={cn(
-          'relative overflow-hidden rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950',
-          'shadow-sm hover:shadow-md transition-all duration-200',
+          'relative overflow-hidden rounded-xl border border-border bg-card',
+          'hover:border-border/80 transition-all duration-200',
           'border-l-4 border-l-purple-500'
         )}>
+          {/* Watermark Icon */}
+          <div className="absolute -right-4 -bottom-4 pointer-events-none">
+            <Package className="w-24 h-24 text-purple-500 opacity-[0.08]" />
+          </div>
           <div className="p-4">
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">{t('weeksOfCover')}</p>
-                <div className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums">
-                  {summary?.totals.averageWoC?.toFixed(1) || '0'} {t('weeks')}
-                </div>
-                <p className="text-xs text-slate-500 dark:text-neutral-400 mt-1">{t('target')}</p>
+            <div>
+              <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">{t('weeksOfCover')}</p>
+              <div className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums pr-14">
+                {summary?.totals.averageWoC?.toFixed(1) || '0'} {t('weeks')}
               </div>
-              <div className="h-10 w-10 rounded-xl bg-purple-50 dark:bg-purple-950 flex items-center justify-center">
-                <Package className="h-5 w-5 text-purple-600" />
-              </div>
+              <p className="text-xs text-slate-500 dark:text-neutral-400 mt-1">{t('target')}</p>
             </div>
           </div>
         </div>
 
         <div className={cn(
-          'relative overflow-hidden rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950',
-          'shadow-sm hover:shadow-md transition-all duration-200',
+          'relative overflow-hidden rounded-xl border border-border bg-card',
+          'hover:border-border/80 transition-all duration-200',
           'border-l-4 border-l-green-500'
         )}>
+          {/* Watermark Icon */}
+          <div className="absolute -right-4 -bottom-4 pointer-events-none">
+            <TrendingUp className="w-24 h-24 text-green-500 opacity-[0.08]" />
+          </div>
           <div className="p-4">
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">{t('sellThruRate')}</p>
-                <div className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums">
-                  {summary?.totals.averageSellThrough?.toFixed(1) || '0'}%
-                </div>
-                <p className="text-xs text-slate-500 dark:text-neutral-400 mt-1">
-                  {t('records', { count: summary?.recordCount || 0 })}
-                </p>
+            <div>
+              <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">{t('sellThruRate')}</p>
+              <div className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums pr-14">
+                {summary?.totals.averageSellThrough?.toFixed(1) || '0'}%
               </div>
-              <div className="h-10 w-10 rounded-xl bg-green-50 dark:bg-green-950 flex items-center justify-center">
-                <TrendingUp className="h-5 w-5 text-green-600" />
-              </div>
+              <p className="text-xs text-slate-500 dark:text-neutral-400 mt-1">
+                {t('records', { count: summary?.recordCount || 0 })}
+              </p>
             </div>
           </div>
         </div>
 
         <div className={cn(
-          'relative overflow-hidden rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950',
-          'shadow-sm hover:shadow-md transition-all duration-200',
+          'relative overflow-hidden rounded-xl border border-border bg-card',
+          'hover:border-border/80 transition-all duration-200',
           'border-l-4 border-l-amber-500'
         )}>
+          {/* Watermark Icon */}
+          <div className="absolute -right-4 -bottom-4 pointer-events-none">
+            <AlertTriangle className="w-24 h-24 text-amber-500 opacity-[0.08]" />
+          </div>
           <div className="p-4">
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">{t('activeAlerts')}</p>
-                <div className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums">{alertCount}</div>
-                <p className="text-xs text-slate-500 dark:text-neutral-400 mt-1">{t('needsAction')}</p>
-              </div>
-              <div className="h-10 w-10 rounded-xl bg-amber-50 dark:bg-amber-950 flex items-center justify-center">
-                <AlertTriangle className="h-5 w-5 text-amber-600" />
-              </div>
+            <div>
+              <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">{t('activeAlerts')}</p>
+              <div className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums pr-14">{alertCount}</div>
+              <p className="text-xs text-slate-500 dark:text-neutral-400 mt-1">{t('needsAction')}</p>
             </div>
           </div>
         </div>

@@ -279,45 +279,35 @@ export function BudgetFlowView({
         {focusedNodeId && <span>⌫ Back</span>}
       </div>
 
-      {/* Floating Action Buttons */}
+      {/* Floating Action Buttons - positioned above the AI chat widget */}
       <div className={cn(
-        'fixed bottom-6 right-6 flex flex-col gap-3',
+        'fixed bottom-[4.75rem] right-6 flex flex-col gap-3',
         (isGapCopilotOpen || isVersionHistoryOpen) && 'hidden'
       )}>
         {/* Export Button */}
         <Button
           onClick={() => setIsExportOpen(true)}
+          size="icon"
           className={cn(
-            'h-12 w-12 rounded-full shadow-lg',
+            'h-10 w-10 rounded-full shadow-lg',
             'bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-700 dark:hover:bg-emerald-600',
-            'flex items-center justify-center transition-all hover:scale-110'
+            'flex items-center justify-center transition-all hover:scale-105'
           )}
         >
-          <Download className="h-5 w-5 text-white" />
+          <Download className="h-4 w-4 text-white" />
         </Button>
 
         {/* Version History Button */}
         <Button
           onClick={() => setIsVersionHistoryOpen(true)}
+          size="icon"
           className={cn(
-            'h-12 w-12 rounded-full shadow-lg',
+            'h-10 w-10 rounded-full shadow-lg',
             'bg-slate-700 hover:bg-slate-800 dark:bg-neutral-700 dark:hover:bg-neutral-600',
-            'flex items-center justify-center transition-all hover:scale-110'
+            'flex items-center justify-center transition-all hover:scale-105'
           )}
         >
-          <History className="h-5 w-5 text-white" />
-        </Button>
-
-        {/* Gap Copilot Button */}
-        <Button
-          onClick={() => setIsGapCopilotOpen(true)}
-          className={cn(
-            'h-14 w-14 rounded-full shadow-xl',
-            'bg-gradient-to-br from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600',
-            'flex items-center justify-center transition-all hover:scale-110'
-          )}
-        >
-          <Sparkles className="h-6 w-6 text-white" />
+          <History className="h-4 w-4 text-white" />
         </Button>
       </div>
 

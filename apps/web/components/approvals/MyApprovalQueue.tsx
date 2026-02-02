@@ -128,7 +128,7 @@ export function MyApprovalQueue({
                 <div
                   key={request.id}
                   className={cn(
-                    'p-4 hover:bg-slate-50 dark:hover:bg-neutral-800 transition-colors',
+                    'p-4 hover:bg-muted/50 dark:hover:bg-neutral-800 transition-colors',
                     request.priority === 'high' && 'border-l-4 border-red-500'
                   )}
                 >

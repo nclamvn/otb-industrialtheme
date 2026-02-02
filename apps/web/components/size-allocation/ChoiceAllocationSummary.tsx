@@ -32,18 +32,18 @@ export function ChoiceAllocationSummary({
   return (
     <div className={cn('space-y-6', className)}>
       {/* Overall Summary */}
-      <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-4">
+      <div className="rounded-xl border border-border bg-card p-4">
         <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">
           Choice Allocation Overview
         </h3>
         <div className="grid grid-cols-2 gap-4">
-          <div className="text-center p-4 rounded-lg bg-slate-50 dark:bg-slate-700/50">
+          <div className="text-center p-4 rounded-lg bg-muted/50 dark:bg-slate-700/50">
             <div className="text-3xl font-bold text-slate-900 dark:text-white">
               {totalUnits.toLocaleString()}
             </div>
             <div className="text-sm text-slate-500">Total Units</div>
           </div>
-          <div className="text-center p-4 rounded-lg bg-slate-50 dark:bg-slate-700/50">
+          <div className="text-center p-4 rounded-lg bg-muted/50 dark:bg-slate-700/50">
             <div className="text-3xl font-bold text-slate-900 dark:text-white">
               {formatCurrency(totalValue)}
             </div>

@@ -10,7 +10,7 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
-import { TrendingUp, TrendingDown, Minus, Info, Target } from 'lucide-react';
+import { TrendingUp, TrendingDown, Minus, Info, Target, BarChart3 } from 'lucide-react';
 
 interface KPIBenchmark {
   excellent: number;
@@ -60,6 +60,23 @@ export function KPIBenchmarkCard({
         return 'bg-red-500';
       default:
         return 'bg-gray-500';
+    }
+  };
+
+  const getBorderColor = () => {
+    switch (status) {
+      case 'excellent':
+        return 'border-l-green-500';
+      case 'good':
+        return 'border-l-blue-500';
+      case 'acceptable':
+        return 'border-l-yellow-500';
+      case 'poor':
+        return 'border-l-orange-500';
+      case 'critical':
+        return 'border-l-red-500';
+      default:
+        return 'border-l-slate-500';
     }
   };
 
@@ -129,11 +146,11 @@ export function KPIBenchmarkCard({
   const benchmarkPosition = getBenchmarkPosition();
 
   return (
-    <Card className="hover:shadow-md transition-shadow">
+    <Card className={cn('relative overflow-hidden hover:border-border/80 transition-shadow border-l-4', getBorderColor())}>
       <CardHeader className="pb-2">
         <div className="flex items-start justify-between">
           <div className="flex-1">
-            <CardTitle className="text-base font-medium flex items-center gap-2">
+            <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
               {name}
               {description && (
                 <TooltipProvider>
@@ -147,7 +164,7 @@ export function KPIBenchmarkCard({
                   </Tooltip>
                 </TooltipProvider>
               )}
-            </CardTitle>
+            </p>
             <Badge variant={getStatusBadgeVariant()} className="mt-1">
               {getStatusLabel()}
             </Badge>
@@ -160,7 +177,7 @@ export function KPIBenchmarkCard({
           {/* Value and Trend */}
           <div className="flex items-baseline justify-between">
             <div className="flex items-baseline gap-2">
-              <span className="text-3xl font-bold">{formattedValue}</span>
+              <span className="text-2xl font-bold tabular-nums">{formattedValue}</span>
               {unit && <span className="text-sm text-muted-foreground">{unit}</span>}
             </div>
             {(trend || changePercent !== undefined) && (
@@ -251,6 +268,9 @@ export function KPIBenchmarkCard({
             </TooltipProvider>
           </div>
         </div>
+
+        {/* Watermark icon */}
+        <BarChart3 className="absolute bottom-4 right-4 w-24 h-24 text-muted-foreground opacity-[0.08]" />
       </CardContent>
     </Card>
   );

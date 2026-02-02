@@ -102,9 +102,9 @@ const AlertItem = ({
   return (
     <div
       className={cn(
-        // Unified: rounded-xl, border-l-4, shadow-sm, hover:shadow-md
-        'relative p-3 rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950',
-        'border-l-4 shadow-sm hover:shadow-md transition-all duration-200',
+        // Flat design: rounded-xl, border-l-4, no shadow
+        'relative p-3 rounded-xl border border-border bg-card',
+        'border-l-4 hover:border-border/80 transition-all duration-200',
         config.borderClass,
         onClick && 'cursor-pointer'
       )}
@@ -131,7 +131,7 @@ const AlertItem = ({
                   e.stopPropagation();
                   onDismiss();
                 }}
-                className="p-1 rounded-full hover:bg-slate-100 dark:hover:bg-neutral-800 transition-colors"
+                className="p-1 rounded-full hover:bg-muted dark:hover:bg-neutral-800 transition-colors"
               >
                 <X className="h-3.5 w-3.5 text-slate-400 dark:text-neutral-500" />
               </button>
@@ -191,9 +191,9 @@ export function DAFCAlertsPanel({
   return (
     <div
       className={cn(
-        // Unified: rounded-xl, shadow-sm, hover:shadow-md, border-l-4
-        'rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 overflow-hidden',
-        'shadow-sm hover:shadow-md transition-all duration-200',
+        // Flat design: rounded-xl, no shadow, border-l-4
+        'rounded-xl border border-border bg-card overflow-hidden',
+        'hover:border-border/80 transition-all duration-200',
         'border-l-4 border-l-amber-500',
         className
       )}

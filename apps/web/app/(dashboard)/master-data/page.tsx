@@ -54,7 +54,7 @@ export default function MasterDataPage() {
       <div className="grid gap-4 md:grid-cols-2">
         {masterDataModules.map((module) => (
           <Link key={module.href} href={module.href}>
-            <Card className="hover:border-primary/50 hover:shadow-md transition-all cursor-pointer h-full">
+            <Card className="hover:border-primary/50 hover:border-border/80 transition-all cursor-pointer h-full">
               <CardHeader className="pb-3">
                 <div className="flex items-center gap-3">
                   <div className={`h-10 w-10 rounded-lg ${module.bgColor} flex items-center justify-center`}>

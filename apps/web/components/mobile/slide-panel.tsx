@@ -99,7 +99,7 @@ export function SlidePanel({
       <div
         {...swipeHandlers}
         className={cn(
-          'fixed z-50 bg-background shadow-xl transition-transform duration-300 ease-out',
+          'fixed z-50 bg-background border-2 border-border transition-transform duration-300 ease-out',
           getPositionClass(),
           getTransformClass(),
           className

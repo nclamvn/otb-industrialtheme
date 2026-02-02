@@ -110,7 +110,7 @@ export function StorePerformanceTable({
           'inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium',
           isPositive && 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300',
           isNegative && 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300',
-          !isPositive && !isNegative && 'bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300'
+          !isPositive && !isNegative && 'bg-muted text-slate-600 dark:bg-slate-700 dark:text-slate-300'
         )}
       >
         {isPositive && <TrendingUp className="h-3 w-3" />}
@@ -122,10 +122,10 @@ export function StorePerformanceTable({
   };
 
   return (
-    <div className={cn('rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden', className)}>
+    <div className={cn('rounded-xl border border-border bg-card overflow-hidden', className)}>
       <Table>
         <TableHeader>
-          <TableRow className="bg-slate-50 dark:bg-slate-800/50">
+          <TableRow className="bg-muted/50">
             <TableHead className="w-8"></TableHead>
             <TableHead>
               <Button
@@ -180,8 +180,8 @@ export function StorePerformanceTable({
                 <TableRow
                   key={item.sku.id}
                   className={cn(
-                    'cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50',
-                    isExpanded && 'bg-slate-50 dark:bg-slate-800/50'
+                    'cursor-pointer hover:bg-muted/50 dark:hover:bg-slate-800/50',
+                    isExpanded && 'bg-muted/50'
                   )}
                   onClick={() => toggleRow(item.sku.id)}
                 >
@@ -223,7 +223,7 @@ export function StorePerformanceTable({
                         'px-2 py-1 rounded text-xs font-medium',
                         winner === 'REX' && 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300',
                         winner === 'TTP' && 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300',
-                        winner === 'TIE' && 'bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300'
+                        winner === 'TIE' && 'bg-muted text-slate-600 dark:bg-slate-700 dark:text-slate-300'
                       )}
                     >
                       {winner}
@@ -233,7 +233,7 @@ export function StorePerformanceTable({
 
                 {/* Expanded Details Row */}
                 {isExpanded && (
-                  <TableRow key={`${item.sku.id}-details`} className="bg-slate-50/50 dark:bg-slate-800/30">
+                  <TableRow key={`${item.sku.id}-details`} className="bg-muted/50/50 dark:bg-slate-800/30">
                     <TableCell colSpan={6}>
                       <div className="grid grid-cols-2 gap-6 py-3 px-4">
                         {/* REX Details */}

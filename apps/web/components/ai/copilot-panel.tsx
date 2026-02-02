@@ -67,12 +67,12 @@ export function CopilotPanel({ isOpen, onClose }: CopilotPanelProps) {
   return (
     <div
       className={cn(
-        'fixed right-0 top-0 h-full bg-background border-l shadow-xl z-50 flex flex-col transition-all duration-300',
+        'fixed right-0 top-0 h-full bg-background border-l z-50 flex flex-col transition-all duration-300',
         isExpanded ? 'w-[600px]' : 'w-[400px]'
       )}
     >
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b bg-gradient-to-r from-primary/10 to-purple-500/10">
+      <div className="flex items-center justify-between p-4 border-b bg-primary/5">
         <div className="flex items-center gap-2">
           <div className="p-2 rounded-lg bg-primary/10">
             <Sparkles className="h-5 w-5 text-primary" />

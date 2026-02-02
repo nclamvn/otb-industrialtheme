@@ -351,7 +351,7 @@ export function PlanningGapDashboard({
                     'flex items-center gap-3 p-3 rounded-lg border transition-all',
                     colors.bg,
                     colors.border,
-                    onNodeClick && 'cursor-pointer hover:shadow-sm'
+                    onNodeClick && 'cursor-pointer hover:border border-border'
                   )}
                   onClick={() => onNodeClick?.(gap.nodeId)}
                 >

@@ -166,7 +166,7 @@ export const STORE_GROUP_COLORS: Record<StoreGroup, {
   },
   ALL: {
     border: 'border-slate-500',
-    bg: 'bg-slate-50 dark:bg-slate-800',
+    bg: 'bg-muted/50',
     text: 'text-slate-700 dark:text-slate-300',
   },
 };

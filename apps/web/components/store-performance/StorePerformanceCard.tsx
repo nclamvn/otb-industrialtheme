@@ -49,7 +49,7 @@ export function StorePerformanceCard({
     <div
       className={cn(
         'rounded-xl border-2 overflow-hidden',
-        'bg-white dark:bg-slate-800 shadow-sm hover:shadow-md transition-all',
+        'bg-card hover:border-border/80 transition-all',
         config.borderColor,
         className
       )}
@@ -57,7 +57,7 @@ export function StorePerformanceCard({
       {/* Header */}
       <div
         className={cn(
-          'px-4 py-3 border-b border-slate-200 dark:border-slate-700',
+          'px-4 py-3 border-b border-border',
           config.bgColor
         )}
       >
@@ -90,7 +90,7 @@ export function StorePerformanceCard({
         </div>
 
         {showDetails && (
-          <div className="grid grid-cols-3 gap-3 pt-4 border-t border-slate-200 dark:border-slate-700">
+          <div className="grid grid-cols-3 gap-3 pt-4 border-t border-border">
             <div className="text-center">
               <div className="text-lg font-semibold text-slate-900 dark:text-white">
                 {data.qtySold.toLocaleString()}

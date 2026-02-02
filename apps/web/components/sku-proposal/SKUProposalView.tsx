@@ -199,7 +199,7 @@ export function SKUProposalView({
   const isEditable = ['DRAFT', 'REJECTED'].includes(proposal.status);
 
   return (
-    <div className={cn('flex flex-col h-full bg-white', className)}>
+    <div className={cn('flex flex-col h-full bg-card', className)}>
       {/* Version Selector Banner */}
       <div className="px-4 pt-4">
         <SKUVersionSelector
@@ -289,7 +289,7 @@ export function SKUProposalView({
               variant="ghost"
               size="icon"
               onClick={() => setShowAIPanel(!showAIPanel)}
-              className={cn(showAIPanel && 'bg-slate-100')}
+              className={cn(showAIPanel && 'bg-muted')}
             >
               {showAIPanel ? (
                 <PanelRightClose className="w-4 h-4" />
@@ -321,7 +321,7 @@ export function SKUProposalView({
       {/* Main Content */}
       <div className="flex-1 flex overflow-hidden">
         {/* Left Sidebar - Category Tree */}
-        <div className="w-80 border-r bg-white overflow-y-auto">
+        <div className="w-80 border-r bg-card overflow-y-auto">
           <CategoryTree
             categories={proposal.categories}
             selectedCategoryId={selectedCategory?.id || null}
@@ -330,7 +330,7 @@ export function SKUProposalView({
         </div>
 
         {/* Main Content - Product List */}
-        <div className="flex-1 overflow-y-auto bg-slate-50/50">
+        <div className="flex-1 overflow-y-auto bg-muted/50/50">
           <div className="p-6">
             <ProductList
               category={selectedCategory}
@@ -347,7 +347,7 @@ export function SKUProposalView({
 
         {/* Right Sidebar - AI Panel */}
         {showAIPanel && (
-          <div className="w-80 border-l bg-white overflow-y-auto">
+          <div className="w-80 border-l bg-card overflow-y-auto">
             <AIWarningsPanel
               warnings={warnings}
               suggestions={suggestions}

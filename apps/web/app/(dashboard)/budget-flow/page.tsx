@@ -243,12 +243,12 @@ export default function BudgetFlowPage() {
               href={`/budget-flow/${budget.id}`}
               className={cn(
                 'flex-shrink-0 px-4 py-3 rounded-xl border transition-all',
-                'bg-white dark:bg-neutral-950 hover:bg-amber-50 dark:hover:bg-amber-950 hover:border-amber-200 dark:hover:border-amber-800',
-                'border-slate-200 dark:border-neutral-800'
+                'bg-card hover:bg-amber-50 dark:hover:bg-amber-950 hover:border-amber-200 dark:hover:border-amber-800',
+                'border-border'
               )}
             >
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-slate-100 dark:bg-neutral-800 flex items-center justify-center">
+                <div className="w-10 h-10 rounded-lg bg-muted dark:bg-neutral-800 flex items-center justify-center">
                   <Layers className="w-5 h-5 text-slate-600 dark:text-neutral-300" />
                 </div>
                 <div>
@@ -264,7 +264,7 @@ export default function BudgetFlowPage() {
       </div>
 
       {/* Demo Budget Flow View */}
-      <div className="border-t border-slate-200 dark:border-neutral-800 mt-2">
+      <div className="border-t border-border mt-2">
         <div className="px-6 py-3 bg-amber-50/50 dark:bg-amber-950/30 border-b border-amber-100 dark:border-amber-900">
           <p className="text-sm text-amber-700 dark:text-amber-400">
             <strong>Demo Mode:</strong> Showing sample budget data. Click a budget above to view real allocation details.

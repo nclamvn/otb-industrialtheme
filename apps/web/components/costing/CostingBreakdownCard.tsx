@@ -30,17 +30,25 @@ export function CostingBreakdownCard({
 }: CostingBreakdownCardProps) {
   const marginStatus = getMarginStatus(costing.grossMargin);
 
+  const getBorderColor = () => {
+    if (costing.grossMargin >= 0.6) return 'border-l-green-500';
+    if (costing.grossMargin >= 0.5) return 'border-l-blue-500';
+    if (costing.grossMargin >= 0.4) return 'border-l-amber-500';
+    return 'border-l-red-500';
+  };
+
   return (
     <div
       className={cn(
-        'rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 overflow-hidden',
+        'relative rounded-xl border border-border bg-card overflow-hidden border-l-4 hover:border-border/80 transition-all',
+        getBorderColor(),
         className
       )}
     >
       {/* Header */}
-      <div className="bg-gradient-to-r from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-700 px-4 py-3 border-b border-slate-200 dark:border-slate-700">
-        <h4 className="font-semibold text-slate-900 dark:text-white">Cost Breakdown</h4>
-        <p className="text-xs text-slate-500">{costing.skuId}</p>
+      <div className="px-4 py-3 border-b border-border">
+        <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Cost Breakdown</p>
+        <p className="text-lg font-bold text-slate-900 dark:text-white mt-1">{costing.skuId}</p>
       </div>
 
       <div className="p-4 space-y-4">
@@ -92,7 +100,7 @@ export function CostingBreakdownCard({
                 </div>
               </div>
 
-              <div className="border-t border-dashed border-slate-200 dark:border-slate-700 my-2" />
+              <div className="border-t border-dashed border-border my-2" />
             </>
           )}
 
@@ -113,7 +121,7 @@ export function CostingBreakdownCard({
           </div>
 
           {/* Landed Cost (VND) */}
-          <div className="flex items-center justify-between bg-slate-50 dark:bg-slate-700/50 -mx-4 px-4 py-3">
+          <div className="flex items-center justify-between bg-muted/50 -mx-4 px-4 py-3">
             <div className="text-sm font-medium">Landed Cost (VND)</div>
             <div className="font-mono font-bold text-lg text-slate-900 dark:text-white">
               {formatCurrency(costing.landedCostVND)}
@@ -131,7 +139,7 @@ export function CostingBreakdownCard({
           </div>
 
           {/* Gross Margin */}
-          <div className="flex items-center justify-between pt-3 border-t border-slate-200 dark:border-slate-700">
+          <div className="flex items-center justify-between pt-3 border-t border-border">
             <div className="flex items-center gap-2 text-sm font-medium">
               <TrendingUp className="w-4 h-4" />
               Gross Margin
@@ -147,6 +155,9 @@ export function CostingBreakdownCard({
             </div>
           </div>
         </div>
+
+        {/* Watermark icon */}
+        <DollarSign className="absolute bottom-4 right-4 w-24 h-24 text-muted-foreground opacity-[0.08]" />
       </div>
     </div>
   );

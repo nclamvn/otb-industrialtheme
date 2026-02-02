@@ -307,7 +307,7 @@ export function AddProductDialog({
 
           {/* Estimated Value */}
           {estimatedValue > 0 && (
-            <div className="p-3 bg-slate-50 rounded-lg">
+            <div className="p-3 bg-muted/50 rounded-lg">
               <div className="flex items-center justify-between">
                 <span className="text-sm text-slate-600">Estimated Value</span>
                 <span

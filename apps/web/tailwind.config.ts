@@ -9,17 +9,17 @@ const config: Config = {
   ],
   theme: {
     // ═══════════════════════════════════════════════════════════════
-    // OVERRIDE DEFAULTS - Industrial Scale
+    // OVERRIDE DEFAULTS - Industrial Scale (Flat Design)
     // ═══════════════════════════════════════════════════════════════
     fontSize: {
-      'xs': ['10px', { lineHeight: '14px' }],
-      'sm': ['11px', { lineHeight: '16px' }],
-      'base': ['12px', { lineHeight: '18px' }],
-      'md': ['14px', { lineHeight: '20px' }],
-      'lg': ['16px', { lineHeight: '24px' }],
-      'xl': ['20px', { lineHeight: '28px' }],
-      '2xl': ['24px', { lineHeight: '32px' }],
-      '3xl': ['32px', { lineHeight: '40px' }],
+      'xs': ['12px', { lineHeight: '16px' }],
+      'sm': ['13px', { lineHeight: '18px' }],
+      'base': ['14px', { lineHeight: '20px' }],
+      'md': ['16px', { lineHeight: '22px' }],
+      'lg': ['18px', { lineHeight: '26px' }],
+      'xl': ['22px', { lineHeight: '30px' }],
+      '2xl': ['26px', { lineHeight: '34px' }],
+      '3xl': ['34px', { lineHeight: '42px' }],
     },
 
     borderRadius: {
@@ -219,12 +219,15 @@ const config: Config = {
       },
 
       // ═══════════════════════════════════════════════════════════════
-      // SHADOWS - Minimal, Dark-optimized
+      // SHADOWS - Flat Design (No shadows, use borders instead)
       // ═══════════════════════════════════════════════════════════════
       boxShadow: {
-        'sm': '0 1px 2px rgba(0, 0, 0, 0.3)',
-        'DEFAULT': '0 4px 8px rgba(0, 0, 0, 0.4)',
-        'lg': '0 8px 24px rgba(0, 0, 0, 0.5)',
+        'sm': 'none',
+        'DEFAULT': 'none',
+        'md': 'none',
+        'lg': 'none',
+        'xl': 'none',
+        '2xl': 'none',
         'focus': '0 0 0 3px rgba(212, 135, 90, 0.3)',
         'none': 'none',
       },

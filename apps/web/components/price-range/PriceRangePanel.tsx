@@ -63,25 +63,25 @@ export function PriceRangePanel({
 
       {/* Summary Cards */}
       <div className="grid grid-cols-4 gap-4">
-        <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-4 text-center">
+        <div className="rounded-xl border border-border bg-card p-4 text-center">
           <div className="text-2xl font-bold text-slate-900 dark:text-white">
             {analysis.totalSKUs}
           </div>
           <div className="text-sm text-slate-500">Total SKUs</div>
         </div>
-        <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-4 text-center">
+        <div className="rounded-xl border border-border bg-card p-4 text-center">
           <div className="text-2xl font-bold text-slate-900 dark:text-white">
             {analysis.totalUnits.toLocaleString()}
           </div>
           <div className="text-sm text-slate-500">Total Units</div>
         </div>
-        <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-4 text-center">
+        <div className="rounded-xl border border-border bg-card p-4 text-center">
           <div className="text-2xl font-bold text-slate-900 dark:text-white">
             {formatPrice(analysis.totalValue)}
           </div>
           <div className="text-sm text-slate-500">Total Value</div>
         </div>
-        <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-4 text-center">
+        <div className="rounded-xl border border-border bg-card p-4 text-center">
           <div className="text-2xl font-bold text-slate-900 dark:text-white">
             {formatPrice(analysis.avgPrice)}
           </div>

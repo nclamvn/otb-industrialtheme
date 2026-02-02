@@ -73,9 +73,9 @@ export function SizeAllocationTable({
   };
 
   return (
-    <div className={cn('rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden', className)}>
+    <div className={cn('rounded-xl border border-border bg-card overflow-hidden', className)}>
       {/* Header */}
-      <div className="px-4 py-3 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-700">
+      <div className="px-4 py-3 bg-muted/50 border-b border-border">
         <div className="flex items-center justify-between">
           <div>
             <div className="font-mono text-sm text-slate-500">{data.skuCode}</div>
@@ -100,7 +100,7 @@ export function SizeAllocationTable({
       {/* Table */}
       <Table>
         <TableHeader>
-          <TableRow className="bg-slate-50/50 dark:bg-slate-800/30">
+          <TableRow className="bg-muted/50/50 dark:bg-slate-800/30">
             <TableHead className="w-16">Size</TableHead>
             <TableHead className={cn('text-center', CHOICE_CONFIG.A.color)}>Qty A</TableHead>
             <TableHead className={cn('text-center', CHOICE_CONFIG.B.color)}>Qty B</TableHead>
@@ -223,7 +223,7 @@ export function SizeAllocationTable({
           ))}
 
           {/* Totals Row */}
-          <TableRow className="bg-slate-100 dark:bg-slate-800 font-semibold">
+          <TableRow className="bg-muted font-semibold">
             <TableCell>TOTAL</TableCell>
             <TableCell className={cn('text-center', CHOICE_CONFIG.A.color)}>
               {data.totalA}

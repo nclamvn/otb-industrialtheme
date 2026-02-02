@@ -33,14 +33,14 @@ export function CostingTable({ costings, className, onRowClick }: CostingTablePr
   return (
     <div
       className={cn(
-        'rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden',
+        'rounded-xl border border-border bg-card overflow-hidden',
         className
       )}
     >
       <div className="overflow-x-auto">
         <Table>
           <TableHeader>
-            <TableRow className="bg-slate-50 dark:bg-slate-800">
+            <TableRow className="bg-muted/50">
               <TableHead className="font-semibold">SKU</TableHead>
               <TableHead className="text-right font-semibold">Unit Cost</TableHead>
               <TableHead className="text-right text-xs">Freight</TableHead>
@@ -60,7 +60,7 @@ export function CostingTable({ costings, className, onRowClick }: CostingTablePr
                 <TableRow
                   key={costing.id}
                   className={cn(
-                    'hover:bg-slate-50 dark:hover:bg-slate-800/50',
+                    'hover:bg-muted/50 dark:hover:bg-slate-800/50',
                     onRowClick && 'cursor-pointer'
                   )}
                   onClick={() => onRowClick?.(costing)}

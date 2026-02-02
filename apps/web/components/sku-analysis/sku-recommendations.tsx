@@ -55,11 +55,15 @@ export function SKURecommendations({ recommendations, onActionClick }: SKURecomm
     return (
       <div
         className={cn(
-          // Unified: rounded-xl, shadow-sm, border-l-4
-          'rounded-xl border border-slate-200 bg-white overflow-hidden',
-          'shadow-sm border-l-4 border-l-slate-400'
+          // Unified: rounded-xl, border border-border, border-l-4
+          'relative rounded-xl border border-border bg-card overflow-hidden',
+          'border border-border border-l-4 border-l-slate-400'
         )}
       >
+        {/* Watermark Icon */}
+        <div className="absolute -right-4 -bottom-4 pointer-events-none">
+          <Package className="w-24 h-24 text-slate-500 opacity-[0.08]" />
+        </div>
         <div className="p-6 text-center text-slate-400">
           <Package className="h-8 w-8 mx-auto mb-2 opacity-50" />
           <p>No recommendations available at this time.</p>
@@ -88,9 +92,9 @@ export function SKURecommendations({ recommendations, onActionClick }: SKURecomm
           <div
             key={priority}
             className={cn(
-              // Unified: rounded-xl, shadow-sm, hover:shadow-md, border-l-4
-              'rounded-xl border border-slate-200 bg-white overflow-hidden',
-              'shadow-sm hover:shadow-md transition-all duration-200',
+              // Unified: rounded-xl, border border-border, hover:border-border/80, border-l-4
+              'rounded-xl border border-border bg-card overflow-hidden',
+              'hover:border-border/80 transition-all duration-200',
               'border-l-4',
               priorityConfig.borderColor
             )}
@@ -121,9 +125,9 @@ export function SKURecommendations({ recommendations, onActionClick }: SKURecomm
                     <div
                       key={rec.skuId}
                       className={cn(
-                        // Unified: rounded-xl, border-l-4, shadow-sm, hover:shadow-md
-                        'flex items-center gap-4 p-3 rounded-xl border border-slate-200',
-                        'border-l-4 shadow-sm hover:shadow-md transition-all duration-200',
+                        // Unified: rounded-xl, border-l-4, border border-border, hover:border-border/80
+                        'flex items-center gap-4 p-3 rounded-xl border border-border bg-card',
+                        'border-l-4 hover:border-border/80 transition-all duration-200',
                         actionConfig.borderColor
                       )}
                     >

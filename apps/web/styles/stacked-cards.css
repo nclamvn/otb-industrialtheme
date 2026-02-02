@@ -1,11 +1,10 @@
-/* Stacked Cards Animation */
+/* Stacked Cards Animation - Flat Design */
 .stacked-card {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .stacked-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+  border-color: var(--border-emphasis, #3D3D3D);
 }
 
 .stacked-card.collapsed {
@@ -13,7 +12,7 @@
 }
 
 .stacked-card.collapsed:hover {
-  transform: translateY(-4px) scale(1.01);
+  border-color: var(--border-emphasis, #3D3D3D);
 }
 
 /* Tab Animation */

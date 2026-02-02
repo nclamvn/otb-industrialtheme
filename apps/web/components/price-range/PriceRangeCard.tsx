@@ -27,14 +27,14 @@ export function PriceRangeCard({
   return (
     <div
       className={cn(
-        'rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden cursor-pointer',
-        'bg-white dark:bg-slate-800 shadow-sm hover:shadow-md transition-all',
+        'rounded-xl border border-border bg-card overflow-hidden cursor-pointer',
+        'bg-card hover:border-border/80 transition-all',
         className
       )}
       onClick={onClick}
     >
       {/* Header */}
-      <div className={cn('px-4 py-3 border-b border-slate-200 dark:border-slate-700', range.bgColor)}>
+      <div className={cn('px-4 py-3 border-b border-border', range.bgColor)}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <DollarSign className={cn('w-5 h-5', range.color)} />
@@ -59,7 +59,7 @@ export function PriceRangeCard({
         </div>
 
         {/* Details */}
-        <div className="grid grid-cols-2 gap-3 pt-4 border-t border-slate-200 dark:border-slate-700">
+        <div className="grid grid-cols-2 gap-3 pt-4 border-t border-border">
           <div className="text-center">
             <div className="flex items-center justify-center gap-1 text-slate-500 mb-1">
               <Package className="w-4 h-4" />
@@ -81,7 +81,7 @@ export function PriceRangeCard({
         </div>
 
         {/* Performance Metrics */}
-        <div className="grid grid-cols-2 gap-3 mt-3 pt-3 border-t border-slate-200 dark:border-slate-700">
+        <div className="grid grid-cols-2 gap-3 mt-3 pt-3 border-t border-border">
           <div className="text-center">
             <div className="text-sm font-medium text-green-600 dark:text-green-400">
               {data.sellThruPercent.toFixed(1)}%

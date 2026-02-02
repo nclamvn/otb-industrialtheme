@@ -35,16 +35,23 @@ export function UnifiedBudgetCard({
   return (
     <div
       className={cn(
-        'rounded-xl border border-slate-200 dark:border-neutral-800 overflow-hidden transition-all duration-200',
-        'hover:shadow-md shadow-sm',
-        levelStyles.bg,
+        'relative rounded-xl border border-border bg-card overflow-hidden transition-all duration-200',
+        'hover:border-border/80',
+        'bg-card',
       )}
       style={{ marginLeft: level > 1 ? `${(level - 1) * 24}px` : 0 }}
     >
+      {/* Watermark Icon - Large, faded into background */}
+      {Icon && (
+        <div className="absolute -right-4 -bottom-4 pointer-events-none">
+          <Icon className="w-20 h-20 text-muted-foreground opacity-[0.06]" />
+        </div>
+      )}
+
       {/* Card Header */}
       <div
         className={cn(
-          'flex items-center justify-between p-4 cursor-pointer',
+          'flex items-center justify-between p-3 cursor-pointer',
           'border-l-4',
           levelStyles.band,
         )}
@@ -52,34 +59,33 @@ export function UnifiedBudgetCard({
         role="button"
         aria-expanded={isExpanded}
       >
-        {/* Left: Icon + Name + Status */}
-        <div className="flex items-center gap-3">
-          {Icon && <Icon className="w-5 h-5 text-slate-600 dark:text-neutral-300" />}
-          <div>
+        {/* Left: Name + Status */}
+        <div className="flex items-center gap-2 min-w-0 flex-1">
+          <div className="min-w-0">
             <div className="flex items-center gap-2">
-              <span className="font-semibold text-slate-900 dark:text-neutral-100">{name}</span>
+              <span className="font-semibold text-foreground truncate">{name}</span>
               <BudgetStatusBadge status={status} />
             </div>
           </div>
         </div>
 
         {/* Right: Budget + Percentage + Chevron */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3 pr-12">
           <div className="text-right">
-            <div className="font-semibold text-slate-900 dark:text-neutral-100">
+            <div className="font-semibold text-foreground tabular-nums">
               {formatBudgetCurrency(budget)}
             </div>
-            <div className="text-sm text-slate-500 dark:text-neutral-400">
+            <div className="text-xs text-muted-foreground tabular-nums">
               {formatBudgetPercentage(percentage)}
             </div>
           </div>
 
           {isExpandable && hasChildren && (
-            <div className="w-6 h-6 flex items-center justify-center text-slate-400 dark:text-neutral-500">
+            <div className="w-5 h-5 flex items-center justify-center text-muted-foreground">
               {isExpanded ? (
-                <ChevronDown className="w-5 h-5" />
+                <ChevronDown className="w-4 h-4" />
               ) : (
-                <ChevronRight className="w-5 h-5" />
+                <ChevronRight className="w-4 h-4" />
               )}
             </div>
           )}
@@ -95,17 +101,17 @@ export function UnifiedBudgetCard({
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.2, ease: 'easeInOut' }}
           >
-            <div className={cn('px-4 pb-4 border-l-4', levelStyles.band)}>
+            <div className={cn('px-3 pb-3 border-l-4', levelStyles.band)}>
               {/* Progress Bar */}
               <BudgetProgressBar
                 budget={budget}
                 allocated={allocated}
-                className="mb-4"
+                className="mb-3"
               />
 
               {/* Children */}
               {children && (
-                <div className="space-y-2 mt-4">
+                <div className="space-y-2 mt-3">
                   {children}
                 </div>
               )}

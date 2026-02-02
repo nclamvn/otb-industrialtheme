@@ -100,9 +100,23 @@ export function KPICard({
     ? Math.min((kpi.value / kpi.target.value) * 100, 100)
     : 0;
 
+  // Get border color based on status
+  const getBorderColor = () => {
+    switch (kpi.status) {
+      case 'on_track':
+        return 'border-l-green-500';
+      case 'at_risk':
+        return 'border-l-amber-500';
+      case 'off_track':
+        return 'border-l-red-500';
+      default:
+        return 'border-l-blue-500';
+    }
+  };
+
   if (compact) {
     return (
-      <Card className="hover:shadow-md transition-shadow">
+      <Card className={cn('border-l-4 transition-colors hover:border-border/80', getBorderColor())}>
         <CardContent className="p-4">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm font-medium text-muted-foreground">
@@ -138,7 +152,7 @@ export function KPICard({
   }
 
   return (
-    <Card className="hover:shadow-md transition-shadow">
+    <Card className={cn('border-l-4 transition-colors hover:border-border/80', getBorderColor())}>
       <CardHeader className="pb-2">
         <div className="flex items-start justify-between">
           <div className="flex-1">

@@ -13,79 +13,111 @@ import {
 } from 'lucide-react';
 
 export default function HelpPage() {
-  const t = useTranslations('common');
-
-  const helpSections = [
-    {
-      title: 'Getting Started',
-      description: 'Learn the basics of the OTB Platform',
-      icon: BookOpen,
-      items: [
-        'Navigate using the sidebar menu',
-        'View dashboards and analytics',
-        'Create and manage budgets',
-        'Submit proposals for approval',
-      ],
-    },
-    {
-      title: 'Keyboard Shortcuts',
-      description: 'Quick navigation shortcuts',
-      icon: Keyboard,
-      items: [
-        '⌘K / Ctrl+K - Open search',
-        '⌘B / Ctrl+B - Toggle sidebar',
-        'Esc - Close modals',
-        '? - Show shortcuts',
-      ],
-    },
-    {
-      title: 'Support',
-      description: 'Get help when you need it',
-      icon: MessageCircle,
-      items: [
-        'Use AI Assistant for quick answers',
-        'Contact your admin for access issues',
-        'Report bugs via the feedback form',
-      ],
-    },
-  ];
+  const t = useTranslations('help');
 
   return (
     <div className="space-y-6">
       <PageHeader
-        title={t('help')}
-        description="Documentation and support resources"
+        title={t('title')}
+        description={t('description')}
       />
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {helpSections.map((section) => (
-          <Card key={section.title}>
-            <CardHeader>
-              <div className="flex items-center gap-2">
-                <section.icon className="h-5 w-5 text-primary" />
-                <CardTitle className="text-lg">{section.title}</CardTitle>
-              </div>
-              <CardDescription>{section.description}</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                {section.items.map((item, idx) => (
-                  <li key={idx} className="flex items-start gap-2">
-                    <span className="text-primary">•</span>
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </CardContent>
-          </Card>
-        ))}
+        {/* Getting Started */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <BookOpen className="h-5 w-5 text-primary" />
+              <CardTitle className="text-lg">{t('gettingStarted.title')}</CardTitle>
+            </div>
+            <CardDescription>{t('gettingStarted.description')}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ul className="space-y-2 text-sm text-muted-foreground">
+              <li className="flex items-start gap-2">
+                <span className="text-primary">•</span>
+                {t('gettingStarted.item1')}
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-primary">•</span>
+                {t('gettingStarted.item2')}
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-primary">•</span>
+                {t('gettingStarted.item3')}
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-primary">•</span>
+                {t('gettingStarted.item4')}
+              </li>
+            </ul>
+          </CardContent>
+        </Card>
+
+        {/* Keyboard Shortcuts */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <Keyboard className="h-5 w-5 text-primary" />
+              <CardTitle className="text-lg">{t('shortcuts.title')}</CardTitle>
+            </div>
+            <CardDescription>{t('shortcuts.description')}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ul className="space-y-2 text-sm text-muted-foreground">
+              <li className="flex items-start gap-2">
+                <span className="text-primary">•</span>
+                {t('shortcuts.item1')}
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-primary">•</span>
+                {t('shortcuts.item2')}
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-primary">•</span>
+                {t('shortcuts.item3')}
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-primary">•</span>
+                {t('shortcuts.item4')}
+              </li>
+            </ul>
+          </CardContent>
+        </Card>
+
+        {/* Support */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <MessageCircle className="h-5 w-5 text-primary" />
+              <CardTitle className="text-lg">{t('support.title')}</CardTitle>
+            </div>
+            <CardDescription>{t('support.description')}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ul className="space-y-2 text-sm text-muted-foreground">
+              <li className="flex items-start gap-2">
+                <span className="text-primary">•</span>
+                {t('support.item1')}
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-primary">•</span>
+                {t('support.item2')}
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-primary">•</span>
+                {t('support.item3')}
+              </li>
+            </ul>
+          </CardContent>
+        </Card>
       </div>
 
       <Card>
         <CardHeader>
           <div className="flex items-center gap-2">
             <HelpCircle className="h-5 w-5 text-primary" />
-            <CardTitle>Need More Help?</CardTitle>
+            <CardTitle>{t('needMoreHelp.title')}</CardTitle>
           </div>
         </CardHeader>
         <CardContent className="flex flex-wrap gap-4">
@@ -103,7 +135,7 @@ export default function HelpPage() {
             className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary"
           >
             <ExternalLink className="h-4 w-4" />
-            Documentation
+            {t('needMoreHelp.documentation')}
           </a>
         </CardContent>
       </Card>

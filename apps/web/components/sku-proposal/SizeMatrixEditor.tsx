@@ -190,8 +190,8 @@ export function SizeMatrixEditor({
                     className={cn(
                       'relative px-3 py-2 rounded-lg border text-sm font-medium transition-all min-w-[48px]',
                       isSelected
-                        ? 'bg-amber-500 border-amber-600 text-white shadow-sm'
-                        : 'bg-white border-slate-200 text-slate-600 hover:border-amber-300 hover:bg-amber-50',
+                        ? 'bg-amber-500 border-amber-600 text-white border border-border'
+                        : 'bg-card border-slate-200 text-slate-600 hover:border-amber-300 hover:bg-amber-50',
                       disabled && 'opacity-50 cursor-not-allowed'
                     )}
                   >
@@ -216,7 +216,7 @@ export function SizeMatrixEditor({
 
       {/* Distribution Controls */}
       {selectedSizes.length > 0 && (
-        <div className="p-4 bg-slate-50 rounded-xl space-y-4">
+        <div className="p-4 bg-muted/50 rounded-xl space-y-4">
           <div className="flex items-end gap-4">
             <div className="flex-1">
               <Label className="text-sm">Total Quantity</Label>
@@ -268,7 +268,7 @@ export function SizeMatrixEditor({
               .map((size) => (
                 <div
                   key={size}
-                  className="bg-white rounded-lg border border-slate-200 p-2"
+                  className="bg-card rounded-lg border border-border p-2"
                 >
                   <div className="text-xs font-medium text-slate-500 mb-1">
                     {size}
@@ -278,7 +278,7 @@ export function SizeMatrixEditor({
                       type="button"
                       onClick={() => quickAdjust(size, -1)}
                       disabled={disabled || (sizeQuantities[size] || 0) <= 0}
-                      className="w-6 h-6 rounded bg-slate-100 hover:bg-slate-200 flex items-center justify-center disabled:opacity-50"
+                      className="w-6 h-6 rounded bg-muted hover:bg-slate-200 flex items-center justify-center disabled:opacity-50"
                     >
                       <Minus className="w-3 h-3" />
                     </button>
@@ -296,7 +296,7 @@ export function SizeMatrixEditor({
                       type="button"
                       onClick={() => quickAdjust(size, 1)}
                       disabled={disabled}
-                      className="w-6 h-6 rounded bg-slate-100 hover:bg-slate-200 flex items-center justify-center disabled:opacity-50"
+                      className="w-6 h-6 rounded bg-muted hover:bg-slate-200 flex items-center justify-center disabled:opacity-50"
                     >
                       <Plus className="w-3 h-3" />
                     </button>
@@ -306,7 +306,7 @@ export function SizeMatrixEditor({
           </div>
 
           {/* Summary */}
-          <div className="flex items-center justify-between pt-3 border-t border-slate-200">
+          <div className="flex items-center justify-between pt-3 border-t border-border">
             <div className="flex gap-6 text-sm">
               <div>
                 <span className="text-slate-500">Sizes:</span>{' '}

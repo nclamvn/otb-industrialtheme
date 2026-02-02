@@ -287,27 +287,23 @@ export default function ReportsPage() {
                 <div
                   key={report.id}
                   className={cn(
-                    'relative overflow-hidden rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950',
-                    'shadow-sm hover:shadow-md transition-all duration-200',
+                    'relative overflow-hidden rounded-xl border border-border bg-card',
+                    'hover:border-border/80 transition-all duration-200',
                     'border-l-4 p-4',
                     colors.border
                   )}
                 >
-                  <div className="flex items-start gap-3 mb-4">
-                    <div className={cn(
-                      'h-10 w-10 rounded-xl flex items-center justify-center',
-                      colors.bg
-                    )}>
-                      <Icon className={cn('h-5 w-5', colors.text)} />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h3 className="text-sm font-semibold text-slate-900 dark:text-neutral-100">
-                        {t(report.nameKey)}
-                      </h3>
-                      <p className="text-xs text-slate-500 dark:text-neutral-400 mt-1">
-                        {t(report.descKey)}
-                      </p>
-                    </div>
+                  {/* Watermark Icon */}
+                  <div className="absolute -right-4 -bottom-4 pointer-events-none">
+                    <Icon className={cn('w-20 h-20 opacity-[0.08]', colors.text)} />
+                  </div>
+                  <div className="mb-4">
+                    <h3 className="text-sm font-semibold text-slate-900 dark:text-neutral-100">
+                      {t(report.nameKey)}
+                    </h3>
+                    <p className="text-xs text-slate-500 dark:text-neutral-400 mt-1 pr-10">
+                      {t(report.descKey)}
+                    </p>
                   </div>
                   <div className="flex flex-wrap gap-2">
                     {report.formats.map((format) => {

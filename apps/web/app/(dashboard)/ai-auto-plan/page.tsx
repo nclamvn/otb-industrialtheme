@@ -496,133 +496,127 @@ export default function AutoOTBPlanningPage() {
               <div className="grid md:grid-cols-6 gap-4">
                 <div
                   className={cn(
-                    'relative overflow-hidden rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950',
-                    'shadow-sm hover:shadow-md transition-all duration-200',
+                    'relative overflow-hidden rounded-xl border border-border bg-card',
+                    'hover:border-border/80 transition-all duration-200',
                     'border-l-4 border-l-blue-500 p-4'
                   )}
                 >
-                  <div className="flex items-start gap-3">
-                    <div className="h-10 w-10 rounded-xl bg-blue-50 dark:bg-blue-950 flex items-center justify-center">
-                      <DollarSign className="h-5 w-5 text-blue-500" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">
-                        {t('totalOTB')}
-                      </p>
-                      <p className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums">
-                        {formatCurrency(selectedPlan.generatedData.summary.totalOTB)}
-                      </p>
-                    </div>
+                  {/* Watermark Icon */}
+                  <div className="absolute -right-4 -bottom-4 pointer-events-none">
+                    <DollarSign className="w-20 h-20 text-blue-500 opacity-[0.08]" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">
+                      {t('totalOTB')}
+                    </p>
+                    <p className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums pr-10">
+                      {formatCurrency(selectedPlan.generatedData.summary.totalOTB)}
+                    </p>
                   </div>
                 </div>
 
                 <div
                   className={cn(
-                    'relative overflow-hidden rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950',
-                    'shadow-sm hover:shadow-md transition-all duration-200',
+                    'relative overflow-hidden rounded-xl border border-border bg-card',
+                    'hover:border-border/80 transition-all duration-200',
                     'border-l-4 border-l-green-500 p-4'
                   )}
                 >
-                  <div className="flex items-start gap-3">
-                    <div className="h-10 w-10 rounded-xl bg-green-50 dark:bg-green-950 flex items-center justify-center">
-                      <BarChart3 className="h-5 w-5 text-green-500" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">
-                        {t('salesPlan')}
-                      </p>
-                      <p className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums">
-                        {formatCurrency(selectedPlan.generatedData.summary.totalSalesPlan)}
-                      </p>
-                    </div>
+                  {/* Watermark Icon */}
+                  <div className="absolute -right-4 -bottom-4 pointer-events-none">
+                    <BarChart3 className="w-20 h-20 text-green-500 opacity-[0.08]" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">
+                      {t('salesPlan')}
+                    </p>
+                    <p className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums pr-10">
+                      {formatCurrency(selectedPlan.generatedData.summary.totalSalesPlan)}
+                    </p>
                   </div>
                 </div>
 
                 <div
                   className={cn(
-                    'relative overflow-hidden rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950',
-                    'shadow-sm hover:shadow-md transition-all duration-200',
+                    'relative overflow-hidden rounded-xl border border-border bg-card',
+                    'hover:border-border/80 transition-all duration-200',
                     'border-l-4 border-l-purple-500 p-4'
                   )}
                 >
-                  <div className="flex items-start gap-3">
-                    <div className="h-10 w-10 rounded-xl bg-purple-50 dark:bg-purple-950 flex items-center justify-center">
-                      <Package className="h-5 w-5 text-purple-500" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">
-                        {t('receiptPlan')}
-                      </p>
-                      <p className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums">
-                        {formatCurrency(selectedPlan.generatedData.summary.totalReceiptPlan)}
-                      </p>
-                    </div>
+                  {/* Watermark Icon */}
+                  <div className="absolute -right-4 -bottom-4 pointer-events-none">
+                    <Package className="w-20 h-20 text-purple-500 opacity-[0.08]" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">
+                      {t('receiptPlan')}
+                    </p>
+                    <p className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums pr-10">
+                      {formatCurrency(selectedPlan.generatedData.summary.totalReceiptPlan)}
+                    </p>
                   </div>
                 </div>
 
                 <div
                   className={cn(
-                    'relative overflow-hidden rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950',
-                    'shadow-sm hover:shadow-md transition-all duration-200',
+                    'relative overflow-hidden rounded-xl border border-border bg-card',
+                    'hover:border-border/80 transition-all duration-200',
                     'border-l-4 border-l-amber-500 p-4'
                   )}
                 >
-                  <div className="flex items-start gap-3">
-                    <div className="h-10 w-10 rounded-xl bg-amber-50 dark:bg-amber-950 flex items-center justify-center">
-                      <Archive className="h-5 w-5 text-amber-500" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">
-                        {t('openingStock')}
-                      </p>
-                      <p className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums">
-                        {formatCurrency(selectedPlan.generatedData.summary.openingStock)}
-                      </p>
-                    </div>
+                  {/* Watermark Icon */}
+                  <div className="absolute -right-4 -bottom-4 pointer-events-none">
+                    <Archive className="w-20 h-20 text-amber-500 opacity-[0.08]" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">
+                      {t('openingStock')}
+                    </p>
+                    <p className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums pr-10">
+                      {formatCurrency(selectedPlan.generatedData.summary.openingStock)}
+                    </p>
                   </div>
                 </div>
 
                 <div
                   className={cn(
-                    'relative overflow-hidden rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950',
-                    'shadow-sm hover:shadow-md transition-all duration-200',
-                    'border-l-4 border-l-blue-500 p-4'
+                    'relative overflow-hidden rounded-xl border border-border bg-card',
+                    'hover:border-border/80 transition-all duration-200',
+                    'border-l-4 border-l-cyan-500 p-4'
                   )}
                 >
-                  <div className="flex items-start gap-3">
-                    <div className="h-10 w-10 rounded-xl bg-blue-50 dark:bg-blue-950 flex items-center justify-center">
-                      <Archive className="h-5 w-5 text-blue-500" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">
-                        {t('closingStock')}
-                      </p>
-                      <p className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums">
-                        {formatCurrency(selectedPlan.generatedData.summary.targetClosingStock)}
-                      </p>
-                    </div>
+                  {/* Watermark Icon */}
+                  <div className="absolute -right-4 -bottom-4 pointer-events-none">
+                    <Archive className="w-20 h-20 text-cyan-500 opacity-[0.08]" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">
+                      {t('closingStock')}
+                    </p>
+                    <p className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums pr-10">
+                      {formatCurrency(selectedPlan.generatedData.summary.targetClosingStock)}
+                    </p>
                   </div>
                 </div>
 
                 <div
                   className={cn(
-                    'relative overflow-hidden rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950',
-                    'shadow-sm hover:shadow-md transition-all duration-200',
+                    'relative overflow-hidden rounded-xl border border-border bg-card',
+                    'hover:border-border/80 transition-all duration-200',
                     'border-l-4 border-l-green-500 p-4'
                   )}
                 >
-                  <div className="flex items-start gap-3">
-                    <div className="h-10 w-10 rounded-xl bg-green-50 dark:bg-green-950 flex items-center justify-center">
-                      <TrendingUp className="h-5 w-5 text-green-500" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">
-                        {t('growthVsLY')}
-                      </p>
-                      <p className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums">
-                        {selectedPlan.generatedData.summary.growthVsLY}
-                      </p>
-                    </div>
+                  {/* Watermark Icon */}
+                  <div className="absolute -right-4 -bottom-4 pointer-events-none">
+                    <TrendingUp className="w-20 h-20 text-green-500 opacity-[0.08]" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">
+                      {t('growthVsLY')}
+                    </p>
+                    <p className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums pr-10">
+                      {selectedPlan.generatedData.summary.growthVsLY}
+                    </p>
                   </div>
                 </div>
               </div>

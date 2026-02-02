@@ -108,7 +108,7 @@ export function DecisionGate({
         'rounded-lg border-2 transition-all duration-200',
         config.bgColor,
         config.borderColor,
-        isPending && 'shadow-md',
+        isPending && 'border-border/80',
         className
       )}
     >
@@ -117,7 +117,7 @@ export function DecisionGate({
         onClick={() => setExpanded(!expanded)}
         className={cn(
           'w-full flex items-center justify-between p-4',
-          'hover:bg-black/5 dark:hover:bg-white/5 transition-colors',
+          'hover:bg-black/5 dark:hover:bg-card/5 transition-colors',
           'rounded-t-lg'
         )}
       >
@@ -153,7 +153,7 @@ export function DecisionGate({
         <div className="px-4 pb-4 space-y-4">
           {/* Submission Info */}
           {data.submittedBy && (
-            <div className="flex items-center gap-3 p-3 bg-white/50 dark:bg-black/20 rounded-lg">
+            <div className="flex items-center gap-3 p-3 bg-card/50 dark:bg-black/20 rounded-lg">
               <Avatar className="h-10 w-10">
                 <AvatarImage src={data.submittedBy.avatar} />
                 <AvatarFallback>
@@ -194,7 +194,7 @@ export function DecisionGate({
                   value={comment}
                   onChange={(e) => setComment(e.target.value)}
                   placeholder={t('commentPlaceholder')}
-                  className="min-h-[80px] bg-white dark:bg-neutral-900"
+                  className="min-h-[80px] bg-card dark:bg-neutral-900"
                 />
               )}
 

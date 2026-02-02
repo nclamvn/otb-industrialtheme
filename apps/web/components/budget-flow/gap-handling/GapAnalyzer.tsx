@@ -107,14 +107,14 @@ export function GapAnalyzer({ data, onNodeSelect, className }: GapAnalyzerProps)
           <div className="text-2xl font-bold text-blue-600">{summary.info}</div>
           <div className="text-xs text-blue-600">Info</div>
         </div>
-        <div className="p-3 rounded-xl bg-slate-50 dark:bg-neutral-900 border border-slate-100 dark:border-neutral-800">
+        <div className="p-3 rounded-xl bg-muted/50 dark:bg-neutral-900 border border-slate-100 dark:border-neutral-800">
           <div className="text-2xl font-bold text-slate-600 dark:text-neutral-300">{gaps.length}</div>
           <div className="text-xs text-slate-600 dark:text-neutral-400">Total</div>
         </div>
       </div>
 
       {/* Over/Under Summary */}
-      <div className="flex gap-4 p-3 rounded-xl bg-slate-50 dark:bg-neutral-900">
+      <div className="flex gap-4 p-3 rounded-xl bg-muted/50 dark:bg-neutral-900">
         <div className="flex-1 flex items-center gap-2">
           <TrendingUp className="w-4 h-4 text-red-500" />
           <span className="text-sm text-slate-600 dark:text-neutral-400">Over Budget:</span>
@@ -150,7 +150,7 @@ export function GapAnalyzer({ data, onNodeSelect, className }: GapAnalyzerProps)
                   'p-3 rounded-xl border cursor-pointer transition-all',
                   colors.bg,
                   colors.border,
-                  'hover:shadow-md'
+                  'hover:border-border/80'
                 )}
               >
                 <div className="flex items-start justify-between mb-2">
@@ -195,7 +195,7 @@ export function GapAnalyzer({ data, onNodeSelect, className }: GapAnalyzerProps)
                 </div>
 
                 {/* Budget vs Allocated mini-bar */}
-                <div className="mt-2 pt-2 border-t border-slate-200/50 dark:border-neutral-700/50">
+                <div className="mt-2 pt-2 border-t border-border/50 dark:border-neutral-700/50">
                   <div className="flex justify-between text-xs text-slate-500 dark:text-neutral-400 mb-1">
                     <span>Budget: {formatCurrency(gap.budget)}</span>
                     <span>Allocated: {formatCurrency(gap.allocated)}</span>

@@ -151,7 +151,7 @@ export default function ComparisonPage() {
       </div>
 
       {/* Comparison Type Selector */}
-      <Card>
+      <Card className="overflow-hidden">
         <CardContent className="py-4">
           <div className="flex items-center gap-4">
             <span className="text-sm font-medium text-muted-foreground">{t('compareBy')}</span>

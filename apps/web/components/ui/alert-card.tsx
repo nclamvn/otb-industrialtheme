@@ -13,20 +13,19 @@ import {
 } from 'lucide-react';
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// VARIANTS
+// VARIANTS - Compact flat design with left border and watermark icon
 // ═══════════════════════════════════════════════════════════════════════════════
 
-// Unified design: rounded-xl, p-4, border-l-4, shadow-sm
 const alertVariants = cva(
-  'relative flex gap-3 p-4 rounded-xl border border-slate-200 bg-white shadow-sm border-l-4',
+  'relative flex gap-3 p-3 rounded-xl border border-border bg-card overflow-hidden border-l-4',
   {
     variants: {
       variant: {
-        critical: 'bg-red-50/50 border-l-red-500 text-red-900',
-        warning: 'bg-amber-50/50 border-l-amber-500 text-amber-900',
-        success: 'bg-green-50/50 border-l-green-500 text-green-900',
-        info: 'bg-blue-50/50 border-l-blue-500 text-blue-900',
-        default: 'bg-white border-l-slate-400 text-slate-900',
+        critical: 'border-l-red-500',
+        warning: 'border-l-amber-500',
+        success: 'border-l-green-500',
+        info: 'border-l-blue-500',
+        default: 'border-l-slate-400',
       },
     },
     defaultVariants: {
@@ -34,6 +33,34 @@ const alertVariants = cva(
     },
   }
 );
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// COLOR MAPS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+const variantIconBgMap: Record<string, string> = {
+  critical: 'bg-red-100 dark:bg-red-950',
+  warning: 'bg-amber-100 dark:bg-amber-950',
+  success: 'bg-green-100 dark:bg-green-950',
+  info: 'bg-blue-100 dark:bg-blue-950',
+  default: 'bg-muted',
+};
+
+const variantIconColorMap: Record<string, string> = {
+  critical: 'text-red-500',
+  warning: 'text-amber-500',
+  success: 'text-green-500',
+  info: 'text-blue-500',
+  default: 'text-slate-500',
+};
+
+const variantTextColorMap: Record<string, string> = {
+  critical: 'text-red-900 dark:text-red-100',
+  warning: 'text-amber-900 dark:text-amber-100',
+  success: 'text-green-900 dark:text-green-100',
+  info: 'text-blue-900 dark:text-blue-100',
+  default: 'text-foreground',
+};
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // TYPES
@@ -76,20 +103,30 @@ export function AlertCard({
   className,
 }: AlertCardProps) {
   const Icon = icon || ALERT_ICONS[variant || 'default'];
+  const variantKey = variant || 'default';
 
   return (
     <div className={cn(alertVariants({ variant }), className)}>
-      {/* Icon */}
-      <Icon className="w-5 h-5 flex-shrink-0 mt-0.5" />
+      {/* Watermark Icon - Top right */}
+      <div className="absolute top-2 right-2 pointer-events-none">
+        <div className={cn(
+          'w-10 h-10 rounded-xl flex items-center justify-center',
+          variantIconBgMap[variantKey]
+        )}>
+          <Icon className={cn('w-5 h-5', variantIconColorMap[variantKey])} />
+        </div>
+      </div>
 
       {/* Content */}
-      <div className="flex-1 min-w-0">
+      <div className="flex-1 min-w-0 pr-12 relative z-10">
         {title && (
-          <h5 className="font-semibold text-sm mb-1">{title}</h5>
+          <h5 className={cn('font-semibold text-sm mb-0.5', variantTextColorMap[variantKey])}>
+            {title}
+          </h5>
         )}
-        <p className="text-sm opacity-90">{description}</p>
+        <p className="text-sm text-muted-foreground">{description}</p>
         {action && (
-          <div className="mt-3">{action}</div>
+          <div className="mt-2">{action}</div>
         )}
       </div>
 
@@ -97,9 +134,9 @@ export function AlertCard({
       {dismissible && (
         <button
           onClick={onDismiss}
-          className="flex-shrink-0 p-1 rounded hover:bg-black/10 dark:hover:bg-white/10 transition-colors"
+          className="absolute top-2 right-14 flex-shrink-0 p-1 rounded hover:bg-muted transition-colors z-20"
         >
-          <X className="w-4 h-4" />
+          <X className="w-4 h-4 text-muted-foreground" />
         </button>
       )}
     </div>
@@ -177,16 +214,12 @@ interface InlineAlertProps {
 export function InlineAlert({ variant = 'info', message, className }: InlineAlertProps) {
   const Icon = ALERT_ICONS[variant];
 
-  // Unified color classes
-  const colorClasses = {
-    critical: 'text-red-600',
-    warning: 'text-amber-600',
-    success: 'text-green-600',
-    info: 'text-blue-600',
-  }[variant];
-
   return (
-    <div className={cn('flex items-center gap-2 text-xs', colorClasses, className)}>
+    <div className={cn(
+      'flex items-center gap-2 text-xs',
+      variantTextColorMap[variant],
+      className
+    )}>
       <Icon className="w-3.5 h-3.5" />
       <span>{message}</span>
     </div>

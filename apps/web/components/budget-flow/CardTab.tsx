@@ -40,11 +40,11 @@ export function CardTab({
       className={cn(
         'w-full text-left',
         'p-4 transition-all duration-200', // Unified: p-4 (16px)
-        'border border-slate-200 dark:border-neutral-800 rounded-xl mb-2', // Unified: rounded-xl (12px)
+        'border border-border rounded-xl mb-2', // Unified: rounded-xl (12px)
         'border-l-4', // Unified: border-l-4 (4px)
         levelStyles.band,
         levelStyles.bg,
-        'shadow-sm hover:shadow-md', // Unified: shadow-sm default, shadow-md hover
+        'hover:border-border/80', // Unified: border border-border default, border-border/80 hover
         'hover:bg-amber-50/50 dark:hover:bg-amber-950/50 hover:border-amber-200 dark:hover:border-amber-800',
         'focus:outline-none focus:bg-amber-50/50 dark:focus:bg-amber-950/50 focus:border-amber-300 dark:focus:border-amber-700',
         'group',

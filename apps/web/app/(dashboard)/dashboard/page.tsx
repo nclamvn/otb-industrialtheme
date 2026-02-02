@@ -98,33 +98,32 @@ export default function DashboardPage() {
 
       {/* Content */}
       <div className="p-4 space-y-4">
-        {/* KPI Cards - Unified Design: rounded-xl, border-l-4, shadow-sm hover:shadow-md */}
+        {/* KPI Cards - Unified Design: rounded-xl, border-l-4, hover:border-border/80, watermark icons */}
         <div className="grid grid-cols-4 gap-3">
           {/* Net Sales Card */}
           <div
             className={cn(
-              'rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 overflow-hidden',
-              'shadow-sm hover:shadow-md transition-all duration-200',
+              'relative rounded-xl border border-border bg-card overflow-hidden',
+              'hover:border-border/80 transition-all duration-200',
               'border-l-4 border-l-green-500'
             )}
           >
+            {/* Watermark Icon */}
+            <div className="absolute -right-4 -bottom-4 pointer-events-none">
+              <DollarSign className="w-24 h-24 text-green-500 opacity-[0.08]" />
+            </div>
             <div className="p-4">
-              <div className="flex items-start justify-between">
-                <div>
-                  <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">Net Sales</p>
-                  <div className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums">
-                    {mockKPIs.netSales.value}
-                  </div>
-                  <div className="flex items-center gap-1 mt-2">
-                    <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-xs font-medium bg-green-50 dark:bg-green-950 text-green-700">
-                      <TrendingUp className="h-3 w-3" />
-                      +{mockKPIs.netSales.trend.value}%
-                    </span>
-                    <span className="text-xs text-slate-400 dark:text-neutral-500">{mockKPIs.netSales.trend.label}</span>
-                  </div>
+              <div>
+                <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">Net Sales</p>
+                <div className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums pr-14">
+                  {mockKPIs.netSales.value}
                 </div>
-                <div className="h-10 w-10 rounded-xl bg-green-50 dark:bg-green-950 flex items-center justify-center">
-                  <DollarSign className="h-5 w-5 text-green-600" />
+                <div className="flex items-center gap-1 mt-2">
+                  <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-xs font-medium bg-green-50 dark:bg-green-950 text-green-700">
+                    <TrendingUp className="h-3 w-3" />
+                    +{mockKPIs.netSales.trend.value}%
+                  </span>
+                  <span className="text-xs text-slate-400 dark:text-neutral-500">{mockKPIs.netSales.trend.label}</span>
                 </div>
               </div>
             </div>
@@ -133,28 +132,27 @@ export default function DashboardPage() {
           {/* Sell-Through Card */}
           <div
             className={cn(
-              'rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 overflow-hidden',
-              'shadow-sm hover:shadow-md transition-all duration-200',
+              'relative rounded-xl border border-border bg-card overflow-hidden',
+              'hover:border-border/80 transition-all duration-200',
               'border-l-4 border-l-amber-500'
             )}
           >
+            {/* Watermark Icon */}
+            <div className="absolute -right-4 -bottom-4 pointer-events-none">
+              <TrendingUp className="w-24 h-24 text-amber-500 opacity-[0.08]" />
+            </div>
             <div className="p-4">
-              <div className="flex items-start justify-between">
-                <div>
-                  <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">Sell-Through</p>
-                  <div className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums">
-                    {mockKPIs.sellThrough.value}
-                  </div>
-                  <div className="flex items-center gap-1 mt-2">
-                    <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-xs font-medium bg-red-50 dark:bg-red-950 text-red-700">
-                      <TrendingDown className="h-3 w-3" />
-                      {mockKPIs.sellThrough.trend.value}%
-                    </span>
-                    <span className="text-xs text-slate-400 dark:text-neutral-500">{mockKPIs.sellThrough.trend.label}</span>
-                  </div>
+              <div>
+                <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">Sell-Through</p>
+                <div className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums pr-14">
+                  {mockKPIs.sellThrough.value}
                 </div>
-                <div className="h-10 w-10 rounded-xl bg-amber-50 dark:bg-amber-950 flex items-center justify-center">
-                  <TrendingUp className="h-5 w-5 text-amber-600" />
+                <div className="flex items-center gap-1 mt-2">
+                  <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-xs font-medium bg-red-50 dark:bg-red-950 text-red-700">
+                    <TrendingDown className="h-3 w-3" />
+                    {mockKPIs.sellThrough.trend.value}%
+                  </span>
+                  <span className="text-xs text-slate-400 dark:text-neutral-500">{mockKPIs.sellThrough.trend.label}</span>
                 </div>
               </div>
             </div>
@@ -163,25 +161,24 @@ export default function DashboardPage() {
           {/* Weeks of Cover Card */}
           <div
             className={cn(
-              'rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 overflow-hidden',
-              'shadow-sm hover:shadow-md transition-all duration-200',
+              'relative rounded-xl border border-border bg-card overflow-hidden',
+              'hover:border-border/80 transition-all duration-200',
               'border-l-4 border-l-blue-500'
             )}
           >
+            {/* Watermark Icon */}
+            <div className="absolute -right-4 -bottom-4 pointer-events-none">
+              <Package className="w-24 h-24 text-blue-500 opacity-[0.08]" />
+            </div>
             <div className="p-4">
-              <div className="flex items-start justify-between">
-                <div>
-                  <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">Weeks of Cover</p>
-                  <div className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums">
-                    {mockKPIs.woc.value}
-                  </div>
-                  <p className="text-xs text-slate-500 dark:text-neutral-400 mt-2">
-                    Target: 4-6 weeks
-                  </p>
+              <div>
+                <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">Weeks of Cover</p>
+                <div className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums pr-14">
+                  {mockKPIs.woc.value}
                 </div>
-                <div className="h-10 w-10 rounded-xl bg-blue-50 dark:bg-blue-950 flex items-center justify-center">
-                  <Package className="h-5 w-5 text-blue-600" />
-                </div>
+                <p className="text-xs text-slate-500 dark:text-neutral-400 mt-2">
+                  Target: 4-6 weeks
+                </p>
               </div>
             </div>
           </div>
@@ -189,33 +186,32 @@ export default function DashboardPage() {
           {/* Alerts Card */}
           <div
             className={cn(
-              'rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 overflow-hidden',
-              'shadow-sm hover:shadow-md transition-all duration-200',
+              'relative rounded-xl border border-border bg-card overflow-hidden',
+              'hover:border-border/80 transition-all duration-200',
               'border-l-4 border-l-red-500'
             )}
           >
+            {/* Watermark Icon */}
+            <div className="absolute -right-4 -bottom-4 pointer-events-none">
+              <AlertTriangle className="w-24 h-24 text-red-500 opacity-[0.08]" />
+            </div>
             <div className="p-4">
-              <div className="flex items-start justify-between">
-                <div>
-                  <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">Alerts</p>
-                  <div className="flex items-center gap-2 mt-1">
-                    <span className="inline-flex items-center justify-center h-7 min-w-[28px] px-2 rounded-full text-sm font-bold bg-red-50 dark:bg-red-950 text-red-700 border border-red-200 tabular-nums">
-                      {mockKPIs.alerts.critical}
-                    </span>
-                    <span className="inline-flex items-center justify-center h-7 min-w-[28px] px-2 rounded-full text-sm font-bold bg-amber-50 dark:bg-amber-950 text-amber-700 border border-amber-200 tabular-nums">
-                      {mockKPIs.alerts.warning}
-                    </span>
-                    <span className="inline-flex items-center justify-center h-7 min-w-[28px] px-2 rounded-full text-sm font-bold bg-green-50 dark:bg-green-950 text-green-700 border border-green-200 tabular-nums">
-                      {mockKPIs.alerts.healthy}
-                    </span>
-                  </div>
-                  <p className="text-xs text-slate-400 dark:text-neutral-500 mt-2">
-                    Critical / Warning / Healthy
-                  </p>
+              <div>
+                <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">Alerts</p>
+                <div className="flex items-center gap-2 mt-1">
+                  <span className="inline-flex items-center justify-center h-7 min-w-[28px] px-2 rounded-full text-sm font-bold bg-red-50 dark:bg-red-950 text-red-700 border border-red-200 tabular-nums">
+                    {mockKPIs.alerts.critical}
+                  </span>
+                  <span className="inline-flex items-center justify-center h-7 min-w-[28px] px-2 rounded-full text-sm font-bold bg-amber-50 dark:bg-amber-950 text-amber-700 border border-amber-200 tabular-nums">
+                    {mockKPIs.alerts.warning}
+                  </span>
+                  <span className="inline-flex items-center justify-center h-7 min-w-[28px] px-2 rounded-full text-sm font-bold bg-green-50 dark:bg-green-950 text-green-700 border border-green-200 tabular-nums">
+                    {mockKPIs.alerts.healthy}
+                  </span>
                 </div>
-                <div className="h-10 w-10 rounded-xl bg-red-50 dark:bg-red-950 flex items-center justify-center">
-                  <AlertTriangle className="h-5 w-5 text-red-600" />
-                </div>
+                <p className="text-xs text-slate-400 dark:text-neutral-500 mt-2">
+                  Critical / Warning / Healthy
+                </p>
               </div>
             </div>
           </div>
@@ -226,8 +222,8 @@ export default function DashboardPage() {
           {/* Trend Chart */}
           <div
             className={cn(
-              'rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 overflow-hidden',
-              'shadow-sm hover:shadow-md transition-all duration-200',
+              'rounded-xl border border-border bg-card overflow-hidden',
+              'hover:border-border/80 transition-all duration-200',
               'border-l-4 border-l-slate-600'
             )}
           >
@@ -242,8 +238,8 @@ export default function DashboardPage() {
           {/* Category Breakdown */}
           <div
             className={cn(
-              'rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 overflow-hidden',
-              'shadow-sm hover:shadow-md transition-all duration-200',
+              'rounded-xl border border-border bg-card overflow-hidden',
+              'hover:border-border/80 transition-all duration-200',
               'border-l-4 border-l-slate-400'
             )}
           >
@@ -280,8 +276,8 @@ export default function DashboardPage() {
         {/* Category Table - Unified Design */}
         <div
           className={cn(
-            'rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 overflow-hidden',
-            'shadow-sm hover:shadow-md transition-all duration-200',
+            'rounded-xl border border-border bg-card overflow-hidden',
+            'hover:border-border/80 transition-all duration-200',
             'border-l-4 border-l-slate-800'
           )}
         >
@@ -290,7 +286,7 @@ export default function DashboardPage() {
             <input
               type="text"
               placeholder="Search..."
-              className="px-3 py-1.5 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-200 focus:border-amber-300 w-48"
+              className="px-3 py-1.5 text-sm border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-200 focus:border-amber-300 w-48"
             />
           </div>
           <DataTable

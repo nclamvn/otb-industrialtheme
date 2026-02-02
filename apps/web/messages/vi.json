@@ -73,6 +73,9 @@
     "suggestions": "Gợi ý thông minh",
     "autoPlan": "Lập kế hoạch tự động",
     "predictiveAlerts": "Cảnh báo dự đoán",
+    "aiImport": "Import dữ liệu",
+    "importedData": "Dữ liệu đã Import",
+    "aiSettings": "Cài đặt AI",
     "integrations": "Tích hợp",
     "apiKeys": "Khóa API",
     "more": "Thêm",
@@ -326,8 +329,11 @@
   },
   "masterData": {
     "title": "Dữ liệu chủ",
+    "groupBrands": "Nhóm thương hiệu",
     "brands": "Thương hiệu",
+    "stores": "Cửa hàng",
     "categories": "Danh mục",
+    "subcategorySizes": "Kích cỡ theo danh mục",
     "seasons": "Mùa vụ",
     "locations": "Địa điểm",
     "suppliers": "Nhà cung cấp",
@@ -427,6 +433,30 @@
     "about": "Thông tin",
     "version": "Phiên bản",
     "poweredBy": "Được hỗ trợ bởi"
+  },
+  "profile": {
+    "title": "Hồ sơ cá nhân",
+    "description": "Quản lý thông tin cá nhân và cài đặt tài khoản",
+    "personalInfo": "Thông tin cá nhân",
+    "personalInfoDesc": "Cập nhật thông tin cá nhân và ảnh đại diện",
+    "fullName": "Họ và tên",
+    "fullNamePlaceholder": "Nhập họ và tên",
+    "email": "Email",
+    "emailPlaceholder": "Nhập email",
+    "emailNote": "Email không thể thay đổi. Liên hệ quản trị viên để được hỗ trợ.",
+    "department": "Phòng ban",
+    "selectDepartment": "Chọn phòng ban",
+    "phone": "Số điện thoại",
+    "phonePlaceholder": "Nhập số điện thoại",
+    "security": "Bảo mật",
+    "securityDesc": "Quản lý mật khẩu và cài đặt bảo mật",
+    "password": "Mật khẩu",
+    "passwordDesc": "Thay đổi lần cuối 30 ngày trước",
+    "changePassword": "Đổi mật khẩu",
+    "twoFactor": "Xác thực hai yếu tố",
+    "twoFactorDesc": "Thêm lớp bảo mật cho tài khoản của bạn",
+    "enable": "Bật",
+    "saveSuccess": "Cập nhật hồ sơ thành công"
   },
   "errors": {
     "generic": "Đã xảy ra lỗi. Vui lòng thử lại.",
@@ -1594,7 +1624,6 @@
     },
     "aiAssistant": {
       "title": "Trợ lý AI",
-      "subtitle": "Hỗ trợ bởi Claude",
       "newChat": "Cuộc trò chuyện mới",
       "noConversations": "Chưa có cuộc trò chuyện",
       "welcomeTitle": "Xin chào! Tôi là trợ lý AI của bạn",
@@ -1605,6 +1634,7 @@
       "inputPlaceholder": "Nhập câu hỏi hoặc yêu cầu...",
       "regenerate": "Thử lại",
       "recording": "Đang ghi âm...",
+      "listening": "Đang nghe...",
       "showMe": "Cho tôi xem",
       "languageVi": "Tiếng Việt",
       "languageEn": "English"
@@ -1690,6 +1720,37 @@
     "suggestions": "Gợi ý thông minh",
     "autoPlan": "Lập kế hoạch tự động",
     "predictiveAlerts": "Cảnh báo dự đoán"
+  },
+  "help": {
+    "title": "Trợ giúp",
+    "description": "Tài liệu hướng dẫn và hỗ trợ",
+    "gettingStarted": {
+      "title": "Bắt đầu",
+      "description": "Tìm hiểu các chức năng cơ bản của nền tảng OTB",
+      "item1": "Điều hướng bằng menu bên trái",
+      "item2": "Xem bảng điều khiển và phân tích",
+      "item3": "Tạo và quản lý ngân sách",
+      "item4": "Gửi đề xuất để phê duyệt"
+    },
+    "shortcuts": {
+      "title": "Phím tắt",
+      "description": "Các phím tắt điều hướng nhanh",
+      "item1": "⌘K / Ctrl+K - Mở tìm kiếm",
+      "item2": "⌘B / Ctrl+B - Ẩn/hiện thanh bên",
+      "item3": "Esc - Đóng hộp thoại",
+      "item4": "? - Hiện phím tắt"
+    },
+    "support": {
+      "title": "Hỗ trợ",
+      "description": "Nhận trợ giúp khi cần thiết",
+      "item1": "Sử dụng Trợ lý AI để được giải đáp nhanh",
+      "item2": "Liên hệ quản trị viên nếu gặp vấn đề truy cập",
+      "item3": "Báo lỗi qua biểu mẫu phản hồi"
+    },
+    "needMoreHelp": {
+      "title": "Cần thêm trợ giúp?",
+      "documentation": "Tài liệu"
+    }
   },
   "excelTools": {
     "dataQuality": {

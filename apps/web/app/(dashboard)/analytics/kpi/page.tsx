@@ -331,90 +331,86 @@ export default function KPIDashboardPage() {
       <div className="grid gap-4 md:grid-cols-4">
         <div
           className={cn(
-            'relative overflow-hidden rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950',
-            'shadow-sm hover:shadow-md transition-all duration-200',
+            'relative overflow-hidden rounded-xl border border-border bg-card',
+            'hover:border-border/80 transition-all duration-200',
             'border-l-4 border-l-green-500 p-4'
           )}
         >
-          <div className="flex items-start justify-between">
-            <div>
-              <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">
-                {t('onTrack')}
-              </p>
-              <p className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums">
-                {onTrack}
-              </p>
-              <p className="text-sm text-muted-foreground mt-1">{t('kpisOnTrack', { count: onTrack })}</p>
-            </div>
-            <div className="h-10 w-10 rounded-xl bg-green-50 dark:bg-green-950 flex items-center justify-center">
-              <CheckCircle className="h-5 w-5 text-green-500" />
-            </div>
+          {/* Watermark Icon */}
+          <div className="absolute -right-4 -bottom-4 pointer-events-none">
+            <CheckCircle className="w-24 h-24 text-green-500 opacity-[0.08]" />
+          </div>
+          <div>
+            <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">
+              {t('onTrack')}
+            </p>
+            <p className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums pr-14">
+              {onTrack}
+            </p>
+            <p className="text-sm text-muted-foreground mt-1">{t('kpisOnTrack', { count: onTrack })}</p>
           </div>
         </div>
         <div
           className={cn(
-            'relative overflow-hidden rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950',
-            'shadow-sm hover:shadow-md transition-all duration-200',
+            'relative overflow-hidden rounded-xl border border-border bg-card',
+            'hover:border-border/80 transition-all duration-200',
             'border-l-4 border-l-amber-500 p-4'
           )}
         >
-          <div className="flex items-start justify-between">
-            <div>
-              <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">
-                {t('atRisk')}
-              </p>
-              <p className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums">
-                {atRisk}
-              </p>
-              <p className="text-sm text-muted-foreground mt-1">{t('kpisAtRisk', { count: atRisk })}</p>
-            </div>
-            <div className="h-10 w-10 rounded-xl bg-amber-50 dark:bg-amber-950 flex items-center justify-center">
-              <AlertTriangle className="h-5 w-5 text-amber-500" />
-            </div>
+          {/* Watermark Icon */}
+          <div className="absolute -right-4 -bottom-4 pointer-events-none">
+            <AlertTriangle className="w-24 h-24 text-amber-500 opacity-[0.08]" />
+          </div>
+          <div>
+            <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">
+              {t('atRisk')}
+            </p>
+            <p className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums pr-14">
+              {atRisk}
+            </p>
+            <p className="text-sm text-muted-foreground mt-1">{t('kpisAtRisk', { count: atRisk })}</p>
           </div>
         </div>
         <div
           className={cn(
-            'relative overflow-hidden rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950',
-            'shadow-sm hover:shadow-md transition-all duration-200',
+            'relative overflow-hidden rounded-xl border border-border bg-card',
+            'hover:border-border/80 transition-all duration-200',
             'border-l-4 border-l-red-500 p-4'
           )}
         >
-          <div className="flex items-start justify-between">
-            <div>
-              <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">
-                {t('offTrack')}
-              </p>
-              <p className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums">
-                {offTrack}
-              </p>
-              <p className="text-sm text-muted-foreground mt-1">{t('kpisOffTrack', { count: offTrack })}</p>
-            </div>
-            <div className="h-10 w-10 rounded-xl bg-red-50 dark:bg-red-950 flex items-center justify-center">
-              <XCircle className="h-5 w-5 text-red-500" />
-            </div>
+          {/* Watermark Icon */}
+          <div className="absolute -right-4 -bottom-4 pointer-events-none">
+            <XCircle className="w-24 h-24 text-red-500 opacity-[0.08]" />
+          </div>
+          <div>
+            <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">
+              {t('offTrack')}
+            </p>
+            <p className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums pr-14">
+              {offTrack}
+            </p>
+            <p className="text-sm text-muted-foreground mt-1">{t('kpisOffTrack', { count: offTrack })}</p>
           </div>
         </div>
         <div
           className={cn(
-            'relative overflow-hidden rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950',
-            'shadow-sm hover:shadow-md transition-all duration-200',
+            'relative overflow-hidden rounded-xl border border-border bg-card',
+            'hover:border-border/80 transition-all duration-200',
             'border-l-4 border-l-blue-500 p-4'
           )}
         >
-          <div className="flex items-start justify-between">
-            <div>
-              <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">
-                {t('activeAlerts')}
-              </p>
-              <p className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums">
-                {activeAlerts}
-              </p>
-              <p className="text-sm text-muted-foreground mt-1">{t('alertsActive', { count: activeAlerts })}</p>
-            </div>
-            <div className="h-10 w-10 rounded-xl bg-blue-50 dark:bg-blue-950 flex items-center justify-center">
-              <Bell className="h-5 w-5 text-blue-500" />
-            </div>
+          {/* Watermark Icon */}
+          <div className="absolute -right-4 -bottom-4 pointer-events-none">
+            <Bell className="w-24 h-24 text-blue-500 opacity-[0.08]" />
+          </div>
+          <div>
+            <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-neutral-400">
+              {t('activeAlerts')}
+            </p>
+            <p className="text-2xl font-bold text-slate-900 dark:text-neutral-100 mt-1 tabular-nums pr-14">
+              {activeAlerts}
+            </p>
+            <p className="text-sm text-muted-foreground mt-1">{t('alertsActive', { count: activeAlerts })}</p>
           </div>
         </div>
       </div>
