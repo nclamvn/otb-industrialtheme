@@ -2,7 +2,6 @@ import NextAuth from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 import bcrypt from 'bcryptjs';
 import { authConfig } from './auth.config';
-import prisma from './prisma';
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
@@ -41,8 +40,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           };
         }
 
-        // Production mode - check database
+        // Production mode - check database (lazy import to avoid connection issues)
         try {
+          const { default: prisma } = await import('./prisma');
           const user = await prisma.user.findUnique({
             where: { email },
             include: {
