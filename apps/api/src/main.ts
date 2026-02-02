@@ -9,9 +9,10 @@ async function bootstrap() {
   // Global prefix for all routes
   app.setGlobalPrefix('api/v1');
 
-  // Enable CORS
+  // Enable CORS - support both CORS_ORIGINS (plural) and CORS_ORIGIN (singular)
+  const corsOrigins = process.env.CORS_ORIGINS || process.env.CORS_ORIGIN;
   app.enableCors({
-    origin: process.env.CORS_ORIGINS?.split(',') || ['http://localhost:3000'],
+    origin: corsOrigins?.split(',') || ['http://localhost:3000'],
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     credentials: true,
   });

@@ -41,9 +41,10 @@ export async function middleware(request: NextRequest) {
   }
 
   // For protected routes, check auth using Edge-compatible getToken
+  // AUTH_SECRET is the NextAuth v5 standard, NEXTAUTH_SECRET is legacy
   const token = await getToken({
     req: request,
-    secret: process.env.NEXTAUTH_SECRET,
+    secret: process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET,
   });
 
   if (!token) {

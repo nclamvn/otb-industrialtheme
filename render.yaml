@@ -21,6 +21,8 @@ services:
         value: https://dafc-otb-web.onrender.com
       - key: AUTH_SECRET
         generateValue: true
+      # IMPORTANT: After first deploy, copy AUTH_SECRET value to NEXTAUTH_SECRET in Render Dashboard
+      # Both must have the same value for middleware to work
       - key: OPENAI_API_KEY
         value: placeholder
       - key: DATABASE_URL
