@@ -7,7 +7,7 @@
 
 ---
 
-## Cap nhat lan cuoi: 29/01/2026 (Session 3 - UI Design)
+## Cap nhat lan cuoi: 03/02/2026 (Session 4 - UI & Render Deployment)
 
 ---
 
@@ -174,6 +174,68 @@ apps/web          -> Build OK
 ```
 
 **Swagger Docs:** `http://localhost:3001/api/docs`
+
+---
+
+## SESSION 03/02/2026 - Session 4 (UI & Render Deployment)
+
+### Thay doi chinh
+
+1. **UI Header Updates**
+   - AI button mau vang (#B8860B) giong icon sidebar
+   - Khung vuong 26x26px, chi co chu "AI"
+   - Hover effect: mau dam hon, font bold hon
+   - Notification bell chuyen ra ngoai cung ben phai
+
+2. **Dashboard Welcome Section**
+   - Loai bo icon vuong mien
+   - Thu nho text, thiet ke khiem ton hon
+   - "Xin chao, Admin!" - text-xl font-bold
+   - Giu lai season badge (dafc-badge dafc-badge-gold)
+
+3. **Authentication Issues (Render)**
+   - Loi MissingCSRF khi login tren Render
+   - Nguyen nhan: Middleware dung NEXTAUTH_SECRET nhung Render chi set AUTH_SECRET
+   - Fix: Simplified middleware - chi xu ly locale, bo auth check
+   - Auth tam thoi disabled de test UI
+
+4. **Render Deployment Issues**
+   - Prisma CLI version mismatch (7.x vs 5.x trong project)
+   - DATABASE_URL khong accessible trong packages/database context
+   - Fix: Cai prisma@5.22.0 globally
+
+### Files da cap nhat
+
+```
+apps/web/components/layout/header.tsx    # AI button, notification bell
+apps/web/app/(dashboard)/page.tsx        # Welcome section
+apps/web/middleware.ts                   # Simplified - only locale
+apps/web/lib/auth.ts                     # AUTH_SECRET || NEXTAUTH_SECRET
+render.yaml                              # Updated build commands
+```
+
+### Render Build Command (Hien tai)
+
+```bash
+npm install -g pnpm prisma@5.22.0 && NODE_ENV=development pnpm install --frozen-lockfile && prisma generate --schema=packages/database/prisma/schema.prisma && pnpm run build --filter=@dafc/web && cp -r apps/web/public apps/web/.next/standalone/apps/web/ && cp -r apps/web/.next/static apps/web/.next/standalone/apps/web/.next/
+```
+
+### Repositories
+
+- **Original:** https://github.com/nclamvn/dafc-otb-monorepo
+- **New:** https://github.com/TCDevop/OTB
+
+### Database Seed (Chua chay)
+
+Database seed chua duoc chay tren Render. Sau khi deploy thanh cong, can:
+1. Mo Render Shell hoac connect database tu local
+2. Chay seed script thu cong
+
+### Pending Tasks
+
+- [ ] Fix Render deployment (prisma version)
+- [ ] Chay database seed sau khi deploy
+- [ ] Tao module dang nhap/phan quyen sau khi test xong
 
 ---
 
