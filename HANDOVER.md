@@ -1,4 +1,4 @@
-# HANDOVER - DAFC OTB Platform (Monorepo)
+# HANDOVER - DAFC OTB NextJS Frontend
 
 > **Khi quay lai, yeu cau Claude doc file nay de tiep tuc:**
 > ```
@@ -7,7 +7,7 @@
 
 ---
 
-## Cap nhat lan cuoi: 03/02/2026 (Session 4 - UI & Render Deployment)
+## Cap nhat lan cuoi: 06/02/2026 (Session 6 - i18n, Premium UI, Light Theme)
 
 ---
 
@@ -17,448 +17,305 @@
 
 | Thong tin | Chi tiet |
 |-----------|----------|
-| **Architecture** | Turborepo Monorepo |
-| **Frontend** | Next.js 14.2.35 (apps/web - port 3000) |
-| **Backend** | NestJS 10 (apps/api - port 3001) |
-| **Shared** | @dafc/shared (types, schemas, utils) |
-| **Database** | Prisma + PostgreSQL (@dafc/database) |
-| **AI** | OpenAI GPT-4 (AI Copilot) |
-
----
-
-## TRANG THAI HIEN TAI: 100% HOAN THANH
-
-### Monorepo Structure: COMPLETED
-
-```
-dafc-otb-monorepo/
-├── apps/
-│   ├── web/                    # Next.js Frontend (port 3000)
-│   │   ├── app/               # Pages
-│   │   ├── components/        # React components
-│   │   ├── lib/
-│   │   │   └── api-client.ts  # Full API client (updated)
-│   │   └── Dockerfile
-│   └── api/                    # NestJS Backend (port 3001)
-│       ├── src/
-│       │   ├── modules/       # All feature modules (updated)
-│       │   │   ├── auth/
-│       │   │   ├── budgets/
-│       │   │   ├── otb-plans/     # +submit/approve/reject/sizing/ai-proposal
-│       │   │   ├── sku-proposals/ # +submit/approve/reject/import/validate/enrich
-│       │   │   ├── workflows/     # NEW: Approvals module
-│       │   │   ├── analytics/     # NEW: KPI, forecasts, scenarios
-│       │   │   ├── integrations/  # NEW: ERP, S3, webhooks, API keys
-│       │   │   └── ...
-│       │   ├── common/
-│       │   └── main.ts
-│       └── Dockerfile
-├── packages/
-│   ├── shared/                 # @dafc/shared
-│   └── database/               # @dafc/database
-├── .github/workflows/ci.yml    # NEW: CI/CD pipeline
-├── docker-compose.yml          # NEW: Docker setup
-├── render.yaml                 # NEW: Render.com deployment
-├── turbo.json
-└── pnpm-workspace.yaml
-```
-
-### Build Status: ALL PASSING
-
-```
-packages/shared    -> Build OK
-packages/database  -> Build OK
-apps/api          -> Build OK (12+ modules)
-apps/web          -> Build OK
-```
-
----
-
-## API ENDPOINTS (Full List)
-
-### Core Business
-```
-# Budgets
-/api/v1/budgets                 # CRUD
-/api/v1/budgets/:id/submit      # Submit for approval
-/api/v1/budgets/:id/approve     # Approve
-/api/v1/budgets/:id/reject      # Reject
-
-# OTB Plans
-/api/v1/otb-plans               # CRUD
-/api/v1/otb-plans/:id/submit    # Submit for approval
-/api/v1/otb-plans/:id/approve   # Approve
-/api/v1/otb-plans/:id/reject    # Reject
-/api/v1/otb-plans/:id/sizing    # Get/Save sizing data
-/api/v1/otb-plans/:id/ai-proposal  # Generate AI proposal
-
-# SKU Proposals
-/api/v1/sku-proposals           # CRUD
-/api/v1/sku-proposals/:id/submit   # Submit for approval
-/api/v1/sku-proposals/:id/approve  # Approve
-/api/v1/sku-proposals/:id/reject   # Reject
-/api/v1/sku-proposals/:id/import   # Import from Excel
-/api/v1/sku-proposals/:id/validate # Validate items
-/api/v1/sku-proposals/:id/enrich   # AI enrichment
-```
-
-### Workflows & Approvals
-```
-/api/v1/approvals               # List all pending approvals
-/api/v1/approvals/mine          # My pending approvals
-/api/v1/workflows/:id           # Get workflow
-/api/v1/workflows/:id/approve   # Approve step
-/api/v1/workflows/:id/reject    # Reject step
-```
-
-### Analytics & KPI
-```
-/api/v1/kpi                     # KPI dashboard
-/api/v1/kpi/alerts              # KPI alerts
-/api/v1/kpi/alerts/:id/acknowledge
-/api/v1/forecast                # Forecasts
-/api/v1/forecast/analyze        # Generate forecast
-/api/v1/simulator               # What-if scenarios
-/api/v1/insights                # AI insights
-/api/v1/analytics/executive-summary
-/api/v1/analytics/stock-optimization
-/api/v1/analytics/risk-assessment
-```
-
-### Integrations
-```
-# API Keys
-/api/v1/api-keys                # CRUD
-
-# Webhooks
-/api/v1/webhooks                # CRUD
-/api/v1/webhooks/:id/test       # Test webhook
-
-# ERP
-/api/v1/integrations/erp        # CRUD connections
-/api/v1/integrations/erp/:id/mappings  # Field mappings
-/api/v1/integrations/erp/:id/sync      # Trigger sync
-
-# S3/Files
-/api/v1/integrations/s3/presign # Get upload URL
-/api/v1/integrations/s3/files   # List/register files
-```
-
-### Master Data
-```
-/api/v1/brands
-/api/v1/categories
-/api/v1/locations
-/api/v1/seasons
-/api/v1/divisions
-/api/v1/users
-```
-
-### AI
-```
-/api/v1/ai/conversations        # Chat conversations
-/api/v1/ai/suggestions          # AI suggestions
-/api/v1/ai/generated-plans      # AI generated plans
-/api/v1/ai/predictive-alerts    # Predictive alerts
-/api/v1/ai/dashboard            # AI dashboard
-```
-
-### Other
-```
-/api/v1/health                  # Health check (public)
-/api/v1/health/ping             # Ping (public)
-/api/v1/auth/login              # Login
-/api/v1/auth/profile            # Get profile
-/api/v1/notifications           # User notifications
-/api/v1/reports                 # Reports
-```
-
-**Swagger Docs:** `http://localhost:3001/api/docs`
-
----
-
-## SESSION 03/02/2026 - Session 4 (UI & Render Deployment)
-
-### Thay doi chinh
-
-1. **UI Header Updates**
-   - AI button mau vang (#B8860B) giong icon sidebar
-   - Khung vuong 26x26px, chi co chu "AI"
-   - Hover effect: mau dam hon, font bold hon
-   - Notification bell chuyen ra ngoai cung ben phai
-
-2. **Dashboard Welcome Section**
-   - Loai bo icon vuong mien
-   - Thu nho text, thiet ke khiem ton hon
-   - "Xin chao, Admin!" - text-xl font-bold
-   - Giu lai season badge (dafc-badge dafc-badge-gold)
-
-3. **Authentication Issues (Render)**
-   - Loi MissingCSRF khi login tren Render
-   - Nguyen nhan: Middleware dung NEXTAUTH_SECRET nhung Render chi set AUTH_SECRET
-   - Fix: Simplified middleware - chi xu ly locale, bo auth check
-   - Auth tam thoi disabled de test UI
-
-4. **Render Deployment Issues**
-   - Prisma CLI version mismatch (7.x vs 5.x trong project)
-   - DATABASE_URL khong accessible trong packages/database context
-   - Fix: Cai prisma@5.22.0 globally
-
-### Files da cap nhat
-
-```
-apps/web/components/layout/header.tsx    # AI button, notification bell
-apps/web/app/(dashboard)/page.tsx        # Welcome section
-apps/web/middleware.ts                   # Simplified - only locale
-apps/web/lib/auth.ts                     # AUTH_SECRET || NEXTAUTH_SECRET
-render.yaml                              # Updated build commands
-```
-
-### Render Build Command (Hien tai)
-
-```bash
-npm install -g pnpm prisma@5.22.0 && NODE_ENV=development pnpm install --frozen-lockfile && prisma generate --schema=packages/database/prisma/schema.prisma && pnpm run build --filter=@dafc/web && cp -r apps/web/public apps/web/.next/standalone/apps/web/ && cp -r apps/web/.next/static apps/web/.next/standalone/apps/web/.next/
-```
+| **Frontend** | Next.js 16.1.6, App Router, React 19 |
+| **Styling** | Tailwind CSS v3, custom CSS variables |
+| **Backend** | NestJS (rieng biet, port 4000) |
+| **API Base** | `http://localhost:4000/api/v1` |
+| **Dev Port** | `http://localhost:3006` |
+| **Language** | Bilingual EN/VN with toggle |
+| **Theme** | Dark/Light mode with CSS variables |
 
 ### Repositories
 
-- **Original:** https://github.com/nclamvn/dafc-otb-monorepo
-- **New:** https://github.com/TCDevop/OTB
+| Remote | URL |
+|--------|-----|
+| **origin** (TCDevop) | https://github.com/TCDevop/OTB.git |
+| **nclamvn** | https://github.com/nclamvn/DAFC-OTB-TCDATA.git |
 
-### Database Seed (Chua chay)
+### Demo Accounts
 
-Database seed chua duoc chay tren Render. Sau khi deploy thanh cong, can:
-1. Mo Render Shell hoac connect database tu local
-2. Chay seed script thu cong
-
-### Pending Tasks
-
-- [ ] Fix Render deployment (prisma version)
-- [ ] Chay database seed sau khi deploy
-- [ ] Tao module dang nhap/phan quyen sau khi test xong
+```
+admin@dafc.com    / dafc@2026  (Admin)
+merch@dafc.com    / dafc@2026  (Merchandiser)
+manager@dafc.com  / dafc@2026  (Manager)
+finance@dafc.com  / dafc@2026  (Finance)
+```
 
 ---
 
-## SESSION 29/01/2026 - Session 3 (UI Design)
+## KIEN TRUC FRONTEND
+
+```
+DAFC-OTB-NextJS/
+├── src/
+│   ├── app/                          # Next.js App Router
+│   │   ├── layout.jsx                # Root layout
+│   │   ├── providers.jsx             # AuthProvider > LanguageProvider > AppProvider
+│   │   ├── globals.css               # Theme CSS variables + component classes
+│   │   ├── login/page.jsx            # Login route
+│   │   └── (dashboard)/              # Protected routes (AuthGuard)
+│   │       ├── layout.jsx            # Sidebar + AppHeader layout
+│   │       ├── page.jsx              # / → HomeScreen
+│   │       ├── budget-management/    # /budget-management
+│   │       ├── planning/             # /planning → BudgetAllocateScreen
+│   │       ├── otb-analysis/         # /otb-analysis
+│   │       ├── proposal/             # /proposal → SKUProposalScreen
+│   │       ├── tickets/              # /tickets
+│   │       ├── approval-config/      # /approval-config
+│   │       ├── master-data/          # /master-data
+│   │       ├── profile/              # /profile
+│   │       ├── settings/             # /settings
+│   │       └── dev-tickets/          # /dev-tickets
+│   ├── screens/                      # 15 screen components (all 'use client')
+│   │   ├── HomeScreen.jsx            # Dashboard KPI cards + alerts
+│   │   ├── BudgetManagementScreen.jsx
+│   │   ├── BudgetAllocateScreen.jsx
+│   │   ├── OTBAnalysisScreen.jsx
+│   │   ├── SKUProposalScreen.jsx
+│   │   ├── TicketScreen.jsx
+│   │   ├── TicketDetailPage.jsx
+│   │   ├── PlanningDetailPage.jsx
+│   │   ├── ProposalDetailPage.jsx
+│   │   ├── ApprovalWorkflowScreen.jsx
+│   │   ├── MasterDataScreen.jsx
+│   │   ├── ProfileScreen.jsx
+│   │   ├── SettingsScreen.jsx
+│   │   ├── LoginScreen.jsx
+│   │   └── DevTicketScreen.jsx
+│   ├── components/
+│   │   ├── Layout/
+│   │   │   ├── Sidebar.jsx           # Navigation sidebar (collapsible)
+│   │   │   └── AppHeader.jsx         # Top header (search, dark mode, lang, notifications)
+│   │   ├── Common/
+│   │   │   ├── LoadingSpinner.jsx
+│   │   │   ├── ErrorMessage.jsx
+│   │   │   ├── EmptyState.jsx
+│   │   │   ├── BudgetModal.jsx
+│   │   │   └── PlanningDetailModal.jsx
+│   │   ├── AuthGuard.jsx             # Route protection
+│   │   ├── BudgetAlertsBanner.jsx    # Premium alert banner
+│   │   ├── RiskScoreCard.jsx         # AI risk assessment
+│   │   ├── OtbAllocationAdvisor.jsx  # AI allocation advisor
+│   │   ├── SkuRecommenderPanel.jsx   # AI SKU recommendations
+│   │   ├── SizeCurveAdvisor.jsx      # AI size curve advisor
+│   │   └── TicketKanbanBoard.jsx     # Kanban board
+│   ├── contexts/
+│   │   ├── AuthContext.js            # JWT auth (login, logout, user)
+│   │   ├── LanguageContext.js        # Bilingual EN/VN with t() function
+│   │   └── AppContext.js             # Shared state (darkMode, allocation data, etc.)
+│   ├── services/
+│   │   ├── api.js                    # Axios instance + JWT interceptor
+│   │   ├── authService.js
+│   │   ├── budgetService.js
+│   │   ├── planningService.js
+│   │   ├── proposalService.js
+│   │   ├── masterDataService.js
+│   │   ├── approvalService.js
+│   │   ├── approvalWorkflowService.js
+│   │   ├── aiService.js
+│   │   └── index.js                  # Re-exports all services
+│   ├── locales/
+│   │   ├── en.js                     # English translations
+│   │   ├── vi.js                     # Vietnamese translations
+│   │   └── index.js
+│   └── utils/
+│       ├── routeMap.js               # screenId → URL mapping
+│       └── formatters.js             # Currency, date formatters
+└── public/
+    └── dafc-logo.png
+```
+
+---
+
+## KEY PATTERNS
+
+### Services
+```js
+// api.js = Axios instance with JWT interceptor (NOT a service with methods)
+// Domain services use: api.get('/endpoint') → response.data.data || response.data
+```
+
+### API Responses
+```js
+// May return { data: { data: [...] } } or { data: [...] } - always handle both
+```
+
+### Bilingual (i18n)
+```js
+const { t, language, setLanguage } = useLanguage();
+// Usage: t('home.welcomeBack', { name: 'Admin' })
+// Translations in src/locales/en.js and src/locales/vi.js
+// Toggle on AppHeader + Settings page
+// Persisted in localStorage
+```
+
+### Dark/Light Mode
+```js
+// CSS variables in globals.css (.light / .dark classes)
+// All screens receive darkMode prop from AppContext
+// Pattern: darkMode ? 'dark-classes' : 'light-classes'
+```
+
+### Premium Card Design
+```js
+// KPI/stat cards use gradient background + watermark icon pattern:
+// - Diagonal gradient: linear-gradient(135deg, base 0%, base 60%, accentGrad 100%)
+// - Large watermark icon: absolute -bottom-3 -right-3, size 80-90px, opacity 0.05
+// - Icon badge: w-10 h-10 rounded-xl backdrop-blur-sm
+// - Accent colors per card: gold, emerald, blue, rose, amber, teal, violet, indigo
+// Applied in: HomeScreen, BudgetManagementScreen, TicketScreen, DevTicketScreen
+```
+
+### Color Palette
+```
+Dark Theme:
+  #0A0A0A  - Background
+  #121212  - Card background
+  #1A1A1A  - Muted/input background
+  #2E2E2E  - Borders
+  #666666  - Muted text
+  #999999  - Secondary text
+  #F2F2F2  - Primary text
+  #D7B797  - Brand gold (primary accent)
+  #2A9E6A  - Success green
+  #F85149  - Error red
+  #E3B341  - Warning gold
+
+Light Theme:
+  #ffffff  - Card background
+  #C4B5A5  - Borders (was border-[#2E2E2E]/20)
+  #D4C8BB  - Light borders (was border-[#2E2E2E]/10)
+  rgba(160,120,75,...) - Hover/accent backgrounds (was rgba(215,183,151,...))
+```
+
+---
+
+## SESSION 06/02/2026 - Session 6
 
 ### Thay doi chinh
 
-1. **Khoi phuc giao dien** - Client khong hai long voi sidebar mau nau do
-   - Reset ve commit `2569d32` (truoc khi doi sidebar)
-   - Tao backup branch: `backup-apple-design-2026-01-29`
+1. **Next.js Migration (tu CRA)**
+   - CRA (reference): `/Users/mac/OTBDAFC/DAFC - OTB - App/`
+   - Next.js 16, App Router, Tailwind v3, React 19
+   - 16 routes (14 static + 2 dynamic), all build OK
+   - AuthGuard bao ve dashboard routes
+   - Cross-screen data: AppContext + sessionStorage
 
-2. **Thiet ke card moi - Watermark Icon Design**
-   - Icon lon (h-32 w-32) lam watermark o goc phai duoi
-   - Opacity 10% (`text-{color}-500/10`)
-   - Typography lon hon (`text-3xl font-bold tracking-tight`)
-   - Ap dung cho ~90+ stat cards tren 22 trang
+2. **Bilingual UI (EN/VN)**
+   - LanguageContext with t() function, {{param}} interpolation
+   - 500+ translated keys across 15 screens + components
+   - Language toggle on AppHeader + Settings page
+   - Persisted in localStorage, default: 'vi'
+   - Missing key fallback: current lang → EN → raw key
 
-### Design Pattern moi cho Stat Cards
+3. **Premium Card Design**
+   - KPI cards: gradient background + large watermark icon (80-90px)
+   - 8 accent themes: gold, emerald, blue, rose, amber, teal, violet, indigo
+   - Applied to HomeScreen (8 cards), BudgetManagement (3), Ticket (3), DevTicket (4)
+   - BudgetAlertsBanner redesigned: glass-morphism, gradient badges, left accent bar
+   - hover:shadow-lg, group-hover watermark scale animation
 
-```tsx
-<Card className="relative overflow-hidden">
-  {/* Watermark icon */}
-  <IconName className="absolute -bottom-4 -right-4 h-32 w-32 text-{color}-500/10" />
+4. **Light Theme Contrast Fix**
+   - CSS variables updated: stronger borders, pure white cards, saturated primary
+   - Component-level light overrides: .light .ind-card, .ind-table, .kpi-card, etc.
+   - Screen-level: border-[#2E2E2E]/20 → border-[#C4B5A5] (solid warm-tan)
+   - Screen-level: rgba(215,183,151,...) → rgba(160,120,75,...) (deeper brown)
+   - 11 screen files + AppHeader + globals.css updated
 
-  <CardHeader className="pb-2">
-    <CardTitle className="text-sm font-medium text-muted-foreground">
-      Title
-    </CardTitle>
-  </CardHeader>
+5. **Dark Blue Flash Fix**
+   - AuthGuard.jsx: bg-[#0f172a] → bg-[#0A0A0A]
+   - LoginScreen.jsx: Full palette conversion from slate to app dark theme
 
-  <CardContent className="relative">
-    <div className="text-3xl font-bold tracking-tight text-{color}-600">
-      $9,600,000
-    </div>
-    <p className="text-sm text-muted-foreground mt-1">Description</p>
-  </CardContent>
-</Card>
-```
+6. **Sidebar Enhancements**
+   - All text bold (font-semibold for items, font-bold for headers/active)
+   - Logo + brand name 120% larger when expanded (h-11, text-xs)
+   - Header height 64px
 
-### Cac trang da cap nhat (22 files)
-
-```
-apps/web/app/(dashboard)/
-├── budget/page.tsx
-├── budget/[id]/page.tsx
-├── dashboard/page.tsx
-├── sku-proposal/page.tsx
-├── wssi/page.tsx
-├── wssi/alerts/page.tsx
-├── wssi/[id]/page.tsx
-├── approvals/page.tsx
-├── size-profiles/page.tsx
-├── settings/audit/page.tsx
-├── otb-analysis/page.tsx
-├── predictive-alerts/page.tsx
-├── ai-auto-plan/page.tsx
-└── analytics/
-    ├── page.tsx
-    ├── kpi/page.tsx
-    ├── simulator/page.tsx
-    ├── forecast/page.tsx
-    ├── insights/page.tsx
-    ├── automation/page.tsx
-    ├── comparison/page.tsx
-    ├── decisions/page.tsx
-    └── demand/page.tsx
-```
-
-### Git Commits
+### Files da cap nhat (39 files)
 
 ```
-daf1414 style: modern watermark icon design for stat cards
-2569d32 style: increase user dropdown menu size (reset point)
+# New files
+src/contexts/LanguageContext.js       # i18n context
+src/locales/en.js                     # English translations
+src/locales/vi.js                     # Vietnamese translations
+src/locales/index.js                  # Re-export
+
+# Modified - Layout & Components
+src/app/globals.css                   # Theme variables + light mode overrides
+src/app/providers.jsx                 # + LanguageProvider
+src/components/AuthGuard.jsx          # Dark flash fix
+src/components/BudgetAlertsBanner.jsx # Premium redesign
+src/components/Layout/AppHeader.jsx   # Lang toggle + i18n + light fix
+src/components/Layout/Sidebar.jsx     # i18n + bold text + larger logo
+src/components/Common/*.jsx           # i18n translations
+src/components/RiskScoreCard.jsx      # i18n
+src/components/OtbAllocationAdvisor.jsx
+src/components/SkuRecommenderPanel.jsx
+src/components/SizeCurveAdvisor.jsx
+src/components/TicketKanbanBoard.jsx
+
+# Modified - Screens (all 15)
+src/screens/*.jsx                     # i18n + light theme fix + premium cards
 ```
 
-### Backup Branch
+---
+
+## PREVIOUS SESSIONS
+
+### Session 5 (06/02/2026) - Frontend-Backend Integration
+- All 7 phases completed: services connected to real API
+- Removed all mock data fallbacks (except TicketDetailPage)
+- HomeScreen/ProfileScreen use AuthContext user
+
+### Session 4 (03/02/2026) - UI & Render Deployment
+- AI button styling, dashboard welcome section
+- Render deployment config (render.yaml)
+
+### Session 3 (29/01/2026) - UI Design
+- Watermark icon card design (original concept)
+- Applied to 22 pages in monorepo version
+
+### Session 2 (14/01/2026) - Backend Completion
+- OTB Plans, SKU Proposals, Workflows, Analytics, Integrations modules
+- Full API client, CI/CD, Docker config
+
+---
+
+## COMMANDS
 
 ```bash
-# Neu can tham khao thiet ke Apple truoc do:
-git checkout backup-apple-design-2026-01-29
+# Development
+npm run dev              # Start dev server (port 3006)
+npm run build            # Production build
+
+# Git (2 remotes)
+git push origin main     # Push to TCDevop/OTB
+git push nclamvn main    # Push to nclamvn/DAFC-OTB-TCDATA
+
+# Backend (separate project)
+cd /path/to/backend && npm run start:dev   # NestJS on port 4000
 ```
 
 ---
 
-## SESSION 14/01/2026 - Session 2
+## REMAINING ITEMS
 
-### Da hoan thanh (100%)
-
-1. **OTB Plans endpoints** - submit, approve, reject, sizing, ai-proposal
-2. **SKU Proposals endpoints** - submit, approve, reject, import, validate, enrich
-3. **Workflows module** - Approvals, pending list, workflow actions
-4. **Analytics module** - KPI dashboard, forecasts, scenarios, insights
-5. **Integrations module** - API keys, webhooks, ERP connections, S3 storage
-6. **api-client.ts** - Full update with all new endpoints
-7. **Deployment config** - render.yaml, docker-compose.yml, Dockerfiles, CI/CD
-
-### Files da tao/update
-
-```
-# Backend modules
-apps/api/src/modules/otb-plans/otb-plans.service.ts      # UPDATED: +12 methods
-apps/api/src/modules/otb-plans/otb-plans.controller.ts   # UPDATED: +6 endpoints
-apps/api/src/modules/sku-proposals/sku-proposals.service.ts  # UPDATED: +12 methods
-apps/api/src/modules/sku-proposals/sku-proposals.controller.ts # UPDATED: +6 endpoints
-apps/api/src/modules/workflows/                           # NEW: Full module
-apps/api/src/modules/analytics/                           # NEW: Full module
-apps/api/src/modules/integrations/                        # NEW: Full module
-apps/api/src/app.module.ts                               # UPDATED: +3 modules
-
-# Frontend
-apps/web/lib/api-client.ts                               # UPDATED: +130 lines
-
-# Deployment
-render.yaml                                              # NEW
-docker-compose.yml                                       # NEW
-apps/api/Dockerfile                                      # NEW
-apps/web/Dockerfile                                      # NEW
-.github/workflows/ci.yml                                 # NEW
-```
-
----
-
-## CREDENTIALS (Development/Testing)
-
-```
-Email: admin@dafc.com
-Password: admin123
-```
-
----
-
-## COMMANDS THUONG DUNG
-
-```bash
-# Install dependencies
-pnpm install
-
-# Development (all apps)
-pnpm dev
-
-# Development (specific app)
-pnpm dev:api     # Backend (port 3001)
-pnpm dev:web     # Frontend (port 3000)
-
-# Build all
-pnpm build
-
-# Build specific
-pnpm turbo run build --filter=@dafc/api
-pnpm turbo run build --filter=@dafc/web
-
-# Database
-cd packages/database
-pnpm db:generate          # Generate Prisma client
-pnpm db:push             # Push schema to DB
-pnpm db:seed             # Seed demo data
-pnpm db:studio           # Open Prisma Studio
-
-# Docker
-docker-compose up -d      # Start all services
-docker-compose logs -f    # View logs
-docker-compose down       # Stop all services
-```
-
----
-
-## ENVIRONMENT VARIABLES
-
-Copy `.env.example` sang `.env` va cap nhat:
-
-```env
-# Database
-DATABASE_URL="postgresql://user:pass@localhost:5432/dafc_otb"
-
-# Auth
-AUTH_SECRET="your-secret-key"
-NEXTAUTH_URL="http://localhost:3000"
-JWT_SECRET="your-jwt-secret"
-JWT_EXPIRES_IN="7d"
-
-# API
-API_PORT=3001
-NEXT_PUBLIC_API_URL="http://localhost:3001"
-CORS_ORIGIN="http://localhost:3000"
-
-# OpenAI
-OPENAI_API_KEY="sk-..."
-```
-
----
-
-## DEPLOYMENT
-
-### Render.com
-1. Connect repository to Render
-2. Blueprint will auto-detect `render.yaml`
-3. Services: dafc-otb-web, dafc-otb-api, dafc-otb-db
-4. Set environment variables in dashboard
-
-### Docker
-```bash
-# Build and run
-docker-compose up -d
-
-# Or build images manually
-docker build -f apps/api/Dockerfile -t dafc-otb-api .
-docker build -f apps/web/Dockerfile -t dafc-otb-web .
-```
-
-### GitHub Actions
-- Auto runs on push to main/develop
-- Jobs: lint, build, test-api, test-web, deploy
-- Set `RENDER_DEPLOY_HOOK_URL` secret for auto-deploy
+- [ ] TicketDetailPage.jsx still has MOCK_SKU_DATA and MOCK_DETAIL_DATA
+- [ ] nclamvn remote has divergent history (needs force push or merge)
+- [ ] E2E testing
+- [ ] Performance tuning
 
 ---
 
 ## GHI CHU CHO CLAUDE
 
 Khi doc file nay:
-1. Kiem tra `pnpm turbo run build` de verify builds
-2. Kiem tra API: `curl http://localhost:3001/api/v1/health`
-3. Du an da 100% hoan thanh ve mat ky thuat
-4. Co the can E2E testing va performance tuning
+1. Frontend: `/Users/mac/OTBDAFC/DAFC-OTB-NextJS/`
+2. Backend: NestJS rieng biet, API tai `localhost:4000/api/v1`
+3. Tat ca screen la `'use client'` components
+4. i18n dung `useLanguage()` hook, translations tai `src/locales/`
+5. Dark/light mode qua `darkMode` prop + CSS variables
+6. Premium cards: gradient + watermark icon pattern (xem HomeScreen lam mau)
 
 ---
 
