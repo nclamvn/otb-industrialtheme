@@ -1,0 +1,16 @@
+{
+  "moduleFileExtensions": ["js", "json", "ts"],
+  "rootDir": "..",
+  "testEnvironment": "node",
+  "testRegex": ".e2e-spec.ts$",
+  "transform": {
+    "^.+\\.(t|j)s$": "ts-jest"
+  },
+  "moduleNameMapper": {
+    "^@dafc/database$": "<rootDir>/../packages/database/src",
+    "^@dafc/shared$": "<rootDir>/../packages/shared/src"
+  },
+  "setupFilesAfterEnv": ["<rootDir>/test/e2e-setup.ts"],
+  "testTimeout": 60000,
+  "verbose": true
+}

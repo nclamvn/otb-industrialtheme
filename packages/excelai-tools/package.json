@@ -1,0 +1,38 @@
+{
+  "name": "@dafc/excelai-tools",
+  "version": "1.0.0",
+  "description": "NL Formula Engine + Data Cleaner for DAFC OTB Platform",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "clean": "rm -rf dist",
+    "lint": "eslint src --ext .ts"
+  },
+  "keywords": [
+    "excel",
+    "formula",
+    "natural-language",
+    "vietnamese",
+    "data-cleaner",
+    "otb"
+  ],
+  "author": "DAFC",
+  "license": "MIT",
+  "dependencies": {
+    "@dafc/excelai-core": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.12",
+    "@types/node": "^20.11.0",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.2",
+    "typescript": "^5.3.3"
+  },
+  "peerDependencies": {
+    "@dafc/excelai-core": ">=1.0.0"
+  }
+}

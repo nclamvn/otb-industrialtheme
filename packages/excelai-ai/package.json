@@ -1,0 +1,51 @@
+{
+  "name": "@dafc/excelai-ai",
+  "version": "1.0.0",
+  "description": "AI Copilot for DAFC OTB Platform",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./providers": {
+      "import": "./dist/providers/index.mjs",
+      "require": "./dist/providers/index.js",
+      "types": "./dist/providers/index.d.ts"
+    },
+    "./context": {
+      "import": "./dist/context/index.mjs",
+      "require": "./dist/context/index.js",
+      "types": "./dist/context/index.d.ts"
+    },
+    "./prompts": {
+      "import": "./dist/prompts/index.mjs",
+      "require": "./dist/prompts/index.js",
+      "types": "./dist/prompts/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest",
+    "test:coverage": "vitest --coverage",
+    "lint": "eslint src/",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "openai": "^4.28.0",
+    "@anthropic-ai/sdk": "^0.17.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "tsup": "^8.0.1",
+    "typescript": "^5.3.0",
+    "vitest": "^1.0.0"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  }
+}

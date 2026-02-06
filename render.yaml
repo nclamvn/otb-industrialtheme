@@ -1,0 +1,68 @@
+# Render.com Blueprint for DAFC OTB Platform Monorepo
+
+services:
+  # ============================================
+  # Frontend - Next.js Web Application
+  # ============================================
+  - type: web
+    name: dafc-otb-web
+    runtime: node
+    region: singapore
+    plan: starter
+    buildCommand: npm install -g pnpm && NODE_ENV=development pnpm install --frozen-lockfile && pnpm --filter @dafc/database exec prisma generate && pnpm --filter @dafc/database exec prisma db push --skip-generate && pnpm --filter @dafc/database db:seed && pnpm run build --filter=@dafc/web && cp -r apps/web/public apps/web/.next/standalone/apps/web/ && cp -r apps/web/.next/static apps/web/.next/standalone/apps/web/.next/
+    startCommand: node apps/web/.next/standalone/apps/web/server.js
+    healthCheckPath: /
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NEXT_PUBLIC_API_URL
+        value: https://dafc-otb-api.onrender.com
+      - key: NEXTAUTH_URL
+        value: https://dafc-otb-web.onrender.com
+      - key: AUTH_SECRET
+        generateValue: true
+      # IMPORTANT: After first deploy, copy AUTH_SECRET value to NEXTAUTH_SECRET in Render Dashboard
+      # Both must have the same value for middleware to work
+      - key: OPENAI_API_KEY
+        value: placeholder
+      - key: DATABASE_URL
+        fromDatabase:
+          name: dafc-otb-db
+          property: connectionString
+
+  # ============================================
+  # Backend - NestJS API
+  # ============================================
+  - type: web
+    name: dafc-otb-api
+    runtime: node
+    region: singapore
+    plan: starter
+    buildCommand: npm install -g pnpm && NODE_ENV=development pnpm install --frozen-lockfile && cd packages/database && pnpm exec prisma generate && cd ../.. && pnpm run build --filter=@dafc/api
+    startCommand: pnpm run start:prod --filter=@dafc/api
+    healthCheckPath: /api/v1/health/ping
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: "3001"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: dafc-otb-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRES_IN
+        value: 7d
+      - key: CORS_ORIGIN
+        value: https://dafc-otb-web.onrender.com
+
+databases:
+  # ============================================
+  # PostgreSQL Database
+  # ============================================
+  - name: dafc-otb-db
+    databaseName: dafc_otb
+    region: singapore
+    plan: free
+    postgresMajorVersion: "15"

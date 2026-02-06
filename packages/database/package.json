@@ -1,0 +1,47 @@
+{
+  "name": "@dafc/database",
+  "version": "1.0.0",
+  "private": true,
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    },
+    "./client": {
+      "types": "./dist/client.d.ts",
+      "import": "./dist/client.mjs",
+      "require": "./dist/client.js"
+    }
+  },
+  "scripts": {
+    "build": "tsup && pnpm db:generate",
+    "dev": "tsup --watch",
+    "clean": "rm -rf dist",
+    "db:generate": "prisma generate",
+    "db:push": "prisma db push",
+    "db:migrate": "prisma migrate dev",
+    "db:seed": "ts-node --compiler-options '{\"module\":\"CommonJS\"}' prisma/seed.ts",
+    "db:seed:comprehensive": "ts-node --compiler-options '{\"module\":\"CommonJS\"}' prisma/seed-comprehensive.ts",
+    "db:seed:advanced": "ts-node --compiler-options '{\"module\":\"CommonJS\"}' prisma/seed-advanced.ts",
+    "db:seed:all": "pnpm db:seed:comprehensive && pnpm db:seed:advanced",
+    "db:studio": "prisma studio",
+    "db:reset": "prisma migrate reset",
+    "db:fresh": "pnpm db:reset && pnpm db:seed:all"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.22.0",
+    "bcryptjs": "^3.0.3"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/node": "^20.10.0",
+    "prisma": "^5.22.0",
+    "ts-node": "^10.9.2",
+    "tsup": "^8.0.1",
+    "typescript": "^5.3.3"
+  }
+}

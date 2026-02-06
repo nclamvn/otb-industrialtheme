@@ -1,0 +1,11 @@
+<svg width="160" height="48" viewBox="0 0 160 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Crown/Wave Icon -->
+  <g transform="translate(12, 0)">
+    <!-- Top crown points -->
+    <path d="M8 16L16 8L24 14L32 8L40 16" stroke="#D4A84B" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <!-- Wave/ribbon shape -->
+    <path d="M4 28C4 28 10 22 24 22C38 22 44 28 44 28L44 36C44 36 38 30 24 30C10 30 4 36 4 36L4 28Z" fill="#D4A84B"/>
+  </g>
+  <!-- DAFC Text -->
+  <text x="68" y="34" font-family="Arial, sans-serif" font-size="28" font-weight="bold" fill="#D4A84B">DAFC</text>
+</svg>
