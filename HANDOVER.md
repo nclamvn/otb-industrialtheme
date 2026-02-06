@@ -27,10 +27,12 @@
 
 ### Repositories
 
-| Remote | URL |
-|--------|-----|
-| **origin** (TCDevop) | https://github.com/TCDevop/OTB.git |
-| **nclamvn** | https://github.com/nclamvn/DAFC-OTB-TCDATA.git |
+| Remote | URL | Note |
+|--------|-----|------|
+| **origin** | https://github.com/TCDevop/OTB.git | TCDevop account |
+| **nclamvn** | https://github.com/nclamvn/DAFC-OTB-TCDATA.git | Legacy |
+| **dafc** | https://github.com/nclamvn/dafc.git | nclamvn mirror |
+| **dafc-otb** | https://github.com/nclamvn/dafc-otb.git | nclamvn primary |
 
 ### Demo Accounts
 
@@ -288,9 +290,11 @@ src/screens/*.jsx                     # i18n + light theme fix + premium cards
 npm run dev              # Start dev server (port 3006)
 npm run build            # Production build
 
-# Git (2 remotes)
+# Git (4 remotes)
 git push origin main     # Push to TCDevop/OTB
-git push nclamvn main    # Push to nclamvn/DAFC-OTB-TCDATA
+git push dafc-otb main   # Push to nclamvn/dafc-otb (primary)
+git push dafc main       # Push to nclamvn/dafc
+git push nclamvn main    # Push to nclamvn/DAFC-OTB-TCDATA (legacy)
 
 # Backend (separate project)
 cd /path/to/backend && npm run start:dev   # NestJS on port 4000
@@ -301,7 +305,6 @@ cd /path/to/backend && npm run start:dev   # NestJS on port 4000
 ## REMAINING ITEMS
 
 - [ ] TicketDetailPage.jsx still has MOCK_SKU_DATA and MOCK_DETAIL_DATA
-- [ ] nclamvn remote has divergent history (needs force push or merge)
 - [ ] E2E testing
 - [ ] Performance tuning
 
