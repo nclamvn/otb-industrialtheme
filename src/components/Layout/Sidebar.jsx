@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   DollarSign, Package, BarChart3, Sparkles, TrendingUp,
@@ -10,9 +10,11 @@ import {
   Database, Building2, FolderTree, Tag
 } from 'lucide-react';
 import { ROUTE_MAP } from '@/utils/routeMap';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const Sidebar = ({ currentScreen, darkMode, setDarkMode, user, onLogout }) => {
   const router = useRouter();
+  const { t } = useLanguage();
   const navigateTo = (screenId) => {
     const route = ROUTE_MAP[screenId];
     if (route) {
@@ -32,38 +34,38 @@ const Sidebar = ({ currentScreen, darkMode, setDarkMode, user, onLogout }) => {
     setOpenGroups(prev => ({ ...prev, [group]: !prev[group] }));
   };
 
-  const menuGroups = [
+  const menuGroups = useMemo(() => [
     {
       id: 'planning',
-      label: 'Planning',
+      label: t('nav.planning'),
       icon: TrendingUp,
       items: [
-        { id: 'budget-management', label: 'Budget Management', icon: Wallet },
-        { id: 'planning', label: 'Budget Allocation', icon: DollarSign },
-        { id: 'otb-analysis', label: 'OTB Analysis', icon: BarChart3 },
-        { id: 'proposal', label: 'SKU Proposal', icon: Package },
+        { id: 'budget-management', label: t('nav.budgetManagement'), icon: Wallet },
+        { id: 'planning', label: t('nav.budgetAllocation'), icon: DollarSign },
+        { id: 'otb-analysis', label: t('nav.otbAnalysis'), icon: BarChart3 },
+        { id: 'proposal', label: t('nav.skuProposal'), icon: Package },
       ]
     },
     {
       id: 'approval',
-      label: 'Approval Hub',
+      label: t('nav.approvalHub'),
       icon: CheckCircle,
       items: [
-        { id: 'tickets', label: 'Tickets', icon: Ticket },
-        { id: 'approvals', label: 'Approvals', icon: FileCheck },
-        { id: 'approval-config', label: 'Workflow Config', icon: Settings },
+        { id: 'tickets', label: t('nav.tickets'), icon: Ticket },
+        { id: 'approvals', label: t('nav.approvals'), icon: FileCheck },
+        { id: 'approval-config', label: t('nav.workflowConfig'), icon: Settings },
       ]
     },
     {
       id: 'confirmation',
-      label: 'Confirmation',
+      label: t('nav.confirmation'),
       icon: ClipboardList,
       items: [
-        { id: 'order-confirmation', label: 'Order Confirm', icon: ShoppingCart },
-        { id: 'receipt-confirmation', label: 'Receipt Confirm', icon: Receipt },
+        { id: 'order-confirmation', label: t('nav.orderConfirm'), icon: ShoppingCart },
+        { id: 'receipt-confirmation', label: t('nav.receiptConfirm'), icon: Receipt },
       ]
     }
-  ];
+  ], [t]);
 
   const getIconClass = (itemId) => {
     const isActive = currentScreen === itemId;
@@ -78,11 +80,11 @@ const Sidebar = ({ currentScreen, darkMode, setDarkMode, user, onLogout }) => {
   const getTextClass = (itemId) => {
     const isActive = currentScreen === itemId;
     if (isActive) {
-      return 'text-[#D7B797] font-semibold';
+      return 'text-[#D7B797] font-bold';
     }
     return darkMode
-      ? 'text-[#999999] group-hover:text-[#D7B797]'
-      : 'text-gray-600 group-hover:text-[#8A6340]';
+      ? 'text-[#999999] font-semibold group-hover:text-[#D7B797]'
+      : 'text-gray-600 font-semibold group-hover:text-[#8A6340]';
   };
 
   // Collapsed sidebar item with tooltip
@@ -148,18 +150,18 @@ const Sidebar = ({ currentScreen, darkMode, setDarkMode, user, onLogout }) => {
 
   return (
     <div
-      className={`${isCollapsed ? 'w-[60px]' : 'w-60'} h-screen ${
+      className={`${isCollapsed ? 'w-[60px]' : 'w-[264px]'} h-screen ${
         darkMode ? 'bg-[#0A0A0A] border-[#1A1A1A]' : 'bg-white border-gray-200'
       } border-r flex flex-col sticky top-0 transition-all duration-300 ease-in-out`}
     >
       {/* Logo Header */}
-      <div className={`h-[56px] flex items-center justify-center border-b ${darkMode ? 'border-[#1A1A1A]' : 'border-gray-200'}`}>
+      <div className={`h-[64px] flex items-center justify-center border-b ${darkMode ? 'border-[#1A1A1A]' : 'border-gray-200'}`}>
         {isCollapsed ? (
           /* Collapsed - Click logo to expand */
           <button
             onClick={() => setIsExpanded(true)}
             className="p-2 rounded-lg transition-all hover:bg-[rgba(215,183,151,0.08)]"
-            title="Expand sidebar"
+            title={t('components.expandSidebar')}
           >
             <img
               src="/dafc-logo.png"
@@ -169,15 +171,15 @@ const Sidebar = ({ currentScreen, darkMode, setDarkMode, user, onLogout }) => {
           </button>
         ) : (
           /* Expanded - Show logo + collapse button */
-          <div className="flex items-center gap-2 px-4 w-full">
+          <div className="flex items-center gap-3 px-4 w-full">
             <img
               src="/dafc-logo.png"
               alt="DAFC"
-              className="h-9 w-auto object-contain"
+              className="h-11 w-auto object-contain"
             />
             <div className="flex-1">
-              <div className={`text-[10px] tracking-wider ${darkMode ? 'text-[#666666]' : 'text-gray-600'}`}>
-                OTB SYSTEM
+              <div className={`text-xs font-bold tracking-wider ${darkMode ? 'text-[#666666]' : 'text-gray-600'}`}>
+                {t('components.otbSystem')}
               </div>
             </div>
             {/* Collapse button */}
@@ -188,7 +190,7 @@ const Sidebar = ({ currentScreen, darkMode, setDarkMode, user, onLogout }) => {
                   ? 'text-[#666666] hover:text-[#D7B797] hover:bg-[rgba(215,183,151,0.08)]'
                   : 'text-gray-500 hover:text-[#8A6340] hover:bg-[rgba(215,183,151,0.1)]'
               }`}
-              title="Collapse sidebar"
+              title={t('components.collapseSidebar')}
             >
               <PanelLeftClose size={16} strokeWidth={2} />
             </button>
@@ -202,7 +204,7 @@ const Sidebar = ({ currentScreen, darkMode, setDarkMode, user, onLogout }) => {
           /* Collapsed View - Clean icon list */
           <div className="px-2 space-y-1">
             {/* Home */}
-            <CollapsedMenuItem item={{ id: 'home', label: 'Home', icon: Home }} showDividerAfter />
+            <CollapsedMenuItem item={{ id: 'home', label: t('nav.homeDashboard'), icon: Home }} showDividerAfter />
 
             {/* Main menu items */}
             {menuGroups.map((group, groupIndex) => (
@@ -223,8 +225,8 @@ const Sidebar = ({ currentScreen, darkMode, setDarkMode, user, onLogout }) => {
             </div>
 
             {/* Master Data & Analytics */}
-            <CollapsedMenuItem item={{ id: 'master-brands', label: 'Master Data', icon: Database }} />
-            <CollapsedMenuItem item={{ id: 'analytics', label: 'Analytics', icon: BarChart3 }} showDividerAfter />
+            <CollapsedMenuItem item={{ id: 'master-brands', label: t('nav.masterData'), icon: Database }} />
+            <CollapsedMenuItem item={{ id: 'analytics', label: t('nav.analytics'), icon: BarChart3 }} showDividerAfter />
 
             {/* AI Features */}
             <div className="relative">
@@ -240,7 +242,7 @@ const Sidebar = ({ currentScreen, darkMode, setDarkMode, user, onLogout }) => {
                   <div className={`px-3 py-1.5 rounded-lg shadow-lg whitespace-nowrap text-xs font-medium font-['Montserrat']
                     ${darkMode ? 'bg-[#1A1A1A] text-[#A371F7] border border-[#2E2E2E]' : 'bg-white text-[#A371F7] border border-gray-200'}`}
                   >
-                    AI Features
+                    {t('nav.aiFeatures')}
                   </div>
                 </div>
               )}
@@ -255,7 +257,7 @@ const Sidebar = ({ currentScreen, darkMode, setDarkMode, user, onLogout }) => {
               className={`group w-full flex items-center gap-2.5 px-3 py-2 rounded-lg transition-all duration-150`}
             >
               <Home size={18} strokeWidth={2.5} className={`transition-colors duration-150 ${getIconClass('home')}`} />
-              <span className={`text-sm font-['Montserrat'] transition-colors duration-150 whitespace-nowrap ${getTextClass('home')}`}>Home Dashboard</span>
+              <span className={`text-sm font-['Montserrat'] transition-colors duration-150 whitespace-nowrap ${getTextClass('home')}`}>{t('nav.homeDashboard')}</span>
             </button>
 
             {/* Menu Groups */}
@@ -268,7 +270,7 @@ const Sidebar = ({ currentScreen, darkMode, setDarkMode, user, onLogout }) => {
                 >
                   <div className="flex items-center gap-2">
                     <group.icon size={16} strokeWidth={2.5} className={`transition-colors duration-150 ${darkMode ? 'text-[#D7B797]' : 'text-[#8A6340]'}`} />
-                    <span className={`font-semibold text-xs uppercase tracking-wider font-['Montserrat'] ${darkMode ? 'text-[#999999]' : 'text-gray-700'}`}>
+                    <span className={`font-bold text-xs uppercase tracking-wider font-['Montserrat'] ${darkMode ? 'text-[#999999]' : 'text-gray-700'}`}>
                       {group.label}
                     </span>
                   </div>
@@ -312,8 +314,8 @@ const Sidebar = ({ currentScreen, darkMode, setDarkMode, user, onLogout }) => {
               >
                 <div className="flex items-center gap-2">
                   <Database size={16} strokeWidth={2.5} className={`transition-colors duration-150 ${darkMode ? 'text-[#D7B797]' : 'text-[#8A6340]'}`} />
-                  <span className={`font-semibold text-xs uppercase tracking-wider font-['Montserrat'] ${darkMode ? 'text-[#999999]' : 'text-gray-700'}`}>
-                    Master Data
+                  <span className={`font-bold text-xs uppercase tracking-wider font-['Montserrat'] ${darkMode ? 'text-[#999999]' : 'text-gray-700'}`}>
+                    {t('nav.masterData')}
                   </span>
                 </div>
                 <ChevronDown
@@ -328,10 +330,10 @@ const Sidebar = ({ currentScreen, darkMode, setDarkMode, user, onLogout }) => {
               {isMasterDataOpen && (
                 <div className="space-y-0.5 ml-2 pl-3 mt-1 border-l border-[rgba(215,183,151,0.15)]">
                   {[
-                    { id: 'master-brands', label: 'Brands', icon: Building2 },
-                    { id: 'master-skus', label: 'SKU Catalog', icon: Package },
-                    { id: 'master-categories', label: 'Categories', icon: FolderTree },
-                    { id: 'master-subcategories', label: 'Sub-Categories', icon: Tag },
+                    { id: 'master-brands', label: t('nav.brands'), icon: Building2 },
+                    { id: 'master-skus', label: t('nav.skuCatalog'), icon: Package },
+                    { id: 'master-categories', label: t('nav.categories'), icon: FolderTree },
+                    { id: 'master-subcategories', label: t('nav.subCategories'), icon: Tag },
                   ].map((item) => (
                     <button
                       key={item.id}
@@ -349,7 +351,7 @@ const Sidebar = ({ currentScreen, darkMode, setDarkMode, user, onLogout }) => {
             {/* Analytics */}
             <button className="group w-full flex items-center gap-2.5 px-3 py-1.5 rounded-lg transition-all duration-150">
               <BarChart3 size={16} strokeWidth={2.5} className={`transition-colors duration-150 ${darkMode ? 'text-[#666666] group-hover:text-[#D7B797]' : 'text-gray-600 group-hover:text-[#8A6340]'}`} />
-              <span className={`text-sm font-['Montserrat'] transition-colors duration-150 whitespace-nowrap ${darkMode ? 'text-[#999999] group-hover:text-[#D7B797]' : 'text-gray-600 group-hover:text-[#8A6340]'}`}>Analytics</span>
+              <span className={`text-sm font-semibold font-['Montserrat'] transition-colors duration-150 whitespace-nowrap ${darkMode ? 'text-[#999999] group-hover:text-[#D7B797]' : 'text-gray-600 group-hover:text-[#8A6340]'}`}>{t('nav.analytics')}</span>
               <ChevronRight size={12} strokeWidth={2.5} className={`ml-auto transition-colors duration-150 ${darkMode ? 'text-[#666666] group-hover:text-[#D7B797]' : 'text-gray-600 group-hover:text-[#8A6340]'}`} />
             </button>
 
@@ -367,7 +369,7 @@ const Sidebar = ({ currentScreen, darkMode, setDarkMode, user, onLogout }) => {
                 <div className="flex items-center gap-2">
                   <Sparkles size={16} strokeWidth={2.5} className="text-[#A371F7]" />
                   <span className={`text-xs font-semibold uppercase tracking-wider font-['Montserrat'] ${darkMode ? 'text-[#666666]' : 'text-gray-600'}`}>
-                    AI Features
+                    {t('nav.aiFeatures')}
                   </span>
                 </div>
                 <ChevronDown
@@ -382,17 +384,17 @@ const Sidebar = ({ currentScreen, darkMode, setDarkMode, user, onLogout }) => {
               {isAIFeaturesOpen && (
                 <div className="space-y-0.5 ml-2 pl-3 mt-1 border-l border-[rgba(163,113,247,0.2)]">
                   {[
-                    { icon: Sparkles, label: 'AI Assistant' },
-                    { icon: TrendingUp, label: 'Smart Suggestions' },
-                    { icon: Edit, label: 'Auto Planning' },
-                    { icon: Filter, label: 'Predictive Alerts' },
+                    { icon: Sparkles, label: t('nav.aiAssistant') },
+                    { icon: TrendingUp, label: t('nav.smartSuggestions') },
+                    { icon: Edit, label: t('nav.autoPlanning') },
+                    { icon: Filter, label: t('nav.predictiveAlerts') },
                   ].map((item, index) => (
                     <button
                       key={index}
                       className="group w-full flex items-center gap-2.5 px-3 py-1.5 rounded-lg transition-all duration-150"
                     >
                       <item.icon size={16} strokeWidth={2.5} className="text-[#A371F7] transition-colors duration-150" />
-                      <span className={`text-sm font-['Montserrat'] transition-colors duration-150 whitespace-nowrap ${darkMode ? 'text-[#999999] group-hover:text-[#A371F7]' : 'text-gray-600 group-hover:text-[#A371F7]'}`}>{item.label}</span>
+                      <span className={`text-sm font-semibold font-['Montserrat'] transition-colors duration-150 whitespace-nowrap ${darkMode ? 'text-[#999999] group-hover:text-[#A371F7]' : 'text-gray-600 group-hover:text-[#A371F7]'}`}>{item.label}</span>
                     </button>
                   ))}
                 </div>
@@ -442,7 +444,7 @@ const Sidebar = ({ currentScreen, darkMode, setDarkMode, user, onLogout }) => {
                     <div className="flex items-center gap-1.5 mt-1">
                       <div className="w-2 h-2 rounded-full bg-[#2A9E6A]" />
                       <span className={`text-[10px] font-medium ${darkMode ? 'text-[#2A9E6A]' : 'text-green-600'}`}>
-                        Online
+                        {t('common.online')}
                       </span>
                     </div>
                   </div>
@@ -467,9 +469,9 @@ const Sidebar = ({ currentScreen, darkMode, setDarkMode, user, onLogout }) => {
                     <Crown size={16} className={darkMode ? 'text-[#D7B797]' : 'text-[#8A6340]'} />
                   </div>
                   <div className="flex-1 text-left">
-                    <div className="text-sm font-medium font-['Montserrat']">My Profile</div>
+                    <div className="text-sm font-medium font-['Montserrat']">{t('userMenu.myProfile')}</div>
                     <div className={`text-[11px] ${darkMode ? 'text-[#666666]' : 'text-gray-700'}`}>
-                      View and edit profile
+                      {t('userMenu.viewAndEditProfile')}
                     </div>
                   </div>
                 </button>
@@ -490,9 +492,9 @@ const Sidebar = ({ currentScreen, darkMode, setDarkMode, user, onLogout }) => {
                     <Settings size={16} className={darkMode ? 'text-[#999999]' : 'text-gray-700'} />
                   </div>
                   <div className="flex-1 text-left">
-                    <div className="text-sm font-medium font-['Montserrat']">Settings</div>
+                    <div className="text-sm font-medium font-['Montserrat']">{t('userMenu.settings')}</div>
                     <div className={`text-[11px] ${darkMode ? 'text-[#666666]' : 'text-gray-700'}`}>
-                      App preferences
+                      {t('userMenu.appPreferences')}
                     </div>
                   </div>
                 </button>
@@ -517,9 +519,9 @@ const Sidebar = ({ currentScreen, darkMode, setDarkMode, user, onLogout }) => {
                       <LogOut size={16} className={darkMode ? 'text-[#FF7B72]' : 'text-red-500'} />
                     </div>
                     <div className="flex-1 text-left">
-                      <div className="text-sm font-medium font-['Montserrat']">Logout</div>
+                      <div className="text-sm font-medium font-['Montserrat']">{t('userMenu.logout')}</div>
                       <div className={`text-[11px] ${darkMode ? 'text-[#666666]' : 'text-gray-700'}`}>
-                        Sign out of account
+                        {t('userMenu.signOutOfAccount')}
                       </div>
                     </div>
                   </button>

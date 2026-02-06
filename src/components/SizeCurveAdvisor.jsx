@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Sparkles, TrendingUp, AlertTriangle, CheckCircle, Info } from 'lucide-react';
 import { aiService } from '../services/aiService';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const SizeCurveAdvisor = ({
   skuId,
@@ -11,6 +12,7 @@ const SizeCurveAdvisor = ({
   onApplyRecommendation,
   darkMode = true,
 }) => {
+  const { t } = useLanguage();
   const [recommendation, setRecommendation] = useState(null);
   const [comparison, setComparison] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -65,7 +67,7 @@ const SizeCurveAdvisor = ({
     return (
       <div className="flex items-center gap-2 text-sm mt-3">
         <Sparkles className={`w-4 h-4 animate-pulse ${darkMode ? 'text-purple-400' : 'text-purple-500'}`} />
-        <span className={darkMode ? 'text-[#999999]' : 'text-gray-500'}>Analyzing size patterns...</span>
+        <span className={darkMode ? 'text-[#999999]' : 'text-gray-500'}>{t('ai.analyzingSizePatterns')}</span>
       </div>
     );
   }
@@ -83,7 +85,7 @@ const SizeCurveAdvisor = ({
         <div className="flex items-center gap-2">
           <Sparkles className={`w-5 h-5 ${darkMode ? 'text-purple-400' : 'text-purple-600'}`} />
           <span className={`font-semibold font-['Montserrat'] ${darkMode ? 'text-purple-200' : 'text-purple-900'}`}>
-            AI Size Advisor
+            {t('ai.sizeAdvisor')}
           </span>
         </div>
 
@@ -97,7 +99,7 @@ const SizeCurveAdvisor = ({
           }`}>
             {comparison.alignment === 'good' && <CheckCircle className="w-4 h-4" />}
             {comparison.alignment !== 'good' && <AlertTriangle className="w-4 h-4" />}
-            {comparison.score}% aligned
+            {t('ai.aligned', { pct: comparison.score })}
           </div>
         )}
       </div>
@@ -156,10 +158,10 @@ const SizeCurveAdvisor = ({
       {/* Legend */}
       <div className={`flex items-center justify-center gap-4 text-xs mb-3 ${darkMode ? 'text-[#666666]' : 'text-gray-500'}`}>
         <span className="flex items-center gap-1">
-          <div className={`w-2 h-2 rounded ${darkMode ? 'bg-[#666666]' : 'bg-gray-400'}`} /> Your input
+          <div className={`w-2 h-2 rounded ${darkMode ? 'bg-[#666666]' : 'bg-gray-400'}`} /> {t('ai.yourInput')}
         </span>
         <span className="flex items-center gap-1">
-          <div className="w-2 h-2 bg-purple-500 rounded" /> AI recommended
+          <div className="w-2 h-2 bg-purple-500 rounded" /> {t('ai.aiRecommended')}
         </span>
       </div>
 
@@ -172,7 +174,7 @@ const SizeCurveAdvisor = ({
           }`}
         >
           <Info className="w-3 h-3" />
-          {showDetails ? 'Hide' : 'Show'} reasoning
+          {showDetails ? t('ai.hideReasoning') : t('ai.showReasoning')}
         </button>
 
         <button
@@ -180,7 +182,7 @@ const SizeCurveAdvisor = ({
           className="px-3 py-1.5 bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium rounded-lg transition-colors flex items-center gap-1.5"
         >
           <Sparkles className="w-4 h-4" />
-          Apply AI Suggestion
+          {t('ai.applyAiSuggestion')}
         </button>
       </div>
 
@@ -203,7 +205,7 @@ const SizeCurveAdvisor = ({
                     ? darkMode ? 'bg-[rgba(215,183,151,0.15)] text-[#D7B797]' : 'bg-amber-100 text-amber-700'
                     : darkMode ? 'bg-[#1A1A1A] text-[#999999]' : 'bg-gray-100 text-gray-600'
                 }`}>
-                  {(rec.confidence * 100).toFixed(0)}% conf
+                  {t('ai.conf', { pct: (rec.confidence * 100).toFixed(0) })}
                 </span>
               </div>
             ))}

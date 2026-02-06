@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   FileText,
   ChevronDown,
@@ -17,8 +17,12 @@ import {
   CheckCircle,
   Circle,
   AlertCircle,
-  ExternalLink
+  ExternalLink,
+  CircleCheckBig,
+  Code2,
+  Sparkles
 } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 // Planning Group Pages Data
 const PLANNING_PAGES = [
@@ -145,7 +149,15 @@ const PLANNING_PAGES = [
   }
 ];
 
+const CARD_ACCENTS = {
+  pages:    { color: '#58A6FF', Icon: FileText,      darkGrad: 'rgba(88,166,255,0.05)',   lightGrad: 'rgba(50,120,220,0.08)', iconDark: 'rgba(88,166,255,0.06)', iconLight: 'rgba(50,120,220,0.06)' },
+  done:     { color: '#2A9E6A', Icon: CircleCheckBig, darkGrad: 'rgba(42,158,106,0.06)',  lightGrad: 'rgba(22,120,70,0.08)',  iconDark: 'rgba(42,158,106,0.07)', iconLight: 'rgba(22,120,70,0.07)' },
+  props:    { color: '#A78BFA', Icon: Code2,          darkGrad: 'rgba(167,139,250,0.05)', lightGrad: 'rgba(120,90,220,0.08)', iconDark: 'rgba(167,139,250,0.06)', iconLight: 'rgba(100,70,200,0.06)' },
+  features: { color: '#F59E0B', Icon: Sparkles,       darkGrad: 'rgba(245,158,11,0.05)',  lightGrad: 'rgba(200,120,10,0.08)', iconDark: 'rgba(245,158,11,0.06)', iconLight: 'rgba(180,110,10,0.06)' },
+};
+
 const DevTicketScreen = ({ darkMode = false }) => {
+  const { t } = useLanguage();
   const [expandedPages, setExpandedPages] = useState({});
   const [expandedSections, setExpandedSections] = useState({});
 
@@ -174,7 +186,7 @@ const DevTicketScreen = ({ darkMode = false }) => {
       },
       gold: {
         bg: 'bg-[#D7B797]',
-        bgLight: darkMode ? 'bg-[rgba(215,183,151,0.15)]' : 'bg-[rgba(215,183,151,0.1)]',
+        bgLight: darkMode ? 'bg-[rgba(215,183,151,0.15)]' : 'bg-[rgba(160,120,75,0.12)]',
         text: 'text-[#D7B797]',
         border: 'border-[rgba(215,183,151,0.4)]'
       }
@@ -211,15 +223,15 @@ const DevTicketScreen = ({ darkMode = false }) => {
       {/* Header */}
       <div className={`rounded-2xl shadow-sm border p-6 ${darkMode ? 'bg-[#121212] border-[#2E2E2E]' : 'bg-white border-gray-200'}`}>
         <div className="flex items-center gap-4 mb-4">
-          <div className={`p-3 rounded-xl ${darkMode ? 'bg-[rgba(215,183,151,0.15)]' : 'bg-[rgba(215,183,151,0.1)]'}`}>
+          <div className={`p-3 rounded-xl ${darkMode ? 'bg-[rgba(215,183,151,0.15)]' : 'bg-[rgba(160,120,75,0.12)]'}`}>
             <FileText size={28} className="text-[#D7B797]" />
           </div>
           <div>
             <h1 className={`text-2xl font-bold font-['Montserrat'] ${darkMode ? 'text-[#F2F2F2]' : 'text-gray-800'}`}>
-              Dev ticket - Planning group
+              {t('devTicket.title')}
             </h1>
             <p className={`text-sm mt-1 ${darkMode ? 'text-[#999999]' : 'text-gray-700'}`}>
-              Complete documentation of all pages in the Planning workflow
+              {t('devTicket.subtitle')}
             </p>
           </div>
         </div>
@@ -229,7 +241,7 @@ const DevTicketScreen = ({ darkMode = false }) => {
           <div className="flex items-center gap-2 mb-3">
             <GitBranch size={16} className={darkMode ? 'text-[#999999]' : 'text-gray-700'} />
             <span className={`text-sm font-semibold font-['Montserrat'] ${darkMode ? 'text-[#999999]' : 'text-gray-600'}`}>
-              Navigation flow
+              {t('devTicket.navigationFlow')}
             </span>
           </div>
           <div className="flex items-center justify-center gap-2 flex-wrap">
@@ -273,7 +285,7 @@ const DevTicketScreen = ({ darkMode = false }) => {
                 className={`w-full flex items-center gap-4 px-5 py-4 ${colors.bgLight} border-b transition-colors ${
                   darkMode
                     ? 'border-[#2E2E2E] hover:bg-[rgba(215,183,151,0.08)]'
-                    : 'border-gray-200 hover:bg-[rgba(215,183,151,0.15)]'
+                    : 'border-gray-200 hover:bg-[rgba(160,120,75,0.18)]'
                 }`}
               >
                 <ChevronRight
@@ -305,19 +317,19 @@ const DevTicketScreen = ({ darkMode = false }) => {
                   {/* Basic Info */}
                   <div className={`grid grid-cols-2 gap-4 p-4 rounded-lg ${darkMode ? 'bg-[#1A1A1A]' : 'bg-gray-50'}`}>
                     <div>
-                      <span className={`text-xs font-medium ${darkMode ? 'text-[#999999]' : 'text-gray-700'}`}>Component</span>
+                      <span className={`text-xs font-medium ${darkMode ? 'text-[#999999]' : 'text-gray-700'}`}>{t('devTicket.component')}</span>
                       <p className={`text-sm font-['JetBrains_Mono'] mt-1 ${darkMode ? 'text-[#F2F2F2]' : 'text-gray-700'}`}>{page.component}</p>
                     </div>
                     <div>
-                      <span className={`text-xs font-medium ${darkMode ? 'text-[#999999]' : 'text-gray-700'}`}>File path</span>
+                      <span className={`text-xs font-medium ${darkMode ? 'text-[#999999]' : 'text-gray-700'}`}>{t('devTicket.filePath')}</span>
                       <p className={`text-sm font-['JetBrains_Mono'] mt-1 ${darkMode ? 'text-[#F2F2F2]' : 'text-gray-700'}`}>{page.file}</p>
                     </div>
                     <div>
-                      <span className={`text-xs font-medium ${darkMode ? 'text-[#999999]' : 'text-gray-700'}`}>Route</span>
+                      <span className={`text-xs font-medium ${darkMode ? 'text-[#999999]' : 'text-gray-700'}`}>{t('devTicket.route')}</span>
                       <p className={`text-sm font-['JetBrains_Mono'] mt-1 ${darkMode ? 'text-[#F2F2F2]' : 'text-gray-700'}`}>{page.route}</p>
                     </div>
                     <div>
-                      <span className={`text-xs font-medium ${darkMode ? 'text-[#999999]' : 'text-gray-700'}`}>Screen ID</span>
+                      <span className={`text-xs font-medium ${darkMode ? 'text-[#999999]' : 'text-gray-700'}`}>{t('devTicket.screenId')}</span>
                       <p className={`text-sm font-['JetBrains_Mono'] mt-1 ${darkMode ? 'text-[#F2F2F2]' : 'text-gray-700'}`}>{page.id}</p>
                     </div>
                   </div>
@@ -338,16 +350,16 @@ const DevTicketScreen = ({ darkMode = false }) => {
                         className={`transition-transform ${expandedSections[`${page.id}_props`] ? '' : '-rotate-90'}`}
                       />
                       <Code size={16} className={darkMode ? 'text-[#999999]' : 'text-gray-700'} />
-                      <span className="text-sm font-semibold font-['Montserrat']">Props ({page.props.length})</span>
+                      <span className="text-sm font-semibold font-['Montserrat']">{t('devTicket.props')} ({page.props.length})</span>
                     </button>
                     {expandedSections[`${page.id}_props`] && (
                       <div className={`rounded-lg border overflow-hidden ${darkMode ? 'border-[#2E2E2E]' : 'border-gray-200'}`}>
                         <table className="w-full text-sm">
                           <thead>
-                            <tr className={darkMode ? 'bg-[#1A1A1A]' : 'bg-[rgba(215,183,151,0.15)]'}>
-                              <th className={`px-4 py-2 text-left text-xs font-semibold font-['Montserrat'] ${darkMode ? 'text-[#999999]' : 'text-[#666666]'}`}>Name</th>
+                            <tr className={darkMode ? 'bg-[#1A1A1A]' : 'bg-[rgba(160,120,75,0.18)]'}>
+                              <th className={`px-4 py-2 text-left text-xs font-semibold font-['Montserrat'] ${darkMode ? 'text-[#999999]' : 'text-[#666666]'}`}>{t('common.name')}</th>
                               <th className={`px-4 py-2 text-left text-xs font-semibold font-['Montserrat'] ${darkMode ? 'text-[#999999]' : 'text-[#666666]'}`}>Type</th>
-                              <th className={`px-4 py-2 text-left text-xs font-semibold font-['Montserrat'] ${darkMode ? 'text-[#999999]' : 'text-[#666666]'}`}>Description</th>
+                              <th className={`px-4 py-2 text-left text-xs font-semibold font-['Montserrat'] ${darkMode ? 'text-[#999999]' : 'text-[#666666]'}`}>{t('common.description')}</th>
                             </tr>
                           </thead>
                           <tbody>
@@ -380,7 +392,7 @@ const DevTicketScreen = ({ darkMode = false }) => {
                         className={`transition-transform ${expandedSections[`${page.id}_features`] ? '' : '-rotate-90'}`}
                       />
                       <Layers size={16} className={darkMode ? 'text-[#999999]' : 'text-gray-700'} />
-                      <span className="text-sm font-semibold font-['Montserrat']">Features ({page.features.length})</span>
+                      <span className="text-sm font-semibold font-['Montserrat']">{t('devTicket.features')} ({page.features.length})</span>
                     </button>
                     {expandedSections[`${page.id}_features`] && (
                       <ul className={`space-y-2 pl-6 ${darkMode ? 'text-[#999999]' : 'text-gray-600'}`}>
@@ -410,12 +422,12 @@ const DevTicketScreen = ({ darkMode = false }) => {
                         className={`transition-transform ${expandedSections[`${page.id}_navigation`] ? '' : '-rotate-90'}`}
                       />
                       <ExternalLink size={16} className={darkMode ? 'text-[#999999]' : 'text-gray-700'} />
-                      <span className="text-sm font-semibold font-['Montserrat']">Navigation</span>
+                      <span className="text-sm font-semibold font-['Montserrat']">{t('devTicket.navigation')}</span>
                     </button>
                     {expandedSections[`${page.id}_navigation`] && (
                       <div className="grid grid-cols-2 gap-4">
                         <div className={`p-3 rounded-lg ${darkMode ? 'bg-[#1A1A1A]' : 'bg-gray-50'}`}>
-                          <span className={`text-xs font-medium ${darkMode ? 'text-[#999999]' : 'text-gray-700'}`}>Navigate from</span>
+                          <span className={`text-xs font-medium ${darkMode ? 'text-[#999999]' : 'text-gray-700'}`}>{t('devTicket.navigateFrom')}</span>
                           <div className="mt-2 space-y-1">
                             {page.navigationFrom.length > 0 ? (
                               page.navigationFrom.map(nav => {
@@ -428,12 +440,12 @@ const DevTicketScreen = ({ darkMode = false }) => {
                                 ) : null;
                               })
                             ) : (
-                              <span className={`text-sm ${darkMode ? 'text-[#666666]' : 'text-gray-600'}`}>Entry point (Sidebar)</span>
+                              <span className={`text-sm ${darkMode ? 'text-[#666666]' : 'text-gray-600'}`}>{t('common.entryPointSidebar')}</span>
                             )}
                           </div>
                         </div>
                         <div className={`p-3 rounded-lg ${darkMode ? 'bg-[#1A1A1A]' : 'bg-gray-50'}`}>
-                          <span className={`text-xs font-medium ${darkMode ? 'text-[#999999]' : 'text-gray-700'}`}>Navigate to</span>
+                          <span className={`text-xs font-medium ${darkMode ? 'text-[#999999]' : 'text-gray-700'}`}>{t('devTicket.navigateTo')}</span>
                           <div className="mt-2 space-y-1">
                             {page.navigationTo.length > 0 ? (
                               page.navigationTo.map(nav => {
@@ -446,7 +458,7 @@ const DevTicketScreen = ({ darkMode = false }) => {
                                 ) : null;
                               })
                             ) : (
-                              <span className={`text-sm ${darkMode ? 'text-[#666666]' : 'text-gray-600'}`}>End of flow</span>
+                              <span className={`text-sm ${darkMode ? 'text-[#666666]' : 'text-gray-600'}`}>{t('common.endOfFlow')}</span>
                             )}
                           </div>
                         </div>
@@ -464,30 +476,129 @@ const DevTicketScreen = ({ darkMode = false }) => {
       <div className={`rounded-xl border p-5 ${darkMode ? 'bg-[#121212] border-[#2E2E2E]' : 'bg-white border-gray-200'}`}>
         <div className="flex items-center gap-2 mb-4">
           <Database size={16} className={darkMode ? 'text-[#999999]' : 'text-gray-700'} />
-          <span className={`text-sm font-semibold font-['Montserrat'] ${darkMode ? 'text-[#999999]' : 'text-gray-600'}`}>Summary</span>
+          <span className={`text-sm font-semibold font-['Montserrat'] ${darkMode ? 'text-[#999999]' : 'text-gray-600'}`}>{t('devTicket.summary')}</span>
         </div>
         <div className="grid grid-cols-4 gap-4">
-          <div className={`p-4 rounded-lg text-center ${darkMode ? 'bg-[#1A1A1A]' : 'bg-gray-50'}`}>
-            <p className={`text-2xl font-bold font-['JetBrains_Mono'] ${darkMode ? 'text-[#F2F2F2]' : 'text-gray-800'}`}>{PLANNING_PAGES.length}</p>
-            <p className={`text-xs mt-1 ${darkMode ? 'text-[#999999]' : 'text-gray-700'}`}>Total pages</p>
+          {/* Total Pages */}
+          <div
+            className={`relative overflow-hidden border rounded-2xl p-4 text-center transition-all duration-200 hover:shadow-lg group ${
+              darkMode ? 'border-[#2E2E2E]' : 'border-gray-200'
+            }`}
+            style={{
+              background: darkMode
+                ? `linear-gradient(135deg, #121212 0%, #121212 60%, ${CARD_ACCENTS.pages.darkGrad} 100%)`
+                : `linear-gradient(135deg, #ffffff 0%, #ffffff 55%, ${CARD_ACCENTS.pages.lightGrad} 100%)`,
+            }}
+          >
+            <div
+              className="absolute -bottom-2 -right-2 transition-all duration-300 group-hover:scale-110 group-hover:opacity-[0.10] pointer-events-none"
+              style={{ opacity: darkMode ? 0.04 : 0.06 }}
+            >
+              <FileText size={65} color={CARD_ACCENTS.pages.color} strokeWidth={1} />
+            </div>
+            <div
+              className="absolute top-3 right-3 w-8 h-8 rounded-lg flex items-center justify-center backdrop-blur-sm"
+              style={{ backgroundColor: darkMode ? CARD_ACCENTS.pages.iconDark : CARD_ACCENTS.pages.iconLight }}
+            >
+              <FileText size={14} color={CARD_ACCENTS.pages.color} />
+            </div>
+            <div className="relative z-10">
+              <p className={`text-2xl font-bold font-['JetBrains_Mono'] ${darkMode ? 'text-[#F2F2F2]' : 'text-gray-800'}`}>{PLANNING_PAGES.length}</p>
+              <p className={`text-xs mt-1 ${darkMode ? 'text-[#999999]' : 'text-gray-700'}`}>{t('devTicket.totalPages')}</p>
+            </div>
           </div>
-          <div className={`p-4 rounded-lg text-center ${darkMode ? 'bg-[#1A1A1A]' : 'bg-gray-50'}`}>
-            <p className="text-2xl font-bold font-['JetBrains_Mono'] text-[#2A9E6A]">
-              {PLANNING_PAGES.filter(p => p.status === 'completed').length}
-            </p>
-            <p className={`text-xs mt-1 ${darkMode ? 'text-[#999999]' : 'text-gray-700'}`}>Completed</p>
+
+          {/* Completed */}
+          <div
+            className={`relative overflow-hidden border rounded-2xl p-4 text-center transition-all duration-200 hover:shadow-lg group ${
+              darkMode ? 'border-[#2E2E2E]' : 'border-gray-200'
+            }`}
+            style={{
+              background: darkMode
+                ? `linear-gradient(135deg, #121212 0%, #121212 60%, ${CARD_ACCENTS.done.darkGrad} 100%)`
+                : `linear-gradient(135deg, #ffffff 0%, #ffffff 55%, ${CARD_ACCENTS.done.lightGrad} 100%)`,
+            }}
+          >
+            <div
+              className="absolute -bottom-2 -right-2 transition-all duration-300 group-hover:scale-110 group-hover:opacity-[0.10] pointer-events-none"
+              style={{ opacity: darkMode ? 0.04 : 0.06 }}
+            >
+              <CircleCheckBig size={65} color={CARD_ACCENTS.done.color} strokeWidth={1} />
+            </div>
+            <div
+              className="absolute top-3 right-3 w-8 h-8 rounded-lg flex items-center justify-center backdrop-blur-sm"
+              style={{ backgroundColor: darkMode ? CARD_ACCENTS.done.iconDark : CARD_ACCENTS.done.iconLight }}
+            >
+              <CircleCheckBig size={14} color={CARD_ACCENTS.done.color} />
+            </div>
+            <div className="relative z-10">
+              <p className="text-2xl font-bold font-['JetBrains_Mono'] text-[#2A9E6A]">
+                {PLANNING_PAGES.filter(p => p.status === 'completed').length}
+              </p>
+              <p className={`text-xs mt-1 ${darkMode ? 'text-[#999999]' : 'text-gray-700'}`}>{t('devTicket.completed')}</p>
+            </div>
           </div>
-          <div className={`p-4 rounded-lg text-center ${darkMode ? 'bg-[#1A1A1A]' : 'bg-gray-50'}`}>
-            <p className={`text-2xl font-bold font-['JetBrains_Mono'] ${darkMode ? 'text-[#F2F2F2]' : 'text-gray-800'}`}>
-              {PLANNING_PAGES.reduce((sum, p) => sum + p.props.length, 0)}
-            </p>
-            <p className={`text-xs mt-1 ${darkMode ? 'text-[#999999]' : 'text-gray-700'}`}>Total props</p>
+
+          {/* Total Props */}
+          <div
+            className={`relative overflow-hidden border rounded-2xl p-4 text-center transition-all duration-200 hover:shadow-lg group ${
+              darkMode ? 'border-[#2E2E2E]' : 'border-gray-200'
+            }`}
+            style={{
+              background: darkMode
+                ? `linear-gradient(135deg, #121212 0%, #121212 60%, ${CARD_ACCENTS.props.darkGrad} 100%)`
+                : `linear-gradient(135deg, #ffffff 0%, #ffffff 55%, ${CARD_ACCENTS.props.lightGrad} 100%)`,
+            }}
+          >
+            <div
+              className="absolute -bottom-2 -right-2 transition-all duration-300 group-hover:scale-110 group-hover:opacity-[0.10] pointer-events-none"
+              style={{ opacity: darkMode ? 0.04 : 0.06 }}
+            >
+              <Code2 size={65} color={CARD_ACCENTS.props.color} strokeWidth={1} />
+            </div>
+            <div
+              className="absolute top-3 right-3 w-8 h-8 rounded-lg flex items-center justify-center backdrop-blur-sm"
+              style={{ backgroundColor: darkMode ? CARD_ACCENTS.props.iconDark : CARD_ACCENTS.props.iconLight }}
+            >
+              <Code2 size={14} color={CARD_ACCENTS.props.color} />
+            </div>
+            <div className="relative z-10">
+              <p className={`text-2xl font-bold font-['JetBrains_Mono'] ${darkMode ? 'text-[#F2F2F2]' : 'text-gray-800'}`}>
+                {PLANNING_PAGES.reduce((sum, p) => sum + p.props.length, 0)}
+              </p>
+              <p className={`text-xs mt-1 ${darkMode ? 'text-[#999999]' : 'text-gray-700'}`}>{t('devTicket.totalProps')}</p>
+            </div>
           </div>
-          <div className={`p-4 rounded-lg text-center ${darkMode ? 'bg-[#1A1A1A]' : 'bg-gray-50'}`}>
-            <p className={`text-2xl font-bold font-['JetBrains_Mono'] ${darkMode ? 'text-[#F2F2F2]' : 'text-gray-800'}`}>
-              {PLANNING_PAGES.reduce((sum, p) => sum + p.features.length, 0)}
-            </p>
-            <p className={`text-xs mt-1 ${darkMode ? 'text-[#999999]' : 'text-gray-700'}`}>Total features</p>
+
+          {/* Total Features */}
+          <div
+            className={`relative overflow-hidden border rounded-2xl p-4 text-center transition-all duration-200 hover:shadow-lg group ${
+              darkMode ? 'border-[#2E2E2E]' : 'border-gray-200'
+            }`}
+            style={{
+              background: darkMode
+                ? `linear-gradient(135deg, #121212 0%, #121212 60%, ${CARD_ACCENTS.features.darkGrad} 100%)`
+                : `linear-gradient(135deg, #ffffff 0%, #ffffff 55%, ${CARD_ACCENTS.features.lightGrad} 100%)`,
+            }}
+          >
+            <div
+              className="absolute -bottom-2 -right-2 transition-all duration-300 group-hover:scale-110 group-hover:opacity-[0.10] pointer-events-none"
+              style={{ opacity: darkMode ? 0.04 : 0.06 }}
+            >
+              <Sparkles size={65} color={CARD_ACCENTS.features.color} strokeWidth={1} />
+            </div>
+            <div
+              className="absolute top-3 right-3 w-8 h-8 rounded-lg flex items-center justify-center backdrop-blur-sm"
+              style={{ backgroundColor: darkMode ? CARD_ACCENTS.features.iconDark : CARD_ACCENTS.features.iconLight }}
+            >
+              <Sparkles size={14} color={CARD_ACCENTS.features.color} />
+            </div>
+            <div className="relative z-10">
+              <p className={`text-2xl font-bold font-['JetBrains_Mono'] ${darkMode ? 'text-[#F2F2F2]' : 'text-gray-800'}`}>
+                {PLANNING_PAGES.reduce((sum, p) => sum + p.features.length, 0)}
+              </p>
+              <p className={`text-xs mt-1 ${darkMode ? 'text-[#999999]' : 'text-gray-700'}`}>{t('devTicket.totalFeatures')}</p>
+            </div>
           </div>
         </div>
       </div>

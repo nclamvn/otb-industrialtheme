@@ -1,6 +1,7 @@
 'use client';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from '@/contexts/AuthContext';
+import { LanguageProvider } from '@/contexts/LanguageContext';
 import { AppProvider, useAppContext } from '@/contexts/AppContext';
 
 function ToasterWithTheme() {
@@ -29,10 +30,12 @@ function ToasterWithTheme() {
 export function Providers({ children }) {
   return (
     <AuthProvider>
-      <AppProvider>
-        {children}
-        <ToasterWithTheme />
-      </AppProvider>
+      <LanguageProvider>
+        <AppProvider>
+          {children}
+          <ToasterWithTheme />
+        </AppProvider>
+      </LanguageProvider>
     </AuthProvider>
   );
 }

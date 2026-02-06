@@ -1,7 +1,67 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import { AlertTriangle, AlertCircle, Info, X, ChevronRight } from 'lucide-react';
+import { AlertTriangle, AlertCircle, Info, X, ChevronRight, ShieldAlert, Bell } from 'lucide-react';
 import { aiService } from '../services/aiService';
+
+const SEVERITY_THEMES = {
+  critical: {
+    color: '#F85149',
+    gradDark: 'linear-gradient(135deg, rgba(248,81,73,0.08) 0%, rgba(248,81,73,0.02) 50%, rgba(248,81,73,0.12) 100%)',
+    gradLight: 'linear-gradient(135deg, rgba(220,50,47,0.06) 0%, rgba(255,255,255,0.9) 40%, rgba(220,50,47,0.10) 100%)',
+    borderDark: 'rgba(248,81,73,0.25)',
+    borderLight: 'rgba(200,50,50,0.25)',
+    glowDark: '0 0 20px rgba(248,81,73,0.08), 0 4px 16px rgba(0,0,0,0.2)',
+    glowLight: '0 0 20px rgba(220,50,47,0.06), 0 4px 16px rgba(0,0,0,0.04)',
+    Icon: AlertCircle,
+    WatermarkIcon: ShieldAlert,
+    iconBgDark: 'rgba(248,81,73,0.15)',
+    iconBgLight: 'rgba(220,50,47,0.10)',
+    textDark: '#FF7B72',
+    textLight: '#C53030',
+    subDark: 'rgba(255,123,114,0.75)',
+    subLight: '#9B2C2C',
+    badgeBg: 'linear-gradient(135deg, #F85149 0%, #DC2626 100%)',
+    badgeText: '#FFFFFF',
+  },
+  warning: {
+    color: '#E3B341',
+    gradDark: 'linear-gradient(135deg, rgba(215,183,151,0.08) 0%, rgba(215,183,151,0.02) 50%, rgba(227,179,65,0.10) 100%)',
+    gradLight: 'linear-gradient(135deg, rgba(180,140,50,0.05) 0%, rgba(255,255,255,0.9) 40%, rgba(200,160,60,0.10) 100%)',
+    borderDark: 'rgba(215,183,151,0.25)',
+    borderLight: 'rgba(180,140,50,0.25)',
+    glowDark: '0 0 20px rgba(215,183,151,0.08), 0 4px 16px rgba(0,0,0,0.2)',
+    glowLight: '0 0 20px rgba(180,140,50,0.06), 0 4px 16px rgba(0,0,0,0.04)',
+    Icon: AlertTriangle,
+    WatermarkIcon: Bell,
+    iconBgDark: 'rgba(215,183,151,0.15)',
+    iconBgLight: 'rgba(180,140,50,0.10)',
+    textDark: '#D7B797',
+    textLight: '#92600A',
+    subDark: 'rgba(215,183,151,0.75)',
+    subLight: '#7C4F0A',
+    badgeBg: 'linear-gradient(135deg, #D7B797 0%, #C49A6C 100%)',
+    badgeText: '#1A1A1A',
+  },
+  info: {
+    color: '#818CF8',
+    gradDark: 'linear-gradient(135deg, rgba(99,102,241,0.08) 0%, rgba(99,102,241,0.02) 50%, rgba(99,102,241,0.10) 100%)',
+    gradLight: 'linear-gradient(135deg, rgba(80,90,220,0.05) 0%, rgba(255,255,255,0.9) 40%, rgba(80,90,220,0.08) 100%)',
+    borderDark: 'rgba(99,102,241,0.25)',
+    borderLight: 'rgba(80,90,220,0.25)',
+    glowDark: '0 0 20px rgba(99,102,241,0.08), 0 4px 16px rgba(0,0,0,0.2)',
+    glowLight: '0 0 20px rgba(80,90,220,0.06), 0 4px 16px rgba(0,0,0,0.04)',
+    Icon: Info,
+    WatermarkIcon: Info,
+    iconBgDark: 'rgba(99,102,241,0.15)',
+    iconBgLight: 'rgba(80,90,220,0.10)',
+    textDark: '#A5B4FC',
+    textLight: '#3730A3',
+    subDark: 'rgba(165,180,252,0.75)',
+    subLight: '#4338CA',
+    badgeBg: 'linear-gradient(135deg, #818CF8 0%, #6366F1 100%)',
+    badgeText: '#FFFFFF',
+  },
+};
 
 const BudgetAlertsBanner = ({ budgetId, darkMode = true }) => {
   const [alerts, setAlerts] = useState([]);
@@ -32,125 +92,175 @@ const BudgetAlertsBanner = ({ budgetId, darkMode = true }) => {
     }
   };
 
-  const getSeverityConfig = (severity) => {
-    switch (severity) {
-      case 'critical':
-        return {
-          bg: darkMode ? 'bg-[rgba(248,81,73,0.1)]' : 'bg-red-50',
-          border: darkMode ? 'border-[rgba(248,81,73,0.3)]' : 'border-red-200',
-          Icon: AlertCircle,
-          iconColor: darkMode ? 'text-[#FF7B72]' : 'text-red-600',
-          textColor: darkMode ? 'text-[#FF7B72]' : 'text-red-800',
-          subText: darkMode ? 'text-[rgba(255,123,114,0.7)]' : 'text-red-600',
-        };
-      case 'warning':
-        return {
-          bg: darkMode ? 'bg-[rgba(215,183,151,0.1)]' : 'bg-amber-50',
-          border: darkMode ? 'border-[rgba(215,183,151,0.3)]' : 'border-amber-200',
-          Icon: AlertTriangle,
-          iconColor: darkMode ? 'text-[#D7B797]' : 'text-amber-600',
-          textColor: darkMode ? 'text-[#D7B797]' : 'text-amber-800',
-          subText: darkMode ? 'text-[rgba(215,183,151,0.7)]' : 'text-amber-600',
-        };
-      default:
-        return {
-          bg: darkMode ? 'bg-[rgba(99,102,241,0.1)]' : 'bg-blue-50',
-          border: darkMode ? 'border-[rgba(99,102,241,0.3)]' : 'border-blue-200',
-          Icon: Info,
-          iconColor: darkMode ? 'text-indigo-400' : 'text-blue-600',
-          textColor: darkMode ? 'text-indigo-300' : 'text-blue-800',
-          subText: darkMode ? 'text-indigo-400/70' : 'text-blue-600',
-        };
-    }
-  };
+  const getTheme = (severity) => SEVERITY_THEMES[severity] || SEVERITY_THEMES.info;
 
   if (loading || alerts.length === 0) return null;
 
   const criticalCount = alerts.filter(a => a.severity === 'critical').length;
   const warningCount = alerts.filter(a => a.severity === 'warning').length;
+  const infoCount = alerts.filter(a => a.severity !== 'critical' && a.severity !== 'warning').length;
   const topAlert = alerts[0];
-  const config = getSeverityConfig(topAlert.severity);
-  const TopIcon = config.Icon;
+  const theme = getTheme(topAlert.severity);
+  const TopIcon = theme.Icon;
+  const WatermarkIcon = theme.WatermarkIcon;
 
   return (
     <div className="mb-4">
       {/* Collapsed Banner */}
       <div
         onClick={() => setExpanded(!expanded)}
-        className={`${config.bg} ${config.border} border rounded-xl p-4 cursor-pointer transition-all hover:shadow-md`}
+        className="relative overflow-hidden rounded-2xl cursor-pointer transition-all duration-300 group"
+        style={{
+          background: darkMode ? theme.gradDark : theme.gradLight,
+          border: `1px solid ${darkMode ? theme.borderDark : theme.borderLight}`,
+          boxShadow: darkMode ? theme.glowDark : theme.glowLight,
+        }}
       >
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className={`p-2 rounded-full ${config.bg}`}>
-              <TopIcon className={`w-5 h-5 ${config.iconColor}`} />
+        {/* Watermark Icon */}
+        <div
+          className="absolute -right-4 -bottom-4 transition-all duration-500 group-hover:scale-110 pointer-events-none"
+          style={{ opacity: darkMode ? 0.04 : 0.05 }}
+        >
+          <WatermarkIcon size={110} color={theme.color} strokeWidth={0.8} />
+        </div>
+
+        {/* Accent line on the left */}
+        <div
+          className="absolute left-0 top-3 bottom-3 w-[3px] rounded-full"
+          style={{ backgroundColor: theme.color, opacity: 0.7 }}
+        />
+
+        <div className="relative z-10 flex items-center justify-between p-5 pl-6">
+          <div className="flex items-center gap-4">
+            {/* Icon with glass effect */}
+            <div
+              className="w-11 h-11 rounded-xl flex items-center justify-center backdrop-blur-sm shrink-0"
+              style={{ backgroundColor: darkMode ? theme.iconBgDark : theme.iconBgLight }}
+            >
+              <TopIcon size={20} color={theme.color} />
             </div>
-            <div>
-              <div className={`font-semibold font-['Montserrat'] ${config.textColor}`}>
+            <div className="min-w-0">
+              <div
+                className="font-semibold font-['Montserrat'] text-[15px] leading-tight"
+                style={{ color: darkMode ? theme.textDark : theme.textLight }}
+              >
                 {topAlert.title}
               </div>
-              <div className={`text-sm ${config.subText}`}>
+              <div
+                className="text-sm mt-1 leading-snug"
+                style={{ color: darkMode ? theme.subDark : theme.subLight }}
+              >
                 {topAlert.message}
               </div>
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 shrink-0 ml-4">
+            {/* Severity badges */}
             <div className="flex items-center gap-2">
               {criticalCount > 0 && (
-                <span className="px-2 py-0.5 bg-[#F85149] text-white text-xs font-bold rounded-full">
-                  {criticalCount} critical
+                <span
+                  className="px-3 py-1.5 text-xs font-bold rounded-xl flex items-center gap-1.5 shadow-sm"
+                  style={{ background: SEVERITY_THEMES.critical.badgeBg, color: SEVERITY_THEMES.critical.badgeText }}
+                >
+                  <AlertCircle size={12} />
+                  {criticalCount}
                 </span>
               )}
               {warningCount > 0 && (
-                <span className="px-2 py-0.5 bg-[#D7B797] text-[#0A0A0A] text-xs font-bold rounded-full">
-                  {warningCount} warning
+                <span
+                  className="px-3 py-1.5 text-xs font-bold rounded-xl flex items-center gap-1.5 shadow-sm"
+                  style={{ background: SEVERITY_THEMES.warning.badgeBg, color: SEVERITY_THEMES.warning.badgeText }}
+                >
+                  <AlertTriangle size={12} />
+                  {warningCount}
+                </span>
+              )}
+              {infoCount > 0 && (
+                <span
+                  className="px-3 py-1.5 text-xs font-bold rounded-xl flex items-center gap-1.5 shadow-sm"
+                  style={{ background: SEVERITY_THEMES.info.badgeBg, color: SEVERITY_THEMES.info.badgeText }}
+                >
+                  <Info size={12} />
+                  {infoCount}
                 </span>
               )}
             </div>
-            <ChevronRight className={`w-5 h-5 transition-transform ${expanded ? 'rotate-90' : ''} ${
-              darkMode ? 'text-[#666666]' : 'text-gray-400'
-            }`} />
+            <div
+              className="w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-300"
+              style={{ backgroundColor: darkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)' }}
+            >
+              <ChevronRight
+                size={16}
+                className={`transition-transform duration-300 ${expanded ? 'rotate-90' : ''}`}
+                color={darkMode ? '#666666' : '#999999'}
+              />
+            </div>
           </div>
         </div>
       </div>
 
       {/* Expanded List */}
       {expanded && (
-        <div className="mt-2 space-y-2">
+        <div className="mt-3 space-y-2">
           {alerts.map(alert => {
-            const alertConfig = getSeverityConfig(alert.severity);
-            const AlertIcon = alertConfig.Icon;
+            const t = getTheme(alert.severity);
+            const AlertIcon = t.Icon;
 
             return (
               <div
                 key={alert.id}
-                className={`${alertConfig.bg} ${alertConfig.border} border rounded-lg p-3 flex items-start justify-between gap-3`}
+                className="relative overflow-hidden rounded-xl transition-all duration-200 group/item hover:shadow-md"
+                style={{
+                  background: darkMode ? t.gradDark : t.gradLight,
+                  border: `1px solid ${darkMode ? t.borderDark : t.borderLight}`,
+                }}
               >
-                <div className="flex items-start gap-3">
-                  <AlertIcon className={`w-4 h-4 mt-0.5 shrink-0 ${alertConfig.iconColor}`} />
-                  <div>
-                    <div className={`font-medium text-sm ${alertConfig.textColor}`}>
-                      {alert.title}
-                    </div>
-                    <div className={`text-xs mt-0.5 ${alertConfig.subText}`}>
-                      {alert.message}
-                    </div>
-                    {alert.budget && (
-                      <div className={`text-xs mt-1 ${darkMode ? 'text-[#666666]' : 'text-gray-500'}`}>
-                        {alert.budget.groupBrand?.name} — {alert.budget.budgetCode}
-                      </div>
-                    )}
-                  </div>
-                </div>
+                {/* Subtle left accent */}
+                <div
+                  className="absolute left-0 top-2.5 bottom-2.5 w-[2px] rounded-full"
+                  style={{ backgroundColor: t.color, opacity: 0.5 }}
+                />
 
-                <button
-                  onClick={(e) => handleDismiss(alert.id, e)}
-                  className={`p-1 rounded transition-colors shrink-0 ${
-                    darkMode ? 'hover:bg-white/10' : 'hover:bg-black/5'
-                  }`}
-                >
-                  <X className={`w-4 h-4 ${darkMode ? 'text-[#666666]' : 'text-gray-400'}`} />
-                </button>
+                <div className="flex items-start justify-between gap-3 p-4 pl-5">
+                  <div className="flex items-start gap-3">
+                    <div
+                      className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 mt-0.5"
+                      style={{ backgroundColor: darkMode ? t.iconBgDark : t.iconBgLight }}
+                    >
+                      <AlertIcon size={15} color={t.color} />
+                    </div>
+                    <div className="min-w-0">
+                      <div
+                        className="font-semibold text-sm font-['Montserrat']"
+                        style={{ color: darkMode ? t.textDark : t.textLight }}
+                      >
+                        {alert.title}
+                      </div>
+                      <div
+                        className="text-xs mt-1 leading-relaxed"
+                        style={{ color: darkMode ? t.subDark : t.subLight }}
+                      >
+                        {alert.message}
+                      </div>
+                      {alert.budget && (
+                        <div className={`text-[11px] mt-1.5 font-['JetBrains_Mono'] ${darkMode ? 'text-[#555555]' : 'text-gray-400'}`}>
+                          {alert.budget.groupBrand?.name} — {alert.budget.budgetCode}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={(e) => handleDismiss(alert.id, e)}
+                    className="p-1.5 rounded-lg transition-all duration-200 shrink-0 opacity-0 group-hover/item:opacity-100"
+                    style={{
+                      backgroundColor: darkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)',
+                    }}
+                  >
+                    <X size={14} color={darkMode ? '#666666' : '#999999'} />
+                  </button>
+                </div>
               </div>
             );
           })}

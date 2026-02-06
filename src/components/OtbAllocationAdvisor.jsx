@@ -4,6 +4,7 @@ import {
   Sparkles, CheckCircle, AlertTriangle, Info, Zap, BarChart3, PieChart,
 } from 'lucide-react';
 import { aiService } from '../services/aiService';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const OtbAllocationAdvisor = ({
   budgetDetailId,
@@ -16,6 +17,7 @@ const OtbAllocationAdvisor = ({
   currentAllocation = null,
   darkMode = true,
 }) => {
+  const { t } = useLanguage();
   const [recommendation, setRecommendation] = useState(null);
   const [comparison, setComparison] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -40,7 +42,7 @@ const OtbAllocationAdvisor = ({
       });
       setRecommendation(result);
     } catch (err) {
-      setError('Failed to generate recommendations.');
+      setError(t('ai.failedToGenerate'));
       console.error('Allocation error:', err);
     }
     setLoading(false);
@@ -79,9 +81,9 @@ const OtbAllocationAdvisor = ({
 
   const qualityBadge = (q) => {
     const cfg = {
-      high: { bg: darkMode ? 'bg-[rgba(42,158,106,0.15)]' : 'bg-emerald-100', text: darkMode ? 'text-[#2A9E6A]' : 'text-emerald-700', label: 'High Confidence' },
-      medium: { bg: darkMode ? 'bg-[rgba(215,183,151,0.15)]' : 'bg-amber-100', text: darkMode ? 'text-[#D7B797]' : 'text-amber-700', label: 'Medium Confidence' },
-      low: { bg: darkMode ? 'bg-[#1A1A1A]' : 'bg-gray-100', text: darkMode ? 'text-[#999999]' : 'text-gray-600', label: 'Limited Data' },
+      high: { bg: darkMode ? 'bg-[rgba(42,158,106,0.15)]' : 'bg-emerald-100', text: darkMode ? 'text-[#2A9E6A]' : 'text-emerald-700', label: t('ai.highConfidence') },
+      medium: { bg: darkMode ? 'bg-[rgba(215,183,151,0.15)]' : 'bg-amber-100', text: darkMode ? 'text-[#D7B797]' : 'text-amber-700', label: t('ai.mediumConfidence') },
+      low: { bg: darkMode ? 'bg-[#1A1A1A]' : 'bg-gray-100', text: darkMode ? 'text-[#999999]' : 'text-gray-600', label: t('ai.limitedData') },
     };
     const c = cfg[q] || cfg.low;
     return <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${c.bg} ${c.text}`}>{c.label}</span>;
@@ -99,15 +101,15 @@ const OtbAllocationAdvisor = ({
           <Sparkles className={`w-6 h-6 animate-pulse ${darkMode ? 'text-purple-400' : 'text-purple-600'}`} />
           <div>
             <div className={`font-semibold font-['Montserrat'] ${darkMode ? 'text-purple-200' : 'text-purple-900'}`}>
-              AI Allocation Engine
+              {t('ai.allocationEngine')}
             </div>
             <div className={`text-sm ${darkMode ? 'text-purple-400/70' : 'text-purple-600'}`}>
-              Analyzing historical data and generating recommendations...
+              {t('ai.analyzingData')}
             </div>
           </div>
         </div>
         <div className="mt-4 space-y-2">
-          {['Collection', 'Gender', 'Category'].map((dim, i) => (
+          {[t('planningDetail.collection'), t('planningDetail.gender'), t('planningDetail.category')].map((dim, i) => (
             <div key={dim} className="flex items-center gap-3">
               <div className={`w-20 text-sm ${darkMode ? 'text-[#999999]' : 'text-gray-500'}`}>{dim}</div>
               <div className={`flex-1 h-2 rounded-full overflow-hidden ${darkMode ? 'bg-purple-900/30' : 'bg-purple-200'}`}>
@@ -128,7 +130,7 @@ const OtbAllocationAdvisor = ({
           <AlertTriangle className={`w-5 h-5 ${darkMode ? 'text-[#FF7B72]' : 'text-red-600'}`} />
           <span className={darkMode ? 'text-[#FF7B72]' : 'text-red-700'}>{error}</span>
           <button onClick={generateRecommendation} className={`ml-auto px-3 py-1 rounded-lg text-sm ${darkMode ? 'bg-[rgba(248,81,73,0.15)] text-[#FF7B72]' : 'bg-red-100 text-red-700'}`}>
-            Retry
+            {t('ai.retry')}
           </button>
         </div>
       </div>
@@ -138,9 +140,9 @@ const OtbAllocationAdvisor = ({
   if (!recommendation) return null;
 
   const dimensions = [
-    { key: 'collection', label: 'Collection', icon: BarChart3, data: recommendation.collections },
-    { key: 'gender', label: 'Gender', icon: PieChart, data: recommendation.genders },
-    { key: 'category', label: 'Category', icon: BarChart3, data: recommendation.categories },
+    { key: 'collection', label: t('planningDetail.collection'), icon: BarChart3, data: recommendation.collections },
+    { key: 'gender', label: t('planningDetail.gender'), icon: PieChart, data: recommendation.genders },
+    { key: 'category', label: t('planningDetail.category'), icon: BarChart3, data: recommendation.categories },
   ];
 
   // ── Main render ────────────────────────────────────────────────────
@@ -159,12 +161,12 @@ const OtbAllocationAdvisor = ({
             </div>
             <div>
               <h3 className={`font-semibold font-['Montserrat'] ${darkMode ? 'text-purple-200' : 'text-purple-900'}`}>
-                AI Allocation Advisor
+                {t('ai.allocationAdvisor')}
               </h3>
               <div className="flex items-center gap-2 mt-0.5">
                 {qualityBadge(recommendation.dataQuality)}
                 <span className={`text-xs ${darkMode ? 'text-[#999999]' : 'text-gray-500'}`}>
-                  {(recommendation.overallConfidence * 100).toFixed(0)}% overall confidence
+                  {t('ai.overallConfidence', { pct: (recommendation.overallConfidence * 100).toFixed(0) })}
                 </span>
               </div>
             </div>
@@ -179,7 +181,7 @@ const OtbAllocationAdvisor = ({
                   : darkMode ? 'bg-[rgba(248,81,73,0.15)] text-[#FF7B72]' : 'bg-red-100 text-red-700'
             }`}>
               {comparison.overallStatus === 'good' ? <CheckCircle className="w-4 h-4" /> : <AlertTriangle className="w-4 h-4" />}
-              {comparison.alignmentScore.toFixed(0)}% aligned
+              {t('ai.aligned', { pct: comparison.alignmentScore.toFixed(0) })}
             </div>
           )}
         </div>
@@ -253,7 +255,7 @@ const OtbAllocationAdvisor = ({
                     {compItem && compItem.userPct !== null && (
                       <div className="flex items-center gap-2 text-xs">
                         <span className={darkMode ? 'text-[#999999]' : 'text-gray-500'}>
-                          Your allocation: {compItem.userPct.toFixed(1)}%
+                          {t('ai.yourAllocation', { pct: compItem.userPct.toFixed(1) })}
                         </span>
                         {compItem.deviation > 5 && (
                           <span className={`px-1.5 py-0.5 rounded ${
@@ -298,14 +300,14 @@ const OtbAllocationAdvisor = ({
                 onClick={() => setShowDetails(!showDetails)}
                 className={`text-sm hover:underline ${darkMode ? 'text-purple-400' : 'text-purple-600'}`}
               >
-                {showDetails ? 'Hide' : 'Show'} reasoning
+                {showDetails ? t('ai.hideReasoning') : t('ai.showReasoning')}
               </button>
               <button
                 onClick={() => handleApply(dim.key)}
                 className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium rounded-lg transition-colors flex items-center gap-2"
               >
                 <Zap className="w-4 h-4" />
-                Apply {dim.label}
+                {t('ai.apply', { label: dim.label })}
               </button>
             </div>
           </div>
@@ -316,14 +318,14 @@ const OtbAllocationAdvisor = ({
       <div className={`p-4 border-t ${darkMode ? 'border-purple-800/40 bg-[rgba(147,51,234,0.04)]' : 'border-purple-200 bg-white/50'}`}>
         <div className="flex items-center justify-between">
           <div className={`text-sm ${darkMode ? 'text-[#999999]' : 'text-gray-600'}`}>
-            Total Budget: <span className={`font-semibold font-['JetBrains_Mono'] ${darkMode ? 'text-[#D7B797]' : 'text-gray-800'}`}>{fmtCurrency(budgetAmount)}</span>
+            {t('ai.totalBudget')} <span className={`font-semibold font-['JetBrains_Mono'] ${darkMode ? 'text-[#D7B797]' : 'text-gray-800'}`}>{fmtCurrency(budgetAmount)}</span>
           </div>
           <button
             onClick={() => handleApply()}
             className="px-6 py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-medium rounded-xl transition-all shadow-lg shadow-purple-500/25 flex items-center gap-2"
           >
             <Sparkles className="w-5 h-5" />
-            Apply All AI Recommendations
+            {t('ai.applyAllRecommendations')}
           </button>
         </div>
       </div>

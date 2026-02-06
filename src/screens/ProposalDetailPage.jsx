@@ -8,8 +8,10 @@ import {
 } from 'lucide-react';
 import { formatCurrency } from '../utils';
 import { masterDataService, proposalService, budgetService } from '../services';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const ProposalDetailPage = ({ proposal, onBack, onSave }) => {
+  const { t } = useLanguage();
   const [ticketName, setTicketName] = useState(proposal?.ticketName || proposal?.subCategory?.name || 'New Proposal');
 
   // API data states
@@ -247,26 +249,26 @@ const ProposalDetailPage = ({ proposal, onBack, onSave }) => {
                   value={ticketName}
                   onChange={(e) => setTicketName(e.target.value)}
                   className="text-lg font-bold text-slate-800 bg-transparent border-none focus:outline-none focus:ring-0 p-0"
-                  placeholder="Ticket name..."
+                  placeholder={t('proposal.newProposal')}
                 />
-                <div className="text-xs text-slate-500">Budget: {contextInfo.budgetName}</div>
+                <div className="text-xs text-slate-500">{t('proposal.budgetInfo')}: {contextInfo.budgetName}</div>
               </div>
             </div>
             {/* Context Info from OTB Analysis */}
             {contextInfo.gender && (
               <div className="flex items-center gap-2 ml-4 px-3 py-1.5 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-lg border border-indigo-200">
                 <div className="flex items-center gap-1.5 text-xs">
-                  <span className="text-slate-500">FY</span>
+                  <span className="text-slate-500">{t('budget.fiscalYear')}</span>
                   <span className="font-semibold text-indigo-700">{contextInfo.fiscalYear}</span>
                 </div>
                 <div className="w-px h-4 bg-indigo-200"></div>
                 <div className="flex items-center gap-1.5 text-xs">
-                  <span className="text-slate-500">Season:</span>
+                  <span className="text-slate-500">{t('skuProposal.season')}:</span>
                   <span className="font-semibold text-amber-700">{contextInfo.seasonGroup} - {contextInfo.season}</span>
                 </div>
                 <div className="w-px h-4 bg-indigo-200"></div>
                 <div className="flex items-center gap-1.5 text-xs">
-                  <span className="text-slate-500">Category:</span>
+                  <span className="text-slate-500">{t('skuProposal.category')}:</span>
                   <span className="font-semibold text-purple-700">{contextInfo.gender?.name} / {contextInfo.category?.name} / {contextInfo.subCategory?.name}</span>
                 </div>
               </div>
@@ -277,19 +279,19 @@ const ProposalDetailPage = ({ proposal, onBack, onSave }) => {
           <div className="flex items-center gap-6 text-sm">
             <div className="flex items-center gap-2">
               <Package size={16} className="text-slate-400" />
-              <span className="text-slate-600"><strong className="text-slate-800">{grandTotals.skuCount}</strong> SKUs</span>
+              <span className="text-slate-600"><strong className="text-slate-800">{grandTotals.skuCount}</strong> {t('header.kpiSKUs')}</span>
             </div>
             <div className="flex items-center gap-2">
               <Hash size={16} className="text-slate-400" />
-              <span className="text-slate-600"><strong className="text-slate-800">{grandTotals.totalOrder}</strong> Order</span>
+              <span className="text-slate-600"><strong className="text-slate-800">{grandTotals.totalOrder}</strong> {t('proposal.order')}</span>
             </div>
             <div className="flex items-center gap-2">
               <DollarSign size={16} className="text-slate-400" />
-              <span className="text-slate-600">Value: <strong className={isOverBudget ? 'text-red-600' : 'text-emerald-600'}>{formatCurrency(grandTotals.totalValue)}</strong></span>
+              <span className="text-slate-600">{t('proposal.totalValue')}: <strong className={isOverBudget ? 'text-red-600' : 'text-emerald-600'}>{formatCurrency(grandTotals.totalValue)}</strong></span>
             </div>
             <div className="h-6 w-px bg-slate-200"></div>
             <div className="text-slate-600">
-              Remaining: <strong className="text-purple-600">{formatCurrency(budgetInfo.remainingBudget)}</strong>
+              {t('proposal.remainingBudget')}: <strong className="text-purple-600">{formatCurrency(budgetInfo.remainingBudget)}</strong>
             </div>
           </div>
 
@@ -297,11 +299,11 @@ const ProposalDetailPage = ({ proposal, onBack, onSave }) => {
           <div className="flex items-center gap-2">
             <button onClick={handleSave} className="flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 rounded-lg text-sm font-medium text-slate-700 transition-colors">
               <Save size={16} />
-              Save Draft
+              {t('common.save')}
             </button>
             <button className="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-sm font-medium transition-colors">
               <Send size={16} />
-              Submit
+              {t('common.submit')}
             </button>
           </div>
         </div>
@@ -311,7 +313,7 @@ const ProposalDetailPage = ({ proposal, onBack, onSave }) => {
       {isOverBudget && (
         <div className="px-6 py-2 bg-red-50 border-b border-red-200 flex items-center justify-center gap-2 text-sm text-red-700">
           <AlertCircle size={16} />
-          <span>Over budget by <strong>{formatCurrency(grandTotals.totalValue - budgetInfo.remainingBudget)}</strong></span>
+          <span>{t('budget.remaining')}: -<strong>{formatCurrency(grandTotals.totalValue - budgetInfo.remainingBudget)}</strong></span>
         </div>
       )}
 
@@ -319,13 +321,13 @@ const ProposalDetailPage = ({ proposal, onBack, onSave }) => {
       <div className="p-6">
         {/* Toolbar */}
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold text-slate-800">SKU List</h2>
+          <h2 className="text-lg font-semibold text-slate-800">{t('proposal.skuCode')}</h2>
           <button
             onClick={() => setShowAddSkuModal(true)}
             className="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-sm font-medium transition-colors"
           >
             <Plus size={16} />
-            Add SKU
+            {t('proposal.addSku')}
           </button>
         </div>
 
@@ -334,22 +336,22 @@ const ProposalDetailPage = ({ proposal, onBack, onSave }) => {
           {skuList.length === 0 ? (
             <div className="p-12 text-center">
               <Package className="mx-auto text-slate-300 mb-3" size={40} />
-              <p className="text-slate-600 font-medium">No SKUs added</p>
-              <p className="text-sm text-slate-400 mt-1">Click "Add SKU" to build your proposal</p>
+              <p className="text-slate-600 font-medium">{t('skuProposal.noSkuData')}</p>
+              <p className="text-sm text-slate-400 mt-1">{t('proposal.addSku')}</p>
             </div>
           ) : (
             <table className="w-full">
               <thead>
-                <tr className="bg-[rgba(215,183,151,0.15)] border-b border-[rgba(215,183,151,0.2)]">
+                <tr className="bg-[rgba(160,120,75,0.18)] border-b border-[rgba(160,120,75,0.25)]">
                   <th className="w-10 px-3 py-3"></th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-[#666666] uppercase">SKU</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-[#666666] uppercase">Product</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-[#666666] uppercase">Rail / Type</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-[#666666] uppercase">Color</th>
-                  <th className="text-right px-4 py-3 text-xs font-semibold text-[#666666] uppercase">Unit Cost</th>
-                  <th className="text-center px-4 py-3 text-xs font-semibold text-[#666666] uppercase">Stores</th>
-                  <th className="text-center px-4 py-3 text-xs font-semibold text-[#666666] uppercase">Order</th>
-                  <th className="text-right px-4 py-3 text-xs font-semibold text-[#666666] uppercase">TTL Value</th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-[#666666] uppercase">{t('proposal.skuCode')}</th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-[#666666] uppercase">{t('proposal.productName')}</th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-[#666666] uppercase">{t('proposal.rail')} / {t('proposal.productType')}</th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-[#666666] uppercase">{t('proposal.color')}</th>
+                  <th className="text-right px-4 py-3 text-xs font-semibold text-[#666666] uppercase">{t('proposal.unitCost')}</th>
+                  <th className="text-center px-4 py-3 text-xs font-semibold text-[#666666] uppercase">{t('proposal.store')}</th>
+                  <th className="text-center px-4 py-3 text-xs font-semibold text-[#666666] uppercase">{t('proposal.order')}</th>
+                  <th className="text-right px-4 py-3 text-xs font-semibold text-[#666666] uppercase">{t('proposal.totalValue')}</th>
                   <th className="w-12 px-3 py-3"></th>
                 </tr>
               </thead>
@@ -408,19 +410,19 @@ const ProposalDetailPage = ({ proposal, onBack, onSave }) => {
 
                       {/* Expanded Store Details */}
                       {isExpanded && (
-                        <tr className="bg-[rgba(215,183,151,0.1)]">
+                        <tr className="bg-[rgba(160,120,75,0.12)]">
                           <td colSpan={10} className="px-4 py-4">
                             <div className="ml-8 pl-4 border-l-2 border-purple-300">
                               <div className="flex items-center justify-between mb-3">
                                 <h4 className="text-sm font-semibold text-slate-700 flex items-center gap-2">
                                   <Store size={14} className="text-purple-500" />
-                                  Store Allocation
+                                  {t('ticketDetail.storeAllocation')}
                                 </h4>
                                 {availableStoresForSku.length > 0 && (
                                   <div className="relative group">
                                     <button className="flex items-center gap-1 px-2 py-1 text-xs text-purple-600 hover:bg-purple-100 rounded transition-colors">
                                       <Plus size={12} />
-                                      Add Store
+                                      {t('proposal.selectStore')}
                                     </button>
                                     <div className="absolute top-full right-0 mt-1 w-48 bg-white border border-slate-200 rounded-lg shadow-lg z-10 hidden group-hover:block">
                                       {availableStoresForSku.map(store => (
@@ -491,8 +493,8 @@ const ProposalDetailPage = ({ proposal, onBack, onSave }) => {
                 })}
 
                 {/* Totals Row */}
-                <tr className="bg-[rgba(215,183,151,0.15)] font-semibold">
-                  <td colSpan={7} className="px-4 py-3 text-right text-[#666666]">Total</td>
+                <tr className="bg-[rgba(160,120,75,0.18)] font-semibold">
+                  <td colSpan={7} className="px-4 py-3 text-right text-[#666666]">{t('skuProposal.total')}</td>
                   <td className="px-4 py-3 text-center text-[#333333]">{grandTotals.totalOrder}</td>
                   <td className="px-4 py-3 text-right text-emerald-600">{formatCurrency(grandTotals.totalValue)}</td>
                   <td></td>
@@ -509,7 +511,7 @@ const ProposalDetailPage = ({ proposal, onBack, onSave }) => {
           <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[70vh] overflow-hidden">
             <div className="p-4 border-b border-slate-200">
               <div className="flex items-center justify-between">
-                <h2 className="text-lg font-bold text-slate-800">Add SKUs</h2>
+                <h2 className="text-lg font-bold text-slate-800">{t('proposal.addSku')}</h2>
                 <button onClick={() => { setShowAddSkuModal(false); setSelectedSkusToAdd([]); setSkuSearchQuery(''); }} className="p-1.5 hover:bg-slate-100 rounded-lg">
                   <X size={18} className="text-slate-500" />
                 </button>
@@ -518,7 +520,7 @@ const ProposalDetailPage = ({ proposal, onBack, onSave }) => {
                 <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                 <input
                   type="text"
-                  placeholder="Search by code or name..."
+                  placeholder={`${t('common.search')}...`}
                   value={skuSearchQuery}
                   onChange={(e) => setSkuSearchQuery(e.target.value)}
                   className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
@@ -530,7 +532,7 @@ const ProposalDetailPage = ({ proposal, onBack, onSave }) => {
               {availableSkus.length === 0 ? (
                 <div className="text-center py-8 text-slate-500">
                   <Package size={28} className="mx-auto mb-2 opacity-50" />
-                  <p className="text-sm">No available SKUs</p>
+                  <p className="text-sm">{t('skuProposal.noSkuData')}</p>
                 </div>
               ) : (
                 <div className="space-y-1">
@@ -559,7 +561,7 @@ const ProposalDetailPage = ({ proposal, onBack, onSave }) => {
                           <div className="font-medium text-slate-800 text-sm truncate">{sku.name}</div>
                         </div>
                         <div className="text-right">
-                          <div className="text-xs text-slate-400">Unit Cost</div>
+                          <div className="text-xs text-slate-400">{t('proposal.unitCost')}</div>
                           <div className="font-semibold text-purple-600 text-sm">{formatCurrency(sku.unitCost)}</div>
                         </div>
                       </div>
@@ -570,10 +572,10 @@ const ProposalDetailPage = ({ proposal, onBack, onSave }) => {
             </div>
 
             <div className="p-4 border-t border-slate-200 flex items-center justify-between bg-slate-50">
-              <span className="text-sm text-slate-600">{selectedSkusToAdd.length} selected</span>
+              <span className="text-sm text-slate-600">{selectedSkusToAdd.length}</span>
               <div className="flex items-center gap-2">
                 <button onClick={() => { setShowAddSkuModal(false); setSelectedSkusToAdd([]); }} className="px-4 py-2 text-slate-600 hover:bg-slate-200 rounded-lg text-sm font-medium">
-                  Cancel
+                  {t('common.cancel')}
                 </button>
                 <button
                   onClick={handleAddSkus}
@@ -582,7 +584,7 @@ const ProposalDetailPage = ({ proposal, onBack, onSave }) => {
                     selectedSkusToAdd.length > 0 ? 'bg-purple-600 text-white hover:bg-purple-700' : 'bg-slate-200 text-slate-400 cursor-not-allowed'
                   }`}
                 >
-                  Add SKUs
+                  {t('proposal.addSku')}
                 </button>
               </div>
             </div>

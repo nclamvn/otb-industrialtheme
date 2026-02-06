@@ -4,8 +4,11 @@
 // ═══════════════════════════════════════════════════════════════════════════
 import React from 'react';
 import { AlertCircle, RefreshCw } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
-const ErrorMessage = ({ darkMode = true, message = 'Something went wrong', onRetry }) => {
+const ErrorMessage = ({ darkMode = true, message, onRetry }) => {
+  const { t } = useLanguage();
+  const resolvedMessage = message || t('components.errorMessage');
   return (
     <div className={`flex flex-col items-center justify-center py-12 px-4 ${
       darkMode ? 'text-slate-300' : 'text-slate-700'
@@ -13,9 +16,9 @@ const ErrorMessage = ({ darkMode = true, message = 'Something went wrong', onRet
       <div className={`p-4 rounded-full ${darkMode ? 'bg-red-500/10' : 'bg-red-50'} mb-4`}>
         <AlertCircle size={32} className="text-red-500" />
       </div>
-      <h3 className="text-lg font-semibold mb-2">Error</h3>
+      <h3 className="text-lg font-semibold mb-2">{t('components.errorTitle')}</h3>
       <p className={`text-sm text-center max-w-md ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
-        {message}
+        {resolvedMessage}
       </p>
       {onRetry && (
         <button
@@ -27,7 +30,7 @@ const ErrorMessage = ({ darkMode = true, message = 'Something went wrong', onRet
           }`}
         >
           <RefreshCw size={16} />
-          Try Again
+          {t('components.tryAgain')}
         </button>
       )}
     </div>

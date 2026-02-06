@@ -5,11 +5,13 @@
 // ═══════════════════════════════════════════════════════════════════════════
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { Eye, EyeOff, LogIn } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const LoginScreen = () => {
   const { login, loading } = useAuth();
+  const { t } = useLanguage();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -20,16 +22,16 @@ const LoginScreen = () => {
     setLocalError('');
 
     if (!email || !password) {
-      setLocalError('Please enter email and password');
+      setLocalError(t('login.emptyFieldError'));
       return;
     }
 
     try {
       await login(email, password);
-      toast.success('Login successful!');
+      toast.success(t('login.loginSuccess'));
     } catch (err) {
-      setLocalError(err.message || 'Login failed');
-      toast.error(err.message || 'Login failed');
+      setLocalError(err.message || t('login.loginFailed'));
+      toast.error(err.message || t('login.loginFailed'));
     }
   };
 
@@ -48,7 +50,7 @@ const LoginScreen = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#0f172a] flex items-center justify-center p-4">
+    <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         {/* Logo & Title */}
         <div className="text-center mb-8">
@@ -57,39 +59,39 @@ const LoginScreen = () => {
             alt="DAFC"
             className="h-16 w-auto mx-auto mb-4"
           />
-          <h1 className="text-2xl font-bold text-white">OTB Planning System</h1>
-          <p className="text-slate-400 mt-2">Open-to-Buy Planning & Management</p>
+          <h1 className="text-2xl font-bold text-white">{t('login.title')}</h1>
+          <p className="text-slate-400 mt-2">{t('login.subtitle')}</p>
         </div>
 
         {/* Login Form */}
-        <div className="bg-slate-900/70 border border-slate-700 rounded-2xl p-8 shadow-xl backdrop-blur-sm">
-          <h2 className="text-xl font-semibold text-white mb-6">Sign In</h2>
+        <div className="bg-[#121212]/90 border border-[#2E2E2E] rounded-2xl p-8 shadow-xl backdrop-blur-sm">
+          <h2 className="text-xl font-semibold text-white mb-6">{t('login.signIn')}</h2>
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
               <label className="block text-sm font-medium text-slate-400 mb-2">
-                Email
+                {t('login.email')}
               </label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-3 bg-slate-800 border border-slate-600 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-[#D7B797] focus:ring-1 focus:ring-[#D7B797] transition-all"
-                placeholder="your@email.com"
+                className="w-full px-4 py-3 bg-[#1A1A1A] border border-[#2E2E2E] rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-[#D7B797] focus:ring-1 focus:ring-[#D7B797] transition-all"
+                placeholder={t('login.emailPlaceholder')}
               />
             </div>
 
             <div>
               <label className="block text-sm font-medium text-slate-400 mb-2">
-                Password
+                {t('login.password')}
               </label>
               <div className="relative">
                 <input
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-4 py-3 bg-slate-800 border border-slate-600 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-[#D7B797] focus:ring-1 focus:ring-[#D7B797] transition-all pr-12"
-                  placeholder="Enter password"
+                  className="w-full px-4 py-3 bg-[#1A1A1A] border border-[#2E2E2E] rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-[#D7B797] focus:ring-1 focus:ring-[#D7B797] transition-all pr-12"
+                  placeholder={t('login.passwordPlaceholder')}
                 />
                 <button
                   type="button"
@@ -115,26 +117,26 @@ const LoginScreen = () => {
               {loading ? (
                 <>
                   <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  Signing in...
+                  {t('login.signingIn')}
                 </>
               ) : (
                 <>
                   <LogIn size={18} />
-                  Sign In
+                  {t('login.signIn')}
                 </>
               )}
             </button>
           </form>
 
           {/* Demo Accounts */}
-          <div className="mt-8 pt-6 border-t border-slate-700">
-            <p className="text-sm text-slate-500 mb-4">Quick login (Demo accounts):</p>
+          <div className="mt-8 pt-6 border-t border-[#2E2E2E]">
+            <p className="text-sm text-slate-500 mb-4">{t('login.quickLogin')}</p>
             <div className="grid grid-cols-2 gap-2">
               {demoAccounts.map((account) => (
                 <button
                   key={account.email}
                   onClick={() => handleDemoLogin(account)}
-                  className="flex items-center justify-between px-3 py-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded-lg transition-colors text-sm group"
+                  className="flex items-center justify-between px-3 py-2.5 bg-[#1A1A1A] hover:bg-[#2E2E2E] border border-[#2E2E2E] rounded-lg transition-colors text-sm group"
                 >
                   <span className="text-slate-300 truncate">{account.email.split('@')[0]}</span>
                   <span className={`font-medium ${account.color}`}>{account.role}</span>
@@ -146,7 +148,7 @@ const LoginScreen = () => {
 
         {/* Footer */}
         <p className="text-center text-slate-500 text-sm mt-8">
-          DAFC Vietnam © 2025. All rights reserved.
+          {t('login.footer')}
         </p>
       </div>
     </div>

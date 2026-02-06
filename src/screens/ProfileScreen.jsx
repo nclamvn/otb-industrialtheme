@@ -6,9 +6,11 @@ import {
   Camera, Edit3, Save, X, CheckCircle, Key, Bell
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const ProfileScreen = ({ user: propUser, darkMode = true, onUpdateUser }) => {
   const { user: authUser } = useAuth();
+  const { t } = useLanguage();
   // Use prop user, then auth context user
   const user = propUser || authUser || {};
   const [isEditing, setIsEditing] = useState(false);
@@ -91,10 +93,10 @@ const ProfileScreen = ({ user: propUser, darkMode = true, onUpdateUser }) => {
           <h1 className={`text-lg font-semibold font-['Montserrat'] ${
             darkMode ? 'text-[#F2F2F2]' : 'text-gray-900'
           }`}>
-            My Profile
+            {t('profile.title')}
           </h1>
           <p className={`text-xs mt-0.5 ${darkMode ? 'text-[#666666]' : 'text-gray-700'}`}>
-            Manage your personal information
+            {t('profile.subtitle')}
           </p>
         </div>
 
@@ -108,7 +110,7 @@ const ProfileScreen = ({ user: propUser, darkMode = true, onUpdateUser }) => {
             }`}
           >
             <Edit3 size={16} />
-            Edit Profile
+            {t('profile.editProfile')}
           </button>
         ) : (
           <div className="flex items-center gap-2">
@@ -121,7 +123,7 @@ const ProfileScreen = ({ user: propUser, darkMode = true, onUpdateUser }) => {
               }`}
             >
               <X size={16} />
-              Cancel
+              {t('common.cancel')}
             </button>
             <button
               onClick={handleSave}
@@ -135,12 +137,12 @@ const ProfileScreen = ({ user: propUser, darkMode = true, onUpdateUser }) => {
               {saving ? (
                 <>
                   <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  Saving...
+                  {t('profile.saving')}
                 </>
               ) : (
                 <>
                   <Save size={16} />
-                  Save Changes
+                  {t('profile.saveChanges')}
                 </>
               )}
             </button>
@@ -218,12 +220,12 @@ const ProfileScreen = ({ user: propUser, darkMode = true, onUpdateUser }) => {
         {/* Info Grid */}
         <div className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <InfoCard icon={User} label="Full Name" value={user?.name} field="name" />
-            <InfoCard icon={Mail} label="Email Address" value={user?.email} field="email" />
-            <InfoCard icon={Phone} label="Phone Number" value={user?.phone || 'Not set'} field="phone" />
-            <InfoCard icon={Building2} label="Department" value={user?.department || 'Not set'} field="department" />
-            <InfoCard icon={Shield} label="Role" value={user?.role?.name} field="role" editable={false} />
-            <InfoCard icon={Key} label="User ID" value={user?.id || 'N/A'} field="id" editable={false} />
+            <InfoCard icon={User} label={t('profile.fullName')} value={user?.name} field="name" />
+            <InfoCard icon={Mail} label={t('profile.emailAddress')} value={user?.email} field="email" />
+            <InfoCard icon={Phone} label={t('profile.phoneNumber')} value={user?.phone || t('profile.notSet')} field="phone" />
+            <InfoCard icon={Building2} label={t('profile.department')} value={user?.department || t('profile.notSet')} field="department" />
+            <InfoCard icon={Shield} label={t('profile.role')} value={user?.role?.name} field="role" editable={false} />
+            <InfoCard icon={Key} label={t('profile.userId')} value={user?.id || 'N/A'} field="id" editable={false} />
           </div>
         </div>
       </div>
@@ -235,7 +237,7 @@ const ProfileScreen = ({ user: propUser, darkMode = true, onUpdateUser }) => {
         <h3 className={`text-base font-semibold font-['Montserrat'] mb-4 ${
           darkMode ? 'text-[#F2F2F2]' : 'text-gray-900'
         }`}>
-          Security
+          {t('profile.security')}
         </h3>
         <div className="space-y-3">
           <button className={`w-full flex items-center justify-between p-4 rounded-lg border transition-all ${
@@ -249,10 +251,10 @@ const ProfileScreen = ({ user: propUser, darkMode = true, onUpdateUser }) => {
               </div>
               <div className="text-left">
                 <div className={`text-sm font-medium ${darkMode ? 'text-[#F2F2F2]' : 'text-gray-900'}`}>
-                  Change Password
+                  {t('profile.changePassword')}
                 </div>
                 <div className={`text-xs ${darkMode ? 'text-[#666666]' : 'text-gray-700'}`}>
-                  Update your password regularly
+                  {t('profile.updatePasswordRegularly')}
                 </div>
               </div>
             </div>
@@ -272,10 +274,10 @@ const ProfileScreen = ({ user: propUser, darkMode = true, onUpdateUser }) => {
               </div>
               <div className="text-left">
                 <div className={`text-sm font-medium ${darkMode ? 'text-[#F2F2F2]' : 'text-gray-900'}`}>
-                  Notification Preferences
+                  {t('profile.notificationPreferences')}
                 </div>
                 <div className={`text-xs ${darkMode ? 'text-[#666666]' : 'text-gray-700'}`}>
-                  Manage email and push notifications
+                  {t('profile.manageNotifications')}
                 </div>
               </div>
             </div>

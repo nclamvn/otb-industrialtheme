@@ -6,11 +6,12 @@ import {
   Palette, Type, Zap, Database, HardDrive, Trash2, Download,
   ChevronRight, Check, Info, AlertTriangle
 } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const SettingsScreen = ({ darkMode = true, setDarkMode, user }) => {
+  const { t, language, setLanguage } = useLanguage();
   const [settings, setSettings] = useState({
     theme: darkMode ? 'dark' : 'light',
-    language: 'vi',
     notifications: {
       email: true,
       push: true,
@@ -35,6 +36,8 @@ const SettingsScreen = ({ darkMode = true, setDarkMode, user }) => {
           [key]: value
         }
       }));
+    } else if (key === 'language') {
+      setLanguage(value);
     } else {
       setSettings(prev => ({ ...prev, [key]: value }));
       if (key === 'theme') {
@@ -150,25 +153,25 @@ const SettingsScreen = ({ darkMode = true, setDarkMode, user }) => {
         <h1 className={`text-lg font-semibold font-['Montserrat'] ${
           darkMode ? 'text-[#F2F2F2]' : 'text-gray-900'
         }`}>
-          Settings
+          {t('settings.title')}
         </h1>
         <p className={`text-xs mt-0.5 ${darkMode ? 'text-[#666666]' : 'text-gray-700'}`}>
-          Customize your app experience
+          {t('settings.subtitle')}
         </p>
       </div>
 
       {/* Appearance */}
-      <SettingSection title="Appearance" description="Customize how the app looks">
+      <SettingSection title={t('settings.appearance')} description={t('settings.customizeAppLooks')}>
         <div className="p-3">
           <div className={`text-xs font-medium uppercase tracking-wider mb-3 ${
             darkMode ? 'text-[#666666]' : 'text-gray-700'
           }`}>
-            Theme
+            {t('settings.theme')}
           </div>
           <div className="flex gap-3">
-            <ThemeOption value="light" icon={Sun} label="Light" current={settings.theme} />
-            <ThemeOption value="dark" icon={Moon} label="Dark" current={settings.theme} />
-            <ThemeOption value="system" icon={Monitor} label="System" current={settings.theme} />
+            <ThemeOption value="light" icon={Sun} label={t('settings.light')} current={settings.theme} />
+            <ThemeOption value="dark" icon={Moon} label={t('settings.dark')} current={settings.theme} />
+            <ThemeOption value="system" icon={Monitor} label={t('settings.system')} current={settings.theme} />
           </div>
         </div>
 
@@ -176,8 +179,8 @@ const SettingsScreen = ({ darkMode = true, setDarkMode, user }) => {
 
         <SettingRow
           icon={Zap}
-          label="Animations"
-          description="Enable smooth transitions and effects"
+          label={t('settings.animations')}
+          description={t('settings.animationsDesc')}
         >
           <Toggle
             enabled={settings.display.animationsEnabled}
@@ -187,8 +190,8 @@ const SettingsScreen = ({ darkMode = true, setDarkMode, user }) => {
 
         <SettingRow
           icon={Type}
-          label="Compact Mode"
-          description="Reduce spacing for more content"
+          label={t('settings.compactMode')}
+          description={t('settings.compactModeDesc')}
         >
           <Toggle
             enabled={settings.display.compactMode}
@@ -198,14 +201,14 @@ const SettingsScreen = ({ darkMode = true, setDarkMode, user }) => {
       </SettingSection>
 
       {/* Language & Region */}
-      <SettingSection title="Language & Region">
+      <SettingSection title={t('settings.languageAndRegion')}>
         <SettingRow
           icon={Globe}
-          label="Language"
-          description="Choose your preferred language"
+          label={t('settings.language')}
+          description={t('settings.chooseLanguage')}
         >
           <select
-            value={settings.language}
+            value={language}
             onChange={(e) => updateSetting(null, 'language', e.target.value)}
             className={`pl-3 pr-8 py-1.5 rounded-lg text-sm font-medium border outline-none cursor-pointer ${
               darkMode
@@ -213,18 +216,18 @@ const SettingsScreen = ({ darkMode = true, setDarkMode, user }) => {
                 : 'bg-gray-100 border-gray-200 text-gray-900'
             }`}
           >
-            <option value="vi">Tiếng Việt</option>
-            <option value="en">English</option>
+            <option value="vi">{t('settings.vietnamese')}</option>
+            <option value="en">{t('settings.english')}</option>
           </select>
         </SettingRow>
       </SettingSection>
 
       {/* Notifications */}
-      <SettingSection title="Notifications" description="Manage how you receive updates">
+      <SettingSection title={t('settings.notifications')} description={t('settings.manageUpdates')}>
         <SettingRow
           icon={Bell}
-          label="Email Notifications"
-          description="Receive updates via email"
+          label={t('settings.emailNotifications')}
+          description={t('settings.emailNotificationsDesc')}
         >
           <Toggle
             enabled={settings.notifications.email}
@@ -234,8 +237,8 @@ const SettingsScreen = ({ darkMode = true, setDarkMode, user }) => {
 
         <SettingRow
           icon={Bell}
-          label="Push Notifications"
-          description="Receive mobile push notifications"
+          label={t('settings.pushNotifications')}
+          description={t('settings.pushNotificationsDesc')}
         >
           <Toggle
             enabled={settings.notifications.push}
@@ -245,8 +248,8 @@ const SettingsScreen = ({ darkMode = true, setDarkMode, user }) => {
 
         <SettingRow
           icon={BellOff}
-          label="Desktop Notifications"
-          description="Show browser notifications"
+          label={t('settings.desktopNotifications')}
+          description={t('settings.desktopNotificationsDesc')}
         >
           <Toggle
             enabled={settings.notifications.desktop}
@@ -256,11 +259,11 @@ const SettingsScreen = ({ darkMode = true, setDarkMode, user }) => {
       </SettingSection>
 
       {/* Privacy */}
-      <SettingSection title="Privacy" description="Control your visibility and data">
+      <SettingSection title={t('settings.privacy')} description={t('settings.controlVisibility')}>
         <SettingRow
           icon={Eye}
-          label="Show Online Status"
-          description="Let others see when you're active"
+          label={t('settings.showOnlineStatus')}
+          description={t('settings.showOnlineStatusDesc')}
         >
           <Toggle
             enabled={settings.privacy.showOnline}
@@ -270,8 +273,8 @@ const SettingsScreen = ({ darkMode = true, setDarkMode, user }) => {
 
         <SettingRow
           icon={EyeOff}
-          label="Show Activity"
-          description="Display your recent activity"
+          label={t('settings.showActivity')}
+          description={t('settings.showActivityDesc')}
         >
           <Toggle
             enabled={settings.privacy.showActivity}
@@ -281,35 +284,35 @@ const SettingsScreen = ({ darkMode = true, setDarkMode, user }) => {
       </SettingSection>
 
       {/* Data & Storage */}
-      <SettingSection title="Data & Storage">
+      <SettingSection title={t('settings.dataAndStorage')}>
         <SettingRow
           icon={Download}
-          label="Export Data"
-          description="Download all your data"
-          onClick={() => alert('Export data feature coming soon')}
+          label={t('settings.exportData')}
+          description={t('settings.exportDataDesc')}
+          onClick={() => alert(t('settings.exportComingSoon'))}
         >
           <ChevronRight size={18} className={darkMode ? 'text-[#666666]' : 'text-gray-600'} />
         </SettingRow>
 
         <SettingRow
           icon={HardDrive}
-          label="Clear Cache"
-          description="Free up storage space"
-          onClick={() => alert('Cache cleared!')}
+          label={t('settings.clearCache')}
+          description={t('settings.clearCacheDesc')}
+          onClick={() => alert(t('settings.cacheCleared'))}
         >
           <ChevronRight size={18} className={darkMode ? 'text-[#666666]' : 'text-gray-600'} />
         </SettingRow>
       </SettingSection>
 
       {/* Danger Zone */}
-      <SettingSection title="Danger Zone">
+      <SettingSection title={t('settings.dangerZone')}>
         <SettingRow
           icon={Trash2}
-          label="Delete Account"
-          description="Permanently delete your account and all data"
+          label={t('settings.deleteAccount')}
+          description={t('settings.deleteAccountDesc')}
           onClick={() => {
-            if (window.confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
-              alert('Account deletion request submitted');
+            if (window.confirm(t('settings.deleteConfirm'))) {
+              alert(t('settings.accountDeletionSubmitted'));
             }
           }}
         >
@@ -318,7 +321,7 @@ const SettingsScreen = ({ darkMode = true, setDarkMode, user }) => {
               ? 'bg-[rgba(248,81,73,0.1)] text-[#FF7B72]'
               : 'bg-red-100 text-red-600'
           }`}>
-            Irreversible
+            {t('common.irreversible')}
           </span>
         </SettingRow>
       </SettingSection>
@@ -337,10 +340,10 @@ const SettingsScreen = ({ darkMode = true, setDarkMode, user }) => {
             <div className={`text-sm font-semibold font-['Montserrat'] ${
               darkMode ? 'text-[#F2F2F2]' : 'text-gray-900'
             }`}>
-              OTB System
+              {t('settings.otbSystem')}
             </div>
             <div className={`text-xs ${darkMode ? 'text-[#666666]' : 'text-gray-700'}`}>
-              Version 1.0.0
+              {t('settings.versionLabel')}
             </div>
           </div>
           <div className={`flex items-center gap-1.5 px-2 py-1 rounded-full text-xs ${
@@ -349,7 +352,7 @@ const SettingsScreen = ({ darkMode = true, setDarkMode, user }) => {
               : 'bg-green-100 text-green-700'
           }`}>
             <Check size={12} />
-            Up to date
+            {t('settings.upToDate')}
           </div>
         </div>
       </div>

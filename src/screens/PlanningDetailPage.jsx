@@ -10,6 +10,7 @@ import {
 import { formatCurrency } from '../utils';
 import { GENDERS, STORES } from '../utils/constants';
 import { masterDataService, planningService } from '../services';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const TABS = [
   { id: 'collection', label: 'Collection', icon: Layers },
@@ -49,7 +50,7 @@ const EditableCell = ({ cellKey, value, isEditing, editValue, onStartEdit, onSav
     <div
       onClick={() => onStartEdit(cellKey, value)}
       className="group flex items-center justify-center gap-1 cursor-pointer"
-      title="Click to edit"
+      title={t ? t('planningDetail.clickToEdit') : 'Click to edit'}
     >
       <div className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 hover:border-blue-300 transition-all min-w-[70px] justify-center">
         <span className="text-slate-700 font-medium">{typeof value === 'number' ? value.toFixed(0) : value}%</span>
@@ -62,10 +63,10 @@ const EditableCell = ({ cellKey, value, isEditing, editValue, onStartEdit, onSav
 // Approval Status Badge Component
 const ApprovalStatusBadge = ({ status }) => {
   const statusConfig = {
-    pending: { bg: 'bg-amber-100', text: 'text-amber-700', icon: Clock, label: 'Pending' },
-    approved: { bg: 'bg-emerald-100', text: 'text-emerald-700', icon: CheckCircle, label: 'Approved' },
-    rejected: { bg: 'bg-red-100', text: 'text-red-700', icon: XCircle, label: 'Rejected' },
-    waiting: { bg: 'bg-slate-100', text: 'text-slate-500', icon: AlertCircle, label: 'Waiting' }
+    pending: { bg: 'bg-amber-100', text: 'text-amber-700', icon: Clock, labelKey: 'pending' },
+    approved: { bg: 'bg-emerald-100', text: 'text-emerald-700', icon: CheckCircle, labelKey: 'approved' },
+    rejected: { bg: 'bg-red-100', text: 'text-red-700', icon: XCircle, labelKey: 'rejected' },
+    waiting: { bg: 'bg-slate-100', text: 'text-slate-500', icon: AlertCircle, labelKey: 'waiting' }
   };
 
   const config = statusConfig[status] || statusConfig.waiting;
@@ -74,7 +75,7 @@ const ApprovalStatusBadge = ({ status }) => {
   return (
     <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${config.bg} ${config.text}`}>
       <Icon size={12} />
-      {config.label}
+      {config.labelKey.charAt(0).toUpperCase() + config.labelKey.slice(1)}
     </span>
   );
 };
@@ -85,6 +86,7 @@ const PlanningDetailPage = ({
   onBack,
   onSave
 }) => {
+  const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState('collection');
   const [editingCell, setEditingCell] = useState(null);
   const [editValue, setEditValue] = useState('');
@@ -465,10 +467,10 @@ const PlanningDetailPage = ({
   }, [planningDetailData]);
 
   // Common table styles - DAFC Design System warm beige
-  const headerClass = "bg-gradient-to-r from-[rgba(215,183,151,0.3)] to-[rgba(215,183,151,0.2)] text-[#5C4A32]";
+  const headerClass = "bg-gradient-to-r from-[rgba(160,120,75,0.35)] to-[rgba(160,120,75,0.22)] text-[#5C4A32]";
   const headerCellClass = "px-4 py-3 text-center text-xs font-semibold uppercase tracking-wide";
-  const groupRowClass = "bg-gradient-to-r from-[rgba(215,183,151,0.15)] to-[rgba(215,183,151,0.08)] border-l-4 border-[#D7B797]";
-  const sumRowClass = "bg-gradient-to-r from-[rgba(215,183,151,0.25)] to-[rgba(215,183,151,0.2)] text-[#5C4A32] font-semibold";
+  const groupRowClass = "bg-gradient-to-r from-[rgba(160,120,75,0.18)] to-[rgba(160,120,75,0.1)] border-l-4 border-[#D7B797]";
+  const sumRowClass = "bg-gradient-to-r from-[rgba(160,120,75,0.28)] to-[rgba(160,120,75,0.22)] text-[#5C4A32] font-semibold";
 
   // Render Collection Tab
   const renderCollectionTab = () => {
@@ -501,14 +503,14 @@ const PlanningDetailPage = ({
         <table className="w-full text-sm">
           <thead>
             <tr className={headerClass}>
-              <th className={`${headerCellClass} text-left min-w-[200px]`}>Collection</th>
-              <th className={headerCellClass}>% Buy</th>
-              <th className={headerCellClass}>% Sales</th>
-              <th className={headerCellClass}>% ST</th>
-              <th className={headerCellClass}>MOC</th>
-              <th className={`${headerCellClass} bg-[rgba(215,183,151,0.3)]`}>% Buy Proposed</th>
-              <th className={headerCellClass}>OTB Proposed</th>
-              <th className={headerCellClass}>% Var vs Last Season</th>
+              <th className={`${headerCellClass} text-left min-w-[200px]`}>{t('planningDetail.collection')}</th>
+              <th className={headerCellClass}>{t('planningDetail.pctBuy')}</th>
+              <th className={headerCellClass}>{t('planningDetail.pctSales')}</th>
+              <th className={headerCellClass}>{t('planningDetail.pctST')}</th>
+              <th className={headerCellClass}>{t('planningDetail.moc')}</th>
+              <th className={`${headerCellClass} bg-[rgba(160,120,75,0.35)]`}>{t('planningDetail.pctBuyProposed')}</th>
+              <th className={headerCellClass}>{t('planningDetail.otbProposed')}</th>
+              <th className={headerCellClass}>{t('planningDetail.pctVarVsLastSeason')}</th>
             </tr>
           </thead>
           <tbody>
@@ -542,7 +544,7 @@ const PlanningDetailPage = ({
                       <td className="px-4 py-3 text-center text-slate-600">{storeRow.salesPct.toFixed(0)}%</td>
                       <td className="px-4 py-3 text-center text-slate-600">{storeRow.stPct.toFixed(0)}%</td>
                       <td className="px-4 py-3 text-center text-slate-600">{storeRow.moc.toFixed(1)}</td>
-                      <td className={`px-4 py-3 ${isReadOnly ? 'bg-[rgba(215,183,151,0.08)]' : 'bg-[rgba(215,183,151,0.15)]'}`}>
+                      <td className={`px-4 py-3 ${isReadOnly ? 'bg-[rgba(160,120,75,0.1)]' : 'bg-[rgba(160,120,75,0.18)]'}`}>
                         <EditableCell
                           cellKey={cellKey}
                           value={userBuyPctValue}
@@ -568,7 +570,7 @@ const PlanningDetailPage = ({
             ))}
 
             <tr className={sumRowClass}>
-              <td className="px-4 py-4 font-bold">SUM</td>
+              <td className="px-4 py-4 font-bold">{t('planningDetail.sum')}</td>
               <td className="px-4 py-4 text-center">100%</td>
               <td className="px-4 py-4 text-center">100%</td>
               <td className="px-4 py-4 text-center">-</td>
@@ -611,13 +613,13 @@ const PlanningDetailPage = ({
         <table className="w-full text-sm">
           <thead>
             <tr className={headerClass}>
-              <th className={`${headerCellClass} text-left min-w-[200px]`}>Gender</th>
-              <th className={headerCellClass}>% Buy</th>
-              <th className={headerCellClass}>% Sales</th>
-              <th className={headerCellClass}>% ST</th>
-              <th className={`${headerCellClass} bg-[rgba(215,183,151,0.3)]`}>% Buy Proposed</th>
-              <th className={headerCellClass}>OTB Proposed</th>
-              <th className={headerCellClass}>% Var vs Last Season</th>
+              <th className={`${headerCellClass} text-left min-w-[200px]`}>{t('planningDetail.gender')}</th>
+              <th className={headerCellClass}>{t('planningDetail.pctBuy')}</th>
+              <th className={headerCellClass}>{t('planningDetail.pctSales')}</th>
+              <th className={headerCellClass}>{t('planningDetail.pctST')}</th>
+              <th className={`${headerCellClass} bg-[rgba(160,120,75,0.35)]`}>{t('planningDetail.pctBuyProposed')}</th>
+              <th className={headerCellClass}>{t('planningDetail.otbProposed')}</th>
+              <th className={headerCellClass}>{t('planningDetail.pctVarVsLastSeason')}</th>
             </tr>
           </thead>
           <tbody>
@@ -650,7 +652,7 @@ const PlanningDetailPage = ({
                       <td className="px-4 py-3 text-center text-slate-600">{storeRow.buyPct.toFixed(1)}%</td>
                       <td className="px-4 py-3 text-center text-slate-600">{storeRow.salesPct.toFixed(0)}%</td>
                       <td className="px-4 py-3 text-center text-slate-600">{storeRow.stPct.toFixed(0)}%</td>
-                      <td className={`px-4 py-3 ${isReadOnly ? 'bg-[rgba(215,183,151,0.08)]' : 'bg-[rgba(215,183,151,0.15)]'}`}>
+                      <td className={`px-4 py-3 ${isReadOnly ? 'bg-[rgba(160,120,75,0.1)]' : 'bg-[rgba(160,120,75,0.18)]'}`}>
                         <EditableCell
                           cellKey={cellKey}
                           value={userBuyPctValue}
@@ -676,7 +678,7 @@ const PlanningDetailPage = ({
             ))}
 
             <tr className={sumRowClass}>
-              <td className="px-4 py-4 font-bold">SUM</td>
+              <td className="px-4 py-4 font-bold">{t('planningDetail.sum')}</td>
               <td className="px-4 py-4 text-center">100%</td>
               <td className="px-4 py-4 text-center">100%</td>
               <td className="px-4 py-4 text-center">-</td>
@@ -757,7 +759,7 @@ const PlanningDetailPage = ({
           <div className="flex items-center gap-6">
             <div className="flex items-center gap-2 text-slate-600">
               <Filter size={16} />
-              <span className="font-medium text-sm">Filters:</span>
+              <span className="font-medium text-sm">{t('planningDetail.filters')}</span>
             </div>
 
             {/* Gender Filter */}
@@ -876,7 +878,7 @@ const PlanningDetailPage = ({
                 className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-red-500 to-rose-500 text-white rounded-lg hover:from-red-600 hover:to-rose-600 transition-all shadow-md hover:shadow-lg text-sm font-medium"
               >
                 <X size={14} />
-                Clear All
+                {t('common.clearAll')}
               </button>
             )}
           </div>
@@ -908,7 +910,7 @@ const PlanningDetailPage = ({
                 <Users size={18} className="text-white" />
                 <span className="font-bold text-white text-lg">{genderGroup.gender.name}</span>
                 <span className="ml-auto text-white/80 text-sm">
-                  {genderGroup.categories.length} categories
+                  {genderGroup.categories.length} {t('planningDetail.category').toLowerCase()}
                 </span>
                 <div className="flex items-center gap-4 ml-4 text-white/90 text-sm">
                   <span>Buy: <strong>{genderTotals.buyPct}%</strong></span>
@@ -951,7 +953,7 @@ const PlanningDetailPage = ({
                             {cat.name}
                           </span>
                           <span className="ml-auto text-slate-500 text-sm">
-                            {cat.subCategories.length} sub-categories
+                            {cat.subCategories.length} {t('planningDetail.subCategory').toLowerCase()}
                           </span>
                           <div className="flex items-center gap-4 ml-4 text-slate-600 text-sm">
                             <span>Buy: <strong>{catTotals.buyPct}%</strong></span>
@@ -965,16 +967,16 @@ const PlanningDetailPage = ({
                           <div className="overflow-x-auto">
                             <table className="w-full text-sm">
                               <thead>
-                                <tr className="bg-[rgba(215,183,151,0.15)] border-b border-[rgba(215,183,151,0.2)]">
-                                  <th className="px-4 py-2 text-left text-xs font-semibold text-[#666666] uppercase">Sub Category</th>
-                                  <th className="px-3 py-2 text-center text-xs font-semibold text-[#666666] uppercase">% Buy</th>
-                                  <th className="px-3 py-2 text-center text-xs font-semibold text-[#666666] uppercase">% Sales</th>
-                                  <th className="px-3 py-2 text-center text-xs font-semibold text-[#666666] uppercase">% ST</th>
-                                  <th className="px-3 py-2 text-center text-xs font-semibold text-[#8A6340] uppercase bg-[rgba(215,183,151,0.25)]">% Proposed</th>
-                                  <th className="px-3 py-2 text-center text-xs font-semibold text-[#666666] uppercase">$ OTB</th>
-                                  <th className="px-3 py-2 text-center text-xs font-semibold text-[#666666] uppercase">% Var</th>
-                                  <th className="px-3 py-2 text-center text-xs font-semibold text-[#666666] uppercase">Submitted</th>
-                                  <th className="px-3 py-2 text-center text-xs font-semibold text-[#666666] uppercase">% Actual</th>
+                                <tr className="bg-[rgba(160,120,75,0.18)] border-b border-[rgba(160,120,75,0.25)]">
+                                  <th className="px-4 py-2 text-left text-xs font-semibold text-[#666666] uppercase">{t('planningDetail.subCategory')}</th>
+                                  <th className="px-3 py-2 text-center text-xs font-semibold text-[#666666] uppercase">{t('planningDetail.pctBuy')}</th>
+                                  <th className="px-3 py-2 text-center text-xs font-semibold text-[#666666] uppercase">{t('planningDetail.pctSales')}</th>
+                                  <th className="px-3 py-2 text-center text-xs font-semibold text-[#666666] uppercase">{t('planningDetail.pctST')}</th>
+                                  <th className="px-3 py-2 text-center text-xs font-semibold text-[#8A6340] uppercase bg-[rgba(160,120,75,0.28)]">{t('planningDetail.pctProposed')}</th>
+                                  <th className="px-3 py-2 text-center text-xs font-semibold text-[#666666] uppercase">{t('planningDetail.dollarOtbProposed')}</th>
+                                  <th className="px-3 py-2 text-center text-xs font-semibold text-[#666666] uppercase">{t('planningDetail.pctVar2025_2026')}</th>
+                                  <th className="px-3 py-2 text-center text-xs font-semibold text-[#666666] uppercase">{t('planningDetail.otbSubmitted')}</th>
+                                  <th className="px-3 py-2 text-center text-xs font-semibold text-[#666666] uppercase">{t('planningDetail.pctBuyActual')}</th>
                                 </tr>
                               </thead>
                               <tbody>
@@ -999,7 +1001,7 @@ const PlanningDetailPage = ({
                                       <td className="px-3 py-2.5 text-center text-slate-600">{rowData.buyPct || 0}%</td>
                                       <td className="px-3 py-2.5 text-center text-slate-600">{rowData.salesPct || 0}%</td>
                                       <td className="px-3 py-2.5 text-center text-slate-600">{rowData.stPct || 0}%</td>
-                                      <td className={`px-3 py-2.5 ${isReadOnly ? 'bg-[rgba(215,183,151,0.08)]' : 'bg-[rgba(215,183,151,0.15)]'}`}>
+                                      <td className={`px-3 py-2.5 ${isReadOnly ? 'bg-[rgba(160,120,75,0.1)]' : 'bg-[rgba(160,120,75,0.18)]'}`}>
                                         <EditableCell
                                           cellKey={cellKey}
                                           value={rowData.buyProposed || 0}
@@ -1028,12 +1030,12 @@ const PlanningDetailPage = ({
                                   );
                                 })}
                                 {/* Category Subtotal Row */}
-                                <tr className="bg-gradient-to-r from-[rgba(215,183,151,0.25)] to-[rgba(215,183,151,0.15)] font-medium">
-                                  <td className="px-4 py-2 text-[#5C4A32] font-semibold">Subtotal</td>
+                                <tr className="bg-gradient-to-r from-[rgba(160,120,75,0.28)] to-[rgba(160,120,75,0.18)] font-medium">
+                                  <td className="px-4 py-2 text-[#5C4A32] font-semibold">{t('planningDetail.subtotal')}</td>
                                   <td className="px-3 py-2 text-center text-[#5C4A32]">{catTotals.buyPct}%</td>
                                   <td className="px-3 py-2 text-center text-[#5C4A32]">{catTotals.salesPct}%</td>
                                   <td className="px-3 py-2 text-center text-[#5C4A32]">{catTotals.stPct}%</td>
-                                  <td className="px-3 py-2 text-center text-[#8A6340] bg-[rgba(215,183,151,0.2)] font-bold">{catTotals.buyProposed}%</td>
+                                  <td className="px-3 py-2 text-center text-[#8A6340] bg-[rgba(160,120,75,0.22)] font-bold">{catTotals.buyProposed}%</td>
                                   <td className="px-3 py-2 text-center text-[#5C4A32] font-bold">{catTotals.otbProposed.toLocaleString()}</td>
                                   <td className={`px-3 py-2 text-center font-bold ${
                                     catTotals.varPct < 0 ? 'text-red-600' : 'text-[#5C4A32]'
@@ -1059,7 +1061,7 @@ const PlanningDetailPage = ({
                   }`}>
                     <div className="flex items-center justify-between">
                       <span className={`font-bold ${isFemale ? 'text-pink-800' : 'text-sky-800'}`}>
-                        TOTAL {genderGroup.gender.name.toUpperCase()}
+                        {t('planningDetail.total')} {genderGroup.gender.name.toUpperCase()}
                       </span>
                       <div className={`flex items-center gap-6 text-sm ${isFemale ? 'text-pink-700' : 'text-sky-700'}`}>
                         <span>% Buy: <strong>{genderTotals.buyPct}%</strong></span>
@@ -1088,8 +1090,8 @@ const PlanningDetailPage = ({
       return (
         <div className="flex flex-col items-center justify-center py-12 text-slate-400">
           <FileText size={48} className="mb-4 opacity-50" />
-          <p className="text-lg font-medium">No version selected</p>
-          <p className="text-sm">Select a version to view approval history</p>
+          <p className="text-lg font-medium">{t('planningDetail.noApprovedVersions')}</p>
+          <p className="text-sm">{t('planningDetail.editHint')}</p>
         </div>
       );
     }
@@ -1103,13 +1105,13 @@ const PlanningDetailPage = ({
               <FileText size={20} className="text-white" />
             </div>
             <div>
-              <h4 className="font-bold text-blue-800">Version {currentVersion.versionNumber}</h4>
-              <p className="text-sm text-blue-600">Created {formatDate(currentVersion.createdAt)}</p>
+              <h4 className="font-bold text-blue-800">{t('common.version')} {currentVersion.versionNumber}</h4>
+              <p className="text-sm text-blue-600">{formatDate(currentVersion.createdAt)}</p>
             </div>
           </div>
           <div className="flex items-center gap-2 text-sm text-blue-700">
             <User size={14} />
-            <span>Created by: <strong>{currentVersion.createdBy.name}</strong></span>
+            <span>{t('budget.createdBy')}: <strong>{currentVersion.createdBy.name}</strong></span>
           </div>
         </div>
 
@@ -1118,7 +1120,7 @@ const PlanningDetailPage = ({
           <div className="bg-gradient-to-r from-amber-500 to-orange-500 px-4 py-3">
             <h4 className="font-bold text-white flex items-center gap-2">
               <CheckCircle2 size={18} />
-              Level 1 Approval
+              {t('planningDetail.approve')} L1
             </h4>
           </div>
           <div className="divide-y divide-slate-100">
@@ -1169,7 +1171,7 @@ const PlanningDetailPage = ({
           <div className="bg-gradient-to-r from-purple-500 to-indigo-500 px-4 py-3">
             <h4 className="font-bold text-white flex items-center gap-2">
               <CheckCircle2 size={18} />
-              Level 2 Approval (Final)
+              {t('planningDetail.approve')} L2
             </h4>
           </div>
           <div className="divide-y divide-slate-100">
@@ -1239,7 +1241,7 @@ const PlanningDetailPage = ({
             <div>
               <h1 className="text-2xl font-bold text-white flex items-center gap-3">
                 <TrendingUp size={28} className="animate-pulse" />
-                OTB Planning Detail
+                {t('planningDetail.title')}
               </h1>
               <p className="text-blue-100 mt-1">
                 {selectedBudgetDetail.budget?.groupBrandName} - {selectedBudgetDetail.budget?.seasonGroupId} {selectedBudgetDetail.budget?.seasonName}
@@ -1250,13 +1252,13 @@ const PlanningDetailPage = ({
           {/* Center - Budget Info */}
           <div className="flex items-center gap-8">
             <div className="text-center px-6 py-2 bg-white/10 rounded-xl backdrop-blur-sm">
-              <div className="text-xs text-blue-100 uppercase tracking-wide">Total Budget</div>
+              <div className="text-xs text-blue-100 uppercase tracking-wide">{t('planningDetail.totalBudget')}</div>
               <div className="text-2xl font-bold text-white">
                 {formatCurrency(selectedBudgetDetail.budget?.totalBudget || 0)}
               </div>
             </div>
             <div className="text-center px-6 py-2 bg-white/10 rounded-xl backdrop-blur-sm">
-              <div className="text-xs text-blue-100 uppercase tracking-wide">Allocated</div>
+              <div className="text-xs text-blue-100 uppercase tracking-wide">{t('planningDetail.allocated')}</div>
               <div className="text-2xl font-bold text-emerald-300">
                 {formatCurrency(grandTotals.otbValue)}
               </div>
@@ -1277,12 +1279,12 @@ const PlanningDetailPage = ({
               {selectedVersion === 'draft' ? (
                 <>
                   <Sparkles size={18} className="animate-spin" style={{ animationDuration: '3s' }} />
-                  <span>Draft (Editing)</span>
+                  <span>{t('planningDetail.draftEditing')}</span>
                 </>
               ) : (
                 <>
                   <CheckCircle2 size={18} />
-                  <span>Version {versions.find(v => v.id === selectedVersion)?.versionNumber}</span>
+                  <span>{t('common.version')} {versions.find(v => v.id === selectedVersion)?.versionNumber}</span>
                 </>
               )}
               <ChevronDown size={18} className={`transition-transform duration-200 ${isVersionDropdownOpen ? 'rotate-180' : ''}`} />
@@ -1307,9 +1309,9 @@ const PlanningDetailPage = ({
                   </div>
                   <div className="flex-1">
                     <div className={`font-semibold ${selectedVersion === 'draft' ? 'text-amber-700' : 'text-slate-700'}`}>
-                      Draft (Current)
+                      {t('planningDetail.draftCurrent')}
                     </div>
-                    <div className="text-xs text-slate-500">Editable version</div>
+                    <div className="text-xs text-slate-500">{t('planningDetail.editableVersion')}</div>
                   </div>
                   {selectedVersion === 'draft' && <Check size={20} className="text-amber-500" />}
                 </div>
@@ -1319,7 +1321,7 @@ const PlanningDetailPage = ({
                   <div className="px-4 py-2 bg-slate-100 border-y border-slate-200">
                     <span className="text-xs font-semibold text-slate-500 uppercase tracking-wide flex items-center gap-2">
                       <History size={14} />
-                      Submitted Versions ({versions.length})
+                      {t('planningDetail.approvedVersions')} ({versions.length})
                     </span>
                   </div>
                 )}
@@ -1329,7 +1331,7 @@ const PlanningDetailPage = ({
                   {versions.length === 0 ? (
                     <div className="px-4 py-8 text-center text-slate-400">
                       <Clock size={32} className="mx-auto mb-2 opacity-50" />
-                      <p className="text-sm">No submitted versions yet</p>
+                      <p className="text-sm">{t('planningDetail.noApprovedVersions')}</p>
                     </div>
                   ) : (
                     versions.slice().reverse().map((version, idx) => (
@@ -1351,7 +1353,7 @@ const PlanningDetailPage = ({
                         </div>
                         <div className="flex-1">
                           <div className={`font-semibold ${selectedVersion === version.id ? 'text-emerald-700' : 'text-slate-700'}`}>
-                            Version {version.versionNumber}
+                            {t('common.version')} {version.versionNumber}
                           </div>
                           <div className="text-xs text-slate-500 flex items-center gap-1">
                             <Clock size={12} />
@@ -1373,12 +1375,12 @@ const PlanningDetailPage = ({
       {isReadOnly && (
         <div className="px-6 py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white flex items-center justify-center gap-3 text-sm font-medium animate-in slide-in-from-top duration-300">
           <CheckCircle2 size={18} />
-          <span>Viewing Version {versions.find(v => v.id === selectedVersion)?.versionNumber} - Read Only</span>
+          <span>{t('planningDetail.viewingApprovedVersion').replace('{{version}}', versions.find(v => v.id === selectedVersion)?.versionNumber)}</span>
           <button
             onClick={() => setSelectedVersion('draft')}
             className="ml-4 px-4 py-1.5 bg-white/20 hover:bg-white/30 rounded-lg transition-all duration-200"
           >
-            Switch to Draft
+            {t('planningDetail.switchToDraft')}
           </button>
         </div>
       )}
@@ -1415,7 +1417,7 @@ const PlanningDetailPage = ({
           {!isReadOnly && (
             <div className="px-6 py-3 bg-blue-50 border-b border-blue-100 flex items-center gap-2 text-sm text-blue-600">
               <Pencil size={14} className="animate-bounce" style={{ animationDuration: '2s' }} />
-              <span>Click on cells with blue background in "% Buy Proposed" column to edit</span>
+              <span>{t('planningDetail.editHint')}</span>
             </div>
           )}
 
@@ -1431,8 +1433,8 @@ const PlanningDetailPage = ({
             <div className="flex items-center gap-6">
               {versions.length > 0 && (
                 <div className="text-sm">
-                  <span className="text-slate-500">Versions:</span>
-                  <span className="ml-2 font-bold text-purple-600">{versions.length} submitted</span>
+                  <span className="text-slate-500">{t('planningDetail.versions')}</span>
+                  <span className="ml-2 font-bold text-purple-600">{versions.length} {t('planningDetail.approved')}</span>
                 </div>
               )}
             </div>
@@ -1451,12 +1453,12 @@ const PlanningDetailPage = ({
                   {approveAnimation ? (
                     <>
                       <CheckCircle2 size={18} className="animate-bounce" />
-                      <span>Version {versions.length} Submitted!</span>
+                      <span>{t('planningDetail.versionCreated').replace('{{version}}', versions.length)}</span>
                     </>
                   ) : (
                     <>
                       <Send size={18} />
-                      <span>Submit for Approval</span>
+                      <span>{t('ticketDetail.submit')}</span>
                     </>
                   )}
                 </button>
@@ -1472,7 +1474,7 @@ const PlanningDetailPage = ({
                 }`}
               >
                 <Save size={18} />
-                Save Draft
+                {t('planningDetail.savePlanning')}
               </button>
             </div>
           </div>
@@ -1482,7 +1484,7 @@ const PlanningDetailPage = ({
         <div className="w-96 shrink-0 bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden flex flex-col">
           <div className="bg-gradient-to-r from-slate-700 to-slate-600 px-5 py-4 flex items-center gap-3">
             <History size={20} className="text-white" />
-            <h3 className="font-bold text-white">Approval History</h3>
+            <h3 className="font-bold text-white">{t('ticketDetail.approvalHistory')}</h3>
           </div>
           <div className="flex-1 overflow-y-auto p-4 max-h-[calc(100vh-280px)]">
             {renderApprovalHistory()}
@@ -1497,8 +1499,8 @@ const PlanningDetailPage = ({
             <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center animate-bounce">
               <CheckCircle2 size={50} />
             </div>
-            <div className="text-2xl font-bold">Version {versions.length} Submitted!</div>
-            <div className="text-emerald-100">Sent for approval review</div>
+            <div className="text-2xl font-bold">{t('planningDetail.versionCreated').replace('{{version}}', versions.length)}</div>
+            <div className="text-emerald-100">{t('planningDetail.planningDataSaved')}</div>
           </div>
         </div>
       )}

@@ -58,27 +58,27 @@
 
   /* Light Mode - Enhanced Contrast */
   .light {
-    --background: 40 25% 96%;
-    --foreground: 0 0% 5%;
-    --card: 40 22% 94%;
-    --card-foreground: 0 0% 5%;
-    --popover: 40 20% 99%;
-    --popover-foreground: 0 0% 5%;
-    --muted: 30 18% 88%;
-    --muted-foreground: 0 0% 20%;
-    --border: 30 12% 78%;
-    --input: 30 18% 88%;
-    --primary: 30 43% 72%;
-    --primary-foreground: 0 0% 0%;
+    --background: 35 18% 95%;
+    --foreground: 25 20% 12%;
+    --card: 0 0% 100%;
+    --card-foreground: 25 20% 12%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 25 20% 12%;
+    --muted: 30 12% 90%;
+    --muted-foreground: 25 10% 35%;
+    --border: 30 15% 72%;
+    --input: 30 10% 92%;
+    --primary: 30 50% 52%;
+    --primary-foreground: 0 0% 100%;
     --secondary: 152 73% 27%;
     --secondary-foreground: 0 0% 95%;
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 95%;
 
     /* Light Mode Hover */
-    --hover-bg: rgba(215, 183, 151, 0.15);
-    --hover-border: rgba(184, 153, 112, 0.4);
-    --hover-text: #8A6340;
+    --hover-bg: rgba(160, 120, 75, 0.12);
+    --hover-border: rgba(138, 99, 64, 0.45);
+    --hover-text: #6B4D30;
   }
 
   /* Base Styles */
@@ -205,11 +205,11 @@
 
 /* Light Mode Scrollbar */
 .light ::-webkit-scrollbar-track {
-  background: #EDEBE8;
+  background: #E8E2DB;
 }
 
 .light ::-webkit-scrollbar-thumb {
-  background: #CCC7C0;
+  background: #B8AD9F;
   border-radius: 2px;
 }
 
@@ -314,6 +314,11 @@
     transition: all 150ms ease;
   }
 
+  .light .ind-card {
+    background: #FFFFFF;
+    border: 1px solid #C4B5A5;
+  }
+
   .ind-card:hover {
     border-color: var(--hover-border);
   }
@@ -321,6 +326,10 @@
   .ind-card-header {
     padding: 12px;
     border-bottom: 1px solid #1A1A1A;
+  }
+
+  .light .ind-card-header {
+    border-bottom: 1px solid #D4C8BB;
   }
 
   .ind-card-content {
@@ -435,11 +444,23 @@
     border: 1px solid rgba(215, 183, 151, 0.3);
   }
 
+  .light .dafc-badge-gold {
+    background: rgba(138, 99, 64, 0.12);
+    color: #6B4D30;
+    border: 1px solid rgba(138, 99, 64, 0.35);
+  }
+
   .dark .dafc-badge-green,
   .dafc-badge-green {
     background: rgba(18, 119, 73, 0.15);
     color: #2A9E6A;
     border: 1px solid rgba(18, 119, 73, 0.3);
+  }
+
+  .light .dafc-badge-green {
+    background: rgba(9, 84, 49, 0.1);
+    color: #065F32;
+    border: 1px solid rgba(9, 84, 49, 0.3);
   }
 
   /* === Industrial Input === */
@@ -467,6 +488,16 @@
 
   .ind-input::placeholder {
     color: #666666;
+  }
+
+  .light .ind-input {
+    background: #FFFFFF;
+    border: 1px solid #C4B5A5;
+    color: #1E1A16;
+  }
+
+  .light .ind-input::placeholder {
+    color: #999999;
   }
 
   /* DAFC Input (Pill) */
@@ -502,6 +533,10 @@
     background: #1A1A1A;
   }
 
+  .light .ind-table thead {
+    background: #F0ECE7;
+  }
+
   .ind-table th {
     height: 40px;
     padding: 0 12px;
@@ -514,10 +549,19 @@
     border-bottom: 1px solid #2E2E2E;
   }
 
+  .light .ind-table th {
+    color: #5D4E37;
+    border-bottom: 1px solid #C4B5A5;
+  }
+
   .ind-table td {
     height: 36px;
     padding: 0 12px;
     border-bottom: 1px solid #1A1A1A;
+  }
+
+  .light .ind-table td {
+    border-bottom: 1px solid #E8E2DB;
   }
 
   .ind-table tbody tr {
@@ -526,8 +570,16 @@
     border-left: 2px solid transparent;
   }
 
+  .light .ind-table tbody tr {
+    background: #FFFFFF;
+  }
+
   .ind-table tbody tr:nth-child(even) {
     background: #161616;
+  }
+
+  .light .ind-table tbody tr:nth-child(even) {
+    background: #FAF8F5;
   }
 
   /* Unified table row hover - Gold accent */
@@ -553,6 +605,10 @@
     background: #1A1A1A;
     border-radius: 2px;
     overflow: hidden;
+  }
+
+  .light .ind-progress {
+    background: #E0DDD8;
   }
 
   .ind-progress-fill {
@@ -582,6 +638,11 @@
     transition: all 150ms ease;
   }
 
+  .light .kpi-card {
+    background: #FFFFFF;
+    border: 1px solid #C4B5A5;
+  }
+
   .kpi-card:hover {
     border-color: var(--hover-border);
   }
@@ -599,12 +660,20 @@
     margin-bottom: 4px;
   }
 
+  .light .kpi-label {
+    color: #5D4E37;
+  }
+
   .kpi-value {
     font-family: var(--font-jetbrains-mono), 'JetBrains Mono', monospace;
     font-size: 26px;
     font-weight: 600;
     font-variant-numeric: tabular-nums;
     color: #F2F2F2;
+  }
+
+  .light .kpi-value {
+    color: #1E1A16;
   }
 
   .kpi-trend {

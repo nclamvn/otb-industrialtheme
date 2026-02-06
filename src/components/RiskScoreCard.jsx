@@ -14,6 +14,7 @@ import {
   Zap,
 } from 'lucide-react';
 import { aiService } from '../services/aiService';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Risk Score Card — AI risk assessment for approvers
@@ -25,28 +26,28 @@ const RISK_LEVELS = {
     color: '#127749',
     bgAlpha: 'rgba(18,119,73,0.12)',
     borderAlpha: 'rgba(18,119,73,0.25)',
-    label: 'Low Risk',
+    labelKey: 'ai.lowRisk',
     Icon: ShieldCheck,
   },
   medium: {
     color: '#D7B797',
     bgAlpha: 'rgba(215,183,151,0.12)',
     borderAlpha: 'rgba(215,183,151,0.25)',
-    label: 'Medium Risk',
+    labelKey: 'ai.mediumRisk',
     Icon: Shield,
   },
   high: {
     color: '#E67E22',
     bgAlpha: 'rgba(230,126,34,0.12)',
     borderAlpha: 'rgba(230,126,34,0.25)',
-    label: 'High Risk',
+    labelKey: 'ai.highRisk',
     Icon: ShieldAlert,
   },
   critical: {
     color: '#F85149',
     bgAlpha: 'rgba(248,81,73,0.12)',
     borderAlpha: 'rgba(248,81,73,0.25)',
-    label: 'Critical Risk',
+    labelKey: 'ai.criticalRisk',
     Icon: ShieldClose,
   },
 };
@@ -70,6 +71,7 @@ export default function RiskScoreCard({
   onScoreCalculated,
   darkMode = true,
 }) {
+  const { t } = useLanguage();
   const [assessment, setAssessment] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -253,7 +255,7 @@ export default function RiskScoreCard({
             }}
           >
             <Zap size={16} />
-            Calculate Risk
+            {t('ai.calculateRisk')}
           </button>
         </div>
       </div>
@@ -278,7 +280,7 @@ export default function RiskScoreCard({
             className="text-sm text-center"
             style={{ color: darkMode ? '#999999' : '#6B7280' }}
           >
-            No risk assessment available
+            {t('ai.noRiskAssessment')}
           </p>
           <button
             onClick={calculateRisk}
@@ -291,7 +293,7 @@ export default function RiskScoreCard({
             }}
           >
             <Zap size={16} />
-            Calculate Risk
+            {t('ai.calculateRisk')}
           </button>
         </div>
       </div>
@@ -329,7 +331,7 @@ export default function RiskScoreCard({
                 fontFamily: 'Montserrat, sans-serif',
               }}
             >
-              AI Risk Assessment
+              {t('ai.riskAssessment')}
             </h3>
             <p
               className="text-sm font-semibold"
@@ -338,7 +340,7 @@ export default function RiskScoreCard({
                 fontFamily: 'Montserrat, sans-serif',
               }}
             >
-              {riskConfig.label}
+              {t(riskConfig.labelKey)}
             </p>
           </div>
           {assessment.isStale && (
@@ -349,7 +351,7 @@ export default function RiskScoreCard({
                 color: '#D7B797',
               }}
             >
-              Stale
+              {t('ai.stale')}
             </span>
           )}
         </div>
@@ -436,12 +438,12 @@ export default function RiskScoreCard({
           {expanded ? (
             <>
               <ChevronUp size={14} />
-              Hide Details
+              {t('ai.hideDetails')}
             </>
           ) : (
             <>
               <ChevronDown size={14} />
-              Show Details
+              {t('ai.showDetails')}
             </>
           )}
         </button>
@@ -468,7 +470,7 @@ export default function RiskScoreCard({
                   fontFamily: 'Montserrat, sans-serif',
                 }}
               >
-                Risk Factors
+                {t('ai.riskFactors')}
               </h4>
               {assessment.factors.map((factor, idx) => {
                 const factorStatus = getFactorStatusIcon(factor.score);
@@ -563,7 +565,7 @@ export default function RiskScoreCard({
                   fontFamily: 'Montserrat, sans-serif',
                 }}
               >
-                Warnings
+                {t('ai.warnings')}
               </h4>
               {assessment.warnings.map((warning, idx) => (
                 <div
@@ -614,7 +616,7 @@ export default function RiskScoreCard({
               size={16}
               className={refreshing ? 'animate-spin' : ''}
             />
-            {refreshing ? 'Recalculating...' : 'Recalculate Risk Score'}
+            {refreshing ? t('ai.recalculating') : t('ai.recalculateRiskScore')}
           </button>
         </div>
       )}

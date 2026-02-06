@@ -5,15 +5,16 @@ import {
   ArrowRight, Building2, Star
 } from 'lucide-react';
 import { formatCurrency } from '../utils';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const COLUMNS = [
-  { id: 'DRAFT', label: 'Draft', icon: FileText },
-  { id: 'SUBMITTED', label: 'Submitted', icon: Clock },
-  { id: 'LEVEL1_APPROVED', label: 'L1 Approved', icon: ArrowRight },
-  { id: 'LEVEL2_APPROVED', label: 'L2 Approved', icon: ArrowRight },
-  { id: 'APPROVED', label: 'Approved', icon: CheckCircle },
-  { id: 'FINAL', label: 'Final', icon: Star },
-  { id: 'REJECTED', label: 'Rejected', icon: XCircle },
+  { id: 'DRAFT', labelKey: 'kanban.draft', icon: FileText },
+  { id: 'SUBMITTED', labelKey: 'kanban.submitted', icon: Clock },
+  { id: 'LEVEL1_APPROVED', labelKey: 'kanban.l1Approved', icon: ArrowRight },
+  { id: 'LEVEL2_APPROVED', labelKey: 'kanban.l2Approved', icon: ArrowRight },
+  { id: 'APPROVED', labelKey: 'kanban.approved', icon: CheckCircle },
+  { id: 'FINAL', labelKey: 'kanban.final', icon: Star },
+  { id: 'REJECTED', labelKey: 'kanban.rejected', icon: XCircle },
 ];
 
 // Map column id to DAFC-style colors
@@ -77,6 +78,7 @@ const ENTITY_COLORS = {
 };
 
 const TicketKanbanBoard = ({ tickets = [], onTicketClick, darkMode = true }) => {
+  const { t } = useLanguage();
   const d = darkMode ? 0 : 1; // index into color arrays
 
   // Group tickets by status — merge LEVEL1_REJECTED/LEVEL2_REJECTED into REJECTED
@@ -109,7 +111,7 @@ const TicketKanbanBoard = ({ tickets = [], onTicketClick, darkMode = true }) => 
               <div className="flex items-center gap-2">
                 <Icon size={16} className={colors.icon[d]} />
                 <span className={`font-semibold text-sm font-['Montserrat'] ${colors.icon[d]}`}>
-                  {column.label}
+                  {t(column.labelKey)}
                 </span>
               </div>
               <span className={`${colors.count[d]} text-xs font-bold font-['JetBrains_Mono'] px-2 py-0.5 rounded-full`}>
@@ -121,7 +123,7 @@ const TicketKanbanBoard = ({ tickets = [], onTicketClick, darkMode = true }) => 
             <div className="p-3 space-y-3 max-h-[calc(100vh-340px)] overflow-y-auto">
               {columnTickets.length === 0 ? (
                 <div className={`text-center py-8 text-sm font-['Montserrat'] ${darkMode ? 'text-[#444444]' : 'text-gray-400'}`}>
-                  No tickets
+                  {t('kanban.noTickets')}
                 </div>
               ) : (
                 columnTickets.map((ticket) => (
@@ -182,7 +184,7 @@ const TicketKanbanBoard = ({ tickets = [], onTicketClick, darkMode = true }) => 
                     {/* Created By */}
                     {ticket.createdBy && ticket.createdBy !== 'System' && (
                       <div className={`mt-1 text-[10px] ${darkMode ? 'text-[#666666]' : 'text-gray-400'}`}>
-                        by {ticket.createdBy}
+                        {t('kanban.by')} {ticket.createdBy}
                       </div>
                     )}
                   </div>

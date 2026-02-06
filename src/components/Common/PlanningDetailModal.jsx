@@ -3,6 +3,7 @@ import { useState, useMemo, useEffect, useRef } from 'react';
 import { X, Save, TrendingUp, Layers, Users, Tag, Info, Pencil, Filter, ChevronDown, Check, CheckCircle2, History, Clock, Sparkles } from 'lucide-react';
 import { formatCurrency } from '../../utils';
 import { GENDERS, STORES } from '../../utils/constants';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 // Category data structure for the Category tab
 const CATEGORY_STRUCTURE = [
@@ -63,9 +64,9 @@ const CATEGORY_STRUCTURE = [
 ];
 
 const TABS = [
-  { id: 'collection', label: 'Collection', icon: Layers },
-  { id: 'gender', label: 'Gender', icon: Users },
-  { id: 'category', label: 'Category', icon: Tag }
+  { id: 'collection', labelKey: 'planningDetail.collection', icon: Layers },
+  { id: 'gender', labelKey: 'planningDetail.gender', icon: Users },
+  { id: 'category', labelKey: 'planningDetail.category', icon: Tag }
 ];
 
 // Reusable editable cell component
@@ -117,6 +118,7 @@ const PlanningDetailModal = ({
   onSave,
   onUpdateDetail
 }) => {
+  const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState('collection');
   const [editingCell, setEditingCell] = useState(null);
   const [editValue, setEditValue] = useState('');
@@ -274,9 +276,9 @@ const PlanningDetailModal = ({
 
   // Generate filter options from CATEGORY_STRUCTURE
   const filterOptions = useMemo(() => {
-    const genders = [{ id: 'all', name: 'All Genders' }];
-    const categories = [{ id: 'all', name: 'All Categories' }];
-    const subCategories = [{ id: 'all', name: 'All Sub-Categories' }];
+    const genders = [{ id: 'all', name: t('planningDetail.allGenders') }];
+    const categories = [{ id: 'all', name: t('planningDetail.allCategories') }];
+    const subCategories = [{ id: 'all', name: t('planningDetail.allSubCategories') }];
 
     CATEGORY_STRUCTURE.forEach(genderGroup => {
       genders.push({ id: genderGroup.gender.id, name: genderGroup.gender.name });
@@ -299,7 +301,7 @@ const PlanningDetailModal = ({
   const filteredCategoryOptions = useMemo(() => {
     if (genderFilter === 'all') return filterOptions.categories;
     return [
-      { id: 'all', name: 'All Categories' },
+      { id: 'all', name: t('planningDetail.allCategories') },
       ...filterOptions.categories.filter(c => c.id !== 'all' && c.genderId === genderFilter)
     ];
   }, [genderFilter, filterOptions.categories]);
@@ -313,7 +315,7 @@ const PlanningDetailModal = ({
     if (categoryFilter !== 'all') {
       options = options.filter(sc => sc.id === 'all' || sc.categoryId === categoryFilter);
     }
-    return [{ id: 'all', name: 'All Sub-Categories' }, ...options.filter(o => o.id !== 'all')];
+    return [{ id: 'all', name: t('planningDetail.allSubCategories') }, ...options.filter(o => o.id !== 'all')];
   }, [genderFilter, categoryFilter, filterOptions.subCategories]);
 
   // Reset dependent filters when parent filter changes
@@ -351,8 +353,8 @@ const PlanningDetailModal = ({
 
   // Collection sections: Carry Over/Commercial and Seasonal
   const COLLECTION_SECTIONS = [
-    { id: 'carryover', name: 'Carry Over/Commercial' },
-    { id: 'seasonal', name: 'Seasonal' }
+    { id: 'carryover', nameKey: 'planningDetail.carryOverCommercial' },
+    { id: 'seasonal', nameKey: 'planningDetail.seasonal' }
   ];
 
   // Common table header style - DAFC Dark Theme
@@ -402,14 +404,14 @@ const PlanningDetailModal = ({
         <table className="w-full text-sm">
           <thead>
             <tr className={headerClass}>
-              <th className={`${headerCellClass} text-left min-w-[200px]`}>Collection</th>
-              <th className={headerCellClass}>% Buy</th>
-              <th className={headerCellClass}>% Sales</th>
-              <th className={headerCellClass}>% ST</th>
-              <th className={headerCellClass}>MOC</th>
-              <th className={`${headerCellClass} bg-[rgba(215,183,151,0.15)]`}>% Buy Proposed</th>
-              <th className={headerCellClass}>OTB Proposed</th>
-              <th className={headerCellClass}>% Var vs Last Season</th>
+              <th className={`${headerCellClass} text-left min-w-[200px]`}>{t('planningDetail.collection')}</th>
+              <th className={headerCellClass}>{t('planningDetail.pctBuy')}</th>
+              <th className={headerCellClass}>{t('planningDetail.pctSales')}</th>
+              <th className={headerCellClass}>{t('planningDetail.pctST')}</th>
+              <th className={headerCellClass}>{t('planningDetail.moc')}</th>
+              <th className={`${headerCellClass} bg-[rgba(215,183,151,0.15)]`}>{t('planningDetail.pctBuyProposed')}</th>
+              <th className={headerCellClass}>{t('planningDetail.otbProposed')}</th>
+              <th className={headerCellClass}>{t('planningDetail.pctVarVsLastSeason')}</th>
             </tr>
           </thead>
           <tbody>
@@ -419,7 +421,7 @@ const PlanningDetailModal = ({
                 <tr key={`col-${colData.section.id}`} className={groupRowClass}>
                   <td className="px-4 py-3" colSpan={8}>
                     <div className="flex items-center gap-2">
-                      <span className="font-bold text-[#D7B797] font-['Montserrat']">{colData.section.name}</span>
+                      <span className="font-bold text-[#D7B797] font-['Montserrat']">{t(colData.section.nameKey)}</span>
                       <Info size={14} className="text-[#666666]" />
                     </div>
                   </td>
@@ -469,7 +471,7 @@ const PlanningDetailModal = ({
 
             {/* SUM Row */}
             <tr className={sumRowClass}>
-              <td className="px-4 py-4 font-bold font-['Montserrat']">SUM</td>
+              <td className="px-4 py-4 font-bold font-['Montserrat']">{t('planningDetail.sum')}</td>
               <td className="px-4 py-4 text-center font-['JetBrains_Mono']">100%</td>
               <td className="px-4 py-4 text-center font-['JetBrains_Mono']">100%</td>
               <td className="px-4 py-4 text-center font-['JetBrains_Mono']">-</td>
@@ -512,13 +514,13 @@ const PlanningDetailModal = ({
         <table className="w-full text-sm">
           <thead>
             <tr className={headerClass}>
-              <th className={`${headerCellClass} text-left min-w-[200px]`}>Gender</th>
-              <th className={headerCellClass}>% Buy</th>
-              <th className={headerCellClass}>% Sales</th>
-              <th className={headerCellClass}>% ST</th>
-              <th className={`${headerCellClass} bg-[rgba(215,183,151,0.15)]`}>% Buy Proposed</th>
-              <th className={headerCellClass}>OTB Proposed</th>
-              <th className={headerCellClass}>% Var vs Last Season</th>
+              <th className={`${headerCellClass} text-left min-w-[200px]`}>{t('planningDetail.gender')}</th>
+              <th className={headerCellClass}>{t('planningDetail.pctBuy')}</th>
+              <th className={headerCellClass}>{t('planningDetail.pctSales')}</th>
+              <th className={headerCellClass}>{t('planningDetail.pctST')}</th>
+              <th className={`${headerCellClass} bg-[rgba(215,183,151,0.15)]`}>{t('planningDetail.pctBuyProposed')}</th>
+              <th className={headerCellClass}>{t('planningDetail.otbProposed')}</th>
+              <th className={headerCellClass}>{t('planningDetail.pctVarVsLastSeason')}</th>
             </tr>
           </thead>
           <tbody>
@@ -577,7 +579,7 @@ const PlanningDetailModal = ({
 
             {/* SUM Row */}
             <tr className={sumRowClass}>
-              <td className="px-4 py-4 font-bold font-['Montserrat']">SUM</td>
+              <td className="px-4 py-4 font-bold font-['Montserrat']">{t('planningDetail.sum')}</td>
               <td className="px-4 py-4 text-center font-['JetBrains_Mono']">100%</td>
               <td className="px-4 py-4 text-center font-['JetBrains_Mono']">100%</td>
               <td className="px-4 py-4 text-center font-['JetBrains_Mono']">-</td>
@@ -676,7 +678,7 @@ const PlanningDetailModal = ({
           <div className="flex items-center gap-6">
             <div className="flex items-center gap-2 text-[#999999]">
               <Filter size={16} />
-              <span className="font-medium text-sm font-['Montserrat']">Filters:</span>
+              <span className="font-medium text-sm font-['Montserrat']">{t('planningDetail.filters')}</span>
             </div>
 
             {/* Gender Filter */}
@@ -795,7 +797,7 @@ const PlanningDetailModal = ({
                 className="flex items-center gap-2 px-4 py-2 bg-[#F85149] text-white rounded-lg hover:bg-[#FF7B72] transition-all shadow-md hover:shadow-lg text-sm font-medium"
               >
                 <X size={14} />
-                Clear All
+                {t('common.clearAll')}
               </button>
             )}
           </div>
@@ -806,17 +808,17 @@ const PlanningDetailModal = ({
           <table className="w-full text-sm">
             <thead>
               <tr className={headerClass}>
-                <th className={`${headerCellClass} text-left min-w-[120px]`}>Gender</th>
-                <th className={`${headerCellClass} text-left min-w-[150px]`}>Category</th>
-                <th className={`${headerCellClass} text-left min-w-[120px]`}>Sub Category</th>
-                <th className={headerCellClass}>% Buy SP25</th>
-                <th className={headerCellClass}>% Sales SP25</th>
-                <th className={headerCellClass}>% ST SP25</th>
-                <th className={`${headerCellClass} bg-[rgba(215,183,151,0.15)]`}>% Buy Proposed</th>
-                <th className={headerCellClass}>$ OTB Proposed</th>
-                <th className={headerCellClass}>% Var (2025-2026)</th>
-                <th className={headerCellClass}>OTB Submitted</th>
-                <th className={headerCellClass}>% Buy Actual</th>
+                <th className={`${headerCellClass} text-left min-w-[120px]`}>{t('planningDetail.gender')}</th>
+                <th className={`${headerCellClass} text-left min-w-[150px]`}>{t('planningDetail.category')}</th>
+                <th className={`${headerCellClass} text-left min-w-[120px]`}>{t('planningDetail.subCategory')}</th>
+                <th className={headerCellClass}>{t('planningDetail.pctBuySP25')}</th>
+                <th className={headerCellClass}>{t('planningDetail.pctSalesSP25')}</th>
+                <th className={headerCellClass}>{t('planningDetail.pctSTSP25')}</th>
+                <th className={`${headerCellClass} bg-[rgba(215,183,151,0.15)]`}>{t('planningDetail.pctBuyProposed')}</th>
+                <th className={headerCellClass}>{t('planningDetail.dollarOtbProposed')}</th>
+                <th className={headerCellClass}>{t('planningDetail.pctVar2025_2026')}</th>
+                <th className={headerCellClass}>{t('planningDetail.otbSubmitted')}</th>
+                <th className={headerCellClass}>{t('planningDetail.pctBuyActual')}</th>
               </tr>
             </thead>
             <tbody>
@@ -829,7 +831,7 @@ const PlanningDetailModal = ({
                     {/* Gender Total Row */}
                     <tr key={`total-${genderGroup.gender.id}`} className={`${sumRowClass}`}>
                       <td className="px-4 py-3 uppercase font-bold font-['Montserrat']" colSpan={3}>
-                        TOTAL {genderGroup.gender.name.toUpperCase()}
+                        {t('planningDetail.total')} {genderGroup.gender.name.toUpperCase()}
                       </td>
                       <td className="px-4 py-3 text-center font-['JetBrains_Mono']">{genderTotals.buyPct}%</td>
                       <td className="px-4 py-3 text-center font-['JetBrains_Mono']">{genderTotals.salesPct}%</td>
@@ -911,7 +913,7 @@ const PlanningDetailModal = ({
 
                           {/* Category Subtotal Row */}
                           <tr key={`subtotal-${genderGroup.gender.id}-${cat.id}`} className="bg-[rgba(42,158,106,0.15)] border-l-4 border-[#2A9E6A] font-medium">
-                            <td className="px-4 py-2.5 text-[#2A9E6A] italic text-right pr-6">Subtotal</td>
+                            <td className="px-4 py-2.5 text-[#2A9E6A] italic text-right pr-6">{t('planningDetail.subtotal')}</td>
                             <td className="px-4 py-2.5 text-center text-[#2A9E6A] font-['JetBrains_Mono']">{catTotals.buyPct}%</td>
                             <td className="px-4 py-2.5 text-center text-[#2A9E6A] font-['JetBrains_Mono']">{catTotals.salesPct}%</td>
                             <td className="px-4 py-2.5 text-center text-[#2A9E6A] font-['JetBrains_Mono']">{catTotals.stPct}%</td>
@@ -953,7 +955,7 @@ const PlanningDetailModal = ({
             <div>
               <h2 className="text-xl font-bold text-[#0A0A0A] flex items-center gap-3 font-['Montserrat']">
                 <TrendingUp size={22} />
-                OTB Planning Detail
+                {t('planningDetail.title')}
               </h2>
               <p className="text-[#0A0A0A]/70 text-sm mt-1">
                 {selectedBudgetDetail.budget?.groupBrandName} - {selectedBudgetDetail.budget?.seasonGroupId} {selectedBudgetDetail.budget?.seasonName}
@@ -974,7 +976,7 @@ const PlanningDetailModal = ({
                 {selectedVersion === 'draft' ? (
                   <>
                     <Sparkles size={16} className="animate-spin" style={{ animationDuration: '3s' }} />
-                    <span>Draft (Editing)</span>
+                    <span>{t('planningDetail.draftEditing')}</span>
                   </>
                 ) : (
                   <>
@@ -1004,9 +1006,9 @@ const PlanningDetailModal = ({
                     </div>
                     <div className="flex-1">
                       <div className={`font-semibold ${selectedVersion === 'draft' ? 'text-[#E3B341]' : 'text-[#F2F2F2]'}`}>
-                        Draft (Current)
+                        {t('planningDetail.draftCurrent')}
                       </div>
-                      <div className="text-xs text-[#666666]">Editable version</div>
+                      <div className="text-xs text-[#666666]">{t('planningDetail.editableVersion')}</div>
                     </div>
                     {selectedVersion === 'draft' && <Check size={18} className="text-[#E3B341]" />}
                   </div>
@@ -1016,7 +1018,7 @@ const PlanningDetailModal = ({
                     <div className="px-4 py-2 bg-[#1A1A1A] border-y border-[#2E2E2E]">
                       <span className="text-xs font-semibold text-[#666666] uppercase tracking-wide flex items-center gap-2">
                         <History size={12} />
-                        Approved Versions ({versions.length})
+                        {t('planningDetail.approvedVersions')} ({versions.length})
                       </span>
                     </div>
                   )}
@@ -1026,7 +1028,7 @@ const PlanningDetailModal = ({
                     {versions.length === 0 ? (
                       <div className="px-4 py-6 text-center text-[#666666] text-sm">
                         <Clock size={24} className="mx-auto mb-2 opacity-50" />
-                        No approved versions yet
+                        {t('planningDetail.noApprovedVersions')}
                       </div>
                     ) : (
                       versions.slice().reverse().map((version, idx) => (
@@ -1077,12 +1079,12 @@ const PlanningDetailModal = ({
         {isReadOnly && (
           <div className="px-6 py-3 bg-[#127749] text-white flex items-center justify-center gap-2 text-sm font-medium animate-in slide-in-from-top duration-300">
             <CheckCircle2 size={16} />
-            <span>Viewing approved Version {versions.find(v => v.id === selectedVersion)?.versionNumber} - Read Only</span>
+            <span>{t('planningDetail.viewingApprovedVersion', { version: versions.find(v => v.id === selectedVersion)?.versionNumber })}</span>
             <button
               onClick={() => setSelectedVersion('draft')}
               className="ml-4 px-3 py-1 bg-white/20 hover:bg-white/30 rounded-lg transition-all duration-200"
             >
-              Switch to Draft
+              {t('planningDetail.switchToDraft')}
             </button>
           </div>
         )}
@@ -1104,7 +1106,7 @@ const PlanningDetailModal = ({
                   }`}
                 >
                   <Icon size={16} />
-                  {tab.label}
+                  {t(tab.labelKey)}
                 </button>
               );
             })}
@@ -1115,7 +1117,7 @@ const PlanningDetailModal = ({
         {!isReadOnly && (
           <div className="px-6 py-2 bg-[rgba(215,183,151,0.08)] border-b border-[#2E2E2E] flex items-center gap-2 text-sm text-[#D7B797] animate-in fade-in slide-in-from-top duration-300">
             <Pencil size={14} className="animate-bounce" style={{ animationDuration: '2s' }} />
-            <span>Click on cells with gold background in "% Buy Proposed" column to edit</span>
+            <span>{t('planningDetail.editHint')}</span>
           </div>
         )}
 
@@ -1130,22 +1132,22 @@ const PlanningDetailModal = ({
         <div className="border-t border-[#2E2E2E] px-6 py-4 flex items-center justify-between bg-[#121212] rounded-b-2xl">
           <div className="flex items-center gap-6">
             <div className="text-sm">
-              <span className="text-[#666666]">Total Budget:</span>
+              <span className="text-[#666666]">{t('planningDetail.totalBudget')}</span>
               <span className="ml-2 font-bold text-[#D7B797] font-['JetBrains_Mono']">
                 {formatCurrency(selectedBudgetDetail.budget?.totalBudget || 0)}
               </span>
             </div>
             <div className="text-sm">
-              <span className="text-[#666666]">Allocated:</span>
+              <span className="text-[#666666]">{t('planningDetail.allocated')}</span>
               <span className="ml-2 font-bold text-[#2A9E6A] font-['JetBrains_Mono']">
                 {formatCurrency(grandTotals.otbValue)}
               </span>
             </div>
             {versions.length > 0 && (
               <div className="text-sm animate-in fade-in slide-in-from-left duration-300">
-                <span className="text-[#666666]">Versions:</span>
+                <span className="text-[#666666]">{t('planningDetail.versions')}</span>
                 <span className="ml-2 font-bold text-[#D7B797] font-['JetBrains_Mono']">
-                  {versions.length} approved
+                  {versions.length} {t('planningDetail.approved')}
                 </span>
               </div>
             )}
@@ -1155,7 +1157,7 @@ const PlanningDetailModal = ({
               onClick={onClose}
               className="px-5 py-2.5 border border-[#2E2E2E] rounded-lg font-medium text-[#999999] hover:bg-[rgba(215,183,151,0.08)] hover:border-[rgba(215,183,151,0.25)] hover:text-[#D7B797] transition-all duration-200 transform hover:scale-105 active:scale-95"
             >
-              Cancel
+              {t('common.cancel')}
             </button>
 
             {/* Approve Button - only show when in draft mode */}
@@ -1172,12 +1174,12 @@ const PlanningDetailModal = ({
                 {approveAnimation ? (
                   <>
                     <CheckCircle2 size={16} className="animate-bounce" />
-                    <span>Version {versions.length} Created!</span>
+                    <span>{t('planningDetail.versionCreated', { version: versions.length })}</span>
                   </>
                 ) : (
                   <>
                     <CheckCircle2 size={16} />
-                    <span>Approve</span>
+                    <span>{t('planningDetail.approve')}</span>
                   </>
                 )}
               </button>
@@ -1193,7 +1195,7 @@ const PlanningDetailModal = ({
               }`}
             >
               <Save size={16} />
-              Save Planning
+              {t('planningDetail.savePlanning')}
             </button>
           </div>
         </div>
@@ -1205,8 +1207,8 @@ const PlanningDetailModal = ({
               <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center animate-bounce">
                 <CheckCircle2 size={40} />
               </div>
-              <div className="text-xl font-bold font-['Montserrat']">Version {versions.length} Approved!</div>
-              <div className="text-[#2A9E6A]/80 text-sm">Planning data has been saved</div>
+              <div className="text-xl font-bold font-['Montserrat']">{t('planningDetail.versionApproved', { version: versions.length })}</div>
+              <div className="text-[#2A9E6A]/80 text-sm">{t('planningDetail.planningDataSaved')}</div>
             </div>
           </div>
         )}

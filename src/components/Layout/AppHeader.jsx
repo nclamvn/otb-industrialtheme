@@ -1,9 +1,10 @@
 'use client';
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { useRouter } from 'next/navigation';
 import { aiService } from '../../services/aiService';
 import { ROUTE_MAP } from '@/utils/routeMap';
+import { useLanguage } from '@/contexts/LanguageContext';
 import {
   Wallet,
   DollarSign,
@@ -34,113 +35,113 @@ import {
   Layers
 } from 'lucide-react';
 
-// Screen configuration with icons and KPIs
-const SCREEN_CONFIG = {
+// Screen configuration builder (uses t() for translations)
+const getScreenConfig = (t) => ({
   'home': {
-    label: 'Dashboard',
+    label: t('screenConfig.dashboard'),
     shortLabel: 'Home',
     icon: Home,
     step: null,
-    kpiLabel: 'Overview',
-    kpiDescription: 'System overview'
+    kpiLabel: t('header.kpiOverview'),
+    kpiDescription: t('header.kpiSystemOverview')
   },
   'budget-management': {
-    label: 'Budget Management',
-    shortLabel: 'Budget',
+    label: t('screenConfig.budgetManagement'),
+    shortLabel: t('budget.title'),
     icon: Wallet,
     step: 1,
-    kpiLabel: 'Budgets',
-    kpiDescription: 'Total budgets created'
+    kpiLabel: t('header.kpiBudgets'),
+    kpiDescription: t('header.kpiBudgetsDesc')
   },
   'planning': {
-    label: 'Budget Allocation',
-    shortLabel: 'Allocation',
+    label: t('screenConfig.budgetAllocation'),
+    shortLabel: t('header.kpiAllocated'),
     icon: DollarSign,
     step: 2,
-    kpiLabel: 'Allocated',
-    kpiDescription: 'Budget allocation progress'
+    kpiLabel: t('header.kpiAllocated'),
+    kpiDescription: t('header.kpiAllocatedDesc')
   },
   'otb-analysis': {
-    label: 'OTB Analysis',
+    label: t('screenConfig.otbAnalysis'),
     shortLabel: 'OTB',
     icon: BarChart3,
     step: 3,
-    kpiLabel: 'Analyzed',
-    kpiDescription: 'Categories analyzed'
+    kpiLabel: t('header.kpiAnalyzed'),
+    kpiDescription: t('header.kpiAnalyzedDesc')
   },
   'proposal': {
-    label: 'SKU Proposal',
+    label: t('screenConfig.skuProposal'),
     shortLabel: 'SKU',
     icon: Package,
     step: 4,
-    kpiLabel: 'SKUs',
-    kpiDescription: 'SKUs proposed'
+    kpiLabel: t('header.kpiSKUs'),
+    kpiDescription: t('header.kpiSKUsDesc')
   },
   'dev-ticket': {
-    label: 'Dev Ticket',
+    label: t('screenConfig.devTicket'),
     shortLabel: 'Dev',
     icon: FileText,
     step: null,
-    kpiLabel: 'Pages',
-    kpiDescription: 'Documentation'
+    kpiLabel: t('header.kpiPages'),
+    kpiDescription: t('header.kpiDocumentation')
   },
   'tickets': {
-    label: 'Tickets',
-    shortLabel: 'Tickets',
+    label: t('screenConfig.tickets'),
+    shortLabel: t('screenConfig.tickets'),
     icon: Ticket,
     step: 5,
-    kpiLabel: 'Ticket',
-    kpiDescription: 'Tickets pending'
+    kpiLabel: t('header.kpiTicket'),
+    kpiDescription: t('header.kpiTicketsPending')
   },
   'ticket-detail': {
-    label: 'Ticket Detail',
-    shortLabel: 'Detail',
+    label: t('screenConfig.ticketDetail'),
+    shortLabel: t('screenConfig.ticketDetail'),
     icon: Ticket,
     step: null,
-    kpiLabel: 'Pending',
-    kpiDescription: 'Tickets pending'
+    kpiLabel: t('header.kpiPending'),
+    kpiDescription: t('header.kpiTicketsPending')
   },
   'approvals': {
-    label: 'Approvals',
-    shortLabel: 'Approvals',
+    label: t('screenConfig.approvals'),
+    shortLabel: t('screenConfig.approvals'),
     icon: FileCheck,
     step: null,
-    kpiLabel: 'Pending',
-    kpiDescription: 'Awaiting approval'
+    kpiLabel: t('header.kpiPending'),
+    kpiDescription: t('header.kpiAwaitingApproval')
   },
   'order-confirmation': {
-    label: 'Order Confirmation',
-    shortLabel: 'Orders',
+    label: t('screenConfig.orderConfirmation'),
+    shortLabel: t('header.kpiOrders'),
     icon: ShoppingCart,
     step: null,
-    kpiLabel: 'Orders',
-    kpiDescription: 'Orders to confirm'
+    kpiLabel: t('header.kpiOrders'),
+    kpiDescription: t('header.kpiOrdersConfirm')
   },
   'receipt-confirmation': {
-    label: 'Receipt Confirmation',
-    shortLabel: 'Receipts',
+    label: t('screenConfig.receiptConfirmation'),
+    shortLabel: t('header.kpiReceipts'),
     icon: Receipt,
     step: null,
-    kpiLabel: 'Receipts',
-    kpiDescription: 'Receipts to confirm'
+    kpiLabel: t('header.kpiReceipts'),
+    kpiDescription: t('header.kpiReceiptsConfirm')
   },
   'profile': {
-    label: 'My Profile',
-    shortLabel: 'Profile',
+    label: t('screenConfig.myProfile'),
+    shortLabel: t('header.kpiProfile'),
     icon: User,
     step: null,
-    kpiLabel: 'Profile',
-    kpiDescription: 'User profile'
+    kpiLabel: t('header.kpiProfile'),
+    kpiDescription: t('header.kpiUserProfile')
   },
   'settings': {
-    label: 'Settings',
-    shortLabel: 'Settings',
+    label: t('screenConfig.settings'),
+    shortLabel: t('header.kpiSettings'),
     icon: Settings,
     step: null,
-    kpiLabel: 'Settings',
-    kpiDescription: 'App settings'
+    kpiLabel: t('header.kpiSettings'),
+    kpiDescription: t('header.kpiAppSettings')
   }
-};
+});
 
 // Planning workflow steps
 const PLANNING_STEPS = [
@@ -180,6 +181,8 @@ const AppHeader = ({
   kpiData = {}
 }) => {
   const router = useRouter();
+  const { t, language, setLanguage } = useLanguage();
+  const SCREEN_CONFIG = useMemo(() => getScreenConfig(t), [t]);
   const onNavigate = (screenId) => {
     const route = ROUTE_MAP[screenId];
     if (route) {
@@ -288,13 +291,13 @@ const AppHeader = ({
                     ? 'bg-[rgba(215,183,151,0.12)] text-[#D7B797] border border-[rgba(215,183,151,0.2)]'
                     : 'bg-[rgba(215,183,151,0.15)] text-[#8A6340] border border-[rgba(215,183,151,0.3)]'
                 }`}>
-                  Step {currentConfig.step}
+                  {t('common.step')} {currentConfig.step}
                 </span>
               )}
             </div>
             {currentConfig.step && (
               <div className="flex items-center gap-1.5 mt-0.5">
-                <span className={`text-xs ${darkMode ? 'text-[#666666]' : 'text-gray-600'}`}>Planning</span>
+                <span className={`text-xs ${darkMode ? 'text-[#666666]' : 'text-gray-600'}`}>{t('header.planningBreadcrumb')}</span>
                 <ChevronRight size={12} className={darkMode ? 'text-[#444444]' : 'text-gray-300'} />
                 <span className={`text-xs font-medium ${darkMode ? 'text-[#999999]' : 'text-gray-600'}`}>
                   {currentConfig.shortLabel}
@@ -312,13 +315,13 @@ const AppHeader = ({
               onClick={() => setShowSearch(!showSearch)}
               className={`flex items-center gap-2 px-3 py-2 rounded-lg border transition-all duration-200 ${
                 darkMode
-                  ? 'border-[#2E2E2E] hover:border-[rgba(215,183,151,0.3)] hover:bg-[rgba(215,183,151,0.05)]'
-                  : 'border-gray-200 hover:border-[rgba(215,183,151,0.5)] hover:bg-[rgba(215,183,151,0.05)]'
+                  ? 'border-[#2E2E2E] hover:border-[rgba(215,183,151,0.3)] hover:bg-[rgba(160,120,75,0.08)]'
+                  : 'border-gray-200 hover:border-[rgba(215,183,151,0.5)] hover:bg-[rgba(160,120,75,0.08)]'
               }`}
             >
               <Search size={16} className={darkMode ? 'text-[#666666]' : 'text-gray-600'} />
               <span className={`text-sm hidden sm:block ${darkMode ? 'text-[#666666]' : 'text-gray-600'}`}>
-                Search...
+                {t('header.searchPlaceholder')}
               </span>
               <kbd className={`hidden sm:flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-['JetBrains_Mono'] ${
                 darkMode
@@ -341,7 +344,7 @@ const AppHeader = ({
                     <Search size={18} className={darkMode ? 'text-[#666666]' : 'text-gray-600'} />
                     <input
                       type="text"
-                      placeholder="Search screens, budgets, tickets..."
+                      placeholder={t('header.searchScreens')}
                       autoFocus
                       className={`flex-1 bg-transparent text-sm outline-none ${
                         darkMode ? 'text-[#F2F2F2] placeholder:text-[#666666]' : 'text-gray-900 placeholder:text-gray-400'
@@ -350,7 +353,7 @@ const AppHeader = ({
                   </div>
                 </div>
                 <div className={`p-2 text-center text-xs ${darkMode ? 'text-[#666666]' : 'text-gray-600'}`}>
-                  Type to search or press <kbd className="px-1 py-0.5 rounded bg-[#1A1A1A] text-[#999999]">ESC</kbd> to close
+                  {t('header.typeToSearch')} <kbd className="px-1 py-0.5 rounded bg-[#1A1A1A] text-[#999999]">ESC</kbd> {t('header.toClose')}
                 </div>
               </div>
             )}
@@ -365,17 +368,34 @@ const AppHeader = ({
             className={`relative p-2.5 rounded-xl transition-all duration-300 group ${
               darkMode
                 ? 'hover:bg-[rgba(215,183,151,0.08)]'
-                : 'hover:bg-[rgba(215,183,151,0.1)]'
+                : 'hover:bg-[rgba(160,120,75,0.12)]'
             }`}
-            title={darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+            title={darkMode ? t('header.darkModeTitle') : t('header.lightModeTitle')}
           >
             <div className="relative w-5 h-5">
               {darkMode ? (
-                <Sun size={20} strokeWidth={2} className="text-[#D7B797] transition-transform group-hover:rotate-45" />
+                <Moon size={20} strokeWidth={2} className="text-[#D7B797] transition-transform group-hover:-rotate-12" />
               ) : (
-                <Moon size={20} strokeWidth={2} className="text-[#8A6340] transition-transform group-hover:-rotate-12" />
+                <Sun size={20} strokeWidth={2} className="text-[#8A6340] transition-transform group-hover:rotate-45" />
               )}
             </div>
+          </button>
+
+          {/* Language Toggle */}
+          <button
+            onClick={() => setLanguage(language === 'en' ? 'vi' : 'en')}
+            className={`relative p-2.5 rounded-xl transition-all duration-300 group ${
+              darkMode
+                ? 'hover:bg-[rgba(215,183,151,0.08)]'
+                : 'hover:bg-[rgba(160,120,75,0.12)]'
+            }`}
+            title={language === 'en' ? 'Chuyển sang Tiếng Việt' : 'Switch to English'}
+          >
+            <span className={`text-xs font-semibold font-['JetBrains_Mono'] ${
+                darkMode ? 'text-[#D7B797]' : 'text-[#8A6340]'
+              }`}>
+                {language === 'en' ? 'EN' : 'VN'}
+              </span>
           </button>
 
           {/* Notification Bell */}
@@ -389,7 +409,7 @@ const AppHeader = ({
                     : 'bg-[rgba(215,183,151,0.15)] border border-[rgba(215,183,151,0.3)]'
                   : darkMode
                     ? 'hover:bg-[rgba(215,183,151,0.08)] border border-transparent'
-                    : 'hover:bg-[rgba(215,183,151,0.1)] border border-transparent'
+                    : 'hover:bg-[rgba(160,120,75,0.12)] border border-transparent'
               }`}
             >
               <Bell size={20} strokeWidth={2} className={
@@ -426,7 +446,7 @@ const AppHeader = ({
                     <h3 className={`text-sm font-semibold font-['Montserrat'] ${
                       darkMode ? 'text-[#F2F2F2]' : 'text-gray-900'
                     }`}>
-                      Budget Alerts
+                      {t('header.budgetAlerts')}
                     </h3>
                   </div>
                   {budgetAlerts.length > 0 && (
@@ -435,7 +455,7 @@ const AppHeader = ({
                         ? darkMode ? 'bg-[rgba(248,81,73,0.15)] text-[#FF7B72]' : 'bg-red-100 text-red-600'
                         : darkMode ? 'bg-[rgba(215,183,151,0.15)] text-[#D7B797]' : 'bg-amber-100 text-amber-600'
                     }`}>
-                      {budgetAlerts.length} alert{budgetAlerts.length !== 1 ? 's' : ''}
+                      {budgetAlerts.length} {budgetAlerts.length !== 1 ? t('header.alerts') : t('header.alert')}
                     </span>
                   )}
                 </div>
@@ -444,7 +464,7 @@ const AppHeader = ({
                 <div className="max-h-80 overflow-y-auto">
                   {budgetAlerts.length === 0 ? (
                     <div className={`px-4 py-8 text-center text-sm ${darkMode ? 'text-[#666666]' : 'text-gray-400'}`}>
-                      No budget alerts
+                      {t('header.noAlerts')}
                     </div>
                   ) : (
                     budgetAlerts.slice(0, 8).map((alert, idx) => (
@@ -452,7 +472,7 @@ const AppHeader = ({
                         key={alert.id}
                         className={`px-4 py-3 flex gap-3 cursor-pointer transition-all duration-200 border-l-2 ${
                           darkMode
-                            ? `hover:bg-[rgba(215,183,151,0.05)] border-transparent hover:border-[#D7B797] ${getAlertBg(alert.severity, darkMode)}`
+                            ? `hover:bg-[rgba(160,120,75,0.08)] border-transparent hover:border-[#D7B797] ${getAlertBg(alert.severity, darkMode)}`
                             : `hover:bg-[rgba(215,183,151,0.08)] border-transparent hover:border-[#D7B797] ${getAlertBg(alert.severity, darkMode)}`
                         } ${idx !== Math.min(budgetAlerts.length, 8) - 1 ? (darkMode ? 'border-b border-b-[#1A1A1A]' : 'border-b border-b-gray-100') : ''}`}
                       >
@@ -494,7 +514,7 @@ const AppHeader = ({
                   darkMode ? 'border-[#2E2E2E] bg-[#0A0A0A]' : 'border-gray-100 bg-gray-50'
                 }`}>
                   <button className="w-full text-center text-xs font-semibold font-['Montserrat'] text-[#D7B797] hover:text-[#B89970] transition-colors py-1">
-                    View all alerts
+                    {t('header.viewAllAlerts')}
                   </button>
                 </div>
               </div>
@@ -537,7 +557,7 @@ const AppHeader = ({
                           : isCompleted
                             ? 'bg-gradient-to-r from-[rgba(18,119,73,0.12)] to-[rgba(18,119,73,0.05)] border-[rgba(18,119,73,0.3)]'
                             : darkMode
-                              ? 'bg-[#121212] border-[#2E2E2E] hover:bg-[rgba(215,183,151,0.05)] hover:border-[rgba(215,183,151,0.2)]'
+                              ? 'bg-[#121212] border-[#2E2E2E] hover:bg-[rgba(160,120,75,0.08)] hover:border-[rgba(215,183,151,0.2)]'
                               : 'bg-white border-gray-200 hover:bg-[rgba(215,183,151,0.08)] hover:border-[rgba(215,183,151,0.3)]'
                       }`}
                     >
@@ -600,7 +620,7 @@ const AppHeader = ({
                   }`}
                 >
                   <Save size={16} />
-                  Save
+                  {t('header.save')}
                 </button>
 
                 {/* Dropdown Toggle */}
@@ -633,7 +653,7 @@ const AppHeader = ({
       {openSaveMenu && createPortal(
         <div
           className={`fixed w-56 border rounded-xl shadow-2xl overflow-hidden ${
-            darkMode ? 'bg-[#1A1A1A] border-[#2E2E2E]' : 'bg-white border-[#2E2E2E]/20'
+            darkMode ? 'bg-[#1A1A1A] border-[#2E2E2E]' : 'bg-white border-[#C4B5A5]'
           }`}
           style={{
             top: saveMenuPosition.top,
@@ -653,7 +673,7 @@ const AppHeader = ({
             }`}
           >
             <Save size={14} />
-            Save
+            {t('header.save')}
           </button>
           <button
             onClick={() => {
@@ -663,11 +683,11 @@ const AppHeader = ({
             className={`w-full px-4 py-3 flex items-center gap-3 text-sm font-medium border-t transition-colors ${
               darkMode
                 ? 'border-[#2E2E2E] hover:bg-[rgba(215,183,151,0.08)] text-[#F2F2F2]'
-                : 'border-[#2E2E2E]/20 hover:bg-[rgba(215,183,151,0.15)] text-[#0A0A0A]'
+                : 'border-[#C4B5A5] hover:bg-[rgba(215,183,151,0.15)] text-[#0A0A0A]'
             }`}
           >
             <Layers size={14} />
-            Save as New Version
+            {t('header.saveAsNewVersion')}
           </button>
         </div>,
         document.body

@@ -2,6 +2,7 @@
 import React, { useEffect } from 'react';
 import { X, Save, Sparkles, FileText, DollarSign, TrendingUp } from 'lucide-react';
 import { formatCurrency } from '../../utils';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const BudgetModal = ({
   selectedCell,
@@ -13,6 +14,8 @@ const BudgetModal = ({
   calculateTotalBudget,
   handleStoreAllocationChange
 }) => {
+  const { t } = useLanguage();
+
   // Block interactions with layout behind modal
   useEffect(() => {
     document.body.style.overflow = 'hidden';
@@ -34,7 +37,7 @@ const BudgetModal = ({
           <div className="relative z-10 animate-in slide-in-from-left duration-500">
             <h2 className="text-2xl font-bold text-[#0A0A0A] flex items-center gap-3 font-['Montserrat']">
               <Sparkles size={24} className="animate-spin" style={{ animationDuration: '3s' }} />
-              {selectedCell.existingBudget ? 'Edit Budget' : 'Create Budget'}
+              {selectedCell.existingBudget ? t('components.editBudgetTitle') : t('components.createBudgetTitle')}
             </h2>
             <p className="text-[#0A0A0A]/70 text-sm mt-1 animate-in fade-in slide-in-from-bottom-2 duration-500" style={{ animationDelay: '200ms' }}>
               {selectedCell.brand.name} - {selectedCell.season.seasonGroupId} {selectedCell.season.name} ({selectedYear})
@@ -54,12 +57,12 @@ const BudgetModal = ({
           <div className="mb-6">
             <label className="block text-sm font-bold text-[#F2F2F2] mb-3 flex items-center gap-2 font-['Montserrat']">
               <FileText size={16} className="text-[#D7B797]" />
-              Budget Comment
+              {t('components.budgetComment')}
             </label>
             <textarea
               value={budgetFormData.comment}
               onChange={(e) => setBudgetFormData(prev => ({ ...prev, comment: e.target.value }))}
-              placeholder="Add any notes or comments about this budget allocation..."
+              placeholder={t('components.budgetCommentPlaceholder')}
               className="w-full px-5 py-4 bg-[#1A1A1A] border-2 border-[#2E2E2E] rounded-2xl text-[#F2F2F2] placeholder-[#666666] focus:ring-2 focus:ring-[#D7B797] focus:border-transparent resize-none transition-all duration-300 hover:border-[rgba(215,183,151,0.25)]"
               rows={3}
             />
@@ -69,7 +72,7 @@ const BudgetModal = ({
           <div>
             <label className="block text-sm font-bold text-[#F2F2F2] mb-4 flex items-center gap-2 animate-in fade-in slide-in-from-left duration-300 font-['Montserrat']" style={{ animationDelay: '100ms' }}>
               <DollarSign size={16} className="text-[#D7B797]" />
-              Store Budget Allocation
+              {t('components.storeBudgetAllocation')}
             </label>
             <div className="space-y-3">
               {budgetFormData.storeAllocations.map((sa, idx) => (
@@ -102,7 +105,7 @@ const BudgetModal = ({
             <div className="flex items-center justify-between relative z-10">
               <span className="text-lg font-bold text-[#F2F2F2] flex items-center gap-2 font-['Montserrat']">
                 <TrendingUp size={20} className="text-[#D7B797] animate-bounce" style={{ animationDuration: '2s' }} />
-                Total Budget:
+                {t('components.totalBudget')}
               </span>
               <span className="text-3xl font-black text-[#D7B797] transition-all duration-300 group-hover:scale-110 font-['JetBrains_Mono']">
                 {formatCurrency(calculateTotalBudget())}
@@ -117,14 +120,14 @@ const BudgetModal = ({
             onClick={onClose}
             className="px-6 py-3 border-2 border-[#2E2E2E] rounded-xl font-semibold text-[#999999] bg-[#1A1A1A] hover:bg-[rgba(215,183,151,0.08)] hover:border-[rgba(215,183,151,0.25)] hover:text-[#D7B797] hover:scale-105 active:scale-95 transition-all duration-300"
           >
-            Cancel
+            {t('common.cancel')}
           </button>
           <button
             onClick={onSave}
             className="px-6 py-3 bg-[#D7B797] text-[#0A0A0A] rounded-xl font-semibold hover:bg-[#C4A684] hover:scale-105 active:scale-95 transition-all duration-300 flex items-center gap-2 shadow-lg shadow-[#D7B797]/20 hover:shadow-xl hover:shadow-[#D7B797]/30 relative overflow-hidden group"
           >
             <Save size={18} className="relative z-10 group-hover:rotate-12 transition-transform duration-300" />
-            <span className="relative z-10 font-['Montserrat']">Save Budget</span>
+            <span className="relative z-10 font-['Montserrat']">{t('components.saveBudget')}</span>
           </button>
         </div>
       </div>
