@@ -29,10 +29,12 @@
 
 | Remote | URL | Note |
 |--------|-----|------|
-| **origin** | https://github.com/TCDevop/OTB.git | TCDevop account |
-| **nclamvn** | https://github.com/nclamvn/DAFC-OTB-TCDATA.git | Legacy |
+| **origin** | https://github.com/TCDevop/OTB.git | TCDevop (co lich su cu monorepo) |
+| **dafc-otb** | https://github.com/nclamvn/dafc-otb.git | nclamvn - CLEAN (chi 95 files, 1 commit) |
 | **dafc** | https://github.com/nclamvn/dafc.git | nclamvn mirror |
-| **dafc-otb** | https://github.com/nclamvn/dafc-otb.git | nclamvn primary |
+| **nclamvn** | https://github.com/nclamvn/DAFC-OTB-TCDATA.git | Legacy, khong dung nua |
+
+> **Luu y:** `dafc-otb` la repo sach nhat — chi chua code Next.js, khong co file cu tu monorepo (`apps/`, `packages/`, `docs/`...).
 
 ### Demo Accounts
 
