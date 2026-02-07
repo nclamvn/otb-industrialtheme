@@ -1,0 +1,688 @@
+// ============================================================================
+// DAFC OTB Planning System - Database Schema
+// Tech: PostgreSQL 16 + Prisma ORM
+// Updated: 2026-02-05 — Removed ProposalRails (flat product structure)
+// ============================================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================================
+// AUTH & RBAC
+// ============================================================================
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  name         String
+  passwordHash String   @map("password_hash")
+  roleId       String   @map("role_id")
+  storeAccess  String[] @map("store_access") // store IDs user can access
+  brandAccess  String[] @map("brand_access") // brand IDs user can access
+  isActive     Boolean  @default(true) @map("is_active")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  role              Role               @relation(fields: [roleId], references: [id])
+  createdBudgets    Budget[]           @relation("BudgetCreator")
+  createdPlannings  PlanningVersion[]  @relation("PlanningCreator")
+  createdProposals  Proposal[]         @relation("ProposalCreator")
+  approvalDecisions Approval[]         @relation("ApprovalDecider")
+  auditLogs         AuditLog[]
+  workflowSteps     ApprovalWorkflowStep[] @relation("WorkflowStepUser")
+
+  @@map("users")
+}
+
+model Role {
+  id          String @id @default(cuid())
+  name        String @unique // buyer, merchandiser, merch_manager, finance_director, admin
+  description String?
+  permissions Json   @default("[]") // ["budget:read", "budget:write", "planning:approve", ...]
+
+  users User[]
+
+  @@map("roles")
+}
+
+// ============================================================================
+// MASTER DATA
+// ============================================================================
+
+model GroupBrand {
+  id          String  @id @default(cuid())
+  code        String  @unique // FER, BUR, GUC, PRA
+  name        String  // Ferragamo, Burberry, Gucci, Prada
+  groupId     String  @map("group_id") // A, B, C
+  colorConfig Json?   @map("color_config") // { gradient: "from-rose-400 to-rose-600" }
+  isActive    Boolean @default(true) @map("is_active")
+  sortOrder   Int     @default(0) @map("sort_order")
+
+  budgets    Budget[]
+  skuCatalog SkuCatalog[]
+  workflowSteps ApprovalWorkflowStep[]
+
+  @@map("group_brands")
+}
+
+model Store {
+  id       String  @id @default(cuid())
+  code     String  @unique // REX, TTP
+  name     String
+  region   String?
+  isActive Boolean @default(true) @map("is_active")
+
+  budgetDetails            BudgetDetail[]
+  productAllocations       ProductAllocation[]
+  salesHistory             SalesHistory[]
+  sizeCurveRecommendations SizeCurveRecommendation[]
+  skuPerformance           SkuPerformance[] @relation("StoreSkuPerformance")
+
+  @@map("stores")
+}
+
+model Collection {
+  id       String  @id @default(cuid())
+  name     String  @unique
+  isActive Boolean @default(true) @map("is_active")
+
+  planningDetails PlanningDetail[]
+
+  @@map("collections")
+}
+
+model Gender {
+  id       String  @id @default(cuid())
+  name     String  @unique // Male, Female, Unisex
+  isActive Boolean @default(true) @map("is_active")
+
+  categories      Category[]
+  planningDetails PlanningDetail[]
+
+  @@map("genders")
+}
+
+model Category {
+  id       String  @id @default(cuid())
+  name     String  // RTW, HARD ACCESSORIES, etc.
+  genderId String  @map("gender_id")
+  isActive Boolean @default(true) @map("is_active")
+
+  gender          Gender           @relation(fields: [genderId], references: [id])
+  subCategories   SubCategory[]
+  planningDetails PlanningDetail[]
+
+  @@map("categories")
+}
+
+model SubCategory {
+  id         String  @id @default(cuid())
+  name       String  // W Outerwear, W Tailoring, M Bags, etc.
+  categoryId String  @map("category_id")
+  isActive   Boolean @default(true) @map("is_active")
+
+  category        Category         @relation(fields: [categoryId], references: [id])
+  planningDetails PlanningDetail[]
+
+  @@map("sub_categories")
+}
+
+model SkuCatalog {
+  id            String  @id @default(cuid())
+  skuCode       String  @unique @map("sku_code")
+  productName   String  @map("product_name")
+  productType   String  @map("product_type") // W OUTERWEAR, W TOPS, M BAGS
+  theme         String? // AUGUST (08), SEPTEMBER (09)
+  color         String?
+  composition   String?
+  srp           Decimal @db.Decimal(18, 2) // Suggested Retail Price (VND)
+  brandId       String? @map("brand_id")
+  seasonGroupId String? @map("season_group_id")
+  imageUrl      String? @map("image_url")
+  isActive      Boolean @default(true) @map("is_active")
+
+  brand                    GroupBrand?               @relation(fields: [brandId], references: [id])
+  products                 ProposalProduct[]
+  sizeCurveRecommendations SizeCurveRecommendation[]
+  skuPerformance           SkuPerformance[]
+  skuRecommendations       SkuRecommendation[]
+
+  @@map("sku_catalog")
+}
+
+// ============================================================================
+// BUDGET MODULE
+// ============================================================================
+
+enum BudgetStatus {
+  DRAFT
+  SUBMITTED
+  LEVEL1_APPROVED
+  APPROVED
+  REJECTED
+}
+
+model Budget {
+  id            String       @id @default(cuid())
+  budgetCode    String       @unique @map("budget_code") // BUD-FER-SS-Pre-2025
+  groupBrandId  String       @map("group_brand_id")
+  seasonGroupId String       @map("season_group_id") // SS | FW
+  seasonType    String       @map("season_type") // pre | main
+  fiscalYear    Int          @map("fiscal_year")
+  totalBudget   Decimal      @default(0) @map("total_budget") @db.Decimal(18, 2)
+  status        BudgetStatus @default(DRAFT)
+  comment       String?
+  createdById   String       @map("created_by_id")
+  createdAt     DateTime     @default(now()) @map("created_at")
+  updatedAt     DateTime     @updatedAt @map("updated_at")
+
+  // Relations
+  groupBrand      GroupBrand       @relation(fields: [groupBrandId], references: [id])
+  createdBy       User             @relation("BudgetCreator", fields: [createdById], references: [id])
+  details         BudgetDetail[]
+  proposals       Proposal[]
+  budgetAlerts    BudgetAlert[]
+  budgetSnapshots BudgetSnapshot[]
+
+  // Constraints
+  @@unique([groupBrandId, seasonGroupId, seasonType, fiscalYear])
+  @@index([fiscalYear])
+  @@index([status])
+  @@map("budgets")
+}
+
+model BudgetDetail {
+  id           String  @id @default(cuid())
+  budgetId     String  @map("budget_id")
+  storeId      String  @map("store_id")
+  budgetAmount Decimal @default(0) @map("budget_amount") @db.Decimal(18, 2)
+
+  // Relations
+  budget                      Budget                      @relation(fields: [budgetId], references: [id], onDelete: Cascade)
+  store                       Store                       @relation(fields: [storeId], references: [id])
+  planningVersions            PlanningVersion[]
+  allocationRecommendations   AllocationRecommendation[]
+  skuRecommendations          SkuRecommendation[]
+
+  @@unique([budgetId, storeId])
+  @@map("budget_details")
+}
+
+// ============================================================================
+// PLANNING MODULE
+// ============================================================================
+
+enum PlanningStatus {
+  DRAFT
+  SUBMITTED
+  LEVEL1_APPROVED
+  APPROVED
+  REJECTED
+}
+
+model PlanningVersion {
+  id             String         @id @default(cuid())
+  planningCode   String         @unique @map("planning_code") // PLN-BUD-FER-SS-Pre-2025-REX-V1
+  budgetDetailId String         @map("budget_detail_id")
+  versionNumber  Int            @map("version_number")
+  versionName    String?        @map("version_name")
+  status         PlanningStatus @default(DRAFT)
+  isFinal        Boolean        @default(false) @map("is_final")
+  snapshotData   Json?          @map("snapshot_data") // frozen data on submit
+  createdById    String         @map("created_by_id")
+  createdAt      DateTime       @default(now()) @map("created_at")
+  updatedAt      DateTime       @updatedAt @map("updated_at")
+
+  // Relations
+  budgetDetail BudgetDetail    @relation(fields: [budgetDetailId], references: [id])
+  createdBy    User            @relation("PlanningCreator", fields: [createdById], references: [id])
+  details      PlanningDetail[]
+  proposals    Proposal[]
+
+  @@unique([budgetDetailId, versionNumber])
+  @@map("planning_versions")
+}
+
+model PlanningDetail {
+  id                String  @id @default(cuid())
+  planningVersionId String  @map("planning_version_id")
+  dimensionType     String  @map("dimension_type") // collection | gender | category
+  collectionId      String? @map("collection_id")
+  genderId          String? @map("gender_id")
+  categoryId        String? @map("category_id")
+  subCategoryId     String? @map("sub_category_id")
+
+  // Metrics
+  lastSeasonSales Decimal @default(0) @map("last_season_sales") @db.Decimal(18, 2)
+  lastSeasonPct   Decimal @default(0) @map("last_season_pct") @db.Decimal(8, 4)
+  systemBuyPct    Decimal @default(0) @map("system_buy_pct") @db.Decimal(8, 4)
+  userBuyPct      Decimal @default(0) @map("user_buy_pct") @db.Decimal(8, 4)
+  otbValue        Decimal @default(0) @map("otb_value") @db.Decimal(18, 2)
+  variancePct     Decimal @default(0) @map("variance_pct") @db.Decimal(8, 4)
+  userComment     String? @map("user_comment")
+
+  // Relations
+  planningVersion PlanningVersion @relation(fields: [planningVersionId], references: [id], onDelete: Cascade)
+  collection      Collection?     @relation(fields: [collectionId], references: [id])
+  gender          Gender?         @relation(fields: [genderId], references: [id])
+  category        Category?       @relation(fields: [categoryId], references: [id])
+  subCategory     SubCategory?    @relation(fields: [subCategoryId], references: [id])
+
+  @@map("planning_details")
+}
+
+// ============================================================================
+// PROPOSAL MODULE (flat — no rails)
+// ============================================================================
+
+enum ProposalStatus {
+  DRAFT
+  SUBMITTED
+  LEVEL1_APPROVED
+  APPROVED
+  REJECTED
+}
+
+model Proposal {
+  id                String         @id @default(cuid())
+  ticketName        String         @map("ticket_name")
+  budgetId          String         @map("budget_id")
+  planningVersionId String?        @map("planning_version_id")
+  status            ProposalStatus @default(DRAFT)
+  totalSkuCount     Int            @default(0) @map("total_sku_count")
+  totalOrderQty     Int            @default(0) @map("total_order_qty")
+  totalValue        Decimal        @default(0) @map("total_value") @db.Decimal(18, 2)
+  createdById       String         @map("created_by_id")
+  createdAt         DateTime       @default(now()) @map("created_at")
+  updatedAt         DateTime       @updatedAt @map("updated_at")
+
+  // Relations
+  budget          Budget           @relation(fields: [budgetId], references: [id])
+  planningVersion PlanningVersion? @relation(fields: [planningVersionId], references: [id])
+  createdBy       User             @relation("ProposalCreator", fields: [createdById], references: [id])
+  products        ProposalProduct[]
+
+  @@map("proposals")
+}
+
+model ProposalProduct {
+  id             String  @id @default(cuid())
+  proposalId     String  @map("proposal_id")
+  skuId          String  @map("sku_id")
+  skuCode        String  @map("sku_code")
+  productName    String  @map("product_name")
+  collection     String?
+  gender         String?
+  category       String?
+  subCategory    String? @map("sub_category")
+  theme          String?
+  color          String?
+  composition    String?
+  unitCost       Decimal @default(0) @map("unit_cost") @db.Decimal(18, 2)
+  srp            Decimal @default(0) @db.Decimal(18, 2)
+  orderQty       Int     @default(0) @map("order_qty")
+  totalValue     Decimal @default(0) @map("total_value") @db.Decimal(18, 2)
+  customerTarget String? @map("customer_target") // New | Existing | VIP
+  imageUrl       String? @map("image_url")
+  sortOrder      Int     @default(0) @map("sort_order")
+
+  // Relations
+  proposal    Proposal            @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+  sku         SkuCatalog          @relation(fields: [skuId], references: [id])
+  allocations ProductAllocation[]
+
+  @@map("proposal_products")
+}
+
+model ProductAllocation {
+  id                String @id @default(cuid())
+  proposalProductId String @map("proposal_product_id")
+  storeId           String @map("store_id")
+  quantity          Int    @default(0)
+
+  // Relations
+  proposalProduct ProposalProduct @relation(fields: [proposalProductId], references: [id], onDelete: Cascade)
+  store           Store           @relation(fields: [storeId], references: [id])
+
+  @@unique([proposalProductId, storeId])
+  @@map("product_allocations")
+}
+
+// ============================================================================
+// APPROVAL WORKFLOW
+// ============================================================================
+
+enum ApprovalAction {
+  APPROVED
+  REJECTED
+}
+
+model Approval {
+  id         String         @id @default(cuid())
+  entityType String         @map("entity_type") // budget | planning | proposal
+  entityId   String         @map("entity_id")
+  level      Int            // 1 = Merch Manager, 2 = Finance Director
+  deciderId  String         @map("decider_id")
+  action     ApprovalAction
+  comment    String?
+  decidedAt  DateTime       @default(now()) @map("decided_at")
+
+  // Relations (only decider has FK - entityId is polymorphic)
+  decider User @relation("ApprovalDecider", fields: [deciderId], references: [id])
+
+  @@index([entityType, entityId])
+  @@map("approvals")
+}
+
+// ============================================================================
+// AUDIT LOG
+// ============================================================================
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  userId     String   @map("user_id")
+  entityType String   @map("entity_type") // budget | planning | proposal
+  entityId   String   @map("entity_id")
+  action     String   // create | update | delete | submit | approve | reject
+  changes    Json?    // { field: { old: x, new: y } }
+  ipAddress  String?  @map("ip_address")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([entityType, entityId])
+  @@index([userId])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
+
+// ============================================================================
+// AI MODULE — Size Curve Optimizer
+// ============================================================================
+
+model SalesHistory {
+  id             String   @id @default(cuid())
+  skuCode        String   @map("sku_code")
+  storeId        String   @map("store_id")
+  sizeCode       String   @map("size_code")       // '0002', '0004', '0006', '0008'
+  season         String                            // 'SS-Pre-2025', 'FW-Main-2024'
+  quantitySold   Int      @default(0) @map("quantity_sold")
+  quantityBought Int      @default(0) @map("quantity_bought")
+  sellThroughPct Decimal  @default(0) @map("sell_through_pct") @db.Decimal(5, 2)
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  store Store @relation(fields: [storeId], references: [id])
+
+  @@index([skuCode, storeId, season])
+  @@map("sales_history")
+}
+
+model SizeCurveRecommendation {
+  id              String   @id @default(cuid())
+  skuId           String   @map("sku_id")
+  storeId         String   @map("store_id")
+  category        String                           // 'W OUTERWEAR', 'M BAGS'
+  sizeCode        String   @map("size_code")
+  recommendedPct  Decimal  @map("recommended_pct") @db.Decimal(5, 2)
+  confidence      Decimal  @db.Decimal(3, 2)       // 0.00 - 1.00
+  basedOnSeasons  Int      @map("based_on_seasons")
+  reasoning       String?
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  sku   SkuCatalog @relation(fields: [skuId], references: [id])
+  store Store      @relation(fields: [storeId], references: [id])
+
+  @@unique([skuId, storeId, sizeCode])
+  @@index([category, storeId])
+  @@map("size_curve_recommendations")
+}
+
+// ============================================================================
+// AI MODULE — Budget Variance Alerts
+// ============================================================================
+
+model BudgetAlert {
+  id          String   @id @default(cuid())
+  budgetId    String   @map("budget_id")
+  alertType   String   @map("alert_type")    // over_budget, under_utilized, pace_warning, category_imbalance
+  severity    String                          // critical, warning, info
+  title       String
+  message     String
+  metricValue Decimal  @map("metric_value") @db.Decimal(18, 2)
+  threshold   Decimal  @db.Decimal(18, 2)
+  category    String?
+  isRead      Boolean  @default(false) @map("is_read")
+  isDismissed Boolean  @default(false) @map("is_dismissed")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  budget Budget @relation(fields: [budgetId], references: [id])
+
+  @@index([budgetId, isRead, createdAt(sort: Desc)])
+  @@map("budget_alerts")
+}
+
+model BudgetSnapshot {
+  id              String   @id @default(cuid())
+  budgetId        String   @map("budget_id")
+  snapshotDate    DateTime @map("snapshot_date") @db.Date
+  totalCommitted  Decimal  @default(0) @map("total_committed") @db.Decimal(18, 2)
+  totalPlanned    Decimal  @default(0) @map("total_planned") @db.Decimal(18, 2)
+  utilizationPct  Decimal  @default(0) @map("utilization_pct") @db.Decimal(5, 2)
+
+  budget Budget @relation(fields: [budgetId], references: [id])
+
+  @@unique([budgetId, snapshotDate])
+  @@index([budgetId, snapshotDate(sort: Desc)])
+  @@map("budget_snapshots")
+}
+
+// ============================================================================
+// OTB AUTO-ALLOCATION ENGINE
+// ============================================================================
+
+model AllocationHistory {
+  id              String   @id @default(cuid())
+  budgetId        String   @map("budget_id")
+  seasonGroup     String   @map("season_group")      // SS | FW
+  seasonType      String   @map("season_type")        // Pre | Main
+  fiscalYear      Int      @map("fiscal_year")
+  dimensionType   String   @map("dimension_type")     // collection | gender | category
+  dimensionValue  String   @map("dimension_value")    // "Carry Over", "Female", "W OUTERWEAR"
+  allocatedPct    Decimal  @map("allocated_pct") @db.Decimal(5, 2)
+  allocatedAmount Decimal  @map("allocated_amount") @db.Decimal(18, 2)
+  actualSales     Decimal? @map("actual_sales") @db.Decimal(18, 2)
+  sellThroughPct  Decimal? @map("sell_through_pct") @db.Decimal(5, 2)
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  @@index([seasonGroup, seasonType, dimensionType])
+  @@index([dimensionType, dimensionValue])
+  @@map("allocation_history")
+}
+
+model AllocationRecommendation {
+  id              String   @id @default(cuid())
+  budgetDetailId  String   @map("budget_detail_id")
+  dimensionType   String   @map("dimension_type")     // collection | gender | category
+  dimensionValue  String   @map("dimension_value")
+  recommendedPct  Decimal  @map("recommended_pct") @db.Decimal(5, 2)
+  recommendedAmt  Decimal  @map("recommended_amt") @db.Decimal(18, 2)
+  confidence      Decimal  @db.Decimal(3, 2)           // 0.00 - 1.00
+  reasoning       String?  @db.Text
+  basedOnSeasons  Int      @map("based_on_seasons")
+  factors         Json?
+  isApplied       Boolean  @default(false) @map("is_applied")
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  budgetDetail BudgetDetail @relation(fields: [budgetDetailId], references: [id])
+
+  @@unique([budgetDetailId, dimensionType, dimensionValue])
+  @@map("allocation_recommendations")
+}
+
+// ============================================================================
+// APPROVAL RISK SCORING
+// ============================================================================
+
+model RiskAssessment {
+  id              String   @id @default(cuid())
+  entityType      String   @map("entity_type")
+  entityId        String   @map("entity_id")
+  overallScore    Decimal  @map("overall_score") @db.Decimal(3,1)
+  riskLevel       String   @map("risk_level")
+
+  budgetAlignmentScore    Decimal @map("budget_alignment_score") @db.Decimal(3,1)
+  skuDiversityScore       Decimal @map("sku_diversity_score") @db.Decimal(3,1)
+  sizeCurveScore          Decimal @map("size_curve_score") @db.Decimal(3,1)
+  vendorConcentrationScore Decimal @map("vendor_concentration_score") @db.Decimal(3,1)
+  categoryBalanceScore    Decimal @map("category_balance_score") @db.Decimal(3,1)
+  marginImpactScore       Decimal @map("margin_impact_score") @db.Decimal(3,1)
+
+  factors         Json?
+  warnings        Json?
+  recommendation  String?  @db.Text
+
+  calculatedAt    DateTime @default(now()) @map("calculated_at")
+  calculatedBy    String?  @map("calculated_by")
+  isStale         Boolean  @default(false) @map("is_stale")
+
+  @@unique([entityType, entityId])
+  @@index([entityType, riskLevel])
+  @@index([overallScore])
+  @@map("risk_assessments")
+}
+
+model RiskThreshold {
+  id              String   @id @default(cuid())
+  factorName      String   @unique @map("factor_name")
+  weight          Decimal  @db.Decimal(3,2)
+  lowThreshold    Decimal  @map("low_threshold") @db.Decimal(3,1)
+  highThreshold   Decimal  @map("high_threshold") @db.Decimal(3,1)
+  description     String?
+  isActive        Boolean  @default(true) @map("is_active")
+
+  @@map("risk_thresholds")
+}
+
+// ============================================================================
+// SKU SELECTION RECOMMENDER
+// ============================================================================
+
+model SkuPerformance {
+  id              String   @id @default(cuid())
+  skuId           String   @map("sku_id")
+  skuCode         String   @map("sku_code")
+  seasonGroup     String   @map("season_group")
+  fiscalYear      Int      @map("fiscal_year")
+  storeId         String?  @map("store_id")
+
+  quantityBought  Int      @map("quantity_bought")
+  quantitySold    Int      @map("quantity_sold")
+  sellThroughPct  Decimal  @map("sell_through_pct") @db.Decimal(5,2)
+  avgSellingPrice Decimal  @map("avg_selling_price") @db.Decimal(18,2)
+  totalRevenue    Decimal  @map("total_revenue") @db.Decimal(18,2)
+  grossMarginPct  Decimal  @map("gross_margin_pct") @db.Decimal(5,2)
+  markdownPct     Decimal  @map("markdown_pct") @db.Decimal(5,2)
+  weeksToSellThru Int?     @map("weeks_to_sell_thru")
+
+  performanceScore Int     @map("performance_score")
+  velocityScore    Int     @map("velocity_score")
+  marginScore      Int     @map("margin_score")
+
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  sku             SkuCatalog @relation(fields: [skuId], references: [id])
+  store           Store?     @relation("StoreSkuPerformance", fields: [storeId], references: [id])
+
+  @@unique([skuId, seasonGroup, fiscalYear, storeId])
+  @@index([skuCode])
+  @@index([performanceScore])
+  @@map("sku_performance")
+}
+
+model AttributeTrend {
+  id              String   @id @default(cuid())
+  attributeType   String   @map("attribute_type")
+  attributeValue  String   @map("attribute_value")
+  category        String?
+  seasonGroup     String   @map("season_group")
+  fiscalYear      Int      @map("fiscal_year")
+
+  totalSkus       Int      @map("total_skus")
+  avgSellThrough  Decimal  @map("avg_sell_through") @db.Decimal(5,2)
+  avgMargin       Decimal  @map("avg_margin") @db.Decimal(5,2)
+  trendScore      Int      @map("trend_score")
+  yoyGrowth       Decimal? @map("yoy_growth") @db.Decimal(5,2)
+
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  @@unique([attributeType, attributeValue, category, seasonGroup, fiscalYear])
+  @@index([trendScore])
+  @@map("attribute_trends")
+}
+
+model SkuRecommendation {
+  id              String   @id @default(cuid())
+  budgetDetailId  String   @map("budget_detail_id")
+  category        String
+  subCategory     String?  @map("sub_category")
+
+  skuId           String   @map("sku_id")
+  skuCode         String   @map("sku_code")
+  productName     String   @map("product_name")
+
+  recommendedQty  Int      @map("recommended_qty")
+  recommendedValue Decimal @map("recommended_value") @db.Decimal(18,2)
+  confidence      Decimal  @db.Decimal(3,2)
+
+  performanceScore Int     @map("performance_score")
+  trendScore       Int     @map("trend_score")
+  assortmentScore  Int     @map("assortment_score")
+  priceScore       Int     @map("price_score")
+  overallScore     Int     @map("overall_score")
+
+  riskLevel       String   @map("risk_level")
+  reasoning       String?  @db.Text
+
+  isSelected      Boolean  @default(false) @map("is_selected")
+  isRejected      Boolean  @default(false) @map("is_rejected")
+
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  budgetDetail    BudgetDetail @relation(fields: [budgetDetailId], references: [id])
+  sku             SkuCatalog   @relation(fields: [skuId], references: [id])
+
+  @@index([budgetDetailId, category])
+  @@index([overallScore])
+  @@map("sku_recommendations")
+}
+
+// ============================================================================
+// APPROVAL WORKFLOW CONFIGURATION
+// ============================================================================
+
+model ApprovalWorkflowStep {
+  id          String   @id @default(cuid())
+  brandId     String   @map("brand_id")
+  stepNumber  Int      @map("step_number")
+  roleName    String   @map("role_name")
+  roleCode    String?  @map("role_code")
+  userId      String?  @map("user_id")
+  description String?
+  isActive    Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  brand       GroupBrand @relation(fields: [brandId], references: [id])
+  user        User?      @relation("WorkflowStepUser", fields: [userId], references: [id])
+
+  @@unique([brandId, stepNumber])
+  @@index([brandId])
+  @@map("approval_workflow_steps")
+}

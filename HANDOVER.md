@@ -1,13 +1,13 @@
-# HANDOVER - DAFC OTB NextJS Frontend
+# HANDOVER - DAFC OTB Platform (Full-Stack)
 
 > **Khi quay lai, yeu cau Claude doc file nay de tiep tuc:**
 > ```
-> doc file HANDOVER.md de tiep tuc
+> doc handover tiep tuc
 > ```
 
 ---
 
-## Cap nhat lan cuoi: 06/02/2026 (Session 6 - i18n, Premium UI, Light Theme)
+## Cap nhat lan cuoi: 07/02/2026 (Session 7 - Full-Stack Handover Documentation)
 
 ---
 
@@ -39,10 +39,11 @@
 ### Demo Accounts
 
 ```
-admin@dafc.com    / dafc@2026  (Admin)
+admin@dafc.com    / dafc@2026  (System Admin - full permissions)
+buyer@dafc.com    / dafc@2026  (Buyer)
 merch@dafc.com    / dafc@2026  (Merchandiser)
-manager@dafc.com  / dafc@2026  (Manager)
-finance@dafc.com  / dafc@2026  (Finance)
+manager@dafc.com  / dafc@2026  (Merch Manager - L1 Approver)
+finance@dafc.com  / dafc@2026  (Finance Director - L2 Approver)
 ```
 
 ---
@@ -285,42 +286,382 @@ src/screens/*.jsx                     # i18n + light theme fix + premium cards
 
 ---
 
+## CONTEXTS (State Management)
+
+### AuthContext.js
+```js
+const { user, loading, error, isAuthenticated, login, logout, hasPermission, hasAnyPermission, canApprove } = useAuth();
+// login(email, password) - Async, sets user on success
+// logout() - Clears tokens + state
+// hasPermission('budget:write') - Check single permission
+// canApprove(1) / canApprove(2) - Check L1/L2 approval permission
+// Token: localStorage.accessToken, localStorage.refreshToken
+// Auto-fetch user profile on mount
+```
+
+### AppContext.js
+```js
+const {
+  darkMode, setDarkMode,                          // Dark/light theme
+  sharedYear, setSharedYear,                       // Filter: fiscal year (default 2025)
+  sharedGroupBrand, setSharedGroupBrand,           // Filter: group brand
+  sharedBrand, setSharedBrand,                     // Filter: brand
+  allocationData, setAllocationData,               // Cross-screen: planning data
+  otbAnalysisContext, setOtbAnalysisContext,        // Cross-screen: OTB analysis
+  skuProposalContext, setSkuProposalContext,        // Cross-screen: SKU proposal
+  kpiData, setKpiData                              // Dashboard KPI values
+} = useAppContext();
+```
+
+### LanguageContext.js
+```js
+const { language, setLanguage, t } = useLanguage();
+// language: 'en' | 'vi' (default 'vi')
+// t('home.welcomeBack', { name: 'Admin' }) - Translation with {{param}} interpolation
+// Fallback: current lang → EN → raw key
+// Persisted: localStorage.getItem('app-language')
+// 758 lines per locale file, 500+ translation keys
+```
+
+---
+
+## HOOKS (Domain Logic)
+
+### useProposal.js
+- State: `proposals`, `loading`, `error`, `showProposalDetail`, `selectedProposal`, `skuCatalog`
+- Actions: `fetchProposals()`, `fetchSkuCatalog()`, `createProposal()`, `addProduct()`, `bulkAddProducts()`, `updateProduct()`, `removeProduct()`, `submitProposal()`, `approveProposal()`, `deleteProposal()`
+
+### useBudget.js
+- State: `selectedYear`, `selectedSeasonGroups`, `budgets`, `loading`, `error`, `brands`, `stores`, `seasons`
+- Actions: `handleCellClick()`, `handleStoreAllocationChange()`, `handleSaveBudget()`, `submitBudget()`, `approveBudget()`
+- Auto-fetches master data on mount, budgets on year change
+
+### usePlanning.js
+- State: `plannings`, `loading`, `error`, `collections`, `genders`, `categories`
+- Actions: `handleOpenPlanningDetail()`, `handleSavePlanning()`, `submitPlanning()`, `approvePlanning()`, `markPlanningFinal()`, `copyPlanning()`
+
+---
+
+## SERVICES → API ENDPOINTS
+
+### authService.js
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/auth/login` | Login → returns accessToken, refreshToken, user |
+| POST | `/auth/refresh` | Refresh token |
+| GET | `/auth/me` | Get current user profile |
+
+### budgetService.js
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/budgets` | List (filters: fiscalYear, status, groupBrandId) |
+| GET | `/budgets/statistics` | Budget stats |
+| GET | `/budgets/:id` | Get one with details & approval history |
+| POST | `/budgets` | Create with store allocations |
+| PUT | `/budgets/:id` | Update (DRAFT only) |
+| POST | `/budgets/:id/submit` | Submit for approval |
+| POST | `/budgets/:id/approve/level1` | L1 approve/reject |
+| POST | `/budgets/:id/approve/level2` | L2 approve/reject |
+| DELETE | `/budgets/:id` | Delete (DRAFT only) |
+
+### planningService.js
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/planning` | List (filters: budgetDetailId, budgetId, status) |
+| GET | `/planning/:id` | Get with details & approvals |
+| POST | `/planning` | Create for a budget detail |
+| POST | `/planning/:id/copy` | Copy to new version |
+| PUT | `/planning/:id` | Update (DRAFT) |
+| PATCH | `/planning/:id/details/:detailId` | Update single detail |
+| POST | `/planning/:id/submit` | Submit for approval |
+| POST | `/planning/:id/approve/level1` | L1 approve/reject |
+| POST | `/planning/:id/approve/level2` | L2 approve/reject |
+| POST | `/planning/:id/final` | Mark as final version |
+| DELETE | `/planning/:id` | Delete (DRAFT) |
+
+### proposalService.js
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/proposals` | List (filters: budgetId, status) |
+| GET | `/proposals/statistics` | Proposal stats |
+| GET | `/proposals/:id` | Get with products & approvals |
+| POST | `/proposals` | Create |
+| PUT | `/proposals/:id` | Update (DRAFT) |
+| POST | `/proposals/:id/products` | Add single product |
+| POST | `/proposals/:id/products/bulk` | Bulk add products |
+| PATCH | `/proposals/:id/products/:productId` | Update product |
+| DELETE | `/proposals/:id/products/:productId` | Remove product |
+| POST | `/proposals/:id/submit` | Submit |
+| POST | `/proposals/:id/approve/level1` | L1 approve/reject |
+| POST | `/proposals/:id/approve/level2` | L2 approve/reject |
+| DELETE | `/proposals/:id` | Delete (DRAFT) |
+
+### masterDataService.js
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/master/brands` | Group brands (FER, BUR, GUC, PRA) |
+| GET | `/master/stores` | Stores (REX, TTP) |
+| GET | `/master/collections` | Collections (Carry Over, New) |
+| GET | `/master/genders` | Genders (Male, Female, Unisex) |
+| GET | `/master/categories` | Full hierarchy: Gender → Category → SubCategory |
+| GET | `/master/seasons` | Season config (SS/FW + Pre/Main) |
+| GET | `/master/sku-catalog` | SKU catalog (query: search, productType, brandId, page, pageSize) |
+| GET | `/master/sub-categories` | SubCategories (fallback: flatten from categories) |
+
+### approvalWorkflowService.js
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/approval-workflow` | List steps (optional: brandId) |
+| GET | `/approval-workflow/roles` | Available roles |
+| GET | `/approval-workflow/brand/:brandId` | Workflow for a brand |
+| POST | `/approval-workflow` | Create step |
+| PATCH | `/approval-workflow/:id` | Update step |
+| DELETE | `/approval-workflow/:id` | Delete step |
+| POST | `/approval-workflow/brand/:brandId/reorder` | Reorder steps |
+
+### aiService.js
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/ai/size-curve/:category/:storeId` | AI size curve recommendation |
+| POST | `/ai/size-curve/calculate` | Calculate size curve |
+| POST | `/ai/size-curve/compare` | Compare user vs AI sizing |
+| GET | `/ai/alerts` | Budget variance alerts |
+| PATCH | `/ai/alerts/:id/read` | Mark alert read |
+| POST | `/ai/alerts/check` | Trigger alert check |
+| POST | `/ai/allocation/generate` | Generate OTB allocation |
+| GET | `/ai/allocation/:budgetDetailId` | Get recommendations |
+| POST | `/ai/allocation/:budgetDetailId/apply` | Apply recommendations |
+| POST | `/ai/risk/assess/:entityType/:entityId` | Calculate risk score |
+| GET | `/ai/risk/:entityType/:entityId` | Get risk assessment |
+| POST | `/ai/sku-recommend/generate` | Generate SKU recommendations |
+| GET | `/ai/sku-recommend/:budgetDetailId` | Get SKU recommendations |
+| PATCH | `/ai/sku-recommend/:id/status` | Mark selected/rejected |
+
+---
+
+## BACKEND (NestJS)
+
+### Location & Tech
+```
+/Users/mac/OTBDAFC/DAFC-Backend/dafc-otb-backend/
+├── src/
+│   ├── main.ts                          # Bootstrap + Swagger
+│   ├── app.module.ts                    # Root (7 feature modules)
+│   ├── prisma/                          # Prisma service
+│   ├── common/guards/                   # jwt-auth.guard, permissions.guard
+│   └── modules/
+│       ├── auth/                        # Login, JWT, refresh
+│       ├── master-data/                 # Brands, stores, SKU catalog
+│       ├── budget/                      # Budget CRUD + 2-level approval
+│       ├── planning/                    # Planning versions + dimensions
+│       ├── proposal/                    # Flat proposal products
+│       ├── ai/                          # Size curve, alerts, allocation, risk, SKU
+│       └── approval-workflow/           # Workflow config per brand
+├── prisma/
+│   ├── schema.prisma                    # 29 tables
+│   ├── seed.ts                          # Default users + master data
+│   └── seed-rich.ts                     # Rich seed data
+├── docker-compose.yml                   # PostgreSQL 16
+└── package.json
+```
+
+### Database (PostgreSQL 16)
+- Docker: `dafc-otb-db` container, port 5432
+- Creds: user=`dafc`, password=`dafc2026`, db=`dafc_otb`
+- ORM: Prisma 5.8.0, 29 tables
+
+### Prisma Schema Summary
+
+**Auth & RBAC:**
+- `users` - accounts with role_id, store_access, brand_access
+- `roles` - roles with JSON permissions array (`*` = admin)
+
+**Master Data:**
+- `group_brands` - FER, BUR, GUC, PRA with color config
+- `stores`, `collections`, `genders`, `categories`, `sub_categories`
+- `sku_catalog` - products with sku_code, product_name, srp, brand_id
+
+**Budget (3 tables):**
+- `budgets` - by GroupBrand × SeasonGroup × SeasonType × FiscalYear
+- `budget_details` - store allocations (Budget → Store)
+- `budget_alerts` - variance alerts
+
+**Planning (2 tables):**
+- `planning_versions` - version per BudgetDetail with isFinal flag
+- `planning_details` - dimension allocation (collection/gender/category) with metrics
+
+**Proposal (3 tables):**
+- `proposals` - flat structure (no rails)
+- `proposal_products` - SKU + orderQty + costings
+- `product_allocations` - per-store quantity
+
+**Approval & Audit:**
+- `approvals` - polymorphic (budget/planning/proposal), level, action, comment
+- `audit_logs` - entity changes with user_id, changes JSON
+
+**AI Module (7+ tables):**
+- `sales_history`, `size_curve_recommendations`, `budget_snapshots`
+- `allocation_recommendations`, `risk_assessments`, `risk_thresholds`
+- `sku_performance`, `attribute_trends`, `sku_recommendations`
+- `approval_workflow_steps`
+
+### Authentication Flow
+```
+1. POST /auth/login → accessToken (8h) + refreshToken (7d)
+2. Request interceptor → Bearer token from localStorage
+3. On 401 → Try POST /auth/refresh → new accessToken → retry
+4. On refresh fail → clear tokens → redirect /login
+5. Permission-based RBAC: budget:read, budget:write, budget:approve_l1, etc.
+6. Admin has wildcard '*' permission
+```
+
+### Status Workflow (Budget / Planning / Proposal)
+```
+DRAFT → SUBMITTED → LEVEL1_APPROVED → APPROVED
+                  ↘                 ↗
+                    → REJECTED ←
+```
+
+### API Response Format
+```json
+// Success
+{ "success": true, "data": { ... }, "message": "..." }
+
+// Paginated
+{ "success": true, "data": [...], "total": 100, "page": 1, "pageSize": 20 }
+
+// Error
+{ "statusCode": 400, "message": "Error", "error": "Bad Request" }
+```
+
+---
+
+## ENVIRONMENT VARIABLES
+
+### Frontend (.env.local)
+```
+NEXT_PUBLIC_API_URL=http://localhost:4000/api/v1
+```
+
+### Backend (.env)
+```
+DATABASE_URL="postgresql://dafc:dafc2026@localhost:5432/dafc_otb?schema=public"
+JWT_SECRET="change-this-to-a-random-64-char-string-in-production"
+PORT=4000
+CORS_ORIGIN="http://localhost:3000"
+```
+
+---
+
 ## COMMANDS
 
 ```bash
-# Development
+# === FRONTEND (DAFC-OTB-NextJS/) ===
 npm run dev              # Start dev server (port 3006)
 npm run build            # Production build
+npm run start            # Start production server
+npm run lint             # ESLint
 
-# Git (4 remotes)
+# === BACKEND (DAFC-Backend/dafc-otb-backend/) ===
+docker compose up -d     # Start PostgreSQL
+npm install
+npm run prisma:generate  # Generate Prisma client
+npm run prisma:migrate   # Run DB migrations
+npm run prisma:seed      # Seed default data + users
+npm run prisma:studio    # Open Prisma Studio (GUI)
+npm run start:dev        # Start NestJS dev (port 4000)
+
+# Swagger docs: http://localhost:4000/api/docs
+
+# === GIT (4 remotes) ===
 git push origin main     # Push to TCDevop/OTB
 git push dafc-otb main   # Push to nclamvn/dafc-otb (primary)
 git push dafc main       # Push to nclamvn/dafc
 git push nclamvn main    # Push to nclamvn/DAFC-OTB-TCDATA (legacy)
-
-# Backend (separate project)
-cd /path/to/backend && npm run start:dev   # NestJS on port 4000
 ```
+
+### Full Startup Sequence
+```bash
+# 1. Start database
+cd "/Users/mac/OTBDAFC/DAFC-Backend/dafc-otb-backend"
+docker compose up -d
+
+# 2. Start backend
+npm run prisma:generate && npm run prisma:migrate && npm run prisma:seed
+npm run start:dev
+# API ready at http://localhost:4000/api/v1
+
+# 3. Start frontend (new terminal)
+cd "/Users/mac/OTBDAFC/DAFC-OTB-NextJS"
+npm run dev
+# App ready at http://localhost:3006
+```
+
+---
+
+## DEPENDENCIES
+
+### Frontend
+| Package | Version | Purpose |
+|---------|---------|---------|
+| next | 16.1.6 | Framework |
+| react | 19.2.3 | UI Library |
+| axios | 1.13.4 | HTTP client |
+| tailwindcss | 3.4.19 | Styling |
+| lucide-react | 0.563.0 | Icons |
+| recharts | 3.7.0 | Charts |
+| react-hot-toast | 2.6.0 | Notifications |
+
+### Backend
+| Package | Version | Purpose |
+|---------|---------|---------|
+| @nestjs/* | 10.3.0 | Framework |
+| @prisma/client | 5.8.0 | ORM |
+| passport + @nestjs/jwt | — | Auth (JWT) |
+| bcryptjs | — | Password hashing |
+| class-validator | — | DTO validation |
+| helmet | — | HTTP security headers |
+| @nestjs/swagger | — | API documentation |
+
+---
+
+## SESSION 07/02/2026 - Session 7
+
+### Thay doi chinh
+
+1. **Full-Stack Handover Documentation**
+   - Bo sung toan bo Backend API documentation (7 modules, 60+ endpoints)
+   - Document Database schema (Prisma, 29 tables)
+   - Document Authentication flow + RBAC permissions
+   - Bo sung Contexts, Hooks documentation chi tiet
+   - Services → API endpoints mapping table day du
+   - Environment variables, startup sequence, dependencies
+   - Swagger docs URL: `http://localhost:4000/api/docs`
 
 ---
 
 ## REMAINING ITEMS
 
 - [ ] TicketDetailPage.jsx still has MOCK_SKU_DATA and MOCK_DETAIL_DATA
-- [ ] E2E testing
+- [ ] E2E testing (test suite co san, chua chay)
 - [ ] Performance tuning
+- [ ] Mobile responsive testing
 
 ---
 
 ## GHI CHU CHO CLAUDE
 
 Khi doc file nay:
-1. Frontend: `/Users/mac/OTBDAFC/DAFC-OTB-NextJS/`
-2. Backend: NestJS rieng biet, API tai `localhost:4000/api/v1`
-3. Tat ca screen la `'use client'` components
-4. i18n dung `useLanguage()` hook, translations tai `src/locales/`
-5. Dark/light mode qua `darkMode` prop + CSS variables
-6. Premium cards: gradient + watermark icon pattern (xem HomeScreen lam mau)
+1. **Frontend**: `/Users/mac/OTBDAFC/DAFC-OTB-NextJS/`
+2. **Backend**: `/Users/mac/OTBDAFC/DAFC-Backend/dafc-otb-backend/`
+3. **API**: `http://localhost:4000/api/v1` | Swagger: `http://localhost:4000/api/docs`
+4. **Database**: PostgreSQL via Docker (port 5432, user=dafc, db=dafc_otb)
+5. Tat ca screen la `'use client'` components
+6. i18n dung `useLanguage()` hook, translations tai `src/locales/`
+7. Dark/light mode qua `darkMode` prop + CSS variables
+8. Premium cards: gradient + watermark icon pattern (xem HomeScreen lam mau)
+9. 2-level approval: DRAFT → SUBMITTED → L1_APPROVED → APPROVED
+10. Permissions: `budget:read`, `budget:write`, `budget:approve_l1`, `budget:approve_l2`, etc.
 
 ---
 
