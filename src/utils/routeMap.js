@@ -14,6 +14,9 @@ export const ROUTE_MAP = {
   'master-categories': '/master-data/categories',
   'master-subcategories': '/master-data/subcategories',
   'approval-config': '/approval-config',
+  'approvals': '/approvals',
+  'order-confirmation': '/order-confirmation',
+  'receipt-confirmation': '/receipt-confirmation',
 };
 
 const PATHNAME_TO_SCREEN = {
@@ -27,6 +30,9 @@ const PATHNAME_TO_SCREEN = {
   '/profile': 'profile',
   '/settings': 'settings',
   '/approval-config': 'approval-config',
+  '/approvals': 'approvals',
+  '/order-confirmation': 'order-confirmation',
+  '/receipt-confirmation': 'receipt-confirmation',
 };
 
 export const getScreenIdFromPathname = (pathname) => {

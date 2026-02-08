@@ -41,6 +41,7 @@
     ".turbo",
     "apps",
     "packages",
+    "backend",
     "*.ts"
   ],
   "include": [
