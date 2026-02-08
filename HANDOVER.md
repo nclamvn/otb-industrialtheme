@@ -7,7 +7,7 @@
 
 ---
 
-## Cap nhat lan cuoi: 07/02/2026 (Session 7 - Full-Stack Handover Documentation)
+## Cap nhat lan cuoi: 08/02/2026 (Session 8 - 100% Migration + Azure Deployment)
 
 ---
 
@@ -67,11 +67,14 @@ DAFC-OTB-NextJS/
 │   │       ├── proposal/             # /proposal → SKUProposalScreen
 │   │       ├── tickets/              # /tickets
 │   │       ├── approval-config/      # /approval-config
+│   │       ├── approvals/            # /approvals (NEW Session 8)
+│   │       ├── order-confirmation/   # /order-confirmation (NEW Session 8)
+│   │       ├── receipt-confirmation/ # /receipt-confirmation (NEW Session 8)
 │   │       ├── master-data/          # /master-data
 │   │       ├── profile/              # /profile
 │   │       ├── settings/             # /settings
 │   │       └── dev-tickets/          # /dev-tickets
-│   ├── screens/                      # 15 screen components (all 'use client')
+│   ├── screens/                      # 18 screen components (all 'use client')
 │   │   ├── HomeScreen.jsx            # Dashboard KPI cards + alerts
 │   │   ├── BudgetManagementScreen.jsx
 │   │   ├── BudgetAllocateScreen.jsx
@@ -86,7 +89,10 @@ DAFC-OTB-NextJS/
 │   │   ├── ProfileScreen.jsx
 │   │   ├── SettingsScreen.jsx
 │   │   ├── LoginScreen.jsx
-│   │   └── DevTicketScreen.jsx
+│   │   ├── DevTicketScreen.jsx
+│   │   ├── ApprovalsScreen.jsx          # (NEW Session 8)
+│   │   ├── OrderConfirmationScreen.jsx  # (NEW Session 8)
+│   │   └── ReceiptConfirmationScreen.jsx # (NEW Session 8)
 │   ├── components/
 │   │   ├── Layout/
 │   │   │   ├── Sidebar.jsx           # Navigation sidebar (collapsible)
@@ -625,6 +631,75 @@ npm run dev
 
 ---
 
+## SESSION 08/02/2026 - Session 8
+
+### Thay doi chinh
+
+1. **100% Migration - 3 man hinh moi**
+   - `ApprovalsScreen.jsx` - Phe duyet: bang, filter (entity type/level), approve/reject modal voi comment
+   - `OrderConfirmationScreen.jsx` - Xac nhan don hang: KPI cards, bang PO, confirm/cancel workflow
+   - `ReceiptConfirmationScreen.jsx` - Xac nhan bien nhan: KPI cards, bang receipt, flag discrepancy
+   - 3 route pages: `/approvals`, `/order-confirmation`, `/receipt-confirmation`
+   - routeMap.js: 3 entries moi (ROUTE_MAP + PATHNAME_TO_SCREEN)
+   - i18n: 105+ translation keys moi (EN + VI) cho 3 man hinh
+
+2. **Azure App Services Deployment Config**
+   - `next.config.mjs`: `output: 'standalone'`, `images.unoptimized`, ignore TS/ESLint
+   - `server.js`: Custom server cho Azure (port tu env, fallback logic)
+   - `startup.sh`: Bash script copy static assets → start standalone server
+   - `package.json`: `start:azure` script, `postbuild` copy assets, `engines: node >=18 <25`
+   - `.nvmrc`: Node 20 LTS
+   - `.env.example`: Huong dan cau hinh Azure
+
+3. **Build & Infrastructure**
+   - tsconfig.json: exclude `backend` directory fix build error
+   - 20 routes total (17 static + 3 dynamic), 18 screens
+   - Standalone build: `.next/standalone/server.js` + `public/` + `.next/static/`
+
+4. **Backend Security Fix**
+   - npm audit fix: 10 vulnerabilities → 0 vulnerabilities
+   - @nestjs/cli: ^10.3.0 → ^11.0.16
+   - @nestjs/swagger: ^7.2.0 → ^11.2.6
+
+### Azure Portal Configuration
+```
+General Settings:
+  Stack: Node
+  Major version: 20 LTS (KHONG dung 24)
+  Startup Command: bash startup.sh
+
+Application Settings:
+  PORT = 3000
+  WEBSITES_PORT = 3000
+  NODE_ENV = production
+  NEXT_PUBLIC_API_URL = https://your-backend.azurewebsites.net/api/v1
+```
+
+### Files da tao/cap nhat (16 files)
+```
+# New files
+.nvmrc                                        # Node 20
+server.js                                     # Custom server cho Azure
+startup.sh                                    # Azure startup script
+src/screens/ApprovalsScreen.jsx               # Approvals screen
+src/screens/OrderConfirmationScreen.jsx       # Order Confirmation screen
+src/screens/ReceiptConfirmationScreen.jsx     # Receipt Confirmation screen
+src/app/(dashboard)/approvals/page.jsx        # Route page
+src/app/(dashboard)/order-confirmation/page.jsx
+src/app/(dashboard)/receipt-confirmation/page.jsx
+
+# Modified files
+next.config.mjs                               # standalone output
+package.json                                  # azure scripts, engines
+tsconfig.json                                 # exclude backend
+src/utils/routeMap.js                         # 3 new routes
+src/locales/en.js                             # 105+ new keys
+src/locales/vi.js                             # 105+ new keys
+.env.example                                  # Azure config guide
+```
+
+---
+
 ## SESSION 07/02/2026 - Session 7
 
 ### Thay doi chinh
@@ -642,7 +717,11 @@ npm run dev
 
 ## REMAINING ITEMS
 
-- [ ] TicketDetailPage.jsx still has MOCK_SKU_DATA and MOCK_DETAIL_DATA
+- [x] ~~3 missing screens (Approvals, Order Confirm, Receipt Confirm)~~ → Done Session 8
+- [x] ~~Azure deployment config~~ → Done Session 8
+- [x] ~~Backend security vulnerabilities~~ → 0 vulnerabilities (Session 8)
+- [ ] TicketDetailPage.jsx still has MOCK_SKU_DATA and MOCK_DETAIL_DATA (fallback)
+- [ ] Azure Portal manual config (Node 20, startup command, env vars)
 - [ ] E2E testing (test suite co san, chua chay)
 - [ ] Performance tuning
 - [ ] Mobile responsive testing
