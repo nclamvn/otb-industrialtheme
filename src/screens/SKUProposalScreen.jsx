@@ -666,13 +666,15 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
                         </div>
                         <div className="flex items-center gap-2">
                           {!version.isFinal && (
-                            <button
-                              type="button"
+                            <span
+                              role="button"
+                              tabIndex={0}
                               onClick={(e) => handleSetFinalVersion(version.id, e)}
-                              className={`text-xs px-2 py-1 rounded transition-colors ${darkMode ? 'text-[#D7B797] hover:bg-[rgba(215,183,151,0.1)]' : 'text-[#8A6340] hover:bg-[rgba(160,120,75,0.12)]'}`}
+                              onKeyDown={(e) => { if (e.key === 'Enter') handleSetFinalVersion(version.id, e); }}
+                              className={`text-xs px-2 py-1 rounded transition-colors cursor-pointer ${darkMode ? 'text-[#D7B797] hover:bg-[rgba(215,183,151,0.1)]' : 'text-[#8A6340] hover:bg-[rgba(160,120,75,0.12)]'}`}
                             >
                               {t('planning.latestVersion')}
-                            </button>
+                            </span>
                           )}
                           {version.id === skuVersion && <Check size={16} className="text-[#2A9E6A]" />}
                         </div>
@@ -737,13 +739,15 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
                         </div>
                         <div className="flex items-center gap-2">
                           {!choice.isFinal && (
-                            <button
-                              type="button"
+                            <span
+                              role="button"
+                              tabIndex={0}
                               onClick={(e) => handleSetFinalSizing(choice.id, e)}
-                              className={`text-xs px-2 py-1 rounded transition-colors ${darkMode ? 'text-[#D7B797] hover:bg-[rgba(215,183,151,0.1)]' : 'text-[#8A6340] hover:bg-[rgba(160,120,75,0.12)]'}`}
+                              onKeyDown={(e) => { if (e.key === 'Enter') handleSetFinalSizing(choice.id, e); }}
+                              className={`text-xs px-2 py-1 rounded transition-colors cursor-pointer ${darkMode ? 'text-[#D7B797] hover:bg-[rgba(215,183,151,0.1)]' : 'text-[#8A6340] hover:bg-[rgba(160,120,75,0.12)]'}`}
                             >
                               {t('planning.latestVersion')}
-                            </button>
+                            </span>
                           )}
                           {choice.id === sizingVersion && <Check size={16} className="text-[#2A9E6A]" />}
                         </div>

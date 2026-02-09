@@ -8,7 +8,7 @@ import {
 import toast from 'react-hot-toast';
 import { GROUP_BRANDS } from '../utils/constants';
 import { formatCurrency } from '../utils/formatters';
-import { budgetService } from '../services';
+import { budgetService, masterDataService } from '../services';
 import { LoadingSpinner, ErrorMessage, EmptyState } from '../components/Common';
 import BudgetAlertsBanner from '../components/BudgetAlertsBanner';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -46,6 +46,10 @@ const BudgetManagementScreen = ({
   const [error, setError] = useState(null);
   const [creating, setCreating] = useState(false);
 
+  // Master data for create form
+  const [apiBrands, setApiBrands] = useState([]);
+  const [apiStores, setApiStores] = useState([]);
+
   // Fetch budgets from API
   const fetchBudgets = useCallback(async () => {
     setLoading(true);
@@ -61,10 +65,10 @@ const BudgetManagementScreen = ({
         id: budget.id,
         fiscalYear: budget.fiscalYear,
         groupBrand: typeof budget.groupBrand === 'object' ? (budget.groupBrand?.name || budget.groupBrand?.code || 'A') : (budget.groupBrand || 'A'),
-        brandId: budget.brandId,
-        brandName: budget.Brand?.name || budget.brandName || 'Unknown',
-        totalBudget: Number(budget.totalAmount || budget.totalBudget) || 0,
-        budgetName: budget.name || budget.budgetName || 'Untitled',
+        brandId: budget.groupBrandId || budget.brandId,
+        brandName: budget.groupBrand?.name || budget.Brand?.name || budget.brandName || 'Unknown',
+        totalBudget: Number(budget.totalBudget || budget.totalAmount) || 0,
+        budgetName: budget.budgetCode || budget.name || budget.budgetName || 'Untitled',
         status: (budget.status || 'DRAFT').toLowerCase(),
         createdAt: budget.createdAt,
         createdBy: budget.createdBy
@@ -82,6 +86,9 @@ const BudgetManagementScreen = ({
   // Initial fetch
   useEffect(() => {
     fetchBudgets();
+    // Fetch master data for create form
+    masterDataService.getBrands().then(b => setApiBrands(Array.isArray(b) ? b : [])).catch(() => {});
+    masterDataService.getStores().then(s => setApiStores(Array.isArray(s) ? s : [])).catch(() => {});
   }, [fetchBudgets]);
 
   // Local State
@@ -100,9 +107,11 @@ const BudgetManagementScreen = ({
 
   // Form state for create budget
   const [newBudgetForm, setNewBudgetForm] = useState({
-    fiscalYear: 2025,
+    fiscalYear: 2026,
     groupBrand: 'A',
-    brandId: '1',
+    brandId: '',
+    seasonGroup: 'SS',
+    seasonType: 'pre',
     name: '',
     totalBudget: '',
     description: ''
@@ -591,6 +600,7 @@ const BudgetManagementScreen = ({
                         onClick={() =>
                           onAllocate &&
                           onAllocate({
+                            id: budget.id,
                             year: budget.fiscalYear,
                             groupBrand: budget.groupBrand,
                             brandId: budget.brandId,
@@ -792,11 +802,42 @@ const BudgetManagementScreen = ({
                     }
                     className={`w-full px-4 py-2.5 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#D7B797] focus:border-[#D7B797] ${darkMode ? 'bg-[#1A1A1A] border-[#2E2E2E] text-[#F2F2F2]' : 'bg-white border-[#C4B5A5] text-[#0A0A0A]'}`}
                   >
-                    {GROUP_BRANDS.map((brand) => (
+                    <option value="">{t('budget.selectBrand')}</option>
+                    {apiBrands.map((brand) => (
                       <option key={brand.id} value={brand.id}>
                         {brand.name}
                       </option>
                     ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* Season Group & Season Type */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className={`block text-sm font-medium mb-2 font-['Montserrat'] ${darkMode ? 'text-[#F2F2F2]' : 'text-[#0A0A0A]'}`}>
+                    {t('otbAnalysis.seasonGroup')} <span className="text-[#F85149]">{t('common.required')}</span>
+                  </label>
+                  <select
+                    value={newBudgetForm.seasonGroup}
+                    onChange={(e) => setNewBudgetForm({ ...newBudgetForm, seasonGroup: e.target.value })}
+                    className={`w-full px-4 py-2.5 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#D7B797] focus:border-[#D7B797] ${darkMode ? 'bg-[#1A1A1A] border-[#2E2E2E] text-[#F2F2F2]' : 'bg-white border-[#C4B5A5] text-[#0A0A0A]'}`}
+                  >
+                    <option value="SS">Spring Summer</option>
+                    <option value="FW">Fall Winter</option>
+                  </select>
+                </div>
+                <div>
+                  <label className={`block text-sm font-medium mb-2 font-['Montserrat'] ${darkMode ? 'text-[#F2F2F2]' : 'text-[#0A0A0A]'}`}>
+                    {t('otbAnalysis.season')} <span className="text-[#F85149]">{t('common.required')}</span>
+                  </label>
+                  <select
+                    value={newBudgetForm.seasonType}
+                    onChange={(e) => setNewBudgetForm({ ...newBudgetForm, seasonType: e.target.value })}
+                    className={`w-full px-4 py-2.5 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#D7B797] focus:border-[#D7B797] ${darkMode ? 'bg-[#1A1A1A] border-[#2E2E2E] text-[#F2F2F2]' : 'bg-white border-[#C4B5A5] text-[#0A0A0A]'}`}
+                  >
+                    <option value="pre">Pre</option>
+                    <option value="main">Main / Show</option>
                   </select>
                 </div>
               </div>
@@ -857,7 +898,7 @@ const BudgetManagementScreen = ({
               <button
                 onClick={() => {
                   setShowCreateModal(false);
-                  setNewBudgetForm({ fiscalYear: 2025, groupBrand: 'A', brandId: '1', name: '', totalBudget: '', description: '' });
+                  setNewBudgetForm({ fiscalYear: 2026, groupBrand: 'A', brandId: apiBrands[0]?.id || '', seasonGroup: 'SS', seasonType: 'pre', name: '', totalBudget: '', description: '' });
                 }}
                 className={`px-5 py-2.5 text-sm font-medium rounded-lg transition-colors ${darkMode ? 'text-[#999999] hover:bg-[#2E2E2E]' : 'text-[#666666] hover:bg-[#E5E5E5]'}`}
               >
@@ -865,20 +906,34 @@ const BudgetManagementScreen = ({
               </button>
               <button
                 onClick={async () => {
-                  if (!newBudgetForm.totalBudget || !newBudgetForm.name) return;
+                  if (!newBudgetForm.totalBudget || !newBudgetForm.brandId) return;
 
                   setCreating(true);
                   try {
+                    const totalAmount = parseInt(newBudgetForm.totalBudget) || 0;
+                    if (apiStores.length === 0) {
+                      toast.error(t('budget.noStoresAvailable') || 'No stores available');
+                      return;
+                    }
+                    // Split budget equally across all stores
+                    const stores = apiStores;
+                    const perStore = Math.floor(totalAmount / stores.length);
+                    const details = stores.map((store, idx) => ({
+                      storeId: store.id,
+                      budgetAmount: idx === 0 ? totalAmount - perStore * (stores.length - 1) : perStore,
+                    }));
+
                     await budgetService.create({
-                      name: newBudgetForm.name,
+                      groupBrandId: newBudgetForm.brandId,
+                      seasonGroupId: newBudgetForm.seasonGroup,
+                      seasonType: newBudgetForm.seasonType,
                       fiscalYear: newBudgetForm.fiscalYear,
-                      brandId: newBudgetForm.brandId,
-                      totalAmount: parseInt(newBudgetForm.totalBudget),
-                      description: newBudgetForm.description || undefined
+                      comment: newBudgetForm.description || undefined,
+                      details,
                     });
                     toast.success(t('budget.budgetCreatedSuccess'));
                     setShowCreateModal(false);
-                    setNewBudgetForm({ fiscalYear: 2025, groupBrand: 'A', brandId: '1', name: '', totalBudget: '', description: '' });
+                    setNewBudgetForm({ fiscalYear: 2026, groupBrand: 'A', brandId: apiBrands[0]?.id || '', seasonGroup: 'SS', seasonType: 'pre', name: '', totalBudget: '', description: '' });
                     // Refresh the list
                     fetchBudgets();
                   } catch (err) {

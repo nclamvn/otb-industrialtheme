@@ -92,10 +92,22 @@ export class BudgetService {
 
     const budgetCode = `BUD-${brand.code}-${dto.seasonGroupId}-${dto.seasonType}-${dto.fiscalYear}`;
 
-    // Check uniqueness
-    const existing = await this.prisma.budget.findUnique({ where: { budgetCode } });
+    // Check uniqueness (both budgetCode and compound unique)
+    const existing = await this.prisma.budget.findFirst({
+      where: {
+        OR: [
+          { budgetCode },
+          {
+            groupBrandId: dto.groupBrandId,
+            seasonGroupId: dto.seasonGroupId,
+            seasonType: dto.seasonType,
+            fiscalYear: dto.fiscalYear,
+          },
+        ],
+      },
+    });
     if (existing) {
-      throw new BadRequestException(`Budget already exists: ${budgetCode}`);
+      throw new BadRequestException(`Budget already exists for this brand/season/year combination: ${existing.budgetCode}`);
     }
 
     return this.prisma.budget.create({

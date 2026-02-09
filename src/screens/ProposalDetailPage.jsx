@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   ArrowLeft, Save, Plus, Trash2, Search,
   Package, DollarSign, ShoppingCart, Store, ChevronDown, ChevronRight,
@@ -362,8 +362,8 @@ const ProposalDetailPage = ({ proposal, onBack, onSave }) => {
                   const availableStoresForSku = getAvailableStores(sku.id);
 
                   return (
-                    <>
-                      <tr key={sku.id} className={`border-b border-slate-100 hover:bg-slate-50 ${isExpanded ? 'bg-purple-50/50' : ''}`}>
+                    <React.Fragment key={sku.id}>
+                      <tr className={`border-b border-slate-100 hover:bg-slate-50 ${isExpanded ? 'bg-purple-50/50' : ''}`}>
                         <td className="px-3 py-3">
                           <button
                             onClick={() => setExpandedSku(isExpanded ? null : sku.id)}
@@ -488,7 +488,7 @@ const ProposalDetailPage = ({ proposal, onBack, onSave }) => {
                           </td>
                         </tr>
                       )}
-                    </>
+                    </React.Fragment>
                   );
                 })}
 

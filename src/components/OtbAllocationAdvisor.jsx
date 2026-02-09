@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Sparkles, CheckCircle, AlertTriangle, Info, Zap, BarChart3, PieChart,
 } from 'lucide-react';
@@ -25,27 +25,40 @@ const OtbAllocationAdvisor = ({
   const [expandedDimension, setExpandedDimension] = useState('collection');
   const [showDetails, setShowDetails] = useState(false);
 
+  const abortRef = useRef(null);
+
   useEffect(() => {
-    if (budgetDetailId && budgetAmount > 0) generateRecommendation();
+    if (budgetDetailId && budgetAmount > 0) {
+      // Cancel any in-flight request to prevent race conditions
+      if (abortRef.current) abortRef.current.abort = true;
+      const token = { abort: false };
+      abortRef.current = token;
+      generateRecommendation(token);
+    }
+    return () => {
+      if (abortRef.current) abortRef.current.abort = true;
+    };
   }, [budgetDetailId, budgetAmount, seasonGroup, seasonType]);
 
   useEffect(() => {
     if (recommendation && currentAllocation?.length > 0) runComparison();
   }, [currentAllocation, recommendation]);
 
-  const generateRecommendation = async () => {
+  const generateRecommendation = async (token) => {
     setLoading(true);
     setError(null);
     try {
       const result = await aiService.generateAllocation({
         budgetDetailId, budgetAmount, seasonGroup, seasonType, storeId, brandId,
       });
+      if (token?.abort) return; // Request was superseded
       setRecommendation(result);
     } catch (err) {
+      if (token?.abort) return;
       setError(t('ai.failedToGenerate'));
-      console.error('Allocation error:', err);
+      console.warn('Allocation advisory unavailable:', err?.response?.status || err.message);
     }
-    setLoading(false);
+    if (!token?.abort) setLoading(false);
   };
 
   const runComparison = async () => {

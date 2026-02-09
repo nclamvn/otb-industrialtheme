@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect, useMemo, Fragment, useCallback } from 'react';
+import { useState, useRef, useEffect, useMemo, Fragment } from 'react';
 import {
   DollarSign, Sparkles, Filter, Clock, ChevronDown, Check,
   ChevronRight, TrendingUp, Sun, Snowflake,
@@ -58,34 +58,36 @@ const BudgetAllocateScreen = ({
     fetchBrands();
   }, []);
 
-  // Fetch budgets from API
-  const fetchBudgets = useCallback(async () => {
-    setLoadingBudgets(true);
-    try {
-      const response = await budgetService.getAll({ status: 'APPROVED' });
-      const budgetList = (response.data || response || []).map(budget => ({
-        id: budget.id,
-        fiscalYear: budget.fiscalYear,
-        groupBrand: typeof budget.groupBrand === 'object' ? (budget.groupBrand?.name || budget.groupBrand?.code || 'A') : (budget.groupBrand || 'A'),
-        brandId: budget.brandId,
-        brandName: budget.Brand?.name || budget.brandName || 'Unknown',
-        totalBudget: budget.totalAmount || budget.totalBudget || 0,
-        budgetName: budget.name || budget.budgetName || 'Untitled',
-        status: (budget.status || 'DRAFT').toLowerCase()
-      }));
-      setApiBudgets(budgetList);
-    } catch (err) {
-      console.error('Failed to fetch budgets:', err);
-      setApiBudgets([]);
-    } finally {
-      setLoadingBudgets(false);
-    }
-  }, []);
-
-  // Fetch budgets on mount
+  // Fetch budgets on mount (with Strict Mode ignore pattern)
   useEffect(() => {
-    fetchBudgets();
-  }, [fetchBudgets]);
+    let ignore = false;
+    const load = async () => {
+      setLoadingBudgets(true);
+      try {
+        const response = await budgetService.getAll({ status: 'APPROVED' });
+        if (ignore) return;
+        const budgetList = (response.data || response || []).map(budget => ({
+          id: budget.id,
+          fiscalYear: budget.fiscalYear,
+          groupBrand: typeof budget.groupBrand === 'object' ? (budget.groupBrand?.name || budget.groupBrand?.code || 'A') : (budget.groupBrand || 'A'),
+          brandId: budget.brandId,
+          brandName: budget.Brand?.name || budget.groupBrand?.name || budget.brandName || 'Unknown',
+          totalBudget: budget.totalAmount || budget.totalBudget || 0,
+          budgetName: budget.budgetCode || budget.name || budget.budgetName || 'Untitled',
+          status: (budget.status || 'DRAFT').toLowerCase()
+        }));
+        setApiBudgets(budgetList);
+      } catch (err) {
+        if (!ignore) {
+          console.error('Failed to fetch budgets:', err);
+        }
+      } finally {
+        if (!ignore) setLoadingBudgets(false);
+      }
+    };
+    load();
+    return () => { ignore = true; };
+  }, []);
 
   // Available budgets for dropdown selection - prefer API data
   const availableBudgets = apiBudgets.length > 0 ? apiBudgets : (propAvailableBudgets || []);
@@ -100,6 +102,10 @@ const BudgetAllocateScreen = ({
 
   // Budget name dropdown state
   const [isBudgetNameDropdownOpen, setIsBudgetNameDropdownOpen] = useState(false);
+
+  // Store allocation data locally to survive the race condition with API fetch
+  const [pendingAllocation, setPendingAllocation] = useState(null);
+  const [fallbackBudgetName, setFallbackBudgetName] = useState(null);
 
   // Collapse states for table sections
   const [collapsedGroups, setCollapsedGroups] = useState({});
@@ -158,56 +164,59 @@ const BudgetAllocateScreen = ({
   // Handle allocation data from Budget Management page
   useEffect(() => {
     if (allocationData) {
+      // Store locally so it survives clearing
+      setPendingAllocation(allocationData);
+      setFallbackBudgetName(allocationData.budgetName);
+
       // Mark that we're applying allocation data (synchronously)
       appliedAllocationRef.current = true;
 
-      // Find and set brand first - match by brandName and groupBrand
-      let matchedBrandId = null;
+      // Set filters from allocation data
+      if (allocationData.year) setSelectedYear(allocationData.year);
+      if (allocationData.groupBrand) setSelectedGroupBrand(allocationData.groupBrand);
+      if (allocationData.totalBudget) setTotalBudget(allocationData.totalBudget);
+
+      // Set budget ID directly if available
+      if (allocationData.id) {
+        setSelectedBudgetId(allocationData.id);
+      }
+
+      // Find and set brand
       if (allocationData.brandName && allocationData.groupBrand) {
         const matchingBrand = brandList.find(
           b => b.groupBrandId === allocationData.groupBrand && b.name === allocationData.brandName
         );
-        if (matchingBrand) {
-          matchedBrandId = matchingBrand.id;
-        }
+        if (matchingBrand) setSelectedBrand(matchingBrand.id);
       }
 
-      // Find matching budget in available budgets
-      const matchingBudget = availableBudgets.find(
-        b => b.budgetName === allocationData.budgetName &&
-          b.fiscalYear === allocationData.year &&
-          b.groupBrand === allocationData.groupBrand
-      );
-
-      // Set all states
-      if (allocationData.year) {
-        setSelectedYear(allocationData.year);
-      }
-      if (allocationData.groupBrand) {
-        setSelectedGroupBrand(allocationData.groupBrand);
-      }
-      if (matchedBrandId) {
-        setSelectedBrand(matchedBrandId);
-      }
-      // Set budget info
-      if (matchingBudget) {
-        setSelectedBudgetId(matchingBudget.id);
-      }
-      if (allocationData.totalBudget) {
-        setTotalBudget(allocationData.totalBudget);
-      }
-
-      // Clear allocation data after using it
-      if (onAllocationDataUsed) {
-        onAllocationDataUsed();
-      }
+      // Clear allocation data from context
+      if (onAllocationDataUsed) onAllocationDataUsed();
     }
-  }, [allocationData, onAllocationDataUsed, availableBudgets]);
+  }, [allocationData, onAllocationDataUsed]);
+
+  // When availableBudgets load and we have pending allocation, try to match
+  useEffect(() => {
+    if (pendingAllocation && availableBudgets.length > 0) {
+      // Match by ID first, then by name
+      const match = pendingAllocation.id
+        ? availableBudgets.find(b => b.id === pendingAllocation.id)
+        : availableBudgets.find(
+            b => b.budgetName === pendingAllocation.budgetName &&
+              b.fiscalYear === pendingAllocation.year &&
+              b.groupBrand === pendingAllocation.groupBrand
+          );
+
+      if (match) {
+        setSelectedBudgetId(match.id);
+        setTotalBudget(match.totalBudget || pendingAllocation.totalBudget);
+        // Keep fallbackBudgetName as a reliable backup - don't clear it
+      }
+      setPendingAllocation(null);
+    }
+  }, [pendingAllocation, availableBudgets]);
 
   // Get selected budget object
-  const selectedBudget = useMemo(() => {
-    return availableBudgets.find(b => b.id === selectedBudgetId);
-  }, [availableBudgets, selectedBudgetId]);
+  const selectedBudget = availableBudgets.find(b => b.id === selectedBudgetId);
 
   // Fetch planning versions when budget is selected
   useEffect(() => {
@@ -472,12 +481,14 @@ const BudgetAllocateScreen = ({
     if (!budget) {
       setSelectedBudgetId(null);
       setTotalBudget(0);
+      setFallbackBudgetName(null);
       return;
     }
 
     appliedAllocationRef.current = true;
     setSelectedBudgetId(budget.id);
     setTotalBudget(budget.totalBudget);
+    setFallbackBudgetName(budget.budgetName);
 
     // Auto-set other filters based on selected budget
     if (budget.fiscalYear) setSelectedYear(budget.fiscalYear);
@@ -502,6 +513,7 @@ const BudgetAllocateScreen = ({
     setTotalBudget(0);
     setSelectedVersionId(null);
     setVersions([]);
+    setFallbackBudgetName(null);
   };
 
   // Handle set version as final
@@ -588,7 +600,7 @@ const BudgetAllocateScreen = ({
                   >
                     <div className="flex items-center gap-2 truncate">
                       <FileText size={14} className={selectedBudget ? 'text-[#127749]' : darkMode ? 'text-[#999999]' : 'text-[#666666]'} />
-                      <span className="truncate">{selectedBudget?.budgetName || t('planning.selectBudget')}</span>
+                      <span className="truncate">{selectedBudget?.budgetName || fallbackBudgetName || t('planning.selectBudget')}</span>
                     </div>
                     <ChevronDown size={16} className={`flex-shrink-0 transition-transform duration-200 ${isBudgetNameDropdownOpen ? 'rotate-180' : ''}`} />
                   </button>
@@ -1027,7 +1039,7 @@ const BudgetAllocateScreen = ({
         </div>
       </div>
       {/* Budget Table - Collapsible by Group Brand and Brand */}
-      {selectedBudget && (
+      {(selectedBudget || selectedBudgetId) && (
         <div className="space-y-4 relative z-[10]">
           {displayGroups.map((group) => {
             const groupBrands = displayBrands.filter(b => b.groupBrandId === group.id);
@@ -1069,10 +1081,10 @@ const BudgetAllocateScreen = ({
                   </div>
                   <div className="flex items-center gap-6">
                     {/* Budget Allocated - show when budget is selected */}
-                    {totalBudget > 0 && selectedBudget && (
+                    {totalBudget > 0 && (selectedBudget || selectedBudgetId) && (
                       <div className="flex items-center gap-3 px-4 py-2 bg-white/15 rounded-xl backdrop-blur-sm">
                         <div className="text-right">
-                          <div className="text-xs text-white/70 font-medium font-['Montserrat']">{selectedBudget.budgetName}</div>
+                          <div className="text-xs text-white/70 font-medium font-['Montserrat']">{selectedBudget?.budgetName || fallbackBudgetName}</div>
                           <div className="text-sm font-bold text-white font-['JetBrains_Mono']">{t('skuProposal.budget')}: {formatCurrency(totalBudget)}</div>
                         </div>
                       </div>
@@ -1263,7 +1275,12 @@ const BudgetAllocateScreen = ({
                                                   if (onOpenOtbAnalysis) {
                                                     onOpenOtbAnalysis({
                                                       budgetId: selectedBudgetId,
-                                                      budgetName: selectedBudget?.budgetName || null,
+                                                      budgetName: selectedBudget?.budgetName || fallbackBudgetName || null,
+                                                      fiscalYear: selectedBudget?.fiscalYear || selectedYear,
+                                                      brandName: selectedBudget?.brandName || brand?.name,
+                                                      groupBrand: selectedBudget?.groupBrand || brand?.groupBrand,
+                                                      totalBudget: selectedBudget?.totalBudget || 0,
+                                                      status: selectedBudget?.status,
                                                       seasonGroup,
                                                       season: subSeason,
                                                       rex: data.rex,
@@ -1274,7 +1291,7 @@ const BudgetAllocateScreen = ({
                                                 className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#127749] hover:bg-[#0d5a37] text-white rounded-lg font-medium text-sm font-['Montserrat'] transition-colors"
                                               >
                                                 <Edit size={14} />
-                                                Planning
+                                                {t('nav.otbAnalysis') || 'OTB Planning'}
                                               </button>
 
                                             </td>

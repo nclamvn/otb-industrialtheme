@@ -9,7 +9,7 @@ import {
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { formatCurrency } from '../utils';
-import api from '../services/api';
+import { proposalService } from '../services/proposalService';
 
 /* ═══════════════════════════════════════════════
    STATUS CONFIG
@@ -84,33 +84,27 @@ const ReceiptConfirmationScreen = ({ darkMode }) => {
     setLoading(true);
     setError(null);
     try {
-      const response = await api.get('/receipts');
-      const data = response.data.data || response.data;
-      setReceipts(Array.isArray(data) ? data : []);
+      // Derive receipts from approved proposals
+      const response = await proposalService.getAll({ status: 'APPROVED' });
+      const data = response.data || response;
+      const proposals = Array.isArray(data) ? data : [];
+      const mapped = proposals.map((p, idx) => ({
+        id: p.id || idx + 1,
+        receiptNumber: `REC-${String(idx + 1).padStart(5, '0')}`,
+        poReference: p.proposalCode || `PO-${String(idx + 1).padStart(5, '0')}`,
+        brandName: p.budget?.groupBrand?.name || p.brandName || '-',
+        itemCount: p.products?.length || p.skuCount || 0,
+        orderedQty: p.products?.reduce((sum, pr) => sum + (pr.totalQuantity || 0), 0) || p.totalQty || 0,
+        receivedQty: 0,
+        status: 'PENDING',
+        receivedDate: null,
+        createdAt: p.updatedAt || p.createdAt || new Date().toISOString(),
+      }));
+      setReceipts(mapped);
     } catch (err) {
-      // Fallback: derive from confirmed orders
-      try {
-        const response = await api.get('/orders?status=CONFIRMED');
-        const data = response.data.data || response.data;
-        const orders = Array.isArray(data) ? data : [];
-        const mapped = orders.map((o, idx) => ({
-          id: o.id || idx + 1,
-          receiptNumber: `REC-${String(o.id || idx + 1).padStart(5, '0')}`,
-          poReference: o.poNumber || `PO-${String(o.id || idx + 1).padStart(5, '0')}`,
-          brandName: o.brandName || o.brand?.name || '-',
-          itemCount: o.skuCount || o.items?.length || 0,
-          orderedQty: o.totalQty || 0,
-          receivedQty: 0,
-          status: 'PENDING',
-          receivedDate: null,
-          createdAt: o.updatedAt || new Date().toISOString(),
-        }));
-        setReceipts(mapped);
-      } catch (fallbackErr) {
-        console.error('Failed to fetch receipts:', fallbackErr);
-        setError(t('receiptConfirm.failedToLoad'));
-        setReceipts([]);
-      }
+      console.error('Failed to fetch receipts:', err);
+      setError(t('receiptConfirm.failedToLoad'));
+      setReceipts([]);
     } finally {
       setLoading(false);
     }
@@ -118,29 +112,19 @@ const ReceiptConfirmationScreen = ({ darkMode }) => {
 
   const handleConfirmReceipt = async (receipt) => {
     setProcessing(true);
-    try {
-      await api.patch(`/receipts/${receipt.id}/confirm`);
-      fetchReceipts();
-    } catch (err) {
-      setReceipts(prev => prev.map(r => r.id === receipt.id ? { ...r, status: 'CONFIRMED', receivedDate: new Date().toISOString() } : r));
-    } finally {
-      setProcessing(false);
-      setConfirmModal(null);
-    }
+    // Local state update (no backend endpoint for receipts yet)
+    setReceipts(prev => prev.map(r => r.id === receipt.id ? { ...r, status: 'CONFIRMED', receivedQty: r.orderedQty, receivedDate: new Date().toISOString() } : r));
+    setProcessing(false);
+    setConfirmModal(null);
   };
 
   const handleFlagDiscrepancy = async (receipt) => {
     setProcessing(true);
-    try {
-      await api.patch(`/receipts/${receipt.id}/discrepancy`, { note: discrepancyNote });
-      fetchReceipts();
-    } catch (err) {
-      setReceipts(prev => prev.map(r => r.id === receipt.id ? { ...r, status: 'DISCREPANCY' } : r));
-    } finally {
-      setProcessing(false);
-      setConfirmModal(null);
-      setDiscrepancyNote('');
-    }
+    // Local state update (no backend endpoint for receipts yet)
+    setReceipts(prev => prev.map(r => r.id === receipt.id ? { ...r, status: 'DISCREPANCY', discrepancyNote } : r));
+    setProcessing(false);
+    setConfirmModal(null);
+    setDiscrepancyNote('');
   };
 
   // Filtered

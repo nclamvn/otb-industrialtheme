@@ -129,8 +129,8 @@ const CollectionBarChart = ({ data, darkMode, t }) => (
     <p className={`text-sm mb-4 ${
       darkMode ? 'text-[#999999]' : 'text-gray-700'
     }`}>Carry Over vs Seasonal — REX & TTP by collection</p>
-    <div className="h-[300px]">
-      <ResponsiveContainer width="100%" height="100%">
+    <div className="h-[300px]" style={{ minWidth: 0, minHeight: 0 }}>
+      <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
         <BarChart data={data} margin={{ top: 12, right: 20, left: 0, bottom: 0 }} barCategoryGap="30%" barGap={8}>
           <CartesianGrid strokeDasharray="3 3" stroke={darkMode ? '#2E2E2E' : '#e2e8f0'} />
           <XAxis dataKey="name" tick={{ fontSize: 13, fill: darkMode ? '#999999' : '#64748b' }} />
@@ -167,8 +167,8 @@ const GenderBarChart = ({ data, darkMode, t }) => (
     <p className={`text-sm mb-4 ${
       darkMode ? 'text-[#999999]' : 'text-gray-700'
     }`}>Male vs Female — REX & TTP by gender</p>
-    <div className="h-[300px]">
-      <ResponsiveContainer width="100%" height="100%">
+    <div className="h-[300px]" style={{ minWidth: 0, minHeight: 0 }}>
+      <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
         <BarChart data={data} margin={{ top: 12, right: 20, left: 0, bottom: 0 }} barCategoryGap="30%" barGap={8}>
           <CartesianGrid strokeDasharray="3 3" stroke={darkMode ? '#2E2E2E' : '#e2e8f0'} />
           <XAxis dataKey="name" tick={{ fontSize: 13, fill: darkMode ? '#999999' : '#64748b' }} />

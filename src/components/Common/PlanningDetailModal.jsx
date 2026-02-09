@@ -1,5 +1,5 @@
 'use client';
-import { useState, useMemo, useEffect, useRef } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { X, Save, TrendingUp, Layers, Users, Tag, Info, Pencil, Filter, ChevronDown, Check, CheckCircle2, History, Clock, Sparkles } from 'lucide-react';
 import { formatCurrency } from '../../utils';
 import { GENDERS, STORES } from '../../utils/constants';
@@ -70,7 +70,7 @@ const TABS = [
 ];
 
 // Reusable editable cell component
-const EditableCell = ({ cellKey, value, isEditing, editValue, onStartEdit, onSaveEdit, onChangeValue, onKeyDown, readOnly = false }) => {
+const EditableCell = React.memo(({ cellKey, value, isEditing, editValue, onStartEdit, onSaveEdit, onChangeValue, onKeyDown, readOnly = false }) => {
   if (isEditing && !readOnly) {
     return (
       <div className="flex items-center justify-center animate-in zoom-in duration-200">
@@ -109,7 +109,7 @@ const EditableCell = ({ cellKey, value, isEditing, editValue, onStartEdit, onSav
       </div>
     </div>
   );
-};
+});
 
 const PlanningDetailModal = ({
   selectedBudgetDetail,
@@ -416,9 +416,9 @@ const PlanningDetailModal = ({
           </thead>
           <tbody>
             {collectionData.map((colData) => (
-              <>
+              <React.Fragment key={`col-${colData.section.id}`}>
                 {/* Section Header Row */}
-                <tr key={`col-${colData.section.id}`} className={groupRowClass}>
+                <tr className={groupRowClass}>
                   <td className="px-4 py-3" colSpan={8}>
                     <div className="flex items-center gap-2">
                       <span className="font-bold text-[#D7B797] font-['Montserrat']">{t(colData.section.nameKey)}</span>
@@ -466,7 +466,7 @@ const PlanningDetailModal = ({
                     </tr>
                   );
                 })}
-              </>
+              </React.Fragment>
             ))}
 
             {/* SUM Row */}
@@ -525,9 +525,9 @@ const PlanningDetailModal = ({
           </thead>
           <tbody>
             {genderData.map((genData) => (
-              <>
+              <React.Fragment key={`gen-${genData.gender.id}`}>
                 {/* Gender Header Row */}
-                <tr key={`gen-${genData.gender.id}`} className={groupRowClass}>
+                <tr className={groupRowClass}>
                   <td className="px-4 py-3" colSpan={7}>
                     <div className="flex items-center gap-2">
                       <span className="font-bold text-[#D7B797] font-['Montserrat']">{genData.gender.name}</span>
@@ -574,7 +574,7 @@ const PlanningDetailModal = ({
                     </tr>
                   );
                 })}
-              </>
+              </React.Fragment>
             ))}
 
             {/* SUM Row */}

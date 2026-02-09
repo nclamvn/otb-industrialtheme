@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useEffect, useRef } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import {
   ArrowLeft, Save, TrendingUp, Layers, Users, Tag, Info, Pencil, Filter,
   ChevronDown, Check, CheckCircle2, History, Clock, Sparkles, X,
@@ -19,7 +19,8 @@ const TABS = [
 ];
 
 // Reusable editable cell component
-const EditableCell = ({ cellKey, value, isEditing, editValue, onStartEdit, onSaveEdit, onChangeValue, onKeyDown, readOnly = false }) => {
+const EditableCell = React.memo(({ cellKey, value, isEditing, editValue, onStartEdit, onSaveEdit, onChangeValue, onKeyDown, readOnly = false }) => {
+  const { t } = useLanguage();
   if (isEditing && !readOnly) {
     return (
       <div className="flex items-center justify-center animate-in zoom-in duration-200">
@@ -58,7 +59,7 @@ const EditableCell = ({ cellKey, value, isEditing, editValue, onStartEdit, onSav
       </div>
     </div>
   );
-};
+});
 
 // Approval Status Badge Component
 const ApprovalStatusBadge = ({ status }) => {
@@ -515,8 +516,8 @@ const PlanningDetailPage = ({
           </thead>
           <tbody>
             {collectionData.map((colData) => (
-              <>
-                <tr key={`col-${colData.section.id}`} className={groupRowClass}>
+              <React.Fragment key={`col-${colData.section.id}`}>
+                <tr className={groupRowClass}>
                   <td className="px-4 py-3" colSpan={8}>
                     <div className="flex items-center gap-2">
                       <span className="font-bold text-slate-800">{colData.section.name}</span>
@@ -566,7 +567,7 @@ const PlanningDetailPage = ({
                     </tr>
                   );
                 })}
-              </>
+              </React.Fragment>
             ))}
 
             <tr className={sumRowClass}>
@@ -624,8 +625,8 @@ const PlanningDetailPage = ({
           </thead>
           <tbody>
             {genderData.map((genData) => (
-              <>
-                <tr key={`gen-${genData.gender.id}`} className={groupRowClass}>
+              <React.Fragment key={`gen-${genData.gender.id}`}>
+                <tr className={groupRowClass}>
                   <td className="px-4 py-3" colSpan={7}>
                     <div className="flex items-center gap-2">
                       <span className="font-bold text-slate-800">{genData.gender.name}</span>
@@ -674,7 +675,7 @@ const PlanningDetailPage = ({
                     </tr>
                   );
                 })}
-              </>
+              </React.Fragment>
             ))}
 
             <tr className={sumRowClass}>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import {
   BarChart3, Filter, ChevronDown, Check,
   Calendar, Tag, Layers, Users, Info, Pencil, X, Star,
@@ -30,8 +30,9 @@ const TABS = [
   { id: 'category', label: 'Category', icon: Tag }
 ];
 
-// Reusable editable cell component
-const EditableCell = ({ cellKey, value, isEditing, editValue, onStartEdit, onSaveEdit, onChangeValue, onKeyDown, readOnly = false, darkMode = false }) => {
+// Reusable editable cell component (memoized to prevent unnecessary re-renders)
+const EditableCell = React.memo(({ cellKey, value, isEditing, editValue, onStartEdit, onSaveEdit, onChangeValue, onKeyDown, readOnly = false, darkMode = false }) => {
+  const { t } = useLanguage();
   if (isEditing && !readOnly) {
     return (
       <div className="flex items-center justify-center animate-in zoom-in duration-200">
@@ -86,7 +87,7 @@ const EditableCell = ({ cellKey, value, isEditing, editValue, onStartEdit, onSav
       </div>
     </div>
   );
-};
+});
 
 const OTBAnalysisScreen = ({ otbContext, onOpenSkuProposal, darkMode = false }) => {
   const { t } = useLanguage();
@@ -115,10 +116,12 @@ const OTBAnalysisScreen = ({ otbContext, onOpenSkuProposal, darkMode = false }) 
         id: budget.id,
         fiscalYear: budget.fiscalYear,
         groupBrand: typeof budget.groupBrand === 'object' ? (budget.groupBrand?.name || budget.groupBrand?.code || 'A') : (budget.groupBrand || 'A'),
-        brandId: budget.brandId,
-        brandName: budget.Brand?.name || budget.brandName || 'Unknown',
-        totalBudget: budget.totalAmount || budget.totalBudget || 0,
-        budgetName: budget.name || budget.budgetName || 'Untitled',
+        brandId: budget.groupBrandId || budget.brandId,
+        brandName: budget.groupBrand?.name || budget.Brand?.name || budget.brandName || 'Unknown',
+        totalBudget: Number(budget.totalBudget) || Number(budget.totalAmount) || 0,
+        budgetName: budget.budgetCode || budget.name || budget.budgetName || 'Untitled',
+        seasonGroup: budget.seasonGroupId || budget.seasonGroup || '',
+        seasonType: budget.seasonType || '',
         status: (budget.status || 'DRAFT').toLowerCase(),
         details: budget.details || []
       }));
@@ -602,8 +605,8 @@ const OTBAnalysisScreen = ({ otbContext, onOpenSkuProposal, darkMode = false }) 
           </thead>
           <tbody>
             {collectionSections.map((section) => (
-              <>
-                <tr key={`col-${section.id}`} className={groupRowClass}>
+              <React.Fragment key={`col-${section.id}`}>
+                <tr className={groupRowClass}>
                   <td className="px-4 py-3" colSpan={8}>
                     <div className="flex items-center gap-2">
                       <span className={`font-bold font-['Montserrat'] ${darkMode ? 'text-[#D7B797]' : 'text-[#8A6340]'}`}>{section.name}</span>
@@ -657,7 +660,7 @@ const OTBAnalysisScreen = ({ otbContext, onOpenSkuProposal, darkMode = false }) 
                     </tr>
                   );
                 })}
-              </>
+              </React.Fragment>
             ))}
 
             <tr className={sumRowClass}>
@@ -694,8 +697,8 @@ const OTBAnalysisScreen = ({ otbContext, onOpenSkuProposal, darkMode = false }) 
           </thead>
           <tbody>
             {GENDERS.map((gen) => (
-              <>
-                <tr key={`gen-${gen.id}`} className={groupRowClass}>
+              <React.Fragment key={`gen-${gen.id}`}>
+                <tr className={groupRowClass}>
                   <td className="px-4 py-3" colSpan={7}>
                     <div className="flex items-center gap-2">
                       <span className={`font-bold font-['Montserrat'] ${darkMode ? 'text-[#D7B797]' : 'text-[#8A6340]'}`}>{gen.name}</span>
@@ -748,7 +751,7 @@ const OTBAnalysisScreen = ({ otbContext, onOpenSkuProposal, darkMode = false }) 
                     </tr>
                   );
                 })}
-              </>
+              </React.Fragment>
             ))}
 
             <tr className={sumRowClass}>
@@ -1321,7 +1324,12 @@ const OTBAnalysisScreen = ({ otbContext, onOpenSkuProposal, darkMode = false }) 
                         {!loadingBudgets && apiBudgets.map((budget) => (
                           <div
                             key={budget.id}
-                            onClick={() => { setSelectedBudgetId(budget.id); setOpenDropdown(null); }}
+                            onClick={() => {
+                              setSelectedBudgetId(budget.id);
+                              if (budget.seasonGroup) setSelectedSeasonGroup(budget.seasonGroup);
+                              if (budget.seasonType) setSelectedSeason(budget.seasonType);
+                              setOpenDropdown(null);
+                            }}
                             className={`px-4 py-3 cursor-pointer transition-colors border-t ${
                               darkMode ? 'border-[#2E2E2E]' : 'border-[#D4C8BB]'
                             } ${
@@ -1596,11 +1604,25 @@ const OTBAnalysisScreen = ({ otbContext, onOpenSkuProposal, darkMode = false }) 
                       <div className={`w-px h-10 ${darkMode ? 'bg-[rgba(215,183,151,0.25)]' : 'bg-[rgba(215,183,151,0.4)]'}`}></div>
                       <div className="flex flex-col items-end">
                         <span className={`text-sm font-bold font-['JetBrains_Mono'] ${darkMode ? 'text-[#D7B797]' : 'text-[#8A6340]'}`}>
-                          {formatCurrency((budgetContext?.rex || 0) + (budgetContext?.ttp || 0))}
+                          {formatCurrency(
+                            budgetContext?.rex || budgetContext?.ttp
+                              ? (budgetContext.rex || 0) + (budgetContext.ttp || 0)
+                              : selectedBudget?.totalBudget || 0
+                          )}
                         </span>
                         <div className={`flex items-center gap-3 text-xs font-['JetBrains_Mono'] ${darkMode ? 'text-[#D7B797]/70' : 'text-[#8A6340]/70'}`}>
-                          <span>Rex: {formatCurrency(budgetContext?.rex || 0)}</span>
-                          <span>TTP: {formatCurrency(budgetContext?.ttp || 0)}</span>
+                          {budgetContext?.rex || budgetContext?.ttp ? (
+                            <>
+                              <span>Rex: {formatCurrency(budgetContext?.rex || 0)}</span>
+                              <span>TTP: {formatCurrency(budgetContext?.ttp || 0)}</span>
+                            </>
+                          ) : selectedBudget?.details?.length > 0 ? (
+                            selectedBudget.details.map(d => (
+                              <span key={d.id || d.store?.code}>{d.store?.code || d.storeCode}: {formatCurrency(Number(d.budgetAmount) || 0)}</span>
+                            ))
+                          ) : (
+                            <span>{t('otbAnalysis.totalBudget')}</span>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -1613,13 +1635,13 @@ const OTBAnalysisScreen = ({ otbContext, onOpenSkuProposal, darkMode = false }) 
       </div>
 
       {/* AI Allocation Advisor */}
-      {selectedBudget && selectedSeasonGroup && selectedSeason && (
+      {selectedBudget && selectedSeasonGroup && selectedSeason && selectedBudget.details?.length > 0 && (
         <OtbAllocationAdvisor
-          budgetDetailId={selectedBudget.details?.[0]?.id || selectedBudget.id}
-          budgetAmount={selectedBudget.totalBudget || budgetContext?.totalBudget || 0}
+          budgetDetailId={selectedBudget.details[0].id}
+          budgetAmount={Number(selectedBudget.details[0].budgetAmount) || selectedBudget.totalBudget || 0}
           seasonGroup={selectedSeasonGroup}
           seasonType={selectedSeason}
-          storeId={STORES[0]?.id || null}
+          storeId={selectedBudget.details[0].storeId || selectedBudget.details[0].store?.id || null}
           brandId={selectedBudget.brandId}
           onApplyRecommendation={handleApplyAiRecommendation}
           currentAllocation={getCurrentAllocation()}

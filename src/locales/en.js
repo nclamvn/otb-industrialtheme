@@ -259,6 +259,7 @@ const en = {
     failedToCreateBudget: 'Failed to create budget',
     loadingBudgets: 'Loading budgets...',
     failedToLoadBudgets: 'Failed to load budgets. Please check your connection and try again.',
+    selectBrand: 'Select Brand',
   },
 
   // ──────────────────────────────────────────────
@@ -303,6 +304,7 @@ const en = {
     total: 'Total',
     subTotal: 'Sub Total',
     clickToEdit: 'Click to edit',
+    totalBudget: 'Total Budget',
   },
 
   // ──────────────────────────────────────────────

@@ -155,7 +155,7 @@ const Sidebar = ({ currentScreen, darkMode, setDarkMode, user, onLogout }) => {
       } border-r flex flex-col sticky top-0 transition-all duration-300 ease-in-out`}
     >
       {/* Logo Header */}
-      <div className={`h-[64px] flex items-center justify-center border-b ${darkMode ? 'border-[#1A1A1A]' : 'border-gray-200'}`}>
+      <div className={`h-14 flex items-center justify-center border-b ${darkMode ? 'border-[#1A1A1A]' : 'border-gray-200'}`}>
         {isCollapsed ? (
           /* Collapsed - Click logo to expand */
           <button
@@ -178,7 +178,7 @@ const Sidebar = ({ currentScreen, darkMode, setDarkMode, user, onLogout }) => {
               className="h-11 w-auto object-contain"
             />
             <div className="flex-1">
-              <div className={`text-xs font-bold tracking-wider ${darkMode ? 'text-[#666666]' : 'text-gray-600'}`}>
+              <div className={`text-xs font-bold tracking-wider whitespace-nowrap ${darkMode ? 'text-[#666666]' : 'text-gray-600'}`}>
                 {t('components.otbSystem')}
               </div>
             </div>

@@ -370,6 +370,11 @@ export class OtbAllocationService {
     budgetDetailId: string,
     recs: DimensionRecommendation[],
   ) {
+    if (!budgetDetailId) {
+      this.logger.warn('No budgetDetailId provided — skipping save.');
+      return;
+    }
+
     // Validate that budgetDetailId actually exists before saving
     const detail = await this.prisma.budgetDetail.findUnique({
       where: { id: budgetDetailId },
@@ -381,22 +386,33 @@ export class OtbAllocationService {
       return;
     }
 
-    await this.prisma.allocationRecommendation.deleteMany({
-      where: { budgetDetailId },
-    });
+    // Deduplicate by (dimensionType, dimensionValue) — keep last occurrence
+    const uniqueMap = new Map<string, (typeof recs)[0]>();
+    for (const r of recs) {
+      uniqueMap.set(`${r.dimensionType}::${r.dimensionValue}`, r);
+    }
+    const dedupedRecs = Array.from(uniqueMap.values());
 
-    await this.prisma.allocationRecommendation.createMany({
-      data: recs.map((r) => ({
-        budgetDetailId,
-        dimensionType: r.dimensionType,
-        dimensionValue: r.dimensionValue,
-        recommendedPct: r.recommendedPct,
-        recommendedAmt: r.recommendedAmt,
-        confidence: r.confidence,
-        reasoning: r.reasoning,
-        basedOnSeasons: Math.round(r.confidence * 3),
-        factors: r.factors,
-      })),
+    // Use interactive transaction (default Read Committed isolation avoids Serializable deadlocks)
+    // skipDuplicates handles any concurrent insert conflicts gracefully
+    await this.prisma.$transaction(async (tx) => {
+      await tx.allocationRecommendation.deleteMany({
+        where: { budgetDetailId },
+      });
+      await tx.allocationRecommendation.createMany({
+        skipDuplicates: true,
+        data: dedupedRecs.map((r) => ({
+          budgetDetailId,
+          dimensionType: r.dimensionType,
+          dimensionValue: r.dimensionValue,
+          recommendedPct: r.recommendedPct,
+          recommendedAmt: r.recommendedAmt,
+          confidence: r.confidence,
+          reasoning: r.reasoning,
+          basedOnSeasons: Math.round(r.confidence * 3),
+          factors: r.factors,
+        })),
+      });
     });
   }
 }

@@ -259,6 +259,7 @@ const vi = {
     failedToCreateBudget: 'Tạo ngân sách thất bại',
     loadingBudgets: 'Đang tải ngân sách...',
     failedToLoadBudgets: 'Tải ngân sách thất bại. Vui lòng kiểm tra kết nối và thử lại.',
+    selectBrand: 'Chọn thương hiệu',
   },
 
   // ──────────────────────────────────────────────
@@ -303,6 +304,7 @@ const vi = {
     total: 'Tổng cộng',
     subTotal: 'Tổng phụ',
     clickToEdit: 'Nhấn để chỉnh sửa',
+    totalBudget: 'Tổng ngân sách',
   },
 
   // ──────────────────────────────────────────────

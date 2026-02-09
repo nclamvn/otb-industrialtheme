@@ -362,6 +362,23 @@ const AppHeader = ({
           {/* Divider */}
           <div className={`w-px h-6 mx-2 ${darkMode ? 'bg-[#2E2E2E]' : 'bg-gray-200'}`} />
 
+          {/* Language Toggle */}
+          <button
+            onClick={() => setLanguage(language === 'en' ? 'vi' : 'en')}
+            className={`relative p-2.5 rounded-xl transition-all duration-300 group ${
+              darkMode
+                ? 'hover:bg-[rgba(215,183,151,0.08)]'
+                : 'hover:bg-[rgba(160,120,75,0.12)]'
+            }`}
+            title={language === 'en' ? 'Chuyển sang Tiếng Việt' : 'Switch to English'}
+          >
+            <span className={`text-sm font-semibold font-['JetBrains_Mono'] ${
+                darkMode ? 'text-[#D7B797]' : 'text-[#8A6340]'
+              }`}>
+                {language === 'en' ? 'EN' : 'VN'}
+              </span>
+          </button>
+
           {/* Dark Mode Toggle */}
           <button
             onClick={() => setDarkMode && setDarkMode(!darkMode)}
@@ -379,23 +396,6 @@ const AppHeader = ({
                 <Sun size={20} strokeWidth={2} className="text-[#8A6340] transition-transform group-hover:rotate-45" />
               )}
             </div>
-          </button>
-
-          {/* Language Toggle */}
-          <button
-            onClick={() => setLanguage(language === 'en' ? 'vi' : 'en')}
-            className={`relative p-2.5 rounded-xl transition-all duration-300 group ${
-              darkMode
-                ? 'hover:bg-[rgba(215,183,151,0.08)]'
-                : 'hover:bg-[rgba(160,120,75,0.12)]'
-            }`}
-            title={language === 'en' ? 'Chuyển sang Tiếng Việt' : 'Switch to English'}
-          >
-            <span className={`text-xs font-semibold font-['JetBrains_Mono'] ${
-                darkMode ? 'text-[#D7B797]' : 'text-[#8A6340]'
-              }`}>
-                {language === 'en' ? 'EN' : 'VN'}
-              </span>
           </button>
 
           {/* Notification Bell */}
@@ -666,13 +666,13 @@ const AppHeader = ({
               console.log('Save');
               setOpenSaveMenu(false);
             }}
-            className={`w-full px-4 py-3 flex items-center gap-3 text-sm font-medium transition-colors ${
+            className={`w-full px-4 py-3 flex items-center gap-3 text-left text-sm font-medium transition-colors ${
               darkMode
                 ? 'hover:bg-[rgba(215,183,151,0.08)] text-[#F2F2F2]'
                 : 'hover:bg-[rgba(215,183,151,0.15)] text-[#0A0A0A]'
             }`}
           >
-            <Save size={14} />
+            <Save size={14} className="shrink-0" />
             {t('header.save')}
           </button>
           <button
@@ -680,13 +680,13 @@ const AppHeader = ({
               console.log('Save As New Version');
               setOpenSaveMenu(false);
             }}
-            className={`w-full px-4 py-3 flex items-center gap-3 text-sm font-medium border-t transition-colors ${
+            className={`w-full px-4 py-3 flex items-center gap-3 text-left text-sm font-medium border-t transition-colors ${
               darkMode
                 ? 'border-[#2E2E2E] hover:bg-[rgba(215,183,151,0.08)] text-[#F2F2F2]'
                 : 'border-[#C4B5A5] hover:bg-[rgba(215,183,151,0.15)] text-[#0A0A0A]'
             }`}
           >
-            <Layers size={14} />
+            <Layers size={14} className="shrink-0" />
             {t('header.saveAsNewVersion')}
           </button>
         </div>,

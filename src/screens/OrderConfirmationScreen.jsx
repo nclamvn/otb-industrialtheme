@@ -91,7 +91,7 @@ const OrderConfirmationScreen = ({ darkMode }) => {
     } catch (err) {
       // Fallback: derive from approved proposals
       try {
-        const proposals = await proposalService.getAll({ status: 'LEVEL2_APPROVED' });
+        const proposals = await proposalService.getAll({ status: 'APPROVED' });
         const data = Array.isArray(proposals) ? proposals : (proposals?.data || []);
         const mapped = data.map((p, idx) => ({
           id: p.id || idx + 1,
