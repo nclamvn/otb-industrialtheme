@@ -7,7 +7,7 @@
 
 ---
 
-## Cap nhat lan cuoi: 09/02/2026 (Session 9 - Fix Azure Deployment Issues)
+## Cap nhat lan cuoi: 09/02/2026 (Session 10 - Node 22/24 Compatibility Fix)
 
 ---
 
@@ -565,7 +565,7 @@ CORS_ORIGIN="http://localhost:3000"
 # === FRONTEND (DAFC-OTB-NextJS/) ===
 npm run dev              # Start dev server (port 3006)
 npm run build            # Production build
-npm run start            # Start production server (node server.js)
+npm run start            # Start production server (standalone)
 npm run lint             # ESLint
 
 # === BACKEND (DAFC-Backend/dafc-otb-backend/) ===
@@ -628,6 +628,69 @@ npm run dev
 | class-validator | — | DTO validation |
 | helmet | — | HTTP security headers |
 | @nestjs/swagger | — | API documentation |
+
+---
+
+## SESSION 09/02/2026 - Session 10
+
+### Thay doi chinh
+
+1. **Node 22/24 Compatibility Fix**
+   - `next.config.mjs`: Xoa `eslint`, `typescript`, `experimental` keys (deprecated Next.js 15)
+   - Them `transpilePackages: []` va `logging.fetches.fullUrl` cho Node 22/24
+   - Xoa `env.NEXT_PUBLIC_API_URL` (Next.js tu dong expose NEXT_PUBLIC_* vars)
+
+2. **Standalone Server (thay the custom server.js)**
+   - Xoa `server.js` — khong tuong thich voi `output: 'standalone'`
+   - `npm run start` → `node .next/standalone/server.js` (built-in server)
+   - `npm run start:azure` → `node azure-startup.js` (Azure wrapper)
+
+3. **Cross-platform Scripts (thay the bash)**
+   - Xoa `postbuild.sh`, `startup.sh` (bash — khong cross-platform)
+   - `scripts/copy-assets.js` — Node.js script copy public/ va .next/static/ vao standalone
+   - `azure-startup.js` — Azure startup: copy assets + spawn standalone server
+   - `package.json`: `postbuild: node scripts/copy-assets.js` (tu dong chay sau build)
+
+4. **Engine & Config Updates**
+   - `engines.node`: `>=18.0.0 <25.0.0` → `>=20.0.0`
+   - `.nvmrc`: `20` → `22`
+   - `.npmrc`: Them `fetch-retries`, `fetch-retry-mintimeout`, `fetch-retry-maxtimeout`
+   - `version`: `0.1.0` → `1.0.0`
+
+### Build Verification
+- 17 static + 3 dynamic routes (20 total), compiled 3.6s, 0 errors
+- Standalone server: Ready in 54ms, HTTP 200 confirmed
+- postbuild auto-copies public/ va .next/static/
+
+### Azure Portal Configuration (UPDATED)
+```
+Frontend App Service:
+  Stack: Node 22 LTS (hoac 24)        ← THAY DOI (khong dung Node 20)
+  Startup Command: node .next/standalone/server.js
+  PORT = 8080
+  WEBSITES_PORT = 8080
+  NODE_ENV = production
+  NEXT_PUBLIC_API_URL = https://[backend-url]/api/v1
+```
+
+### Files da tao/cap nhat (9 files)
+```
+# New files
+scripts/copy-assets.js                    # Cross-platform asset copy (Node.js)
+azure-startup.js                          # Azure startup wrapper
+
+# Modified files
+next.config.mjs                           # Remove deprecated keys, add transpilePackages/logging
+package.json                              # New scripts, engines >=20.0.0, version 1.0.0
+package-lock.json                         # Updated
+.nvmrc                                    # 20 → 22
+.npmrc                                    # Added retry settings
+
+# Deleted files
+server.js                                 # Custom server (replaced by standalone)
+postbuild.sh                              # Bash script (replaced by scripts/copy-assets.js)
+startup.sh                                # Bash script (replaced by azure-startup.js)
+```
 
 ---
 
@@ -781,7 +844,7 @@ src/locales/vi.js                             # 105+ new keys
 - [x] ~~Azure deployment config~~ → Done Session 8
 - [x] ~~Backend security vulnerabilities~~ → 0 vulnerabilities (Session 8)
 - [ ] TicketDetailPage.jsx still has MOCK_SKU_DATA and MOCK_DETAIL_DATA (fallback)
-- [ ] Azure Portal manual config (Node 20, `node server.js` / `node dist/src/main.js`, env vars)
+- [ ] Azure Portal manual config (Node 22 LTS, `node .next/standalone/server.js` / `node dist/src/main.js`, env vars)
 - [ ] E2E testing (test suite co san, chua chay)
 - [ ] Performance tuning
 - [ ] Mobile responsive testing
