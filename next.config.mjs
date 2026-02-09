@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Output standalone for Azure App Services
+  // Output standalone for Azure App Services (Node 22/24 compatible)
   output: 'standalone',
 
   // Disable image optimization (không dùng Vercel)
@@ -8,9 +8,14 @@ const nextConfig = {
     unoptimized: true,
   },
 
-  // Environment variables
-  env: {
-    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
+  // Transpile packages if needed for Node 22/24
+  transpilePackages: [],
+
+  // Logging
+  logging: {
+    fetches: {
+      fullUrl: true,
+    },
   },
 };
 
