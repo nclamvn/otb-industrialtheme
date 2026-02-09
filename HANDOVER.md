@@ -7,7 +7,7 @@
 
 ---
 
-## Cap nhat lan cuoi: 08/02/2026 (Session 8 - 100% Migration + Azure Deployment)
+## Cap nhat lan cuoi: 09/02/2026 (Session 9 - Fix Azure Deployment Issues)
 
 ---
 
@@ -565,7 +565,7 @@ CORS_ORIGIN="http://localhost:3000"
 # === FRONTEND (DAFC-OTB-NextJS/) ===
 npm run dev              # Start dev server (port 3006)
 npm run build            # Production build
-npm run start            # Start production server
+npm run start            # Start production server (node server.js)
 npm run lint             # ESLint
 
 # === BACKEND (DAFC-Backend/dafc-otb-backend/) ===
@@ -628,6 +628,66 @@ npm run dev
 | class-validator | — | DTO validation |
 | helmet | — | HTTP security headers |
 | @nestjs/swagger | — | API documentation |
+
+---
+
+## SESSION 09/02/2026 - Session 9
+
+### Thay doi chinh
+
+1. **Fix Frontend Azure Deployment (`sh: 1: next: not found`)**
+   - `server.js`: Viet lai hoan toan — dung `next()` truc tiep thay vi require standalone
+   - `package.json`: Scripts moi — `start: node server.js`, `start:standalone`, `start:next`, `postinstall`
+   - `next.config.mjs`: Them `env.NEXT_PUBLIC_API_URL`, `experimental: {}`
+   - `.npmrc`: Tao moi — `legacy-peer-deps=true`, `auto-install-peers=true`
+   - `.env.production`: Tao moi — placeholder cho Azure
+
+2. **Fix Backend Deployment (`Cannot find module '@nestjs/config'`)**
+   - `package.json`: Them `@nestjs/config@^4.0.3`
+   - `app.module.ts`: Them `ConfigModule.forRoot({ isGlobal: true })` lam import dau tien
+   - `start:prod`: Fix path `node dist/main` → `node dist/src/main` (do tsconfig outDir)
+   - `.npmrc`: Tao moi — `legacy-peer-deps=true` (fix swagger v11 peer dep conflict)
+
+3. **Build Verification**
+   - Frontend: 17 static + 3 dynamic routes, `.next/standalone/server.js` ton tai
+   - Backend: Build thanh cong, `dist/src/main.js` ton tai
+
+### Azure Portal Configuration (UPDATED)
+```
+Frontend App Service:
+  Stack: Node 20 LTS
+  Startup Command: node server.js        ← THAY DOI (khong dung bash startup.sh)
+  PORT = 3000
+  WEBSITES_PORT = 3000
+  NODE_ENV = production
+  NEXT_PUBLIC_API_URL = https://[backend-url]/api/v1
+
+Backend App Service:
+  Stack: Node 20 LTS
+  Startup Command: node dist/src/main.js  ← THAY DOI (khong phai dist/main.js)
+  PORT = 3000
+  NODE_ENV = production
+  DATABASE_URL = [postgresql-connection-string]
+  JWT_SECRET = [your-secret]
+  JWT_EXPIRES_IN = 7d
+```
+
+### Files da tao/cap nhat (8 files)
+```
+# New files
+.npmrc                                    # npm config (legacy-peer-deps)
+.env.production                           # Production env placeholder
+
+# Modified files
+server.js                                 # Rewritten: proper Next.js custom server
+package.json                              # New scripts for Azure
+next.config.mjs                           # Added env, experimental
+backend/package.json                      # +@nestjs/config, fix start:prod path
+backend/src/app.module.ts                 # +ConfigModule.forRoot()
+
+# Also updated (standalone backend copy)
+/Users/mac/otbdafc/DAFC-Backend/dafc-otb-backend/  # Same changes applied
+```
 
 ---
 
@@ -721,7 +781,7 @@ src/locales/vi.js                             # 105+ new keys
 - [x] ~~Azure deployment config~~ → Done Session 8
 - [x] ~~Backend security vulnerabilities~~ → 0 vulnerabilities (Session 8)
 - [ ] TicketDetailPage.jsx still has MOCK_SKU_DATA and MOCK_DETAIL_DATA (fallback)
-- [ ] Azure Portal manual config (Node 20, startup command, env vars)
+- [ ] Azure Portal manual config (Node 20, `node server.js` / `node dist/src/main.js`, env vars)
 - [ ] E2E testing (test suite co san, chua chay)
 - [ ] Performance tuning
 - [ ] Mobile responsive testing
