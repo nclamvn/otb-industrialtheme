@@ -1,8 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // ─── Azure App Services: standalone output ───
+  // CRITICAL: Output standalone for Azure
   output: 'standalone',
 
+  // Disable image optimization (không dùng Vercel)
   images: {
     unoptimized: true,
   },
@@ -14,6 +15,13 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+
+  // Environment variables
+  env: {
+    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
+  },
+
+  experimental: {},
 };
 
 export default nextConfig;

@@ -1,42 +1,37 @@
-// ═══════════════════════════════════════════════════════════════════════════
-// Custom Server for Azure App Services
-// This file is used when deploying to Azure App Services (Linux)
-// It starts the Next.js standalone server with the correct port
-// ═══════════════════════════════════════════════════════════════════════════
-
 const { createServer } = require('http');
 const { parse } = require('url');
+const next = require('next');
 const path = require('path');
 
-// Azure App Services uses PORT env variable
+const dev = process.env.NODE_ENV !== 'production';
+const hostname = process.env.HOST || '0.0.0.0';
 const port = parseInt(process.env.PORT || process.env.WEBSITES_PORT || '3000', 10);
-const hostname = '0.0.0.0';
 
-// In standalone mode, Next.js outputs a server.js in .next/standalone/
-// We need to require it properly
-async function startServer() {
-  try {
-    // Try standalone server first (production)
-    const next = require('./.next/standalone/server.js');
-    console.log(`✓ Next.js standalone server starting on port ${port}`);
-  } catch (err) {
-    // Fallback: use next directly (development)
-    const next = require('next');
-    const app = next({ dev: false, hostname, port });
-    const handle = app.getRequestHandler();
+console.log('=== DAFC OTB Frontend Server ===');
+console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+console.log(`Node version: ${process.version}`);
+console.log(`Port: ${port}`);
+console.log(`Hostname: ${hostname}`);
 
-    await app.prepare();
+const app = next({ dev, hostname, port });
+const handle = app.getRequestHandler();
 
-    createServer((req, res) => {
+app.prepare().then(() => {
+  createServer(async (req, res) => {
+    try {
       const parsedUrl = parse(req.url, true);
-      handle(req, res, parsedUrl);
-    }).listen(port, hostname, () => {
-      console.log(`✓ Next.js server running on http://${hostname}:${port}`);
-    });
-  }
-}
-
-startServer().catch((err) => {
-  console.error('Failed to start server:', err);
-  process.exit(1);
+      await handle(req, res, parsedUrl);
+    } catch (err) {
+      console.error('Error occurred handling', req.url, err);
+      res.statusCode = 500;
+      res.end('Internal Server Error');
+    }
+  })
+  .once('error', (err) => {
+    console.error('Server error:', err);
+    process.exit(1);
+  })
+  .listen(port, hostname, () => {
+    console.log(`> Ready on http://${hostname}:${port}`);
+  });
 });
