@@ -502,7 +502,7 @@ async function main() {
     { code: 'BUD-PRA-FW-main-2025', brandId: brandPRA.id, season: 'FW', type: 'main', year: 2025, total: 800000000, status: 'DRAFT' },
   ];
 
-  const createdBudgets = [];
+  const createdBudgets: any[] = [];
   for (const spec of budgetSpecs) {
     const budget = await prisma.budget.upsert({
       where: { budgetCode: spec.code },
