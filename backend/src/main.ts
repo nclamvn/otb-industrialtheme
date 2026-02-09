@@ -10,8 +10,11 @@ async function bootstrap() {
   // Security
   app.use(helmet());
 
-  // CORS - allow multiple localhost ports for development
-  const allowedOrigins = ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:3002', 'http://localhost:3006'];
+  // CORS - allow localhost + production origins
+  const allowedOrigins = [
+    'http://localhost:3000', 'http://localhost:3001', 'http://localhost:3002', 'http://localhost:3006',
+    ...(process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',') : []),
+  ];
   app.enableCors({
     origin: (origin, callback) => {
       // Allow requests with no origin (like mobile apps or curl)
