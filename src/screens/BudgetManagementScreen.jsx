@@ -9,7 +9,7 @@ import toast from 'react-hot-toast';
 import { GROUP_BRANDS } from '../utils/constants';
 import { formatCurrency } from '../utils/formatters';
 import { budgetService, masterDataService } from '../services';
-import { LoadingSpinner, ErrorMessage, EmptyState } from '../components/Common';
+import { LoadingSpinner, ErrorMessage, EmptyState, ExpandableStatCard } from '../components/Common';
 import BudgetAlertsBanner from '../components/BudgetAlertsBanner';
 import { useLanguage } from '@/contexts/LanguageContext';
 
@@ -134,16 +134,39 @@ const BudgetManagementScreen = ({
     const approved = budgetData.filter(b => b.status === 'approved').reduce((sum, b) => sum + (Number(b.totalBudget) || 0), 0);
     const pending = budgetData.filter(b => b.status === 'pending').reduce((sum, b) => sum + (Number(b.totalBudget) || 0), 0);
     const draft = budgetData.filter(b => b.status === 'draft').reduce((sum, b) => sum + (Number(b.totalBudget) || 0), 0);
+    const remaining = total - approved;
+
+    // Group by brand for breakdown
+    const byBrand = {};
+    budgetData.forEach(b => {
+      const name = b.brandName || b.groupBrand || 'Other';
+      byBrand[name] = (byBrand[name] || 0) + (Number(b.totalBudget) || 0);
+    });
+    const brandBreakdown = Object.entries(byBrand)
+      .map(([label, value]) => ({ label, value, displayValue: formatCurrency(value, { currency }), pct: total > 0 ? Math.round((value / total) * 100) : 0 }))
+      .sort((a, b) => b.value - a.value);
+
+    // Status counts
+    const statusCounts = { approved: 0, pending: 0, draft: 0 };
+    budgetData.forEach(b => {
+      const s = b.status || 'draft';
+      if (statusCounts[s] !== undefined) statusCounts[s]++;
+    });
 
     return {
       total,
       approved,
       pending,
       draft,
+      remaining,
+      count: budgetData.length,
       approvedPct: total > 0 ? ((approved / total) * 100).toFixed(1) : 0,
-      pendingPct: total > 0 ? ((pending / total) * 100).toFixed(1) : 0
+      pendingPct: total > 0 ? ((pending / total) * 100).toFixed(1) : 0,
+      remainingPct: total > 0 ? ((remaining / total) * 100).toFixed(1) : 0,
+      brandBreakdown,
+      statusCounts,
     };
-  }, [budgetData]);
+  }, [budgetData, currency]);
 
   // Clear all filters
   const clearFilters = () => {
@@ -184,30 +207,16 @@ const BudgetManagementScreen = ({
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-3">
       {/* Budget Alerts Banner */}
       <BudgetAlertsBanner darkMode={darkMode} />
 
       {/* Filters Section */}
-      <div className={`rounded-xl shadow-sm border p-4 ${darkMode ? 'bg-[#121212] border-[#2E2E2E]' : 'bg-white border-[#C4B5A5]'}`}>
-        <div className="flex items-center gap-3 mb-4">
-          <Filter size={18} className={darkMode ? 'text-[#999999]' : 'text-[#666666]'} />
-          <span className={`text-sm font-medium font-['Montserrat'] ${darkMode ? 'text-[#999999]' : 'text-[#666666]'}`}>{t('budget.filters')}</span>
-          {hasActiveFilters && (
-            <button
-              onClick={clearFilters}
-              className={`ml-auto text-xs font-medium transition-colors ${
-                darkMode
-                  ? 'text-[#D7B797] hover:text-[#D7B797]/80'
-                  : 'text-[#8A6340] hover:text-[#8A6340]/80'
-              }`}
-            >
-              {t('budget.clearAll')}
-            </button>
-          )}
-        </div>
-
-        <div className="flex flex-wrap items-center gap-3">
+      <div className={`rounded-lg shadow-sm border px-3 py-2 ${darkMode ? 'bg-[#121212] border-[#2E2E2E]' : 'bg-white border-[#C4B5A5]'}`}>
+        <div className="flex flex-wrap items-center gap-2">
+          <Filter size={14} className={`shrink-0 ${darkMode ? 'text-[#999999]' : 'text-[#666666]'}`} />
+          <span className={`text-xs font-medium font-['Montserrat'] shrink-0 ${darkMode ? 'text-[#999999]' : 'text-[#666666]'}`}>{t('budget.filters')}</span>
+          <div className={`h-5 w-px shrink-0 ${darkMode ? 'bg-[#2E2E2E]' : 'bg-[#C4B5A5]/50'}`}></div>
           {/* Year Filter */}
           <div className="relative">
             <button
@@ -216,7 +225,7 @@ const BudgetManagementScreen = ({
                 setGroupBrandDropdownOpen(false);
                 setBrandDropdownOpen(false);
               }}
-              className={`flex items-center justify-between gap-3 px-4 py-2.5 border rounded-lg transition-colors min-w-[140px] ${selectedYear
+              className={`flex items-center justify-between gap-2 px-3 py-1.5 border rounded-lg transition-colors min-w-[110px] ${selectedYear
                 ? darkMode
                   ? 'bg-[rgba(215,183,151,0.08)] border-[rgba(215,183,151,0.25)] text-[#D7B797]'
                   : 'bg-[rgba(160,120,75,0.18)] border-[rgba(215,183,151,0.4)] text-[#8A6340]'
@@ -257,7 +266,7 @@ const BudgetManagementScreen = ({
                 setYearDropdownOpen(false);
                 setBrandDropdownOpen(false);
               }}
-              className={`flex items-center justify-between gap-3 px-4 py-2.5 border rounded-lg transition-colors min-w-[150px] ${selectedGroupBrand
+              className={`flex items-center justify-between gap-2 px-3 py-1.5 border rounded-lg transition-colors min-w-[130px] ${selectedGroupBrand
                 ? darkMode
                   ? 'bg-[rgba(215,183,151,0.08)] border-[rgba(215,183,151,0.25)] text-[#D7B797]'
                   : 'bg-[rgba(160,120,75,0.18)] border-[rgba(215,183,151,0.4)] text-[#8A6340]'
@@ -302,7 +311,7 @@ const BudgetManagementScreen = ({
                 setYearDropdownOpen(false);
                 setGroupBrandDropdownOpen(false);
               }}
-              className={`flex items-center justify-between gap-3 px-4 py-2.5 border rounded-lg transition-colors min-w-[140px] ${selectedBrand
+              className={`flex items-center justify-between gap-2 px-3 py-1.5 border rounded-lg transition-colors min-w-[110px] ${selectedBrand
                 ? darkMode
                   ? 'bg-[rgba(215,183,151,0.08)] border-[rgba(215,183,151,0.25)] text-[#D7B797]'
                   : 'bg-[rgba(160,120,75,0.18)] border-[rgba(215,183,151,0.4)] text-[#8A6340]'
@@ -338,14 +347,14 @@ const BudgetManagementScreen = ({
           </div>
 
           {/* Search */}
-          <div className="relative flex-1 min-w-[200px]">
-            <Search size={18} className={`absolute left-3 top-1/2 -translate-y-1/2 ${darkMode ? 'text-[#666666]' : 'text-[#999999]'}`} />
+          <div className="relative flex-1 min-w-[160px]">
+            <Search size={14} className={`absolute left-2.5 top-1/2 -translate-y-1/2 ${darkMode ? 'text-[#666666]' : 'text-[#999999]'}`} />
             <input
               type="text"
               placeholder={t('budget.searchBudgets')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className={`w-full pl-10 pr-4 py-2.5 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#D7B797] focus:border-transparent ${darkMode ? 'bg-[#1A1A1A] border-[#2E2E2E] text-[#F2F2F2] placeholder-[#666666]' : 'bg-white border-[#C4B5A5] text-[#0A0A0A] placeholder-[#999999]'}`}
+              className={`w-full pl-8 pr-3 py-1.5 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#D7B797] focus:border-transparent ${darkMode ? 'bg-[#1A1A1A] border-[#2E2E2E] text-[#F2F2F2] placeholder-[#666666]' : 'bg-white border-[#C4B5A5] text-[#0A0A0A] placeholder-[#999999]'}`}
             />
           </div>
 
@@ -407,119 +416,73 @@ const BudgetManagementScreen = ({
             </button>
           </div> */}
 
+          {hasActiveFilters && (
+            <button
+              onClick={clearFilters}
+              className={`flex items-center gap-1 text-xs font-medium transition-colors shrink-0 ${
+                darkMode ? 'text-[#999999] hover:text-[#D7B797]' : 'text-[#666666] hover:text-[#8A6340]'
+              }`}
+            >
+              <X size={12} />
+              {t('budget.clearAll')}
+            </button>
+          )}
+
           <button
             onClick={() => setShowCreateModal(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-[#127749] text-white rounded-lg hover:bg-[#2A9E6A] transition-colors shadow-sm text-sm font-medium font-['Montserrat']"
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-[#127749] text-white rounded-lg hover:bg-[#2A9E6A] transition-colors shadow-sm text-xs font-medium font-['Montserrat'] shrink-0"
           >
-            <Plus size={16} />
+            <Plus size={14} />
             {t('budget.createBudget')}
           </button>
         </div>
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-3 gap-4">
-        {/* Total Budget Card */}
-        <div
-          className={`relative overflow-hidden border rounded-2xl shadow-sm p-5 transition-all duration-200 hover:shadow-lg group ${
-            darkMode ? 'border-[#2E2E2E]' : 'border-gray-200'
-          }`}
-          style={{
-            background: darkMode
-              ? `linear-gradient(135deg, #121212 0%, #121212 60%, ${CARD_ACCENTS.total.darkGrad} 100%)`
-              : `linear-gradient(135deg, #ffffff 0%, #ffffff 55%, ${CARD_ACCENTS.total.lightGrad} 100%)`,
-          }}
-        >
-          <div
-            className="absolute -bottom-3 -right-3 transition-all duration-300 group-hover:scale-110 group-hover:opacity-[0.12] pointer-events-none"
-            style={{ opacity: darkMode ? 0.05 : 0.07 }}
-          >
-            <Wallet size={80} color={CARD_ACCENTS.total.color} strokeWidth={1} />
-          </div>
-          <div className="relative z-10">
-            <div className="flex items-start justify-between">
-              <div>
-                <p className={`text-xs font-semibold tracking-wider mb-2 font-['Montserrat'] ${darkMode ? 'text-[#F2F2F2]' : 'text-[#0A0A0A]'}`}>{t('budget.totalBudget')}</p>
-                <p className={`text-2xl font-bold font-['JetBrains_Mono'] ${darkMode ? 'text-[#F2F2F2]' : 'text-[#0A0A0A]'}`}>{formatCurrency(summaryStats.total, { currency })}</p>
-                <p className={`text-xs mt-1 ${darkMode ? 'text-[#666666]' : 'text-[#999999]'}`}>{t('budget.allBudgetsCombined')}</p>
-              </div>
-              <div
-                className="w-10 h-10 rounded-xl flex items-center justify-center backdrop-blur-sm"
-                style={{ backgroundColor: darkMode ? CARD_ACCENTS.total.iconDark : CARD_ACCENTS.total.iconLight }}
-              >
-                <Wallet size={18} color={CARD_ACCENTS.total.color} />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Allocated Card */}
-        <div
-          className={`relative overflow-hidden border rounded-2xl shadow-sm p-5 transition-all duration-200 hover:shadow-lg group ${
-            darkMode ? 'border-[#2E2E2E]' : 'border-gray-200'
-          }`}
-          style={{
-            background: darkMode
-              ? `linear-gradient(135deg, #121212 0%, #121212 60%, ${CARD_ACCENTS.allocated.darkGrad} 100%)`
-              : `linear-gradient(135deg, #ffffff 0%, #ffffff 55%, ${CARD_ACCENTS.allocated.lightGrad} 100%)`,
-          }}
-        >
-          <div
-            className="absolute -bottom-3 -right-3 transition-all duration-300 group-hover:scale-110 group-hover:opacity-[0.12] pointer-events-none"
-            style={{ opacity: darkMode ? 0.05 : 0.07 }}
-          >
-            <CircleCheckBig size={80} color={CARD_ACCENTS.allocated.color} strokeWidth={1} />
-          </div>
-          <div className="relative z-10">
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-xs font-semibold text-[#127749] tracking-wider mb-2 font-['Montserrat']">{t('budget.allocated')}</p>
-                <p className="text-2xl font-bold text-[#2A9E6A] font-['JetBrains_Mono']">{formatCurrency(summaryStats.approved, { currency })}</p>
-                <p className={`text-xs mt-1 ${darkMode ? 'text-[#666666]' : 'text-[#999999]'}`}>{summaryStats.approvedPct}% {t('budget.ofTotal')}</p>
-              </div>
-              <div
-                className="w-10 h-10 rounded-xl flex items-center justify-center backdrop-blur-sm"
-                style={{ backgroundColor: darkMode ? CARD_ACCENTS.allocated.iconDark : CARD_ACCENTS.allocated.iconLight }}
-              >
-                <CircleCheckBig size={18} color={CARD_ACCENTS.allocated.color} />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Remaining Card */}
-        <div
-          className={`relative overflow-hidden border rounded-2xl shadow-sm p-5 transition-all duration-200 hover:shadow-lg group ${
-            darkMode ? 'border-[#2E2E2E]' : 'border-gray-200'
-          }`}
-          style={{
-            background: darkMode
-              ? `linear-gradient(135deg, #121212 0%, #121212 60%, ${CARD_ACCENTS.remaining.darkGrad} 100%)`
-              : `linear-gradient(135deg, #ffffff 0%, #ffffff 55%, ${CARD_ACCENTS.remaining.lightGrad} 100%)`,
-          }}
-        >
-          <div
-            className="absolute -bottom-3 -right-3 transition-all duration-300 group-hover:scale-110 group-hover:opacity-[0.12] pointer-events-none"
-            style={{ opacity: darkMode ? 0.05 : 0.07 }}
-          >
-            <Hourglass size={80} color={CARD_ACCENTS.remaining.color} strokeWidth={1} />
-          </div>
-          <div className="relative z-10">
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-xs font-semibold text-[#E3B341] tracking-wider mb-2 font-['Montserrat']">{t('budget.remaining')}</p>
-                <p className="text-2xl font-bold text-[#E3B341] font-['JetBrains_Mono']">{formatCurrency(summaryStats.pending, { currency })}</p>
-                <p className={`text-xs mt-1 ${darkMode ? 'text-[#666666]' : 'text-[#999999]'}`}>{summaryStats.pendingPct}% {t('budget.ofTotal')}</p>
-              </div>
-              <div
-                className="w-10 h-10 rounded-xl flex items-center justify-center backdrop-blur-sm"
-                style={{ backgroundColor: darkMode ? CARD_ACCENTS.remaining.iconDark : CARD_ACCENTS.remaining.iconLight }}
-              >
-                <Hourglass size={18} color={CARD_ACCENTS.remaining.color} />
-              </div>
-            </div>
-          </div>
-        </div>
+      <div className="grid grid-cols-3 gap-2">
+        <ExpandableStatCard
+          title={t('budget.totalBudget')}
+          value={formatCurrency(summaryStats.total, { currency })}
+          sub={t('budget.allBudgetsCombined')}
+          darkMode={darkMode}
+          icon={Wallet}
+          accent="gold"
+          trendLabel={`${summaryStats.count} budgets`}
+          trend={1}
+          breakdown={summaryStats.brandBreakdown.slice(0, 5)}
+          expandTitle={t('home.kpiDetail.byBrand')}
+        />
+        <ExpandableStatCard
+          title={t('budget.allocated')}
+          value={formatCurrency(summaryStats.approved, { currency })}
+          sub={`${summaryStats.approvedPct}% ${t('budget.ofTotal')}`}
+          darkMode={darkMode}
+          icon={CircleCheckBig}
+          accent="emerald"
+          progress={Number(summaryStats.approvedPct)}
+          progressLabel={t('budget.allocated')}
+          badges={[
+            { label: 'Approved', value: summaryStats.statusCounts.approved, color: '#2A9E6A' },
+            { label: 'Pending', value: summaryStats.statusCounts.pending, color: '#D29922' },
+            { label: 'Draft', value: summaryStats.statusCounts.draft, color: '#666666' },
+          ]}
+          expandTitle={t('home.kpiDetail.byStatus')}
+        />
+        <ExpandableStatCard
+          title={t('budget.remaining')}
+          value={formatCurrency(summaryStats.remaining, { currency })}
+          sub={`${summaryStats.remainingPct}% ${t('budget.ofTotal')}`}
+          darkMode={darkMode}
+          icon={Hourglass}
+          accent="amber"
+          progress={Number(summaryStats.remainingPct)}
+          progressLabel={t('budget.remaining')}
+          breakdown={[
+            { label: 'Draft', value: summaryStats.draft, displayValue: formatCurrency(summaryStats.draft, { currency }), pct: summaryStats.total > 0 ? Math.round((summaryStats.draft / summaryStats.total) * 100) : 0, color: '#666666' },
+            { label: 'Pending', value: summaryStats.pending, displayValue: formatCurrency(summaryStats.pending, { currency }), pct: summaryStats.total > 0 ? Math.round((summaryStats.pending / summaryStats.total) * 100) : 0, color: '#D29922' },
+          ]}
+          expandTitle={t('home.kpiDetail.breakdown')}
+        />
       </div>
 
       {/* Data Table */}
@@ -528,22 +491,22 @@ const BudgetManagementScreen = ({
           <table className="w-full">
             <thead className={darkMode ? 'bg-[#1A1A1A]' : 'bg-[rgba(160,120,75,0.18)]'}>
               <tr>
-                <th className={`text-left px-6 py-4 text-xs font-semibold tracking-wider font-['Montserrat'] ${darkMode ? 'text-[#999999]' : 'text-[#666666]'}`}>
+                <th className={`text-left px-3 py-2 text-xs font-semibold tracking-wider font-['Montserrat'] ${darkMode ? 'text-[#999999]' : 'text-[#666666]'}`}>
                   {t('budget.fiscalYear')}
                 </th>
-                <th className={`text-left px-6 py-4 text-xs font-semibold tracking-wider font-['Montserrat'] ${darkMode ? 'text-[#999999]' : 'text-[#666666]'}`}>
+                <th className={`text-left px-3 py-2 text-xs font-semibold tracking-wider font-['Montserrat'] ${darkMode ? 'text-[#999999]' : 'text-[#666666]'}`}>
                   {t('budget.groupBrand')}
                 </th>
-                <th className={`text-left px-6 py-4 text-xs font-semibold tracking-wider font-['Montserrat'] ${darkMode ? 'text-[#999999]' : 'text-[#666666]'}`}>
+                <th className={`text-left px-3 py-2 text-xs font-semibold tracking-wider font-['Montserrat'] ${darkMode ? 'text-[#999999]' : 'text-[#666666]'}`}>
                   {t('budget.brand')}
                 </th>
-                <th className={`text-left px-6 py-4 text-xs font-semibold tracking-wider font-['Montserrat'] ${darkMode ? 'text-[#999999]' : 'text-[#666666]'}`}>
+                <th className={`text-left px-3 py-2 text-xs font-semibold tracking-wider font-['Montserrat'] ${darkMode ? 'text-[#999999]' : 'text-[#666666]'}`}>
                   {t('budget.budgetName')}
                 </th>
-                <th className={`text-left px-6 py-4 text-xs font-semibold tracking-wider font-['Montserrat'] ${darkMode ? 'text-[#999999]' : 'text-[#666666]'}`}>
+                <th className={`text-left px-3 py-2 text-xs font-semibold tracking-wider font-['Montserrat'] ${darkMode ? 'text-[#999999]' : 'text-[#666666]'}`}>
                   {t('budget.amount')}
                 </th>
-                <th className={`text-right px-6 py-4 text-xs font-semibold tracking-wider font-['Montserrat'] ${darkMode ? 'text-[#999999]' : 'text-[#666666]'}`}>
+                <th className={`text-right px-3 py-2 text-xs font-semibold tracking-wider font-['Montserrat'] ${darkMode ? 'text-[#999999]' : 'text-[#666666]'}`}>
                   {t('common.actions')}
                 </th>
               </tr>
@@ -554,18 +517,18 @@ const BudgetManagementScreen = ({
                   key={budget.id}
                   className={`transition-colors ${darkMode ? 'hover:bg-[rgba(215,183,151,0.08)]' : 'hover:bg-[rgba(160,120,75,0.18)]'}`}
                 >
-                  <td className="px-6 py-4">
+                  <td className="px-3 py-2">
                     <span className={`text-sm font-medium ${darkMode ? 'text-[#F2F2F2]' : 'text-[#0A0A0A]'}`}>FY{budget.fiscalYear}</span>
                   </td>
-                  <td className="px-6 py-4">
+                  <td className="px-3 py-2">
                     <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${darkMode ? 'bg-[#2E2E2E] text-[#F2F2F2]' : 'bg-[#F2F2F2] text-[#0A0A0A]'}`}>
                       {budget.groupBrand}
                     </span>
                   </td>
-                  <td className="px-6 py-4">
+                  <td className="px-3 py-2">
                     <span className={`text-sm ${darkMode ? 'text-[#999999]' : 'text-[#666666]'}`}>{budget.brandName}</span>
                   </td>
-                  <td className="px-6 py-4">
+                  <td className="px-3 py-2">
                     <span className={`text-sm font-medium cursor-pointer transition-colors ${
                       darkMode
                         ? 'text-[#D7B797] hover:text-[#D7B797]/80 hover:underline'
@@ -574,10 +537,10 @@ const BudgetManagementScreen = ({
                       {budget.budgetName}
                     </span>
                   </td>
-                  <td className="px-6 py-4">
+                  <td className="px-3 py-2">
                     <span className={`text-sm font-semibold font-['JetBrains_Mono'] ${darkMode ? 'text-[#F2F2F2]' : 'text-[#0A0A0A]'}`}>{formatCurrency(budget.totalBudget, { currency })}</span>
                   </td>
-                  <td className="px-6 py-4">
+                  <td className="px-3 py-2">
                     <div className="flex items-center justify-end gap-2">
                       {/* View */}
                       <button

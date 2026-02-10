@@ -48,8 +48,13 @@ const SettingsScreen = ({ darkMode = true, setDarkMode, user }) => {
 
   const SettingSection = ({ title, description, children }) => (
     <div className={`rounded-xl border overflow-hidden ${
-      darkMode ? 'bg-[#121212] border-[#2E2E2E]' : 'bg-white border-gray-200'
-    }`}>
+      darkMode ? 'border-[#2E2E2E]' : 'border-gray-200'
+    }`} style={{
+      background: darkMode
+        ? 'linear-gradient(135deg, #121212 0%, rgba(215,183,151,0.03) 40%, rgba(215,183,151,0.08) 100%)'
+        : 'linear-gradient(135deg, #ffffff 0%, rgba(215,183,151,0.04) 35%, rgba(215,183,151,0.10) 100%)',
+      boxShadow: `inset 0 -1px 0 ${darkMode ? 'rgba(215,183,151,0.06)' : 'rgba(215,183,151,0.04)'}`,
+    }}>
       <div className={`px-5 py-4 border-b ${darkMode ? 'border-[#2E2E2E]' : 'border-gray-100'}`}>
         <h3 className={`text-base font-semibold font-['Montserrat'] ${
           darkMode ? 'text-[#F2F2F2]' : 'text-gray-900'

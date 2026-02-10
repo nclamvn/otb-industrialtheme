@@ -11,6 +11,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { formatCurrency } from '../utils';
 import api from '../services/api';
+import { ExpandableStatCard } from '../components/Common';
 
 /* ═══════════════════════════════════════════════
    STATUS CONFIG
@@ -21,45 +22,6 @@ const ORDER_STATUS = {
   SHIPPED: { color: '#58A6FF', bg: 'rgba(88,166,255,0.12)', label: 'Shipped' },
   CANCELLED: { color: '#F85149', bg: 'rgba(248,81,73,0.12)', label: 'Cancelled' },
   PARTIAL: { color: '#A371F7', bg: 'rgba(163,113,247,0.12)', label: 'Partial' },
-};
-
-/* ═══════════════════════════════════════════════
-   STAT CARD
-═══════════════════════════════════════════════ */
-const STAT_ACCENTS = {
-  amber: { color: '#D29922', darkGrad: 'rgba(210,153,34,0.05)', lightGrad: 'rgba(180,130,20,0.08)' },
-  blue: { color: '#58A6FF', darkGrad: 'rgba(88,166,255,0.05)', lightGrad: 'rgba(50,120,220,0.08)' },
-  emerald: { color: '#2A9E6A', darkGrad: 'rgba(42,158,106,0.06)', lightGrad: 'rgba(22,120,70,0.08)' },
-  gold: { color: '#D7B797', darkGrad: 'rgba(215,183,151,0.06)', lightGrad: 'rgba(180,140,95,0.10)' },
-};
-
-const StatCard = ({ title, value, sub, darkMode, icon: Icon, accent = 'blue' }) => {
-  const a = STAT_ACCENTS[accent] || STAT_ACCENTS.blue;
-  const borderColor = darkMode ? 'border-[#2E2E2E]' : 'border-gray-200';
-  const textMuted = darkMode ? 'text-[#666666]' : 'text-gray-700';
-  const textPrimary = darkMode ? 'text-[#F2F2F2]' : 'text-gray-900';
-
-  return (
-    <div
-      className={`relative overflow-hidden border ${borderColor} rounded-2xl p-5 transition-all duration-200 hover:shadow-lg group`}
-      style={{
-        background: darkMode
-          ? `linear-gradient(135deg, #121212 0%, #121212 60%, ${a.darkGrad} 100%)`
-          : `linear-gradient(135deg, #ffffff 0%, #ffffff 55%, ${a.lightGrad} 100%)`,
-      }}
-    >
-      {Icon && (
-        <div className="absolute -bottom-3 -right-3 transition-all duration-300 group-hover:scale-110 group-hover:opacity-[0.12] pointer-events-none" style={{ opacity: darkMode ? 0.05 : 0.07 }}>
-          <Icon size={80} color={a.color} strokeWidth={1} />
-        </div>
-      )}
-      <div className="relative z-10">
-        <div className={`text-xs font-medium uppercase tracking-wider ${textMuted}`}>{title}</div>
-        <div className={`text-2xl font-bold mt-1 font-['JetBrains_Mono'] ${textPrimary}`}>{value}</div>
-        {sub && <div className={`text-xs mt-1 ${textMuted}`}>{sub}</div>}
-      </div>
-    </div>
-  );
 };
 
 /* ═══════════════════════════════════════════════
@@ -158,12 +120,31 @@ const OrderConfirmationScreen = ({ darkMode }) => {
   }, [orders, statusFilter, searchTerm]);
 
   // Stats
-  const stats = useMemo(() => ({
-    total: orders.length,
-    pending: orders.filter(o => o.status === 'PENDING').length,
-    confirmed: orders.filter(o => o.status === 'CONFIRMED').length,
-    totalValue: orders.reduce((sum, o) => sum + (o.totalValue || 0), 0),
-  }), [orders]);
+  const stats = useMemo(() => {
+    const total = orders.length;
+    const pending = orders.filter(o => o.status === 'PENDING').length;
+    const confirmed = orders.filter(o => o.status === 'CONFIRMED').length;
+    const shipped = orders.filter(o => o.status === 'SHIPPED').length;
+    const cancelled = orders.filter(o => o.status === 'CANCELLED').length;
+    const totalValue = orders.reduce((sum, o) => sum + (o.totalValue || 0), 0);
+    const confirmedValue = orders.filter(o => o.status === 'CONFIRMED').reduce((sum, o) => sum + (o.totalValue || 0), 0);
+    const pendingValue = orders.filter(o => o.status === 'PENDING').reduce((sum, o) => sum + (o.totalValue || 0), 0);
+
+    return {
+      total, pending, confirmed, shipped, cancelled, totalValue, confirmedValue, pendingValue,
+      confirmedPct: total > 0 ? Math.round((confirmed / total) * 100) : 0,
+      statusBreakdown: [
+        { label: t('orderConfirm.statusPending'), value: pending, color: '#D29922' },
+        { label: t('orderConfirm.statusConfirmed'), value: confirmed, color: '#2A9E6A' },
+        { label: t('orderConfirm.statusShipped'), value: shipped, color: '#58A6FF' },
+        { label: t('orderConfirm.statusCancelled'), value: cancelled, color: '#F85149' },
+      ].filter(b => b.value > 0),
+      valueBreakdown: [
+        { label: t('orderConfirm.statusPending'), value: pendingValue, displayValue: formatCurrency(pendingValue), color: '#D29922' },
+        { label: t('orderConfirm.statusConfirmed'), value: confirmedValue, displayValue: formatCurrency(confirmedValue), color: '#2A9E6A' },
+      ].filter(b => b.value > 0),
+    };
+  }, [orders, t]);
 
   const bg = darkMode ? 'bg-[#0A0A0A]' : 'bg-gray-50';
   const cardBg = darkMode ? 'bg-[#121212]' : 'bg-white';
@@ -173,70 +154,124 @@ const OrderConfirmationScreen = ({ darkMode }) => {
   const textMuted = darkMode ? 'text-[#666666]' : 'text-gray-500';
 
   return (
-    <div className={`min-h-screen ${bg} p-6`}>
-      {/* Header */}
-      <div className="mb-6">
-        <h1 className={`text-2xl font-bold font-['Montserrat'] ${textPrimary}`}>
-          {t('screenConfig.orderConfirmation')}
-        </h1>
-        <p className={`text-sm mt-1 ${textSecondary}`}>
-          {t('orderConfirm.subtitle')}
-        </p>
-      </div>
-
-      {/* KPI Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        <StatCard title={t('orderConfirm.totalOrders')} value={stats.total} sub={t('orderConfirm.allPurchaseOrders')} darkMode={darkMode} icon={ShoppingCart} accent="gold" />
-        <StatCard title={t('orderConfirm.pendingConfirm')} value={stats.pending} sub={t('orderConfirm.awaitingConfirmation')} darkMode={darkMode} icon={Clock} accent="amber" />
-        <StatCard title={t('orderConfirm.confirmed')} value={stats.confirmed} sub={t('orderConfirm.ordersConfirmed')} darkMode={darkMode} icon={CheckCircle} accent="emerald" />
-        <StatCard title={t('orderConfirm.totalValue')} value={formatCurrency(stats.totalValue)} sub={t('orderConfirm.allOrdersValue')} darkMode={darkMode} icon={DollarSign} accent="blue" />
-      </div>
-
-      {/* Filters */}
-      <div className={`${cardBg} border ${border} rounded-2xl p-4 mb-4`}>
-        <div className="flex flex-wrap items-center gap-3">
-          <div className={`flex items-center gap-2 px-3 py-2 rounded-xl border ${border} ${darkMode ? 'bg-[#1A1A1A]' : 'bg-gray-50'} flex-1 min-w-[200px] max-w-[360px]`}>
-            <Search size={16} className={textMuted} />
-            <input
-              type="text"
-              placeholder={t('orderConfirm.searchPlaceholder')}
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className={`bg-transparent outline-none text-sm w-full font-['Montserrat'] ${textPrimary} placeholder:${textMuted}`}
-            />
-            {searchTerm && (
-              <button onClick={() => setSearchTerm('')}>
-                <X size={14} className={textMuted} />
-              </button>
-            )}
+    <div className={`min-h-screen ${bg} p-4`}>
+      {/* Compact Header + Filters */}
+      <div className={`border ${border} rounded-xl px-3 py-2 mb-3`} style={{
+        background: darkMode
+          ? 'linear-gradient(135deg, #121212 0%, rgba(215,183,151,0.03) 40%, rgba(215,183,151,0.10) 100%)'
+          : 'linear-gradient(135deg, #ffffff 0%, rgba(215,183,151,0.04) 35%, rgba(215,183,151,0.12) 100%)',
+        boxShadow: `inset 0 -1px 0 ${darkMode ? 'rgba(215,183,151,0.08)' : 'rgba(215,183,151,0.05)'}`,
+      }}>
+        <div className="flex items-center gap-3">
+          {/* Icon + Title */}
+          <div className={`w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 ${darkMode ? 'bg-[rgba(215,183,151,0.1)]' : 'bg-[rgba(215,183,151,0.15)]'}`}>
+            <ShoppingCart size={14} className={darkMode ? 'text-[#D7B797]' : 'text-[#8A6340]'} />
+          </div>
+          <div className="flex-shrink-0">
+            <h1 className={`text-sm font-semibold font-['Montserrat'] ${textPrimary} leading-tight`}>
+              {t('screenConfig.orderConfirmation')}
+            </h1>
+            <p className={`text-[10px] ${textMuted} leading-tight`}>
+              {t('orderConfirm.subtitle')}
+            </p>
           </div>
 
-          <div className="relative">
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className={`appearance-none px-3 py-2 pr-8 rounded-xl border ${border} ${darkMode ? 'bg-[#1A1A1A]' : 'bg-gray-50'} text-sm font-['Montserrat'] ${textPrimary} outline-none cursor-pointer`}
+          {/* Inline Filters */}
+          <div className="flex items-center gap-2 ml-auto">
+            <div className={`flex items-center gap-1.5 px-2 py-1 rounded-lg border ${border} ${darkMode ? 'bg-[#1A1A1A]' : 'bg-gray-50'} w-48`}>
+              <Search size={12} className={textMuted} />
+              <input
+                type="text"
+                placeholder={t('orderConfirm.searchPlaceholder')}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className={`bg-transparent outline-none text-xs w-full font-['Montserrat'] ${textPrimary} placeholder:${textMuted}`}
+              />
+              {searchTerm && (
+                <button onClick={() => setSearchTerm('')}>
+                  <X size={10} className={textMuted} />
+                </button>
+              )}
+            </div>
+
+            <div className="relative">
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className={`appearance-none px-2 py-1 pr-6 rounded-lg border ${border} ${darkMode ? 'bg-[#1A1A1A]' : 'bg-gray-50'} text-xs font-['Montserrat'] ${textPrimary} outline-none cursor-pointer`}
+              >
+                <option value="all">{t('orderConfirm.allStatuses')}</option>
+                <option value="PENDING">{t('orderConfirm.statusPending')}</option>
+                <option value="CONFIRMED">{t('orderConfirm.statusConfirmed')}</option>
+                <option value="SHIPPED">{t('orderConfirm.statusShipped')}</option>
+                <option value="CANCELLED">{t('orderConfirm.statusCancelled')}</option>
+              </select>
+              <ChevronDown size={10} className={`absolute right-1.5 top-1/2 -translate-y-1/2 pointer-events-none ${textMuted}`} />
+            </div>
+
+            <button
+              onClick={fetchOrders}
+              className={`px-2.5 py-1 rounded-lg border ${border} text-xs font-medium font-['Montserrat'] transition-all ${darkMode ? 'text-[#D7B797] hover:bg-[rgba(215,183,151,0.08)]' : 'text-[#8A6340] hover:bg-[rgba(215,183,151,0.1)]'}`}
             >
-              <option value="all">{t('orderConfirm.allStatuses')}</option>
-              <option value="PENDING">{t('orderConfirm.statusPending')}</option>
-              <option value="CONFIRMED">{t('orderConfirm.statusConfirmed')}</option>
-              <option value="SHIPPED">{t('orderConfirm.statusShipped')}</option>
-              <option value="CANCELLED">{t('orderConfirm.statusCancelled')}</option>
-            </select>
-            <ChevronDown size={14} className={`absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none ${textMuted}`} />
+              {t('common.refresh')}
+            </button>
           </div>
-
-          <button
-            onClick={fetchOrders}
-            className={`px-4 py-2 rounded-xl border ${border} text-sm font-medium font-['Montserrat'] transition-all ${darkMode ? 'text-[#D7B797] hover:bg-[rgba(215,183,151,0.08)]' : 'text-[#8A6340] hover:bg-[rgba(215,183,151,0.1)]'}`}
-          >
-            {t('common.refresh')}
-          </button>
         </div>
       </div>
 
+      {/* KPI Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-2 mb-3">
+        <ExpandableStatCard
+          title={t('orderConfirm.totalOrders')}
+          value={stats.total}
+          sub={t('orderConfirm.allPurchaseOrders')}
+          darkMode={darkMode}
+          icon={ShoppingCart}
+          accent="gold"
+          breakdown={stats.statusBreakdown}
+          expandTitle={t('orderConfirm.allStatuses')}
+        />
+        <ExpandableStatCard
+          title={t('orderConfirm.pendingConfirm')}
+          value={stats.pending}
+          sub={t('orderConfirm.awaitingConfirmation')}
+          darkMode={darkMode}
+          icon={Clock}
+          accent="amber"
+          trendLabel={stats.total > 0 ? `${Math.round((stats.pending / stats.total) * 100)}%` : '0%'}
+          trend={stats.pending > 0 ? -1 : 0}
+        />
+        <ExpandableStatCard
+          title={t('orderConfirm.confirmed')}
+          value={stats.confirmed}
+          sub={t('orderConfirm.ordersConfirmed')}
+          darkMode={darkMode}
+          icon={CheckCircle}
+          accent="emerald"
+          progress={stats.confirmedPct}
+          progressLabel={t('orderConfirm.statusConfirmed')}
+          badges={[
+            { label: t('orderConfirm.statusShipped'), value: stats.shipped, color: '#58A6FF' },
+          ].filter(b => b.value > 0)}
+        />
+        <ExpandableStatCard
+          title={t('orderConfirm.totalValue')}
+          value={formatCurrency(stats.totalValue)}
+          sub={t('orderConfirm.allOrdersValue')}
+          darkMode={darkMode}
+          icon={DollarSign}
+          accent="blue"
+          breakdown={stats.valueBreakdown}
+          expandTitle={t('orderConfirm.colValue')}
+        />
+      </div>
+
       {/* Table */}
-      <div className={`${cardBg} border ${border} rounded-2xl overflow-hidden`}>
+      <div className={`border ${border} rounded-xl overflow-hidden`} style={{
+        background: darkMode
+          ? 'linear-gradient(135deg, #121212 0%, rgba(215,183,151,0.02) 40%, rgba(215,183,151,0.06) 100%)'
+          : 'linear-gradient(135deg, #ffffff 0%, rgba(215,183,151,0.03) 35%, rgba(215,183,151,0.08) 100%)',
+      }}>
         {loading ? (
           <div className="flex flex-col items-center justify-center py-20">
             <Loader2 size={32} className="animate-spin text-[#D7B797]" />
@@ -262,7 +297,7 @@ const OrderConfirmationScreen = ({ darkMode }) => {
               <thead>
                 <tr className={`${darkMode ? 'bg-[#1A1A1A]' : 'bg-gray-50'} border-b ${border}`}>
                   {[t('orderConfirm.colPO'), t('orderConfirm.colBrand'), t('orderConfirm.colSeason'), t('orderConfirm.colSKUs'), t('orderConfirm.colValue'), t('orderConfirm.colStatus'), t('orderConfirm.colDate'), t('common.actions')].map((h) => (
-                    <th key={h} className={`px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider font-['Montserrat'] ${textMuted}`}>
+                    <th key={h} className={`px-3 py-2 text-left text-[10px] font-semibold uppercase tracking-wider font-['Montserrat'] ${textMuted}`}>
                       {h}
                     </th>
                   ))}
@@ -273,22 +308,22 @@ const OrderConfirmationScreen = ({ darkMode }) => {
                   const sc = ORDER_STATUS[order.status] || ORDER_STATUS.PENDING;
                   return (
                     <tr key={order.id || idx} className={`border-b ${border} transition-colors ${darkMode ? 'hover:bg-[#1A1A1A]' : 'hover:bg-gray-50'}`}>
-                      <td className="px-4 py-3.5">
+                      <td className="px-3 py-1.5">
                         <span className={`text-sm font-semibold font-['JetBrains_Mono'] ${textPrimary}`}>{order.poNumber}</span>
                       </td>
-                      <td className="px-4 py-3.5">
+                      <td className="px-3 py-1.5">
                         <span className={`text-sm font-['Montserrat'] ${textPrimary}`}>{order.brandName}</span>
                       </td>
-                      <td className="px-4 py-3.5">
+                      <td className="px-3 py-1.5">
                         <span className={`text-sm font-['Montserrat'] ${textSecondary}`}>{order.season}</span>
                       </td>
-                      <td className="px-4 py-3.5">
+                      <td className="px-3 py-1.5">
                         <span className={`text-sm font-['JetBrains_Mono'] ${textPrimary}`}>{order.skuCount}</span>
                       </td>
-                      <td className="px-4 py-3.5">
+                      <td className="px-3 py-1.5">
                         <span className={`text-sm font-semibold font-['JetBrains_Mono'] ${textPrimary}`}>{formatCurrency(order.totalValue)}</span>
                       </td>
-                      <td className="px-4 py-3.5">
+                      <td className="px-3 py-1.5">
                         <span
                           className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold font-['JetBrains_Mono']"
                           style={{ color: sc.color, backgroundColor: sc.bg }}
@@ -297,12 +332,12 @@ const OrderConfirmationScreen = ({ darkMode }) => {
                           {sc.label}
                         </span>
                       </td>
-                      <td className="px-4 py-3.5">
+                      <td className="px-3 py-1.5">
                         <span className={`text-xs font-['JetBrains_Mono'] ${textMuted}`}>
                           {order.createdAt ? new Date(order.createdAt).toLocaleDateString('vi-VN') : '-'}
                         </span>
                       </td>
-                      <td className="px-4 py-3.5">
+                      <td className="px-3 py-1.5">
                         {order.status === 'PENDING' && (
                           <div className="flex items-center gap-2">
                             <button

@@ -274,49 +274,66 @@ const AppHeader = ({
   }, []);
 
   return (
-    <div className={`sticky top-0 z-40 ${darkMode ? 'bg-[#0A0A0A]' : 'bg-white'}`}>
+    <div className="sticky top-0 z-40" style={{
+      background: darkMode
+        ? 'linear-gradient(180deg, #0A0A0A 0%, rgba(13,11,9,1) 100%)'
+        : 'linear-gradient(180deg, #ffffff 0%, #fdfbf9 100%)',
+    }}>
       {/* Main Header */}
-      <div className={`h-14 px-6 flex items-center justify-between border-b ${
-        darkMode ? 'border-[#1A1A1A]' : 'border-gray-200'
-      }`}>
+      <div className="h-11 px-4 flex items-center justify-between" style={{
+        borderBottom: `1px solid ${darkMode ? '#1A1A1A' : '#E5E7EB'}`,
+        background: darkMode
+          ? 'linear-gradient(135deg, #0A0A0A 0%, rgba(215,183,151,0.02) 100%)'
+          : 'linear-gradient(135deg, #ffffff 0%, rgba(215,183,151,0.04) 100%)',
+      }}>
         {/* Left - Page Title */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2.5">
           {/* Icon with gradient background */}
           <div className="relative">
-            <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 ${
-              darkMode
-                ? 'bg-gradient-to-br from-[rgba(215,183,151,0.15)] to-[rgba(215,183,151,0.05)] border border-[rgba(215,183,151,0.2)]'
-                : 'bg-gradient-to-br from-[rgba(215,183,151,0.2)] to-[rgba(215,183,151,0.08)] border border-[rgba(215,183,151,0.3)]'
-            }`}>
-              <CurrentIcon size={20} strokeWidth={2} className="text-[#D7B797]" />
+            <div
+              className="w-7 h-7 rounded-lg flex items-center justify-center transition-all duration-300"
+              style={{
+                background: darkMode
+                  ? 'linear-gradient(135deg, rgba(215,183,151,0.10) 0%, rgba(215,183,151,0.20) 100%)'
+                  : 'linear-gradient(135deg, rgba(215,183,151,0.12) 0%, rgba(215,183,151,0.22) 100%)',
+                border: `1px solid ${darkMode ? 'rgba(215,183,151,0.15)' : 'rgba(215,183,151,0.25)'}`,
+                boxShadow: darkMode ? '0 0 8px rgba(215,183,151,0.08)' : 'none',
+              }}
+            >
+              <CurrentIcon size={14} strokeWidth={2} className="text-[#D7B797]" style={{ filter: darkMode ? 'drop-shadow(0 0 3px rgba(215,183,151,0.4))' : 'none' }} />
             </div>
-            {/* Active pulse indicator */}
-            <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-[#2A9E6A] border-2 border-[#0A0A0A]" />
+            <div
+              className="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full bg-[#2A9E6A]"
+              style={{
+                border: `1.5px solid ${darkMode ? '#0A0A0A' : '#ffffff'}`,
+                boxShadow: '0 0 4px rgba(42,158,106,0.5)',
+              }}
+            />
           </div>
 
           {/* Title & Breadcrumb */}
           <div>
-            <div className="flex items-center gap-2">
-              <h1 className={`text-lg font-semibold font-['Montserrat'] tracking-tight ${
+            <div className="flex items-center gap-1.5">
+              <h1 className={`text-sm font-semibold font-['Montserrat'] tracking-tight ${
                 darkMode ? 'text-[#F2F2F2]' : 'text-gray-900'
               }`}>
                 {currentConfig.label || 'Dashboard'}
               </h1>
               {currentConfig.step && (
-                <span className={`px-2 py-0.5 rounded-md text-[10px] font-medium font-['JetBrains_Mono'] uppercase tracking-wider ${
+                <span className={`px-1.5 py-px rounded text-[9px] font-medium font-['JetBrains_Mono'] uppercase tracking-wider ${
                   darkMode
-                    ? 'bg-[rgba(215,183,151,0.12)] text-[#D7B797] border border-[rgba(215,183,151,0.2)]'
-                    : 'bg-[rgba(215,183,151,0.15)] text-[#8A6340] border border-[rgba(215,183,151,0.3)]'
+                    ? 'bg-[rgba(215,183,151,0.12)] text-[#D7B797] border border-[rgba(215,183,151,0.15)]'
+                    : 'bg-[rgba(215,183,151,0.15)] text-[#8A6340] border border-[rgba(215,183,151,0.25)]'
                 }`}>
                   {t('common.step')} {currentConfig.step}
                 </span>
               )}
             </div>
             {currentConfig.step && (
-              <div className="flex items-center gap-1.5 mt-0.5">
-                <span className={`text-xs ${darkMode ? 'text-[#666666]' : 'text-gray-600'}`}>{t('header.planningBreadcrumb')}</span>
-                <ChevronRight size={12} className={darkMode ? 'text-[#444444]' : 'text-gray-300'} />
-                <span className={`text-xs font-medium ${darkMode ? 'text-[#999999]' : 'text-gray-600'}`}>
+              <div className="flex items-center gap-1">
+                <span className={`text-[10px] ${darkMode ? 'text-[#555555]' : 'text-gray-500'}`}>{t('header.planningBreadcrumb')}</span>
+                <ChevronRight size={10} className={darkMode ? 'text-[#333333]' : 'text-gray-300'} />
+                <span className={`text-[10px] font-medium ${darkMode ? 'text-[#888888]' : 'text-gray-600'}`}>
                   {currentConfig.shortLabel}
                 </span>
               </div>
@@ -325,27 +342,27 @@ const AppHeader = ({
         </div>
 
         {/* Right - Actions */}
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-0.5">
           {/* Search Button */}
           <div className="relative" ref={searchRef}>
             <button
               onClick={() => setShowSearch(!showSearch)}
-              className={`flex items-center gap-2 px-3 py-2 rounded-lg border transition-all duration-200 ${
+              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md border transition-all duration-200 ${
                 darkMode
-                  ? 'border-[#2E2E2E] hover:border-[rgba(215,183,151,0.3)] hover:bg-[rgba(160,120,75,0.08)]'
-                  : 'border-gray-200 hover:border-[rgba(215,183,151,0.5)] hover:bg-[rgba(160,120,75,0.08)]'
+                  ? 'border-[#1A1A1A] hover:border-[rgba(215,183,151,0.2)] hover:bg-[rgba(160,120,75,0.06)]'
+                  : 'border-gray-200 hover:border-[rgba(215,183,151,0.4)] hover:bg-[rgba(160,120,75,0.06)]'
               }`}
             >
-              <Search size={16} className={darkMode ? 'text-[#666666]' : 'text-gray-600'} />
-              <span className={`text-sm hidden sm:block ${darkMode ? 'text-[#666666]' : 'text-gray-600'}`}>
+              <Search size={13} className={darkMode ? 'text-[#555555]' : 'text-gray-500'} />
+              <span className={`text-[11px] hidden sm:block ${darkMode ? 'text-[#555555]' : 'text-gray-500'}`}>
                 {t('header.searchPlaceholder')}
               </span>
-              <kbd className={`hidden sm:flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-['JetBrains_Mono'] ${
+              <kbd className={`hidden sm:flex items-center gap-0.5 px-1 py-px rounded text-[9px] font-['JetBrains_Mono'] ${
                 darkMode
-                  ? 'bg-[#1A1A1A] text-[#666666] border border-[#2E2E2E]'
-                  : 'bg-gray-100 text-gray-600 border border-gray-200'
+                  ? 'bg-[#0A0A0A] text-[#444444] border border-[#1A1A1A]'
+                  : 'bg-gray-100 text-gray-400 border border-gray-200'
               }`}>
-                <Command size={10} />K
+                <Command size={8} />K
               </kbd>
             </button>
 
@@ -428,67 +445,67 @@ const AppHeader = ({
           </div>
 
           {/* Divider */}
-          <div className={`w-px h-6 mx-2 ${darkMode ? 'bg-[#2E2E2E]' : 'bg-gray-200'}`} />
+          <div className="w-px h-4 mx-1" style={{
+            background: darkMode
+              ? 'linear-gradient(180deg, transparent 0%, rgba(215,183,151,0.15) 50%, transparent 100%)'
+              : 'linear-gradient(180deg, transparent 0%, rgba(215,183,151,0.25) 50%, transparent 100%)',
+          }} />
 
           {/* Language Toggle */}
           <button
             onClick={() => setLanguage(language === 'en' ? 'vi' : 'en')}
-            className={`relative p-2.5 rounded-xl transition-all duration-300 group ${
+            className={`relative p-1.5 rounded-md transition-all duration-200 group ${
               darkMode
-                ? 'hover:bg-[rgba(215,183,151,0.08)]'
-                : 'hover:bg-[rgba(160,120,75,0.12)]'
+                ? 'hover:bg-[rgba(215,183,151,0.06)]'
+                : 'hover:bg-[rgba(160,120,75,0.08)]'
             }`}
             title={language === 'en' ? 'Chuyển sang Tiếng Việt' : 'Switch to English'}
           >
-            <span className={`text-sm font-semibold font-['JetBrains_Mono'] ${
-                darkMode ? 'text-[#D7B797]' : 'text-[#8A6340]'
-              }`}>
-                {language === 'en' ? 'EN' : 'VN'}
-              </span>
+            <span className={`text-[11px] font-bold font-['JetBrains_Mono'] ${darkMode ? 'text-[#D7B797]' : 'text-[#8A6340]'}`}>
+              {language === 'en' ? 'EN' : 'VN'}
+            </span>
           </button>
 
           {/* Dark Mode Toggle */}
           <button
             onClick={() => setDarkMode && setDarkMode(!darkMode)}
-            className={`relative p-2.5 rounded-xl transition-all duration-300 group ${
+            className={`relative p-1.5 rounded-md transition-all duration-200 group ${
               darkMode
-                ? 'hover:bg-[rgba(215,183,151,0.08)]'
-                : 'hover:bg-[rgba(160,120,75,0.12)]'
+                ? 'hover:bg-[rgba(215,183,151,0.06)]'
+                : 'hover:bg-[rgba(160,120,75,0.08)]'
             }`}
             title={darkMode ? t('header.darkModeTitle') : t('header.lightModeTitle')}
           >
-            <div className="relative w-5 h-5">
-              {darkMode ? (
-                <Moon size={20} strokeWidth={2} className="text-[#D7B797] transition-transform group-hover:-rotate-12" />
-              ) : (
-                <Sun size={20} strokeWidth={2} className="text-[#8A6340] transition-transform group-hover:rotate-45" />
-              )}
-            </div>
+            {darkMode ? (
+              <Moon size={15} strokeWidth={2} className="text-[#D7B797] transition-transform group-hover:-rotate-12" style={{ filter: 'drop-shadow(0 0 3px rgba(215,183,151,0.3))' }} />
+            ) : (
+              <Sun size={15} strokeWidth={2} className="text-[#8A6340] transition-transform group-hover:rotate-45" />
+            )}
           </button>
 
           {/* Notification Bell */}
           <div className="relative" ref={notificationRef}>
             <button
               onClick={() => setShowNotifications(!showNotifications)}
-              className={`relative p-2.5 rounded-xl transition-all duration-300 ${
+              className={`relative p-1.5 rounded-md transition-all duration-200 ${
                 showNotifications
                   ? darkMode
-                    ? 'bg-[rgba(215,183,151,0.12)] border border-[rgba(215,183,151,0.25)]'
-                    : 'bg-[rgba(215,183,151,0.15)] border border-[rgba(215,183,151,0.3)]'
+                    ? 'bg-[rgba(215,183,151,0.10)]'
+                    : 'bg-[rgba(215,183,151,0.12)]'
                   : darkMode
-                    ? 'hover:bg-[rgba(215,183,151,0.08)] border border-transparent'
-                    : 'hover:bg-[rgba(160,120,75,0.12)] border border-transparent'
+                    ? 'hover:bg-[rgba(215,183,151,0.06)]'
+                    : 'hover:bg-[rgba(160,120,75,0.08)]'
               }`}
             >
-              <Bell size={20} strokeWidth={2} className={
+              <Bell size={15} strokeWidth={2} className={
                 showNotifications
                   ? 'text-[#D7B797]'
-                  : darkMode ? 'text-[#999999]' : 'text-gray-700'
-              } />
+                  : darkMode ? 'text-[#888888]' : 'text-gray-600'
+              } style={showNotifications ? { filter: 'drop-shadow(0 0 3px rgba(215,183,151,0.4))' } : undefined} />
 
               {/* Badge */}
               {budgetAlerts.length > 0 && (
-                <span className={`absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 rounded-full text-white text-[10px] flex items-center justify-center font-['JetBrains_Mono'] font-bold shadow-lg ${
+                <span className={`absolute -top-1 -right-1 min-w-[14px] h-[14px] px-0.5 rounded-full text-white text-[8px] flex items-center justify-center font-['JetBrains_Mono'] font-bold shadow-lg ${
                   hasCritical
                     ? 'bg-gradient-to-r from-[#F85149] to-[#FF6B6B] shadow-[rgba(248,81,73,0.3)] animate-pulse'
                     : 'bg-gradient-to-r from-[#D7B797] to-[#C4A584] shadow-[rgba(215,183,151,0.3)]'
@@ -593,14 +610,15 @@ const AppHeader = ({
 
       {/* KPI Tracking Bar - Only show for Planning workflow */}
       {currentScreen !== 'budget-management' && isInPlanningWorkflow && (
-        <div className={`px-6 py-2.5 border-b ${
-          darkMode
-            ? 'border-[#1A1A1A] bg-gradient-to-r from-[#0A0A0A] via-[#0D0D0D] to-[#0A0A0A]'
-            : 'border-gray-100 bg-gradient-to-r from-gray-50 via-white to-gray-50'
-        }`}>
-          <div className="flex items-center gap-4">
+        <div className="px-4 py-1.5" style={{
+          borderBottom: `1px solid ${darkMode ? '#1A1A1A' : '#E5E7EB'}`,
+          background: darkMode
+            ? 'linear-gradient(90deg, #0A0A0A 0%, rgba(215,183,151,0.02) 50%, #0A0A0A 100%)'
+            : 'linear-gradient(90deg, #FAFAFA 0%, #ffffff 50%, #FAFAFA 100%)',
+        }}>
+          <div className="flex items-center gap-3">
             {/* Step Progress */}
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-1">
               {PLANNING_STEPS.map((step, index) => {
                 const config = SCREEN_CONFIG[step.id];
                 const Icon = config.icon;
@@ -611,60 +629,50 @@ const AppHeader = ({
                 return (
                   <React.Fragment key={step.id}>
                     {index > 0 && (
-                      <div className={`w-6 h-[2px] rounded-full transition-all duration-300 ${
-                        isCompleted
-                          ? 'bg-gradient-to-r from-[#127749] to-[#2A9E6A]'
-                          : darkMode ? 'bg-[#2E2E2E]' : 'bg-gray-200'
-                      }`} />
+                      <div className={`w-4 h-[1.5px] rounded-full transition-all duration-300`} style={{
+                        background: isCompleted
+                          ? 'linear-gradient(90deg, #127749, #2A9E6A)'
+                          : darkMode ? '#1A1A1A' : '#E5E7EB',
+                      }} />
                     )}
                     <button
                       onClick={() => onNavigate(step.id)}
-                      className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-200 border ${
-                        isCurrent
-                          ? 'bg-gradient-to-r from-[rgba(215,183,151,0.15)] to-[rgba(215,183,151,0.08)] border-[rgba(215,183,151,0.3)] shadow-sm shadow-[rgba(215,183,151,0.1)]'
+                      className="flex items-center gap-1.5 px-2 py-1 rounded-md transition-all duration-200"
+                      style={{
+                        background: isCurrent
+                          ? 'linear-gradient(135deg, rgba(215,183,151,0.08) 0%, rgba(215,183,151,0.16) 100%)'
                           : isCompleted
-                            ? 'bg-gradient-to-r from-[rgba(18,119,73,0.12)] to-[rgba(18,119,73,0.05)] border-[rgba(18,119,73,0.3)]'
-                            : darkMode
-                              ? 'bg-[#121212] border-[#2E2E2E] hover:bg-[rgba(160,120,75,0.08)] hover:border-[rgba(215,183,151,0.2)]'
-                              : 'bg-white border-gray-200 hover:bg-[rgba(215,183,151,0.08)] hover:border-[rgba(215,183,151,0.3)]'
-                      }`}
+                            ? 'linear-gradient(135deg, rgba(18,119,73,0.06) 0%, rgba(18,119,73,0.12) 100%)'
+                            : 'transparent',
+                        border: `1px solid ${
+                          isCurrent ? 'rgba(215,183,151,0.2)' : isCompleted ? 'rgba(18,119,73,0.2)' : 'transparent'
+                        }`,
+                      }}
                     >
-                      <div className={`p-1 rounded-md ${
-                        isCurrent
-                          ? 'bg-[#D7B797]'
-                          : isCompleted
-                            ? 'bg-[#127749]'
-                            : darkMode ? 'bg-[#1A1A1A]' : 'bg-gray-200'
+                      <div className={`p-0.5 rounded ${
+                        isCurrent ? 'bg-[#D7B797]' : isCompleted ? 'bg-[#127749]' : darkMode ? 'bg-[#1A1A1A]' : 'bg-gray-200'
                       }`}>
                         {isCompleted ? (
-                          <CheckCircle size={12} className="text-white" strokeWidth={2.5} />
+                          <CheckCircle size={10} className="text-white" strokeWidth={2.5} />
                         ) : (
-                          <Icon size={12} className={
-                            isCurrent ? 'text-[#0A0A0A]' : darkMode ? 'text-[#666666]' : 'text-gray-700'
-                          } strokeWidth={2.5} />
+                          <Icon size={10} className={isCurrent ? 'text-[#0A0A0A]' : darkMode ? 'text-[#555555]' : 'text-gray-600'} strokeWidth={2.5} />
                         )}
                       </div>
                       <div className="text-left">
-                        <div className={`text-xs font-semibold font-['Montserrat'] ${
-                          isCurrent
-                            ? 'text-[#D7B797]'
-                            : isCompleted
-                              ? 'text-[#2A9E6A]'
-                              : darkMode ? 'text-[#999999]' : 'text-gray-600'
+                        <div className={`text-[11px] font-semibold font-['Montserrat'] leading-tight ${
+                          isCurrent ? 'text-[#D7B797]' : isCompleted ? 'text-[#2A9E6A]' : darkMode ? 'text-[#888888]' : 'text-gray-600'
                         }`}>
                           {config.shortLabel}
                         </div>
-                        <div className="flex items-center gap-1">
+                        <div className="flex items-center gap-0.5">
                           {kpi.status === 'completed' ? (
-                            <CheckCircle size={9} className="text-[#2A9E6A]" />
+                            <CheckCircle size={7} className="text-[#2A9E6A]" />
                           ) : kpi.status === 'in-progress' ? (
-                            <Clock size={9} className="text-[#E3B341]" />
+                            <Clock size={7} className="text-[#E3B341]" />
                           ) : (
-                            <Target size={9} className={darkMode ? 'text-[#666666]' : 'text-gray-600'} />
+                            <Target size={7} className={darkMode ? 'text-[#444444]' : 'text-gray-400'} />
                           )}
-                          <span className={`text-[10px] font-['JetBrains_Mono'] ${
-                            darkMode ? 'text-[#666666]' : 'text-gray-600'
-                          }`}>
+                          <span className={`text-[8px] font-['JetBrains_Mono'] ${darkMode ? 'text-[#555555]' : 'text-gray-500'}`}>
                             {kpi.value} {config.kpiLabel}
                           </span>
                         </div>
@@ -675,41 +683,29 @@ const AppHeader = ({
               })}
             </div>
 
-            {/* Save Button - moved from BudgetAllocateScreen */}
+            {/* Save Button */}
             <div className="ml-auto relative" ref={saveButtonRef}>
-              <div className="inline-flex rounded-xl shadow-lg shadow-[rgba(215,183,151,0.3)]">
-                {/* Primary Save */}
+              <div className="inline-flex rounded-lg" style={{
+                boxShadow: '0 2px 8px rgba(215,183,151,0.2)',
+              }}>
                 <button
                   onClick={() => console.log('Save')}
-                  className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium font-['Montserrat'] rounded-l-xl transition-colors ${
-                    darkMode
-                      ? 'bg-[#D7B797] text-[#0A0A0A] hover:bg-[#C4A684]'
-                      : 'bg-[#D7B797] text-[#0A0A0A] hover:bg-[#C4A684]'
-                  }`}
+                  className="flex items-center gap-1.5 px-3 py-1 text-xs font-medium font-['Montserrat'] rounded-l-lg transition-colors bg-[#D7B797] text-[#0A0A0A] hover:bg-[#C4A684]"
                 >
-                  <Save size={16} />
+                  <Save size={12} />
                   {t('header.save')}
                 </button>
-
-                {/* Dropdown Toggle */}
                 <button
                   onClick={() => {
                     if (!openSaveMenu && saveButtonRef.current) {
                       const rect = saveButtonRef.current.getBoundingClientRect();
-                      setSaveMenuPosition({
-                        top: rect.bottom + 8,
-                        right: window.innerWidth - rect.right
-                      });
+                      setSaveMenuPosition({ top: rect.bottom + 6, right: window.innerWidth - rect.right });
                     }
                     setOpenSaveMenu(!openSaveMenu);
                   }}
-                  className={`px-3 py-2.5 rounded-r-xl border-l border-[rgba(26,26,26,0.2)] transition-colors ${
-                    darkMode
-                      ? 'bg-[#D7B797] text-[#0A0A0A] hover:bg-[#C4A684]'
-                      : 'bg-[#D7B797] text-[#0A0A0A] hover:bg-[#C4A684]'
-                  }`}
+                  className="px-2 py-1 rounded-r-lg border-l border-[rgba(26,26,26,0.2)] transition-colors bg-[#D7B797] text-[#0A0A0A] hover:bg-[#C4A684]"
                 >
-                  <ChevronDown size={16} className={`transition-transform ${openSaveMenu ? 'rotate-180' : ''}`} />
+                  <ChevronDown size={12} className={`transition-transform ${openSaveMenu ? 'rotate-180' : ''}`} />
                 </button>
               </div>
             </div>

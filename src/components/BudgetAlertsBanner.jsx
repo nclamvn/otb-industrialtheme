@@ -6,8 +6,8 @@ import { aiService } from '../services/aiService';
 const SEVERITY_THEMES = {
   critical: {
     color: '#F85149',
-    gradDark: 'linear-gradient(135deg, rgba(248,81,73,0.08) 0%, rgba(248,81,73,0.02) 50%, rgba(248,81,73,0.12) 100%)',
-    gradLight: 'linear-gradient(135deg, rgba(220,50,47,0.06) 0%, rgba(255,255,255,0.9) 40%, rgba(220,50,47,0.10) 100%)',
+    gradDark: 'linear-gradient(135deg, #121212 0%, rgba(248,81,73,0.05) 40%, rgba(248,81,73,0.18) 100%)',
+    gradLight: 'linear-gradient(135deg, #ffffff 0%, rgba(220,50,47,0.06) 35%, rgba(220,50,47,0.16) 100%)',
     borderDark: 'rgba(248,81,73,0.25)',
     borderLight: 'rgba(200,50,50,0.25)',
     glowDark: '0 0 20px rgba(248,81,73,0.08), 0 4px 16px rgba(0,0,0,0.2)',
@@ -25,8 +25,8 @@ const SEVERITY_THEMES = {
   },
   warning: {
     color: '#E3B341',
-    gradDark: 'linear-gradient(135deg, rgba(215,183,151,0.08) 0%, rgba(215,183,151,0.02) 50%, rgba(227,179,65,0.10) 100%)',
-    gradLight: 'linear-gradient(135deg, rgba(180,140,50,0.05) 0%, rgba(255,255,255,0.9) 40%, rgba(200,160,60,0.10) 100%)',
+    gradDark: 'linear-gradient(135deg, #121212 0%, rgba(215,183,151,0.05) 40%, rgba(227,179,65,0.16) 100%)',
+    gradLight: 'linear-gradient(135deg, #ffffff 0%, rgba(180,140,50,0.06) 35%, rgba(200,160,60,0.16) 100%)',
     borderDark: 'rgba(215,183,151,0.25)',
     borderLight: 'rgba(180,140,50,0.25)',
     glowDark: '0 0 20px rgba(215,183,151,0.08), 0 4px 16px rgba(0,0,0,0.2)',
@@ -44,8 +44,8 @@ const SEVERITY_THEMES = {
   },
   info: {
     color: '#818CF8',
-    gradDark: 'linear-gradient(135deg, rgba(99,102,241,0.08) 0%, rgba(99,102,241,0.02) 50%, rgba(99,102,241,0.10) 100%)',
-    gradLight: 'linear-gradient(135deg, rgba(80,90,220,0.05) 0%, rgba(255,255,255,0.9) 40%, rgba(80,90,220,0.08) 100%)',
+    gradDark: 'linear-gradient(135deg, #121212 0%, rgba(99,102,241,0.05) 40%, rgba(99,102,241,0.16) 100%)',
+    gradLight: 'linear-gradient(135deg, #ffffff 0%, rgba(80,90,220,0.06) 35%, rgba(80,90,220,0.14) 100%)',
     borderDark: 'rgba(99,102,241,0.25)',
     borderLight: 'rgba(80,90,220,0.25)',
     glowDark: '0 0 20px rgba(99,102,241,0.08), 0 4px 16px rgba(0,0,0,0.2)',
@@ -105,11 +105,11 @@ const BudgetAlertsBanner = ({ budgetId, darkMode = true }) => {
   const WatermarkIcon = theme.WatermarkIcon;
 
   return (
-    <div className="mb-4">
+    <div className="mb-2">
       {/* Collapsed Banner */}
       <div
         onClick={() => setExpanded(!expanded)}
-        className="relative overflow-hidden rounded-2xl cursor-pointer transition-all duration-300 group"
+        className="relative overflow-hidden rounded-lg cursor-pointer transition-all duration-300 group"
         style={{
           background: darkMode ? theme.gradDark : theme.gradLight,
           border: `1px solid ${darkMode ? theme.borderDark : theme.borderLight}`,
@@ -118,84 +118,81 @@ const BudgetAlertsBanner = ({ budgetId, darkMode = true }) => {
       >
         {/* Watermark Icon */}
         <div
-          className="absolute -right-4 -bottom-4 transition-all duration-500 group-hover:scale-110 pointer-events-none"
-          style={{ opacity: darkMode ? 0.04 : 0.05 }}
+          className="absolute -right-2 -bottom-2 transition-all duration-500 group-hover:scale-110 pointer-events-none"
+          style={{ opacity: darkMode ? 0.03 : 0.04 }}
         >
-          <WatermarkIcon size={110} color={theme.color} strokeWidth={0.8} />
+          <WatermarkIcon size={64} color={theme.color} strokeWidth={0.8} />
         </div>
 
         {/* Accent line on the left */}
         <div
-          className="absolute left-0 top-3 bottom-3 w-[3px] rounded-full"
+          className="absolute left-0 top-2 bottom-2 w-[2px] rounded-full"
           style={{ backgroundColor: theme.color, opacity: 0.7 }}
         />
 
-        <div className="relative z-10 flex items-center justify-between p-5 pl-6">
-          <div className="flex items-center gap-4">
-            {/* Icon with glass effect */}
+        <div className="relative z-10 flex items-center justify-between px-3 py-2 pl-4">
+          <div className="flex items-center gap-2.5">
+            {/* Icon compact */}
             <div
-              className="w-11 h-11 rounded-xl flex items-center justify-center backdrop-blur-sm shrink-0"
+              className="w-7 h-7 rounded-lg flex items-center justify-center backdrop-blur-sm shrink-0"
               style={{ backgroundColor: darkMode ? theme.iconBgDark : theme.iconBgLight }}
             >
-              <TopIcon size={20} color={theme.color} />
+              <TopIcon size={14} color={theme.color} />
             </div>
             <div className="min-w-0">
-              <div
-                className="font-semibold font-['Montserrat'] text-[15px] leading-tight"
-                style={{ color: darkMode ? theme.textDark : theme.textLight }}
-              >
-                {topAlert.title}
-              </div>
-              <div
-                className="text-sm mt-1 leading-snug"
-                style={{ color: darkMode ? theme.subDark : theme.subLight }}
-              >
-                {topAlert.message}
+              <div className="flex items-center gap-2 flex-wrap">
+                <span
+                  className="font-semibold font-['Montserrat'] text-xs leading-tight"
+                  style={{ color: darkMode ? theme.textDark : theme.textLight }}
+                >
+                  {topAlert.title}
+                </span>
+                <span
+                  className="text-xs leading-snug truncate"
+                  style={{ color: darkMode ? theme.subDark : theme.subLight }}
+                >
+                  {topAlert.message}
+                </span>
               </div>
             </div>
           </div>
 
-          <div className="flex items-center gap-3 shrink-0 ml-4">
+          <div className="flex items-center gap-2 shrink-0 ml-3">
             {/* Severity badges */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5">
               {criticalCount > 0 && (
                 <span
-                  className="px-3 py-1.5 text-xs font-bold rounded-xl flex items-center gap-1.5 shadow-sm"
+                  className="px-2 py-0.5 text-[10px] font-bold rounded-lg flex items-center gap-1 shadow-sm"
                   style={{ background: SEVERITY_THEMES.critical.badgeBg, color: SEVERITY_THEMES.critical.badgeText }}
                 >
-                  <AlertCircle size={12} />
+                  <AlertCircle size={10} />
                   {criticalCount}
                 </span>
               )}
               {warningCount > 0 && (
                 <span
-                  className="px-3 py-1.5 text-xs font-bold rounded-xl flex items-center gap-1.5 shadow-sm"
+                  className="px-2 py-0.5 text-[10px] font-bold rounded-lg flex items-center gap-1 shadow-sm"
                   style={{ background: SEVERITY_THEMES.warning.badgeBg, color: SEVERITY_THEMES.warning.badgeText }}
                 >
-                  <AlertTriangle size={12} />
+                  <AlertTriangle size={10} />
                   {warningCount}
                 </span>
               )}
               {infoCount > 0 && (
                 <span
-                  className="px-3 py-1.5 text-xs font-bold rounded-xl flex items-center gap-1.5 shadow-sm"
+                  className="px-2 py-0.5 text-[10px] font-bold rounded-lg flex items-center gap-1 shadow-sm"
                   style={{ background: SEVERITY_THEMES.info.badgeBg, color: SEVERITY_THEMES.info.badgeText }}
                 >
-                  <Info size={12} />
+                  <Info size={10} />
                   {infoCount}
                 </span>
               )}
             </div>
-            <div
-              className="w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-300"
-              style={{ backgroundColor: darkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)' }}
-            >
-              <ChevronRight
-                size={16}
-                className={`transition-transform duration-300 ${expanded ? 'rotate-90' : ''}`}
-                color={darkMode ? '#666666' : '#999999'}
-              />
-            </div>
+            <ChevronRight
+              size={14}
+              className={`transition-transform duration-300 ${expanded ? 'rotate-90' : ''}`}
+              color={darkMode ? '#666666' : '#999999'}
+            />
           </div>
         </div>
       </div>

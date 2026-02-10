@@ -76,10 +76,13 @@ const SizeCurveAdvisor = ({
 
   return (
     <div className={`mt-4 p-4 rounded-xl border ${
-      darkMode
-        ? 'bg-gradient-to-r from-[rgba(147,51,234,0.08)] to-[rgba(99,102,241,0.08)] border-purple-800/40'
-        : 'bg-gradient-to-r from-purple-50 to-indigo-50 border-purple-200'
-    }`}>
+      darkMode ? 'border-purple-800/40' : 'border-purple-200'
+    }`} style={{
+      background: darkMode
+        ? 'linear-gradient(135deg, #121212 0%, rgba(147,51,234,0.06) 40%, rgba(99,102,241,0.16) 100%)'
+        : 'linear-gradient(135deg, #ffffff 0%, rgba(147,51,234,0.06) 35%, rgba(99,102,241,0.18) 100%)',
+      boxShadow: `inset 0 -1px 0 ${darkMode ? 'rgba(99,102,241,0.12)' : 'rgba(99,102,241,0.08)'}`,
+    }}>
       {/* Header */}
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">

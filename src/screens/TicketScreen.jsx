@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Eye, Loader2, Plus, X, LayoutList, LayoutGrid, Ticket, CircleCheckBig, DollarSign } from 'lucide-react';
 import TicketKanbanBoard from '../components/TicketKanbanBoard';
+import { ExpandableStatCard } from '../components/Common';
 import { budgetService, planningService, proposalService } from '../services';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -36,68 +37,6 @@ const getEntityTypeLabel = (type, t) => {
     'proposal': t ? t('ticket.entityProposal') : 'SKU Proposal'
   };
   return labels[type] || type;
-};
-
-/* =========================
-   KPI CARD
-========================= */
-
-const STAT_ACCENTS = {
-  blue:    { color: '#58A6FF', darkGrad: 'rgba(88,166,255,0.05)',   lightGrad: 'rgba(50,120,220,0.08)', iconDark: 'rgba(88,166,255,0.06)', iconLight: 'rgba(50,120,220,0.06)' },
-  emerald: { color: '#2A9E6A', darkGrad: 'rgba(42,158,106,0.06)',  lightGrad: 'rgba(22,120,70,0.08)',  iconDark: 'rgba(42,158,106,0.07)', iconLight: 'rgba(22,120,70,0.07)' },
-  gold:    { color: '#D7B797', darkGrad: 'rgba(215,183,151,0.06)', lightGrad: 'rgba(180,140,95,0.10)', iconDark: 'rgba(215,183,151,0.07)', iconLight: 'rgba(160,120,75,0.08)' },
-};
-
-const StatCard = ({ title, value, sub, darkMode, icon: Icon, accent = 'blue' }) => {
-  const a = STAT_ACCENTS[accent] || STAT_ACCENTS.blue;
-  const borderColor = darkMode ? 'border-[#2E2E2E]' : 'border-gray-200';
-  const textMuted = darkMode ? 'text-[#666666]' : 'text-gray-700';
-  const textPrimary = darkMode ? 'text-[#F2F2F2]' : 'text-gray-900';
-
-  return (
-    <div
-      className={`relative overflow-hidden border ${borderColor} rounded-2xl p-5 transition-all duration-200 hover:shadow-lg group`}
-      style={{
-        background: darkMode
-          ? `linear-gradient(135deg, #121212 0%, #121212 60%, ${a.darkGrad} 100%)`
-          : `linear-gradient(135deg, #ffffff 0%, #ffffff 55%, ${a.lightGrad} 100%)`,
-      }}
-    >
-      {/* Watermark Icon */}
-      {Icon && (
-        <div
-          className="absolute -bottom-3 -right-3 transition-all duration-300 group-hover:scale-110 group-hover:opacity-[0.12] pointer-events-none"
-          style={{ opacity: darkMode ? 0.05 : 0.07 }}
-        >
-          <Icon size={80} color={a.color} strokeWidth={1} />
-        </div>
-      )}
-
-      <div className="relative z-10 flex items-start justify-between">
-        <div>
-          <div className={`text-xs font-medium uppercase tracking-wider ${textMuted}`}>
-            {title}
-          </div>
-          <div className={`text-2xl font-bold font-['JetBrains_Mono'] tabular-nums mt-2 ${textPrimary}`}>
-            {value}
-          </div>
-          {sub && (
-            <div className={`text-xs mt-1 ${darkMode ? 'text-[#666666]' : 'text-gray-600'}`}>
-              {sub}
-            </div>
-          )}
-        </div>
-        {Icon && (
-          <div
-            className="w-10 h-10 rounded-xl flex items-center justify-center backdrop-blur-sm"
-            style={{ backgroundColor: darkMode ? a.iconDark : a.iconLight }}
-          >
-            <Icon size={18} color={a.color} />
-          </div>
-        )}
-      </div>
-    </div>
-  );
 };
 
 const SEASON_GROUPS = [
@@ -216,14 +155,36 @@ const TicketScreen = ({ onOpenTicketDetail, darkMode = true }) => {
     const approved = tickets.filter(t =>
       ['LEVEL2_APPROVED', 'APPROVED', 'FINAL'].includes(t.status?.toUpperCase())
     ).length;
+    const pending = tickets.filter(t =>
+      ['SUBMITTED', 'LEVEL1_APPROVED'].includes(t.status?.toUpperCase())
+    ).length;
+    const draft = tickets.filter(t => t.status?.toUpperCase() === 'DRAFT').length;
+    const rejected = tickets.filter(t =>
+      ['LEVEL1_REJECTED', 'LEVEL2_REJECTED', 'REJECTED'].includes(t.status?.toUpperCase())
+    ).length;
     const totalSpending = tickets
       .filter(t => ['LEVEL2_APPROVED', 'APPROVED', 'FINAL'].includes(t.status?.toUpperCase()))
       .reduce((sum, t) => sum + (t.totalBudget || 0), 0);
 
+    // By entity type
+    const byType = {};
+    tickets.forEach(tk => {
+      const type = tk.entityType || 'other';
+      byType[type] = (byType[type] || 0) + 1;
+    });
+    const typeBreakdown = Object.entries(byType)
+      .map(([label, value]) => ({ label: label.charAt(0).toUpperCase() + label.slice(1), value, pct: total > 0 ? Math.round((value / total) * 100) : 0 }))
+      .sort((a, b) => b.value - a.value);
+
     return {
       totalTickets: total,
       approvedTickets: approved,
-      totalSpending
+      pendingTickets: pending,
+      draftTickets: draft,
+      rejectedTickets: rejected,
+      totalSpending,
+      approvedPct: total > 0 ? Math.round((approved / total) * 100) : 0,
+      typeBreakdown,
     };
   }, [tickets]);
 
@@ -333,22 +294,32 @@ const TicketScreen = ({ onOpenTicketDetail, darkMode = true }) => {
       </div>
 
       {/* ===== KPI HEADER ===== */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <StatCard
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+        <ExpandableStatCard
           title={t('ticket.totalTickets')}
           value={ticketStats.totalTickets}
           darkMode={darkMode}
           icon={Ticket}
           accent="blue"
+          breakdown={ticketStats.typeBreakdown}
+          expandTitle={t('home.kpiDetail.byEntityType')}
+          badges={[
+            { label: 'Pending', value: ticketStats.pendingTickets, color: '#D29922' },
+            { label: 'Draft', value: ticketStats.draftTickets, color: '#666666' },
+          ]}
         />
-        <StatCard
+        <ExpandableStatCard
           title={t('ticket.approvedTickets')}
           value={ticketStats.approvedTickets}
           darkMode={darkMode}
           icon={CircleCheckBig}
           accent="emerald"
+          progress={ticketStats.approvedPct}
+          progressLabel={t('ticket.approvedTickets')}
+          trendLabel={`${ticketStats.approvedPct}%`}
+          trend={ticketStats.approvedPct > 50 ? 1 : -1}
         />
-        <StatCard
+        <ExpandableStatCard
           title={t('ticket.totalSpending')}
           value={formatCurrency(ticketStats.totalSpending)}
           sub={t('ticket.approvedBudgetsOnly')}
@@ -459,11 +430,14 @@ const TicketScreen = ({ onOpenTicketDetail, darkMode = true }) => {
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
           <div className={`rounded-2xl shadow-2xl w-full max-w-md mx-4 overflow-hidden ${darkMode ? 'bg-[#121212]' : 'bg-white'}`}>
             {/* Header */}
-            <div className={`px-6 py-4 flex items-center justify-between ${
-              darkMode
-                ? 'bg-gradient-to-r from-[rgba(215,183,151,0.15)] to-[rgba(215,183,151,0.08)] border-b border-[rgba(215,183,151,0.2)]'
-                : 'bg-gradient-to-r from-[rgba(215,183,151,0.2)] to-[rgba(215,183,151,0.1)] border-b border-[rgba(215,183,151,0.3)]'
-            }`}>
+            <div className={`px-6 py-4 flex items-center justify-between border-b ${
+              darkMode ? 'border-[rgba(215,183,151,0.2)]' : 'border-[rgba(215,183,151,0.3)]'
+            }`} style={{
+              background: darkMode
+                ? 'linear-gradient(135deg, #121212 0%, rgba(215,183,151,0.06) 40%, rgba(215,183,151,0.18) 100%)'
+                : 'linear-gradient(135deg, #ffffff 0%, rgba(215,183,151,0.08) 35%, rgba(215,183,151,0.22) 100%)',
+              boxShadow: `inset 0 -1px 0 ${darkMode ? 'rgba(215,183,151,0.12)' : 'rgba(215,183,151,0.08)'}`,
+            }}>
               <h3 className={`text-lg font-bold font-['Montserrat'] ${darkMode ? 'text-[#D7B797]' : 'text-[#8A6340]'}`}>{t('ticket.createNewTicket')}</h3>
               <button
                 onClick={() => setShowCreatePopup(false)}

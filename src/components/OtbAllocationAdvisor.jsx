@@ -241,8 +241,13 @@ const OtbAllocationAdvisor = ({
 
                 return (
                   <div key={index} className={`rounded-xl p-4 border ${
-                    darkMode ? 'bg-[#121212] border-[#2E2E2E]' : 'bg-white border-gray-200'
-                  }`}>
+                    darkMode ? 'border-[#2E2E2E]' : 'border-gray-200'
+                  }`} style={{
+                    background: darkMode
+                      ? 'linear-gradient(135deg, #121212 0%, rgba(147,51,234,0.04) 40%, rgba(99,102,241,0.12) 100%)'
+                      : 'linear-gradient(135deg, #ffffff 0%, rgba(147,51,234,0.04) 35%, rgba(99,102,241,0.10) 100%)',
+                    boxShadow: `inset 0 -1px 0 ${darkMode ? 'rgba(99,102,241,0.08)' : 'rgba(99,102,241,0.05)'}`,
+                  }}>
                     <div className="flex items-center justify-between mb-2">
                       <span className={`font-medium ${darkMode ? 'text-[#F2F2F2]' : 'text-gray-800'}`}>
                         {item.dimensionValue}

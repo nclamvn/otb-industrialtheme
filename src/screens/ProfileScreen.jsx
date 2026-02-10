@@ -232,8 +232,13 @@ const ProfileScreen = ({ user: propUser, darkMode = true, onUpdateUser }) => {
 
       {/* Security Section */}
       <div className={`rounded-xl border p-6 ${
-        darkMode ? 'bg-[#121212] border-[#2E2E2E]' : 'bg-white border-gray-200'
-      }`}>
+        darkMode ? 'border-[#2E2E2E]' : 'border-gray-200'
+      }`} style={{
+        background: darkMode
+          ? 'linear-gradient(135deg, #121212 0%, rgba(215,183,151,0.03) 40%, rgba(215,183,151,0.10) 100%)'
+          : 'linear-gradient(135deg, #ffffff 0%, rgba(215,183,151,0.04) 35%, rgba(215,183,151,0.12) 100%)',
+        boxShadow: `inset 0 -1px 0 ${darkMode ? 'rgba(215,183,151,0.08)' : 'rgba(215,183,151,0.05)'}`,
+      }}>
         <h3 className={`text-base font-semibold font-['Montserrat'] mb-4 ${
           darkMode ? 'text-[#F2F2F2]' : 'text-gray-900'
         }`}>

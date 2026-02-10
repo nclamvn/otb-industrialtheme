@@ -26,6 +26,12 @@ const RISK_LEVELS = {
     color: '#127749',
     bgAlpha: 'rgba(18,119,73,0.12)',
     borderAlpha: 'rgba(18,119,73,0.25)',
+    darkGrad: 'rgba(18,119,73,0.16)',
+    darkMid: 'rgba(18,119,73,0.05)',
+    lightGrad: 'rgba(18,119,73,0.18)',
+    lightMid: 'rgba(18,119,73,0.06)',
+    glowDark: 'rgba(18,119,73,0.12)',
+    glowLight: 'rgba(18,119,73,0.08)',
     labelKey: 'ai.lowRisk',
     Icon: ShieldCheck,
   },
@@ -33,6 +39,12 @@ const RISK_LEVELS = {
     color: '#D7B797',
     bgAlpha: 'rgba(215,183,151,0.12)',
     borderAlpha: 'rgba(215,183,151,0.25)',
+    darkGrad: 'rgba(215,183,151,0.16)',
+    darkMid: 'rgba(215,183,151,0.05)',
+    lightGrad: 'rgba(215,183,151,0.20)',
+    lightMid: 'rgba(215,183,151,0.06)',
+    glowDark: 'rgba(215,183,151,0.12)',
+    glowLight: 'rgba(215,183,151,0.08)',
     labelKey: 'ai.mediumRisk',
     Icon: Shield,
   },
@@ -40,6 +52,12 @@ const RISK_LEVELS = {
     color: '#E67E22',
     bgAlpha: 'rgba(230,126,34,0.12)',
     borderAlpha: 'rgba(230,126,34,0.25)',
+    darkGrad: 'rgba(230,126,34,0.16)',
+    darkMid: 'rgba(230,126,34,0.05)',
+    lightGrad: 'rgba(230,126,34,0.18)',
+    lightMid: 'rgba(230,126,34,0.06)',
+    glowDark: 'rgba(230,126,34,0.12)',
+    glowLight: 'rgba(230,126,34,0.08)',
     labelKey: 'ai.highRisk',
     Icon: ShieldAlert,
   },
@@ -47,6 +65,12 @@ const RISK_LEVELS = {
     color: '#F85149',
     bgAlpha: 'rgba(248,81,73,0.12)',
     borderAlpha: 'rgba(248,81,73,0.25)',
+    darkGrad: 'rgba(248,81,73,0.16)',
+    darkMid: 'rgba(248,81,73,0.05)',
+    lightGrad: 'rgba(248,81,73,0.18)',
+    lightMid: 'rgba(248,81,73,0.06)',
+    glowDark: 'rgba(248,81,73,0.12)',
+    glowLight: 'rgba(248,81,73,0.08)',
     labelKey: 'ai.criticalRisk',
     Icon: ShieldClose,
   },
@@ -188,8 +212,11 @@ export default function RiskScoreCard({
       <div
         className="border rounded-xl shadow-sm p-5"
         style={{
-          backgroundColor: darkMode ? '#121212' : '#FFFFFF',
+          background: darkMode
+            ? 'linear-gradient(135deg, #121212 0%, rgba(215,183,151,0.05) 40%, rgba(215,183,151,0.16) 100%)'
+            : 'linear-gradient(135deg, #ffffff 0%, rgba(215,183,151,0.06) 35%, rgba(215,183,151,0.20) 100%)',
           borderColor: darkMode ? '#2E2E2E' : '#E5E7EB',
+          boxShadow: `inset 0 -1px 0 ${darkMode ? 'rgba(215,183,151,0.12)' : 'rgba(215,183,151,0.08)'}`,
         }}
       >
         <div className="animate-pulse space-y-4">
@@ -232,8 +259,11 @@ export default function RiskScoreCard({
       <div
         className="border rounded-xl shadow-sm p-5"
         style={{
-          backgroundColor: darkMode ? '#121212' : '#FFFFFF',
+          background: darkMode
+            ? 'linear-gradient(135deg, #121212 0%, rgba(248,81,73,0.05) 40%, rgba(248,81,73,0.16) 100%)'
+            : 'linear-gradient(135deg, #ffffff 0%, rgba(248,81,73,0.06) 35%, rgba(248,81,73,0.18) 100%)',
           borderColor: darkMode ? '#2E2E2E' : '#E5E7EB',
+          boxShadow: `inset 0 -1px 0 ${darkMode ? 'rgba(248,81,73,0.12)' : 'rgba(248,81,73,0.08)'}`,
         }}
       >
         <div className="flex flex-col items-center gap-3 py-4">
@@ -270,8 +300,11 @@ export default function RiskScoreCard({
       <div
         className="border rounded-xl shadow-sm p-5"
         style={{
-          backgroundColor: darkMode ? '#121212' : '#FFFFFF',
+          background: darkMode
+            ? 'linear-gradient(135deg, #121212 0%, rgba(215,183,151,0.05) 40%, rgba(215,183,151,0.16) 100%)'
+            : 'linear-gradient(135deg, #ffffff 0%, rgba(215,183,151,0.06) 35%, rgba(215,183,151,0.20) 100%)',
           borderColor: darkMode ? '#2E2E2E' : '#E5E7EB',
+          boxShadow: `inset 0 -1px 0 ${darkMode ? 'rgba(215,183,151,0.12)' : 'rgba(215,183,151,0.08)'}`,
         }}
       >
         <div className="flex flex-col items-center gap-3 py-4">
@@ -307,8 +340,11 @@ export default function RiskScoreCard({
     <div
       className="border rounded-xl shadow-sm overflow-hidden sm:col-span-2"
       style={{
-        backgroundColor: darkMode ? '#121212' : '#FFFFFF',
+        background: darkMode
+          ? `linear-gradient(135deg, #121212 0%, ${riskConfig.darkMid} 40%, ${riskConfig.darkGrad} 100%)`
+          : `linear-gradient(135deg, #ffffff 0%, ${riskConfig.lightMid} 35%, ${riskConfig.lightGrad} 100%)`,
         borderColor: darkMode ? '#2E2E2E' : '#E5E7EB',
+        boxShadow: `inset 0 -1px 0 ${darkMode ? riskConfig.glowDark : riskConfig.glowLight}`,
       }}
     >
       {/* ── Header ─────────────────────────────────────────────────── */}

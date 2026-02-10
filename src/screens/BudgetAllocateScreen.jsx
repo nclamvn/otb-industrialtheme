@@ -129,6 +129,7 @@ const BudgetAllocateScreen = ({
 
   // Budget name dropdown state
   const [isBudgetNameDropdownOpen, setIsBudgetNameDropdownOpen] = useState(false);
+  const [filtersCollapsed, setFiltersCollapsed] = useState(false);
 
   // Store allocation data locally to survive the race condition with API fetch
   const [pendingAllocation, setPendingAllocation] = useState(null);
@@ -575,31 +576,57 @@ const BudgetAllocateScreen = ({
         <div className="relative">
           {/* Filter Section - Redesigned */}
           <div className={`rounded-xl border shadow-sm ${darkMode ? 'bg-[#121212] border-[#2E2E2E]' : 'bg-white border-[#C4B5A5]'}`}>
-            {/* Filter Header */}
-            <div className={`flex items-center justify-between px-4 py-3 border-b ${darkMode ? 'bg-[#1A1A1A]/50 border-[#2E2E2E]' : 'bg-gradient-to-r from-[rgba(215,183,151,0.05)] to-[rgba(215,183,151,0.1)] border-[#C4B5A5]'}`}>
+            {/* Filter Header - Clickable to toggle collapse */}
+            <div
+              className={`flex items-center justify-between px-4 py-2 border-b cursor-pointer select-none transition-colors ${darkMode ? 'bg-[#1A1A1A]/50 border-[#2E2E2E] hover:bg-[#1A1A1A]' : 'bg-gradient-to-r from-[rgba(215,183,151,0.05)] to-[rgba(215,183,151,0.1)] border-[#C4B5A5] hover:bg-[rgba(215,183,151,0.15)]'}`}
+              onClick={() => setFiltersCollapsed(!filtersCollapsed)}
+            >
               <div className="flex items-center gap-2">
-                <Filter size={16} className={darkMode ? 'text-[#999999]' : 'text-[#666666]'} />
-                <span className={`text-sm font-semibold font-['Montserrat'] ${darkMode ? 'text-[#F2F2F2]' : 'text-[#0A0A0A]'}`}>{t('common.filters')}</span>
+                <ChevronRight size={14} className={`transition-transform duration-200 ${!filtersCollapsed ? 'rotate-90' : ''} ${darkMode ? 'text-[#999999]' : 'text-[#666666]'}`} />
+                <Filter size={14} className={darkMode ? 'text-[#999999]' : 'text-[#666666]'} />
+                <span className={`text-xs font-semibold font-['Montserrat'] ${darkMode ? 'text-[#F2F2F2]' : 'text-[#0A0A0A]'}`}>{t('common.filters')}</span>
+                {filtersCollapsed && (
+                  <div className="flex items-center gap-1.5 ml-1">
+                    {selectedBudget && (
+                      <span className={`px-2 py-0.5 rounded text-[10px] font-medium ${darkMode ? 'bg-[rgba(18,119,73,0.15)] text-[#2A9E6A]' : 'bg-[rgba(18,119,73,0.1)] text-[#127749]'}`}>
+                        {selectedBudget.budgetName}
+                      </span>
+                    )}
+                    <span className={`px-2 py-0.5 rounded text-[10px] font-medium font-['JetBrains_Mono'] ${darkMode ? 'bg-[#1A1A1A] text-[#999999]' : 'bg-gray-100 text-[#666666]'}`}>
+                      FY{selectedYear}
+                    </span>
+                    {selectedGroupBrandObj && (
+                      <span className={`px-2 py-0.5 rounded text-[10px] font-medium ${darkMode ? 'bg-[rgba(215,183,151,0.08)] text-[#D7B797]' : 'bg-[rgba(215,183,151,0.15)] text-[#8A6340]'}`}>
+                        {selectedGroupBrandObj.name}
+                      </span>
+                    )}
+                    {selectedVersion?.isFinal && (
+                      <span className="px-1.5 py-0.5 text-[10px] font-bold bg-[#D7B797] text-[#0A0A0A] rounded">FINAL</span>
+                    )}
+                  </div>
+                )}
               </div>
-              {(selectedBudgetId || selectedGroupBrand || selectedBrand || selectedVersionId) && (
-                <button
-                  onClick={() => {
-                    clearBudgetSelection();
-                    setSelectedGroupBrand(null);
-                    setSelectedBrand(null);
-                    setSelectedVersionId(null);
-                    setVersions([]);
-                  }}
-                  className={`flex items-center gap-1 text-xs transition-colors ${darkMode ? 'text-[#999999] hover:text-[#D7B797]' : 'text-[#666666] hover:text-[#8A6340]'}`}
-                >
-                  <X size={12} />
-                  {t('common.clearAllFilters')}
-                </button>
-              )}
+              <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+                {!filtersCollapsed && (selectedBudgetId || selectedGroupBrand || selectedBrand || selectedVersionId) && (
+                  <button
+                    onClick={() => {
+                      clearBudgetSelection();
+                      setSelectedGroupBrand(null);
+                      setSelectedBrand(null);
+                      setSelectedVersionId(null);
+                      setVersions([]);
+                    }}
+                    className={`flex items-center gap-1 text-xs transition-colors ${darkMode ? 'text-[#999999] hover:text-[#D7B797]' : 'text-[#666666] hover:text-[#8A6340]'}`}
+                  >
+                    <X size={12} />
+                    {t('common.clearAllFilters')}
+                  </button>
+                )}
+              </div>
             </div>
 
-            {/* Filter Controls */}
-            <div className="p-4 relative z-[100]">
+            {/* Filter Controls - Collapsible */}
+            <div className={`p-3 relative z-[100] ${filtersCollapsed ? 'hidden' : ''}`}>
               <div className="flex flex-wrap items-end gap-3">
                 {/* Budget Name Dropdown */}
                 <div className="relative min-w-[200px]" ref={budgetNameDropdownRef}>
@@ -1067,7 +1094,7 @@ const BudgetAllocateScreen = ({
       </div>
       {/* Budget Table - Collapsible by Group Brand and Brand */}
       {(selectedBudget || selectedBudgetId) && (
-        <div className="space-y-4 relative z-[10]">
+        <div className="space-y-2 relative z-[10]">
           {displayGroups.map((group) => {
             const groupBrands = displayBrands.filter(b => b.groupBrandId === group.id);
             const isGroupCollapsed = collapsedGroups[group.id];
@@ -1087,7 +1114,7 @@ const BudgetAllocateScreen = ({
                 {/* Group Header - Collapsible with Total Budget */}
                 <div
                   onClick={() => !selectedGroupBrand && toggleGroupCollapse(group.id)}
-                  className={`px-6 py-4 bg-gradient-to-r ${group.color} border-b border-[#C4B5A5] flex items-center justify-between ${!selectedGroupBrand ? 'cursor-pointer hover:opacity-90' : ''}`}
+                  className={`px-4 py-2 bg-gradient-to-r ${group.color} border-b border-[#C4B5A5] flex items-center justify-between ${!selectedGroupBrand ? 'cursor-pointer hover:opacity-90' : ''}`}
                 >
                   <div className="flex items-center gap-4">
                     {!selectedGroupBrand && (
@@ -1096,30 +1123,30 @@ const BudgetAllocateScreen = ({
                         className={`text-white transition-transform duration-200 ${!isGroupCollapsed ? 'rotate-90' : ''}`}
                       />
                     )}
-                    <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center text-white font-bold font-['Montserrat'] shadow-lg">
+                    <div className="w-7 h-7 rounded-lg bg-white/20 flex items-center justify-center text-white text-sm font-bold font-['Montserrat'] shadow-lg">
                       {group.id}
                     </div>
                     <div>
-                      <div className="font-bold text-lg text-white font-['Montserrat']">{group.name}</div>
-                      <div className="text-sm text-white/80 font-['JetBrains_Mono']">
+                      <div className="font-semibold text-sm text-white font-['Montserrat']">{group.name}</div>
+                      <div className="text-xs text-white/80 font-['JetBrains_Mono']">
                         {groupBrands.length} brand{groupBrands.length !== 1 ? 's' : ''} • {selectedSeasonGroup ? SEASON_CONFIG[selectedSeasonGroup]?.name : t('planning.allSeasonGroups')} {selectedYear}
                       </div>
                     </div>
                   </div>
-                  <div className="flex items-center gap-6">
+                  <div className="flex items-center gap-3">
                     {/* Budget Allocated - show when budget is selected */}
                     {totalBudget > 0 && (selectedBudget || selectedBudgetId) && (
-                      <div className="flex items-center gap-3 px-4 py-2 bg-white/15 rounded-xl backdrop-blur-sm">
+                      <div className="flex items-center gap-2 px-3 py-1 bg-white/15 rounded-lg backdrop-blur-sm">
                         <div className="text-right">
-                          <div className="text-xs text-white/70 font-medium font-['Montserrat']">{selectedBudget?.budgetName || fallbackBudgetName}</div>
-                          <div className="text-sm font-bold text-white font-['JetBrains_Mono']">{t('skuProposal.budget')}: {formatCurrency(totalBudget)}</div>
+                          <div className="text-[10px] text-white/70 font-medium font-['Montserrat']">{selectedBudget?.budgetName || fallbackBudgetName}</div>
+                          <div className="text-xs font-bold text-white font-['JetBrains_Mono']">{t('skuProposal.budget')}: {formatCurrency(totalBudget)}</div>
                         </div>
                       </div>
                     )}
                     {/* Group Total */}
                     <div className="text-right">
-                      <div className="text-sm text-white/80 font-['Montserrat']">{t('skuProposal.totalPlanned')}</div>
-                      <div className="font-bold text-xl text-white font-['JetBrains_Mono']">
+                      <div className="text-xs text-white/80 font-['Montserrat']">{t('skuProposal.totalPlanned')}</div>
+                      <div className="font-bold text-sm text-white font-['JetBrains_Mono']">
                         {formatCurrency(groupTotals.sum)}
                       </div>
                     </div>
@@ -1139,7 +1166,7 @@ const BudgetAllocateScreen = ({
                           {(!selectedBrand && groupBrands.length > 1) && (
                             <div
                               onClick={() => toggleBrandCollapse(brand.id)}
-                              className={`px-6 py-3 border-b flex items-center justify-between cursor-pointer transition-colors ${darkMode ? 'bg-[#1A1A1A] border-[#2E2E2E] hover:bg-[rgba(215,183,151,0.08)]' : 'bg-gradient-to-r from-[rgba(215,183,151,0.05)] to-[rgba(215,183,151,0.1)] border-[#C4B5A5] hover:bg-[rgba(160,120,75,0.18)]'}`}
+                              className={`px-4 py-1.5 border-b flex items-center justify-between cursor-pointer transition-colors ${darkMode ? 'bg-[#1A1A1A] border-[#2E2E2E] hover:bg-[rgba(215,183,151,0.08)]' : 'bg-gradient-to-r from-[rgba(215,183,151,0.05)] to-[rgba(215,183,151,0.1)] border-[#C4B5A5] hover:bg-[rgba(160,120,75,0.18)]'}`}
                             >
                               <div className="flex items-center gap-3">
                                 <ChevronRight
@@ -1149,8 +1176,8 @@ const BudgetAllocateScreen = ({
                                 <Tag size={16} className={darkMode ? 'text-[#999999]' : 'text-[#666666]'} />
                                 <span className={`font-semibold font-['Montserrat'] ${darkMode ? 'text-[#F2F2F2]' : 'text-[#0A0A0A]'}`}>{brand.name}</span>
                               </div>
-                              <div className="flex items-center gap-6">
-                                <div className="flex items-center gap-4">
+                              <div className="flex items-center gap-4">
+                                <div className="flex items-center gap-3">
                                   <div className="text-right">
                                     <span className={`text-xs ${darkMode ? 'text-[#999999]' : 'text-[#666666]'}`}>{t('proposal.rex')}: </span>
                                     <span className={`text-sm font-medium font-['JetBrains_Mono'] ${darkMode ? 'text-[#D7B797]' : 'text-[#8A6340]'}`}>{formatCurrency(brandTotals.rex)}</span>
@@ -1174,21 +1201,21 @@ const BudgetAllocateScreen = ({
                               <table className="w-full">
                                 <thead>
                                   <tr className={darkMode ? 'bg-[#1A1A1A]' : 'bg-[rgba(215,183,151,0.2)]'}>
-                                    <th className={`px-6 py-3 text-left text-sm font-semibold w-64 font-['Montserrat'] ${darkMode ? 'text-white' : 'text-[#333333]'}`}>
+                                    <th className={`px-3 py-2 text-left text-xs font-semibold w-48 font-['Montserrat'] ${darkMode ? 'text-white' : 'text-[#333333]'}`}>
                                       <div className="flex items-center gap-2">
                                         <TrendingUp size={16} />
                                         {selectedBrand || groupBrands.length === 1 ? brand.name : ''} FY {selectedYear}
                                       </div>
                                     </th>
                                     {STORES.map((store) => (
-                                      <th key={store.id} className={`px-6 py-3 text-center text-sm font-semibold font-['Montserrat'] ${darkMode ? 'text-white' : 'text-[#333333]'}`}>
+                                      <th key={store.id} className={`px-3 py-2 text-center text-xs font-semibold font-['Montserrat'] ${darkMode ? 'text-white' : 'text-[#333333]'}`}>
                                         <div>{store.code}</div>
                                         <div className={`text-xs font-normal font-['JetBrains_Mono'] ${darkMode ? 'text-[#999999]' : 'text-[#666666]'}`}>({storePercentages[store.id]}%)</div>
                                       </th>
                                     ))}
-                                    <th className={`px-6 py-3 text-center text-sm font-semibold font-['Montserrat'] ${darkMode ? 'text-white' : 'text-[#333333]'}`}>{t('planning.totalValue')}</th>
-                                    <th className={`px-6 py-3 text-center text-sm font-semibold font-['Montserrat'] ${darkMode ? 'text-white' : 'text-[#333333]'}`}>% MIX</th>
-                                    <th className={`px-6 py-3 text-center text-sm font-semibold w-36 font-['Montserrat'] ${darkMode ? 'text-white' : 'text-[#333333]'}`}>{t('common.actions')}</th>
+                                    <th className={`px-3 py-2 text-center text-xs font-semibold font-['Montserrat'] ${darkMode ? 'text-white' : 'text-[#333333]'}`}>{t('planning.totalValue')}</th>
+                                    <th className={`px-3 py-2 text-center text-xs font-semibold font-['Montserrat'] ${darkMode ? 'text-white' : 'text-[#333333]'}`}>% MIX</th>
+                                    <th className={`px-3 py-2 text-center text-xs font-semibold w-24 font-['Montserrat'] ${darkMode ? 'text-white' : 'text-[#333333]'}`}>{t('common.actions')}</th>
                                   </tr>
                                 </thead>
                                 <tbody>
@@ -1197,9 +1224,9 @@ const BudgetAllocateScreen = ({
                                     <Fragment key={`${brand.id}-${seasonGroup}`}>
                                       {/* Season Group Header */}
                                       <tr className={darkMode ? 'bg-[#1A1A1A] border-b border-[#2E2E2E]' : 'bg-[rgba(160,120,75,0.12)] border-b border-[#C4B5A5]'}>
-                                        <td className="px-6 py-3">
-                                          <div className="flex items-center gap-3">
-                                            <div className={`w-1.5 h-5 rounded-full ${seasonGroup === 'SS' ? 'bg-[#E3B341]' : 'bg-[#D7B797]'}`}></div>
+                                        <td className="px-3 py-1.5">
+                                          <div className="flex items-center gap-2">
+                                            <div className={`w-1 h-4 rounded-full ${seasonGroup === 'SS' ? 'bg-[#E3B341]' : 'bg-[#D7B797]'}`}></div>
                                             {seasonGroup === 'SS' ? (
                                               <Sun size={16} className="text-[#E3B341]" />
                                             ) : (
@@ -1208,43 +1235,43 @@ const BudgetAllocateScreen = ({
                                             <span className={`font-semibold font-['Montserrat'] ${darkMode ? 'text-[#F2F2F2]' : 'text-[#0A0A0A]'}`}>{SEASON_CONFIG[seasonGroup]?.name}</span>
                                           </div>
                                         </td>
-                                        <td className="px-4 py-2 text-center">
+                                        <td className="px-2 py-1 text-center">
                                           <input
                                             type="text"
                                             value={formatCurrency(getSeasonTotalValue(brand.id, seasonGroup, 'rex') || 0)}
                                             readOnly
                                             tabIndex={-1}
-                                            className={`w-full px-3 py-2 text-center border rounded-lg font-semibold font-['JetBrains_Mono'] cursor-default ${darkMode
+                                            className={`w-full px-2 py-1 text-center border rounded-lg text-sm font-semibold font-['JetBrains_Mono'] cursor-default ${darkMode
                                               ? 'border-[#2E2E2E] text-[#F2F2F2] bg-[#121212]'
                                               : 'border-[#C4B5A5] text-[#0A0A0A] bg-[rgba(160,120,75,0.12)]'
                                             }`}
                                           />
                                         </td>
-                                        <td className="px-4 py-2 text-center">
+                                        <td className="px-2 py-1 text-center">
                                           <input
                                             type="text"
                                             value={formatCurrency(getSeasonTotalValue(brand.id, seasonGroup, 'ttp') || 0)}
                                             readOnly
                                             tabIndex={-1}
-                                            className={`w-full px-3 py-2 text-center border rounded-lg font-semibold font-['JetBrains_Mono'] cursor-default ${darkMode
+                                            className={`w-full px-2 py-1 text-center border rounded-lg text-sm font-semibold font-['JetBrains_Mono'] cursor-default ${darkMode
                                               ? 'border-[#2E2E2E] text-[#F2F2F2] bg-[#121212]'
                                               : 'border-[#C4B5A5] text-[#0A0A0A] bg-[rgba(160,120,75,0.12)]'
                                             }`}
                                           />
 
                                         </td>
-                                        <td className="px-4 py-2 text-center">
-                                          <div className={`px-3 py-2 border rounded-lg font-bold font-['JetBrains_Mono'] ${darkMode
+                                        <td className="px-2 py-1 text-center">
+                                          <div className={`px-2 py-1 border rounded-lg font-bold text-sm font-['JetBrains_Mono'] ${darkMode
                                             ? 'bg-[#1A1A1A] border-[#2E2E2E] text-[#F2F2F2]'
                                             : 'bg-[rgba(160,120,75,0.18)] border-[rgba(215,183,151,0.4)] text-[#0A0A0A]'
                                           }`}>
                                             {formatCurrency(getSeasonTotalValue(brand.id, seasonGroup, 'rex') + getSeasonTotalValue(brand.id, seasonGroup, 'ttp'))}
                                           </div>
                                         </td>
-                                        <td className={`px-6 py-3 text-center font-semibold font-['JetBrains_Mono'] ${darkMode ? 'text-[#999999]' : 'text-[#666666]'}`}>
+                                        <td className={`px-3 py-1.5 text-center text-sm font-semibold font-['JetBrains_Mono'] ${darkMode ? 'text-[#999999]' : 'text-[#666666]'}`}>
                                           {selectedSeasonGroup ? '100%' : `${calculateMix(getSeasonTotalValue(brand.id, seasonGroup, 'rex') + getSeasonTotalValue(brand.id, seasonGroup, 'ttp'), brand.id)}%`}
                                         </td>
-                                        <td className="px-6 py-3"></td>
+                                        <td className="px-3 py-1.5"></td>
                                       </tr>
 
                                       {/* Sub-Season Rows */}
@@ -1254,49 +1281,49 @@ const BudgetAllocateScreen = ({
 
                                         return (
                                           <tr key={`${brand.id}-${seasonGroup}-${subSeason}`} className={`border-b transition-colors ${darkMode ? 'border-[#2E2E2E] hover:bg-[rgba(215,183,151,0.08)]' : 'border-[#D4C8BB] hover:bg-[rgba(160,120,75,0.12)]'}`}>
-                                            <td className="px-6 py-3 pl-14">
+                                            <td className="px-3 py-1.5 pl-10">
                                               <span className={`font-medium ${darkMode ? 'text-[#999999]' : 'text-[#666666]'}`}>{subSeason}</span>
                                             </td>
-                                            <td className="px-4 py-2 text-center">
+                                            <td className="px-2 py-1 text-center">
                                               <input
                                                 type="text"
                                                 value={editingCell === `${brand.id}-${seasonGroup}-${subSeason}-rex` ? (data.rex || '') : formatCurrency(data.rex)}
                                                 onChange={(e) => handleAllocationChange(brand.id, seasonGroup, subSeason, 'rex', e.target.value)}
                                                 onFocus={() => setEditingCell(`${brand.id}-${seasonGroup}-${subSeason}-rex`)}
                                                 onBlur={() => setEditingCell(null)}
-                                                className={`w-full px-3 py-2 text-center border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D7B797] focus:border-[#D7B797] font-medium font-['JetBrains_Mono'] transition-colors ${darkMode
+                                                className={`w-full px-2 py-1 text-center border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#D7B797] focus:border-[#D7B797] font-medium font-['JetBrains_Mono'] transition-colors ${darkMode
                                                   ? 'border-[#2E2E2E] text-[#F2F2F2] bg-[#121212] hover:border-[rgba(215,183,151,0.25)]'
                                                   : 'border-[#C4B5A5] text-[#0A0A0A] bg-white hover:border-[rgba(215,183,151,0.4)]'
                                                 }`}
                                                 placeholder="0"
                                               />
                                             </td>
-                                            <td className="px-4 py-2 text-center">
+                                            <td className="px-2 py-1 text-center">
                                               <input
                                                 type="text"
                                                 value={editingCell === `${brand.id}-${seasonGroup}-${subSeason}-ttp` ? (data.ttp || '') : formatCurrency(data.ttp)}
                                                 onChange={(e) => handleAllocationChange(brand.id, seasonGroup, subSeason, 'ttp', e.target.value)}
                                                 onFocus={() => setEditingCell(`${brand.id}-${seasonGroup}-${subSeason}-ttp`)}
                                                 onBlur={() => setEditingCell(null)}
-                                                className={`w-full px-3 py-2 text-center border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D7B797] focus:border-[#D7B797] font-medium font-['JetBrains_Mono'] transition-colors ${darkMode
+                                                className={`w-full px-2 py-1 text-center border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#D7B797] focus:border-[#D7B797] font-medium font-['JetBrains_Mono'] transition-colors ${darkMode
                                                   ? 'border-[#2E2E2E] text-[#F2F2F2] bg-[#121212] hover:border-[rgba(215,183,151,0.25)]'
                                                   : 'border-[#C4B5A5] text-[#0A0A0A] bg-white hover:border-[rgba(215,183,151,0.4)]'
                                                 }`}
                                                 placeholder="0"
                                               />
                                             </td>
-                                            <td className="px-4 py-2 text-center">
-                                              <div className={`px-3 py-2 border rounded-lg font-semibold font-['JetBrains_Mono'] ${darkMode
+                                            <td className="px-2 py-1 text-center">
+                                              <div className={`px-2 py-1 border rounded-lg font-semibold text-sm font-['JetBrains_Mono'] ${darkMode
                                                 ? 'bg-[rgba(18,119,73,0.15)] border-[#127749] text-[#2A9E6A]'
                                                 : 'bg-[rgba(18,119,73,0.1)] border-[#127749] text-[#127749]'
                                               }`}>
                                                 {formatCurrency(data.sum)}
                                               </div>
                                             </td>
-                                            <td className={`px-6 py-3 text-center font-['JetBrains_Mono'] ${darkMode ? 'text-[#999999]' : 'text-[#666666]'}`}>
+                                            <td className={`px-3 py-1.5 text-center text-sm font-['JetBrains_Mono'] ${darkMode ? 'text-[#999999]' : 'text-[#666666]'}`}>
                                               {mix}%
                                             </td>
-                                            <td className="px-6 py-3 text-center">
+                                            <td className="px-2 py-1.5 text-center">
                                               <button
                                                 onClick={() => {
                                                   if (onOpenOtbAnalysis) {
@@ -1315,7 +1342,7 @@ const BudgetAllocateScreen = ({
                                                     });
                                                   }
                                                 }}
-                                                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#127749] hover:bg-[#0d5a37] text-white rounded-lg font-medium text-sm font-['Montserrat'] transition-colors"
+                                                className="inline-flex items-center gap-1 px-2 py-1 bg-[#127749] hover:bg-[#0d5a37] text-white rounded-md font-medium text-xs font-['Montserrat'] transition-colors"
                                               >
                                                 <Edit size={14} />
                                                 {t('nav.otbAnalysis') || 'OTB Planning'}
@@ -1330,36 +1357,36 @@ const BudgetAllocateScreen = ({
 
                                   {/* Total Row */}
                                   <tr className={`border-t-2 ${darkMode ? 'bg-[rgba(18,119,73,0.15)] border-[#127749]' : 'bg-[rgba(18,119,73,0.1)] border-[#127749]'}`}>
-                                    <td className="px-6 py-3">
-                                      <span className={`font-bold font-['Montserrat'] ${darkMode ? 'text-[#F2F2F2]' : 'text-[#0A0A0A]'}`}>TOTAL</span>
+                                    <td className="px-3 py-1.5">
+                                      <span className={`font-bold text-sm font-['Montserrat'] ${darkMode ? 'text-[#F2F2F2]' : 'text-[#0A0A0A]'}`}>TOTAL</span>
                                     </td>
-                                    <td className="px-4 py-2 text-center">
+                                    <td className="px-2 py-1 text-center">
                                       <input
                                         type="text"
                                         value={formatCurrency(getBrandTotalValue(brand.id, 'rex') || 0)}
                                         readOnly
                                         tabIndex={-1}
-                                        className={`w-full px-3 py-2 text-center border rounded-lg font-bold font-['JetBrains_Mono'] cursor-default ${darkMode
+                                        className={`w-full px-2 py-1 text-center border rounded-lg text-sm font-bold font-['JetBrains_Mono'] cursor-default ${darkMode
                                           ? 'border-[#127749] text-[#2A9E6A] bg-[rgba(18,119,73,0.2)]'
                                           : 'border-[#127749] text-[#127749] bg-[rgba(18,119,73,0.15)]'
                                         }`}
                                       />
                                     </td>
 
-                                    <td className="px-4 py-2 text-center">
+                                    <td className="px-2 py-1 text-center">
                                       <input
                                         type="text"
                                         value={formatCurrency(getBrandTotalValue(brand.id, 'ttp') || 0)}
                                         readOnly
                                         tabIndex={-1}
-                                        className={`w-full px-3 py-2 text-center border rounded-lg font-bold font-['JetBrains_Mono'] cursor-default ${darkMode
+                                        className={`w-full px-2 py-1 text-center border rounded-lg text-sm font-bold font-['JetBrains_Mono'] cursor-default ${darkMode
                                           ? 'border-[#127749] text-[#2A9E6A] bg-[rgba(18,119,73,0.2)]'
                                           : 'border-[#127749] text-[#127749] bg-[rgba(18,119,73,0.15)]'
                                         }`}
                                       />
                                     </td>
 
-                                    <td className="px-4 py-2 text-center">
+                                    <td className="px-2 py-1 text-center">
                                       <div className={`px-3 py-2 border rounded-lg font-bold text-lg font-['JetBrains_Mono'] ${darkMode
                                         ? 'bg-[rgba(18,119,73,0.25)] border-[#2A9E6A] text-[#2A9E6A]'
                                         : 'bg-[rgba(18,119,73,0.2)] border-[#127749] text-[#127749]'
@@ -1367,8 +1394,8 @@ const BudgetAllocateScreen = ({
                                         {formatCurrency(getBrandTotalValue(brand.id, 'rex') + getBrandTotalValue(brand.id, 'ttp'))}
                                       </div>
                                     </td>
-                                    <td className={`px-6 py-3 text-center font-bold font-['JetBrains_Mono'] ${darkMode ? 'text-[#F2F2F2]' : 'text-[#0A0A0A]'}`}>100%</td>
-                                    <td className="px-6 py-3"></td>
+                                    <td className={`px-3 py-1.5 text-center text-sm font-bold font-['JetBrains_Mono'] ${darkMode ? 'text-[#F2F2F2]' : 'text-[#0A0A0A]'}`}>100%</td>
+                                    <td className="px-3 py-1.5"></td>
                                   </tr>
                                 </tbody>
                               </table>

@@ -133,100 +133,103 @@ const MasterDataScreen = ({ type = 'brands', darkMode = false }) => {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className={`backdrop-blur-xl rounded-2xl shadow-xl border p-6 ${
-        darkMode ? 'bg-[#121212]/95 border-[#2E2E2E]' : 'bg-gradient-to-br from-white to-[rgba(160,120,75,0.12)] border-[#C4B5A5]'
-      }`}>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div className={`p-3 rounded-xl ${
-              darkMode ? 'bg-[rgba(215,183,151,0.1)]' : 'bg-[rgba(160,120,75,0.18)]'
-            }`}>
-              <Icon size={24} className={darkMode ? 'text-[#D7B797]' : 'text-[#8A6340]'} />
+    <div className="space-y-3">
+      {/* Header + Search - Merged compact */}
+      <div className={`rounded-lg border overflow-hidden ${
+        darkMode ? 'border-[#2E2E2E]' : 'border-[#C4B5A5]'
+      }`} style={{
+        background: darkMode
+          ? 'linear-gradient(135deg, #121212 0%, rgba(215,183,151,0.03) 40%, rgba(215,183,151,0.10) 100%)'
+          : 'linear-gradient(135deg, #ffffff 0%, rgba(215,183,151,0.05) 35%, rgba(215,183,151,0.14) 100%)',
+        boxShadow: `inset 0 -1px 0 ${darkMode ? 'rgba(215,183,151,0.06)' : 'rgba(215,183,151,0.08)'}`,
+      }}>
+        <div className="flex items-center justify-between px-3 py-2">
+          <div className="flex items-center gap-2.5">
+            <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{
+              background: darkMode
+                ? 'linear-gradient(135deg, rgba(215,183,151,0.10) 0%, rgba(215,183,151,0.20) 100%)'
+                : 'linear-gradient(135deg, rgba(160,120,75,0.12) 0%, rgba(160,120,75,0.22) 100%)',
+            }}>
+              <Icon size={14} className={darkMode ? 'text-[#D7B797]' : 'text-[#8A6340]'} style={darkMode ? { filter: 'drop-shadow(0 0 3px rgba(215,183,151,0.4))' } : undefined} />
             </div>
             <div>
-              <h1 className={`text-2xl font-bold font-['Montserrat'] ${darkMode ? 'text-[#F2F2F2]' : 'text-[#0A0A0A]'}`}>
+              <h1 className={`text-sm font-bold font-['Montserrat'] leading-tight ${darkMode ? 'text-[#F2F2F2]' : 'text-[#0A0A0A]'}`}>
                 {config.title}
               </h1>
-              <p className={`text-sm font-['JetBrains_Mono'] ${darkMode ? 'text-[#999999]' : 'text-[#666666]'}`}>
+              <p className={`text-[10px] font-['JetBrains_Mono'] ${darkMode ? 'text-[#666666]' : 'text-[#999999]'}`}>
                 {loading ? t('common.loading') : t('masterData.records', { count: filteredData.length })}
               </p>
             </div>
           </div>
 
-          <button
-            onClick={fetchData}
-            disabled={loading}
-            className={`flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium text-sm font-['Montserrat'] transition-all ${
-              darkMode
-                ? 'text-[#999999] hover:text-[#D7B797] hover:bg-[rgba(215,183,151,0.08)] border border-[#2E2E2E]'
-                : 'text-[#666666] hover:text-[#8A6340] hover:bg-[rgba(160,120,75,0.18)] border border-[#C4B5A5]'
-            }`}
-          >
-            <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
-            {t('masterData.refresh')}
-          </button>
-        </div>
-      </div>
-
-      {/* Search / Filter */}
-      <div className={`rounded-xl border shadow-sm p-4 ${
-        darkMode ? 'bg-[#121212] border-[#2E2E2E]' : 'bg-white border-[#C4B5A5]'
-      }`}>
-        <div className="flex items-center gap-3">
           <div className="flex items-center gap-2">
-            <Filter size={16} className={darkMode ? 'text-[#999999]' : 'text-[#666666]'} />
-            <span className={`text-sm font-semibold font-['Montserrat'] ${darkMode ? 'text-[#F2F2F2]' : 'text-[#0A0A0A]'}`}>{t('masterData.search')}</span>
-          </div>
-          <div className="relative flex-1 max-w-md">
-            <Search size={16} className={`absolute left-3 top-1/2 -translate-y-1/2 ${darkMode ? 'text-[#666666]' : 'text-[#999999]'}`} />
-            <input
-              type="text"
-              value={searchTerm}
-              onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
-              placeholder={`Search ${config.title.toLowerCase()}...`}
-              className={`w-full pl-10 pr-10 py-2.5 border rounded-lg text-sm font-['Montserrat'] transition-all focus:outline-none focus:ring-2 focus:ring-[#D7B797] ${
+            {/* Inline Search */}
+            <div className="relative">
+              <Search size={13} className={`absolute left-2.5 top-1/2 -translate-y-1/2 ${darkMode ? 'text-[#555555]' : 'text-[#999999]'}`} />
+              <input
+                type="text"
+                value={searchTerm}
+                onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
+                placeholder={`${t('masterData.search')} ${config.title.toLowerCase()}...`}
+                className={`w-56 pl-8 pr-7 py-1 border rounded-md text-xs font-['Montserrat'] transition-all focus:outline-none focus:ring-1 focus:ring-[#D7B797] ${
+                  darkMode
+                    ? 'bg-[#0A0A0A] border-[#1A1A1A] text-[#F2F2F2] placeholder-[#444444]'
+                    : 'bg-white border-[#C4B5A5] text-[#0A0A0A] placeholder-[#999999]'
+                }`}
+              />
+              {searchTerm && (
+                <button
+                  onClick={() => { setSearchTerm(''); setCurrentPage(1); }}
+                  className={`absolute right-2 top-1/2 -translate-y-1/2 ${darkMode ? 'text-[#555555] hover:text-[#999999]' : 'text-[#999999] hover:text-[#666666]'}`}
+                >
+                  <X size={12} />
+                </button>
+              )}
+            </div>
+
+            <button
+              onClick={fetchData}
+              disabled={loading}
+              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md font-medium text-xs font-['Montserrat'] transition-all ${
                 darkMode
-                  ? 'bg-[#1A1A1A] border-[#2E2E2E] text-[#F2F2F2] placeholder-[#666666]'
-                  : 'bg-white border-[#C4B5A5] text-[#0A0A0A] placeholder-[#999999]'
+                  ? 'text-[#888888] hover:text-[#D7B797] hover:bg-[rgba(215,183,151,0.06)] border border-[#1A1A1A]'
+                  : 'text-[#666666] hover:text-[#8A6340] hover:bg-[rgba(160,120,75,0.12)] border border-[#C4B5A5]'
               }`}
-            />
-            {searchTerm && (
-              <button
-                onClick={() => { setSearchTerm(''); setCurrentPage(1); }}
-                className={`absolute right-3 top-1/2 -translate-y-1/2 ${darkMode ? 'text-[#666666] hover:text-[#999999]' : 'text-[#999999] hover:text-[#666666]'}`}
-              >
-                <X size={14} />
-              </button>
-            )}
+            >
+              <RefreshCw size={12} className={loading ? 'animate-spin' : ''} />
+              {t('masterData.refresh')}
+            </button>
           </div>
         </div>
       </div>
 
       {/* Data Table */}
-      <div className={`rounded-xl border shadow-sm overflow-hidden ${
-        darkMode ? 'bg-[#121212] border-[#2E2E2E]' : 'bg-white border-[#C4B5A5]'
-      }`}>
+      <div className={`rounded-lg border overflow-hidden ${
+        darkMode ? 'border-[#2E2E2E]' : 'border-[#C4B5A5]'
+      }`} style={{
+        background: darkMode
+          ? 'linear-gradient(135deg, #121212 0%, rgba(215,183,151,0.02) 40%, rgba(215,183,151,0.06) 100%)'
+          : 'linear-gradient(135deg, #ffffff 0%, rgba(215,183,151,0.03) 35%, rgba(215,183,151,0.08) 100%)',
+      }}>
         {loading ? (
-          <div className="p-16 text-center">
-            <RefreshCw size={32} className={`animate-spin mx-auto mb-4 ${darkMode ? 'text-[#D7B797]' : 'text-[#8A6340]'}`} />
-            <p className={`text-sm font-['Montserrat'] ${darkMode ? 'text-[#999999]' : 'text-[#666666]'}`}>{t('masterData.loadingData')}</p>
+          <div className="p-10 text-center">
+            <RefreshCw size={24} className={`animate-spin mx-auto mb-3 ${darkMode ? 'text-[#D7B797]' : 'text-[#8A6340]'}`} />
+            <p className={`text-xs font-['Montserrat'] ${darkMode ? 'text-[#666666]' : 'text-[#999999]'}`}>{t('masterData.loadingData')}</p>
           </div>
         ) : error ? (
-          <div className="p-16 text-center">
-            <p className="text-red-400 mb-4 font-['Montserrat']">{error}</p>
+          <div className="p-10 text-center">
+            <p className="text-red-400 mb-3 text-xs font-['Montserrat']">{error}</p>
             <button
               onClick={fetchData}
-              className="px-4 py-2 bg-[#D7B797] text-[#0A0A0A] rounded-lg font-medium text-sm font-['Montserrat'] hover:bg-[#C4A480] transition-colors"
+              className="px-3 py-1.5 bg-[#D7B797] text-[#0A0A0A] rounded-md font-medium text-xs font-['Montserrat'] hover:bg-[#C4A480] transition-colors"
             >
               {t('masterData.tryAgain')}
             </button>
           </div>
         ) : filteredData.length === 0 ? (
-          <div className="p-16 text-center">
-            <Icon size={48} className={`mx-auto mb-4 ${darkMode ? 'text-[#2E2E2E]' : 'text-[#2E2E2E]/30'}`} />
-            <p className={`text-sm font-['Montserrat'] ${darkMode ? 'text-[#999999]' : 'text-[#666666]'}`}>
+          <div className="p-10 text-center">
+            <Icon size={32} className={`mx-auto mb-3 ${darkMode ? 'text-[#2E2E2E]' : 'text-[#2E2E2E]/30'}`} />
+            <p className={`text-xs font-['Montserrat'] ${darkMode ? 'text-[#666666]' : 'text-[#999999]'}`}>
               {searchTerm ? t('masterData.noResultsFound') : t('masterData.noDataAvailable')}
             </p>
           </div>
@@ -235,17 +238,17 @@ const MasterDataScreen = ({ type = 'brands', darkMode = false }) => {
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className={darkMode ? 'bg-[#1A1A1A]' : 'bg-[rgba(160,120,75,0.12)]'}>
-                    <th className={`px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider font-['Montserrat'] w-12 ${
-                      darkMode ? 'text-[#999999]' : 'text-[#666666]'
+                  <tr className={darkMode ? 'bg-[#0A0A0A]' : 'bg-[rgba(160,120,75,0.08)]'}>
+                    <th className={`px-3 py-2 text-left text-[10px] font-semibold uppercase tracking-wider font-['Montserrat'] w-10 ${
+                      darkMode ? 'text-[#666666]' : 'text-[#999999]'
                     }`}>
                       #
                     </th>
                     {config.columns.map((col) => (
                       <th
                         key={col.key}
-                        className={`px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider font-['Montserrat'] ${
-                          darkMode ? 'text-[#999999]' : 'text-[#666666]'
+                        className={`px-3 py-2 text-left text-[10px] font-semibold uppercase tracking-wider font-['Montserrat'] ${
+                          darkMode ? 'text-[#666666]' : 'text-[#999999]'
                         }`}
                         style={{ width: col.width }}
                       >
@@ -260,11 +263,11 @@ const MasterDataScreen = ({ type = 'brands', darkMode = false }) => {
                       key={item.id || index}
                       className={`border-t transition-colors ${
                         darkMode
-                          ? 'border-[#2E2E2E] hover:bg-[rgba(215,183,151,0.04)]'
-                          : 'border-[#D4C8BB] hover:bg-[rgba(215,183,151,0.06)]'
+                          ? 'border-[#1A1A1A] hover:bg-[rgba(215,183,151,0.03)]'
+                          : 'border-[#D4C8BB] hover:bg-[rgba(215,183,151,0.05)]'
                       }`}
                     >
-                      <td className={`px-4 py-3 text-sm font-['JetBrains_Mono'] ${darkMode ? 'text-[#666666]' : 'text-[#999999]'}`}>
+                      <td className={`px-3 py-1.5 text-xs font-['JetBrains_Mono'] ${darkMode ? 'text-[#444444]' : 'text-[#BBBBBB]'}`}>
                         {(currentPage - 1) * pageSize + index + 1}
                       </td>
                       {config.columns.map((col) => {
@@ -274,7 +277,7 @@ const MasterDataScreen = ({ type = 'brands', darkMode = false }) => {
                         return (
                           <td
                             key={col.key}
-                            className={`px-4 py-3 text-sm ${
+                            className={`px-3 py-1.5 text-xs ${
                               col.mono ? "font-['JetBrains_Mono']" : "font-['Montserrat']"
                             } ${darkMode ? 'text-[#F2F2F2]' : 'text-[#0A0A0A]'}`}
                           >
@@ -290,33 +293,33 @@ const MasterDataScreen = ({ type = 'brands', darkMode = false }) => {
 
             {/* Pagination */}
             {totalPages > 1 && (
-              <div className={`flex items-center justify-between px-4 py-3 border-t ${
-                darkMode ? 'border-[#2E2E2E]' : 'border-[#D4C8BB]'
+              <div className={`flex items-center justify-between px-3 py-1.5 border-t ${
+                darkMode ? 'border-[#1A1A1A]' : 'border-[#D4C8BB]'
               }`}>
-                <p className={`text-sm font-['JetBrains_Mono'] ${darkMode ? 'text-[#999999]' : 'text-[#666666]'}`}>
+                <p className={`text-[10px] font-['JetBrains_Mono'] ${darkMode ? 'text-[#666666]' : 'text-[#999999]'}`}>
                   {(currentPage - 1) * pageSize + 1}–{Math.min(currentPage * pageSize, filteredData.length)} of {filteredData.length}
                 </p>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1">
                   <button
                     onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                     disabled={currentPage === 1}
-                    className={`p-2 rounded-lg transition-colors disabled:opacity-30 disabled:cursor-not-allowed ${
-                      darkMode ? 'hover:bg-[rgba(215,183,151,0.08)] text-[#999999]' : 'hover:bg-[rgba(160,120,75,0.18)] text-[#666666]'
+                    className={`p-1 rounded-md transition-colors disabled:opacity-30 disabled:cursor-not-allowed ${
+                      darkMode ? 'hover:bg-[rgba(215,183,151,0.06)] text-[#888888]' : 'hover:bg-[rgba(160,120,75,0.12)] text-[#666666]'
                     }`}
                   >
-                    <ChevronLeft size={16} />
+                    <ChevronLeft size={14} />
                   </button>
-                  <span className={`px-3 py-1 text-sm font-['JetBrains_Mono'] ${darkMode ? 'text-[#F2F2F2]' : 'text-[#0A0A0A]'}`}>
+                  <span className={`px-2 py-0.5 text-[10px] font-['JetBrains_Mono'] ${darkMode ? 'text-[#F2F2F2]' : 'text-[#0A0A0A]'}`}>
                     {currentPage} / {totalPages}
                   </span>
                   <button
                     onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
                     disabled={currentPage === totalPages}
-                    className={`p-2 rounded-lg transition-colors disabled:opacity-30 disabled:cursor-not-allowed ${
-                      darkMode ? 'hover:bg-[rgba(215,183,151,0.08)] text-[#999999]' : 'hover:bg-[rgba(160,120,75,0.18)] text-[#666666]'
+                    className={`p-1 rounded-md transition-colors disabled:opacity-30 disabled:cursor-not-allowed ${
+                      darkMode ? 'hover:bg-[rgba(215,183,151,0.06)] text-[#888888]' : 'hover:bg-[rgba(160,120,75,0.12)] text-[#666666]'
                     }`}
                   >
-                    <ChevronRight size={16} />
+                    <ChevronRight size={14} />
                   </button>
                 </div>
               </div>

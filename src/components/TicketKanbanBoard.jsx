@@ -132,9 +132,15 @@ const TicketKanbanBoard = ({ tickets = [], onTicketClick, darkMode = true }) => 
                     onClick={() => onTicketClick?.(ticket)}
                     className={`rounded-lg border p-3 cursor-pointer transition-all duration-150 ${
                       darkMode
-                        ? 'bg-[#121212] border-[#2E2E2E] hover:border-[rgba(215,183,151,0.4)] hover:shadow-lg hover:shadow-[rgba(215,183,151,0.05)]'
-                        : 'bg-white border-gray-200 hover:border-[#D7B797] hover:shadow-md'
+                        ? 'border-[#2E2E2E] hover:border-[rgba(215,183,151,0.4)] hover:shadow-lg hover:shadow-[rgba(215,183,151,0.05)]'
+                        : 'border-gray-200 hover:border-[#D7B797] hover:shadow-md'
                     }`}
+                    style={{
+                      background: darkMode
+                        ? 'linear-gradient(135deg, #121212 0%, rgba(215,183,151,0.03) 40%, rgba(215,183,151,0.08) 100%)'
+                        : 'linear-gradient(135deg, #ffffff 0%, rgba(215,183,151,0.04) 35%, rgba(215,183,151,0.10) 100%)',
+                      boxShadow: `inset 0 -1px 0 ${darkMode ? 'rgba(215,183,151,0.06)' : 'rgba(215,183,151,0.04)'}`,
+                    }}
                   >
                     {/* Entity Type + Date */}
                     <div className="flex items-center justify-between mb-2">

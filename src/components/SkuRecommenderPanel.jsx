@@ -188,7 +188,10 @@ const SkuRecommenderPanel = ({
   // --- Loading State ---
   if (loading) {
     return (
-      <div className="rounded-2xl border border-[#2E2E2E] overflow-hidden bg-gradient-to-br from-[#1A1A1A] via-[#121212] to-[rgba(99,102,241,0.05)]">
+      <div className="rounded-2xl border border-[#2E2E2E] overflow-hidden" style={{
+        background: 'linear-gradient(135deg, #121212 0%, rgba(99,102,241,0.05) 40%, rgba(99,102,241,0.16) 100%)',
+        boxShadow: 'inset 0 -1px 0 rgba(99,102,241,0.12)',
+      }}>
         <div className="p-5">
           <div className="flex items-center gap-3 mb-5">
             <div className="p-2 rounded-lg bg-gradient-to-br from-indigo-500/20 to-purple-500/20">
@@ -238,7 +241,10 @@ const SkuRecommenderPanel = ({
   const priceTiers = summary?.priceTierDistribution || summary?.priceTiers || null;
 
   return (
-    <div className="rounded-2xl border border-[#2E2E2E] overflow-hidden bg-gradient-to-br from-[#1A1A1A] via-[#121212] to-[rgba(99,102,241,0.03)]">
+    <div className="rounded-2xl border border-[#2E2E2E] overflow-hidden" style={{
+      background: 'linear-gradient(135deg, #121212 0%, rgba(99,102,241,0.05) 40%, rgba(99,102,241,0.16) 100%)',
+      boxShadow: 'inset 0 -1px 0 rgba(99,102,241,0.12)',
+    }}>
       {/* Header */}
       <div className="px-5 py-4 border-b border-[#2E2E2E]">
         <div className="flex items-center justify-between">
