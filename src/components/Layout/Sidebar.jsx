@@ -188,7 +188,7 @@ const Sidebar = ({ currentScreen, darkMode, setDarkMode, user, onLogout }) => {
           </button>
         ) : (
           <div className="flex items-center gap-2.5 px-3 w-full h-full">
-            <img src="/dafc-logo.png" alt="DAFC" className="h-10 w-auto object-contain flex-shrink-0" />
+            <img src="/dafc-logo.png" alt="DAFC" className="h-9 w-auto object-contain flex-shrink-0 -mt-[2px]" />
             <span
               className="flex-1 text-xs font-bold tracking-widest whitespace-nowrap leading-none"
               style={darkMode ? {
