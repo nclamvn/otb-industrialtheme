@@ -32,7 +32,10 @@ import {
   Settings,
   Save,
   ChevronDown,
-  Layers
+  Layers,
+  LineChart,
+  PieChart,
+  Activity
 } from 'lucide-react';
 
 // Screen configuration builder (uses t() for translations)
@@ -140,6 +143,30 @@ const getScreenConfig = (t) => ({
     step: null,
     kpiLabel: t('header.kpiSettings'),
     kpiDescription: t('header.kpiAppSettings')
+  },
+  'analytics-sales': {
+    label: t('analytics.salesPerformance', 'Sales Performance'),
+    shortLabel: 'Sales',
+    icon: LineChart,
+    step: null,
+    kpiLabel: t('analytics.salesPerformance', 'Sales'),
+    kpiDescription: t('analytics.salesDesc', 'SKU performance analysis')
+  },
+  'analytics-budget': {
+    label: t('analytics.budgetAnalytics', 'Budget Analytics'),
+    shortLabel: 'Budget',
+    icon: PieChart,
+    step: null,
+    kpiLabel: t('analytics.budgetAnalytics', 'Budget'),
+    kpiDescription: t('analytics.budgetDesc', 'Budget utilization trends')
+  },
+  'analytics-trends': {
+    label: t('analytics.categoryTrends', 'Category Trends'),
+    shortLabel: 'Trends',
+    icon: Activity,
+    step: null,
+    kpiLabel: t('analytics.categoryTrends', 'Trends'),
+    kpiDescription: t('analytics.trendsDesc', 'Attribute trends and YoY comparison')
   }
 });
 

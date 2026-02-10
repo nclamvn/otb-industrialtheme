@@ -17,6 +17,9 @@ export const ROUTE_MAP = {
   'approvals': '/approvals',
   'order-confirmation': '/order-confirmation',
   'receipt-confirmation': '/receipt-confirmation',
+  'analytics-sales': '/analytics/sales',
+  'analytics-budget': '/analytics/budget',
+  'analytics-trends': '/analytics/trends',
 };
 
 const PATHNAME_TO_SCREEN = {
@@ -33,6 +36,9 @@ const PATHNAME_TO_SCREEN = {
   '/approvals': 'approvals',
   '/order-confirmation': 'order-confirmation',
   '/receipt-confirmation': 'receipt-confirmation',
+  '/analytics/sales': 'analytics-sales',
+  '/analytics/budget': 'analytics-budget',
+  '/analytics/trends': 'analytics-trends',
 };
 
 export const getScreenIdFromPathname = (pathname) => {

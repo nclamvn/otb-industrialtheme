@@ -10,3 +10,4 @@ export { proposalService } from './proposalService';
 export { approvalService } from './approvalService';
 export { aiService } from './aiService';
 export { approvalWorkflowService } from './approvalWorkflowService';
+export { analyticsService } from './analyticsService';

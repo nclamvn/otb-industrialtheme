@@ -9,3 +9,6 @@ export { default as HomeScreen } from './HomeScreen';
 export { default as TicketScreen } from './TicketScreen';
 export { default as TicketDetailPage } from './TicketDetailPage';
 export { default as LoginScreen } from './LoginScreen';
+export { default as SalesPerformanceScreen } from './SalesPerformanceScreen';
+export { default as BudgetAnalyticsScreen } from './BudgetAnalyticsScreen';
+export { default as CategoryTrendsScreen } from './CategoryTrendsScreen';

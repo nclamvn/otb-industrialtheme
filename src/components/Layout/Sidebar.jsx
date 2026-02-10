@@ -7,7 +7,8 @@ import {
   Bot, Filter, ChevronDown, Wallet, FileCheck,
   ClipboardList, Receipt, Ticket, Home, LogOut,
   Settings, Crown, PanelLeftClose,
-  Database, Building2, FolderTree, Tag, Wand2
+  Database, Building2, FolderTree, Tag, Wand2,
+  LineChart, PieChart, Activity
 } from 'lucide-react';
 import { ROUTE_MAP } from '@/utils/routeMap';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -23,6 +24,7 @@ const Sidebar = ({ currentScreen, darkMode, setDarkMode, user, onLogout }) => {
   };
   const [isAIFeaturesOpen, setIsAIFeaturesOpen] = useState(false);
   const [isMasterDataOpen, setIsMasterDataOpen] = useState(false);
+  const [isAnalyticsOpen, setIsAnalyticsOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(true);
   const [openGroups, setOpenGroups] = useState({ planning: true, approval: false, confirmation: false });
   const [hoveredItem, setHoveredItem] = useState(null);
@@ -243,7 +245,9 @@ const Sidebar = ({ currentScreen, darkMode, setDarkMode, user, onLogout }) => {
               }} />
             </div>
             <CollapsedMenuItem item={{ id: 'master-brands', label: t('nav.masterData'), icon: Database }} />
-            <CollapsedMenuItem item={{ id: 'analytics', label: t('nav.analytics'), icon: BarChart3 }} showDividerAfter />
+            <CollapsedMenuItem item={{ id: 'analytics-sales', label: t('nav.salesPerformance', 'Sales'), icon: LineChart }} />
+            <CollapsedMenuItem item={{ id: 'analytics-budget', label: t('nav.budgetAnalytics', 'Budget'), icon: PieChart }} />
+            <CollapsedMenuItem item={{ id: 'analytics-trends', label: t('nav.categoryTrends', 'Trends'), icon: Activity }} showDividerAfter />
             <div className="relative">
               <button
                 onMouseEnter={() => setHoveredItem('ai')}
@@ -452,14 +456,83 @@ const Sidebar = ({ currentScreen, darkMode, setDarkMode, user, onLogout }) => {
               )}
             </div>
 
-            {/* Analytics */}
-            <button className="group w-full flex items-center gap-2 px-2.5 py-1 rounded-md transition-all duration-150">
-              <BarChart3 size={14} strokeWidth={2.5} className={`transition-colors duration-150 ${darkMode ? 'text-[#555555] group-hover:text-[#D7B797]' : 'text-gray-500 group-hover:text-[#8A6340]'}`} />
-              <span className={`text-[13px] font-medium font-['Montserrat'] transition-colors duration-150 whitespace-nowrap ${darkMode ? 'text-[#888888] group-hover:text-[#D7B797]' : 'text-gray-600 group-hover:text-[#8A6340]'}`}>
-                {t('nav.analytics')}
-              </span>
-              <ChevronRight size={10} strokeWidth={2.5} className={`ml-auto transition-colors duration-150 ${darkMode ? 'text-[#444444] group-hover:text-[#D7B797]' : 'text-gray-400 group-hover:text-[#8A6340]'}`} />
-            </button>
+            {/* Analytics - Expandable */}
+            <div>
+              <button
+                onClick={() => setIsAnalyticsOpen(!isAnalyticsOpen)}
+                className="group w-full px-2.5 py-1 flex items-center justify-between rounded-md transition-all duration-150 hover:bg-[rgba(215,183,151,0.04)]"
+              >
+                <div className="flex items-center gap-1.5">
+                  <BarChart3
+                    size={13}
+                    strokeWidth={2.5}
+                    className="transition-colors duration-150"
+                    style={{
+                      color: darkMode ? '#D7B797' : '#8A6340',
+                      filter: darkMode ? 'drop-shadow(0 0 3px rgba(215,183,151,0.3))' : 'none',
+                    }}
+                  />
+                  <span
+                    className="font-bold text-[10px] uppercase tracking-wider font-['Montserrat']"
+                    style={darkMode ? {
+                      background: 'linear-gradient(135deg, #888888 0%, #AAAAAA 100%)',
+                      WebkitBackgroundClip: 'text',
+                      WebkitTextFillColor: 'transparent',
+                      backgroundClip: 'text',
+                      color: 'transparent',
+                    } : {
+                      color: '#8A6340',
+                    }}
+                  >
+                    {t('nav.analytics')}
+                  </span>
+                </div>
+                <ChevronDown
+                  size={10}
+                  strokeWidth={2.5}
+                  className={`${darkMode ? 'text-[#444444]' : 'text-gray-400'} transition-transform duration-200 ${
+                    isAnalyticsOpen ? 'rotate-180' : ''
+                  }`}
+                />
+              </button>
+
+              {isAnalyticsOpen && (
+                <div className="space-y-px ml-1.5 pl-2.5 mt-0.5" style={{
+                  borderLeft: darkMode
+                    ? '1px solid rgba(215,183,151,0.1)'
+                    : '1px solid rgba(215,183,151,0.2)',
+                }}>
+                  {[
+                    { id: 'analytics-sales', label: t('nav.salesPerformance', 'Sales Performance'), icon: LineChart },
+                    { id: 'analytics-budget', label: t('nav.budgetAnalytics', 'Budget Analytics'), icon: PieChart },
+                    { id: 'analytics-trends', label: t('nav.categoryTrends', 'Category Trends'), icon: Activity },
+                  ].map((item) => {
+                    const isActive = currentScreen === item.id;
+                    return (
+                      <button
+                        key={item.id}
+                        onClick={() => navigateTo(item.id)}
+                        className="group w-full flex items-center gap-2 px-2.5 py-1 rounded-md transition-all duration-200"
+                        style={isActive ? {
+                          background: 'linear-gradient(135deg, rgba(215,183,151,0.06) 0%, rgba(215,183,151,0.14) 100%)',
+                          boxShadow: 'inset 0 0 0 1px rgba(215,183,151,0.1)',
+                        } : undefined}
+                      >
+                        <item.icon
+                          size={14}
+                          strokeWidth={2.5}
+                          className={`transition-colors duration-150 ${getIconClass(item.id)}`}
+                          style={isActive ? { filter: 'drop-shadow(0 0 4px rgba(215,183,151,0.4))' } : undefined}
+                        />
+                        <span className={`text-[13px] font-['Montserrat'] transition-colors duration-150 whitespace-nowrap ${getTextClass(item.id)}`}>
+                          {item.label}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
 
             {/* Gradient Divider */}
             <div className="py-1.5">
