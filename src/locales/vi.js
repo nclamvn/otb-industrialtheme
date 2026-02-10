@@ -49,6 +49,9 @@ const vi = {
     chartsComingSoon: 'Biểu đồ sắp ra mắt',
     entryPointSidebar: 'Điểm vào: Thanh bên',
     endOfFlow: 'Kết thúc luồng',
+    gender: 'Giới tính',
+    category: 'Danh mục',
+    subCategories: 'Danh mục phụ',
   },
 
   // ──────────────────────────────────────────────
@@ -77,6 +80,7 @@ const vi = {
     salesPerformance: 'Hiệu suất bán hàng',
     budgetAnalytics: 'Phân tích ngân sách',
     categoryTrends: 'Xu hướng danh mục',
+    importData: 'Nhập dữ liệu',
     aiFeatures: 'Tính năng AI',
     aiAssistant: 'Trợ lý AI',
     smartSuggestions: 'Gợi ý thông minh',
@@ -303,6 +307,7 @@ const vi = {
     loadingBudgets: 'Đang tải ngân sách...',
     failedToLoadBudgets: 'Tải ngân sách thất bại. Vui lòng kiểm tra kết nối và thử lại.',
     selectBrand: 'Chọn thương hiệu',
+    categoryBreakdown: 'Phân tích theo danh mục',
   },
 
   // ──────────────────────────────────────────────
@@ -966,6 +971,46 @@ const vi = {
     noTrends: 'Không có xu hướng',
     noYoYData: 'Không có dữ liệu YoY',
     noGenderData: 'Không có dữ liệu giới tính',
+  },
+
+  // ──────────────────────────────────────────────
+  // Import Data
+  // ──────────────────────────────────────────────
+  import: {
+    title: 'Nhập dữ liệu',
+    subtitle: 'Tải lên và quản lý dữ liệu nhập cho hệ thống OTB',
+    importConfig: 'Cấu hình nhập',
+    target: 'Mục tiêu',
+    mode: 'Chế độ nhập',
+    duplicateHandling: 'Xử lý trùng lặp',
+    matchKeys: 'Khóa khớp',
+    dropzone: 'Kéo thả file CSV/Excel vào đây hoặc nhấn để chọn',
+    supportedFormats: 'Hỗ trợ .csv, .tsv, .xlsx, .xls',
+    rows: 'dòng',
+    columns: 'cột',
+    showingPreview: 'Hiển thị 10 dòng đầu của',
+    startImport: 'Bắt đầu nhập',
+    abort: 'Hủy bỏ',
+    importComplete: 'Nhập hoàn tất',
+    totalRows: 'Tổng dòng',
+    inserted: 'Đã thêm',
+    updated: 'Đã cập nhật',
+    skipped: 'Đã bỏ qua',
+    errors: 'Lỗi',
+    errorDetails: 'Chi tiết lỗi',
+    upload: 'Tải lên',
+    viewData: 'Xem dữ liệu',
+    statistics: 'Thống kê',
+    searchRecords: 'Tìm kiếm bản ghi...',
+    clearAll: 'Xóa tất cả dữ liệu',
+    confirmClear: 'Xóa tất cả bản ghi cho',
+    records: 'bản ghi',
+    page: 'trang',
+    importedAt: 'Ngày nhập',
+    totalRecords: 'Tổng bản ghi',
+    sessions: 'Phiên',
+    lastImport: 'Lần nhập cuối',
+    fields: 'Trường',
   },
 };
 

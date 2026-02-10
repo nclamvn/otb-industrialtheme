@@ -10,7 +10,7 @@ import toast from 'react-hot-toast';
 import { formatCurrency } from '../utils';
 import { STORES, GENDERS } from '../utils/constants';
 import { budgetService, masterDataService, planningService } from '../services';
-import OtbAllocationAdvisor from '../components/OtbAllocationAdvisor';
+
 import { useLanguage } from '@/contexts/LanguageContext';
 
 // Constants
@@ -442,49 +442,6 @@ const OTBAnalysisScreen = ({ otbContext, onOpenSkuProposal, darkMode = false }) 
   const selectedVersion = versions.find(v => v.id === selectedVersionId);
 
   // Build current allocation from localData for AI comparison
-  const getCurrentAllocation = useCallback(() => {
-    const allocation = [];
-    collectionSections.forEach(section => {
-      const pcts = STORES.map(store => localData[`collection_${section.id}_${store.id}`]?.userBuyPct || 0);
-      const avg = pcts.reduce((s, v) => s + v, 0) / Math.max(pcts.filter(p => p > 0).length, 1);
-      if (avg > 0) allocation.push({ dimensionType: 'collection', dimensionValue: section.name, pct: avg });
-    });
-    GENDERS.forEach(gender => {
-      const pcts = STORES.map(store => localData[`gender_${gender.id}_${store.id}`]?.userBuyPct || 0);
-      const avg = pcts.reduce((s, v) => s + v, 0) / Math.max(pcts.filter(p => p > 0).length, 1);
-      if (avg > 0) allocation.push({ dimensionType: 'gender', dimensionValue: gender.name, pct: avg });
-    });
-    return allocation.length > 0 ? allocation : null;
-  }, [localData, collectionSections]);
-
-  // Handle applying AI allocation recommendations to localData
-  const handleApplyAiRecommendation = useCallback((recommendations) => {
-    if (!recommendations) return;
-    setLocalData(prev => {
-      const next = { ...prev };
-      (recommendations.collections || []).forEach(rec => {
-        const section = collectionSections.find(s => s.name === rec.dimensionValue);
-        if (section) {
-          STORES.forEach(store => {
-            const key = `collection_${section.id}_${store.id}`;
-            if (next[key]) next[key] = { ...next[key], userBuyPct: rec.recommendedPct };
-          });
-        }
-      });
-      (recommendations.genders || []).forEach(rec => {
-        const gender = GENDERS.find(g => g.name === rec.dimensionValue);
-        if (gender) {
-          STORES.forEach(store => {
-            const key = `gender_${gender.id}_${store.id}`;
-            if (next[key]) next[key] = { ...next[key], userBuyPct: rec.recommendedPct };
-          });
-        }
-      });
-      return next;
-    });
-    toast.success(t('common.save'));
-  }, [collectionSections]);
-
   // Calculate grand totals
   const grandTotals = useMemo(() => {
     let totalOtbValue = 0;
@@ -1634,20 +1591,6 @@ const OTBAnalysisScreen = ({ otbContext, onOpenSkuProposal, darkMode = false }) 
         </div>
       </div>
 
-      {/* AI Allocation Advisor */}
-      {selectedBudget && selectedSeasonGroup && selectedSeason && selectedBudget.details?.length > 0 && (
-        <OtbAllocationAdvisor
-          budgetDetailId={selectedBudget.details[0].id}
-          budgetAmount={Number(selectedBudget.details[0].budgetAmount) || selectedBudget.totalBudget || 0}
-          seasonGroup={selectedSeasonGroup}
-          seasonType={selectedSeason}
-          storeId={selectedBudget.details[0].storeId || selectedBudget.details[0].store?.id || null}
-          brandId={selectedBudget.brandId}
-          onApplyRecommendation={handleApplyAiRecommendation}
-          currentAllocation={getCurrentAllocation()}
-          darkMode={darkMode}
-        />
-      )}
 
       {/* Tabs & Content */}
       {selectedBudget && selectedSeason && selectedSeasonGroup && (

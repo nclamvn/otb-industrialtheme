@@ -49,6 +49,9 @@ const en = {
     chartsComingSoon: 'Charts coming soon',
     entryPointSidebar: 'Entry point: Sidebar',
     endOfFlow: 'End of flow',
+    gender: 'Gender',
+    category: 'Category',
+    subCategories: 'Sub-Categories',
   },
 
   // ──────────────────────────────────────────────
@@ -77,6 +80,7 @@ const en = {
     salesPerformance: 'Sales Performance',
     budgetAnalytics: 'Budget Analytics',
     categoryTrends: 'Category Trends',
+    importData: 'Import Data',
     aiFeatures: 'AI Features',
     aiAssistant: 'AI Assistant',
     smartSuggestions: 'Smart Suggestions',
@@ -303,6 +307,7 @@ const en = {
     loadingBudgets: 'Loading budgets...',
     failedToLoadBudgets: 'Failed to load budgets. Please check your connection and try again.',
     selectBrand: 'Select Brand',
+    categoryBreakdown: 'Category Breakdown',
   },
 
   // ──────────────────────────────────────────────
@@ -966,6 +971,46 @@ const en = {
     noTrends: 'No trend data',
     noYoYData: 'No YoY data',
     noGenderData: 'No gender data',
+  },
+
+  // ──────────────────────────────────────────────
+  // Import Data
+  // ──────────────────────────────────────────────
+  import: {
+    title: 'Import Data',
+    subtitle: 'Upload and manage imported data for OTB system',
+    importConfig: 'Import Configuration',
+    target: 'Target',
+    mode: 'Import Mode',
+    duplicateHandling: 'Duplicate Handling',
+    matchKeys: 'Match Keys',
+    dropzone: 'Drop CSV/Excel file here or click to browse',
+    supportedFormats: 'Supports .csv, .tsv, .xlsx, .xls',
+    rows: 'rows',
+    columns: 'columns',
+    showingPreview: 'Showing first 10 of',
+    startImport: 'Start Import',
+    abort: 'Abort',
+    importComplete: 'Import Complete',
+    totalRows: 'Total Rows',
+    inserted: 'Inserted',
+    updated: 'Updated',
+    skipped: 'Skipped',
+    errors: 'Errors',
+    errorDetails: 'Error Details',
+    upload: 'Upload',
+    viewData: 'View Data',
+    statistics: 'Statistics',
+    searchRecords: 'Search records...',
+    clearAll: 'Clear all data',
+    confirmClear: 'Clear all records for',
+    records: 'records',
+    page: 'page',
+    importedAt: 'Imported At',
+    totalRecords: 'Total Records',
+    sessions: 'Sessions',
+    lastImport: 'Last Import',
+    fields: 'Fields',
   },
 };
 
