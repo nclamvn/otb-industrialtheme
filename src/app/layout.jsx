@@ -19,6 +19,13 @@ const jetbrainsMono = JetBrains_Mono({
 export const metadata = {
   title: 'DAFC OTB Planning System',
   description: 'DAFC OTB Planning Management System',
+  viewport: {
+    width: 'device-width',
+    initialScale: 1,
+    maximumScale: 1,
+    userScalable: false,
+    viewportFit: 'cover',
+  },
 };
 
 export default function RootLayout({ children }) {

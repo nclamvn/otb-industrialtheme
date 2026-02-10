@@ -11,6 +11,8 @@ import { budgetService, masterDataService } from '../services';
 import { LoadingSpinner, ErrorMessage, EmptyState, ExpandableStatCard } from '../components/Common';
 import BudgetAlertsBanner from '../components/BudgetAlertsBanner';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useIsMobile } from '@/hooks/useIsMobile';
+import { MobileFilterSheet, MobileDataCard } from '@/components/ui';
 
 const YEARS = [2023, 2024, 2025, 2026];
 
@@ -31,6 +33,8 @@ const BudgetManagementScreen = ({
   darkMode = false
 }) => {
   const { t } = useLanguage();
+  const { isMobile } = useIsMobile();
+  const [showMobileFilters, setShowMobileFilters] = useState(false);
 
   // API state
   const [budgetData, setBudgetData] = useState([]);
@@ -221,14 +225,58 @@ const BudgetManagementScreen = ({
       {/* Budget Alerts Banner */}
       <BudgetAlertsBanner darkMode={darkMode} />
 
+      {/* Mobile Filter Sheet */}
+      {isMobile && (
+        <MobileFilterSheet
+          isOpen={showMobileFilters}
+          onClose={() => setShowMobileFilters(false)}
+          darkMode={darkMode}
+          title={t('budget.filters')}
+          filters={[
+            { key: 'year', label: t('budget.fiscalYear'), type: 'select', options: YEARS.map(y => ({ value: y, label: `FY${y}` })) },
+            { key: 'groupBrand', label: t('budget.groupBrand'), type: 'select', options: groupBrandCategories.map(g => ({ value: g.id, label: g.name })) },
+            { key: 'brand', label: t('budget.brand'), type: 'select', options: brandList.map(b => ({ value: b.id, label: b.name })) },
+            { key: 'search', label: t('budget.searchBudgets'), type: 'search' },
+          ]}
+          values={{ year: selectedYear || '', groupBrand: selectedGroupBrand || '', brand: selectedBrand || '', search: searchQuery }}
+          onApply={(v) => {
+            setSelectedYear(v.year ? Number(v.year) : null);
+            setSelectedGroupBrand(v.groupBrand || null);
+            setSelectedBrand(v.brand || null);
+            setSearchQuery(v.search || '');
+          }}
+          onReset={clearFilters}
+        />
+      )}
+
       {/* Filters Section */}
       <div className={`rounded-lg shadow-sm border px-3 py-2 ${darkMode ? 'bg-[#121212] border-[#2E2E2E]' : 'bg-white border-[#C4B5A5]'}`}>
         <div className="flex flex-wrap items-center gap-2">
-          <Filter size={14} className={`shrink-0 ${darkMode ? 'text-[#999999]' : 'text-[#666666]'}`} />
-          <span className={`text-xs font-medium font-['Montserrat'] shrink-0 ${darkMode ? 'text-[#999999]' : 'text-[#666666]'}`}>{t('budget.filters')}</span>
-          <div className={`h-5 w-px shrink-0 ${darkMode ? 'bg-[#2E2E2E]' : 'bg-[#C4B5A5]/50'}`}></div>
-          {/* Year Filter */}
-          <div className="relative">
+          {isMobile ? (
+            <>
+              <button
+                onClick={() => setShowMobileFilters(true)}
+                className={`flex items-center gap-1.5 px-3 py-1.5 border rounded-lg text-xs font-medium ${
+                  hasActiveFilters
+                    ? darkMode ? 'border-[rgba(215,183,151,0.3)] bg-[rgba(215,183,151,0.08)] text-[#D7B797]' : 'border-[rgba(215,183,151,0.4)] bg-[rgba(215,183,151,0.1)] text-[#8A6340]'
+                    : darkMode ? 'border-[#2E2E2E] text-[#999999]' : 'border-[#C4B5A5] text-[#666666]'
+                }`}
+              >
+                <Filter size={14} />
+                {t('budget.filters')}
+                {hasActiveFilters && <span className="w-1.5 h-1.5 rounded-full bg-dafc-gold" />}
+              </button>
+              <div className="flex-1" />
+            </>
+          ) : (
+            <>
+              <Filter size={14} className={`shrink-0 ${darkMode ? 'text-[#999999]' : 'text-[#666666]'}`} />
+              <span className={`text-xs font-medium font-['Montserrat'] shrink-0 ${darkMode ? 'text-[#999999]' : 'text-[#666666]'}`}>{t('budget.filters')}</span>
+              <div className={`h-5 w-px shrink-0 ${darkMode ? 'bg-[#2E2E2E]' : 'bg-[#C4B5A5]/50'}`}></div>
+            </>
+          )}
+          {/* Desktop filters - hidden on mobile */}
+          {!isMobile && <><div className="relative">
             <button
               onClick={() => {
                 setYearDropdownOpen(!yearDropdownOpen);
@@ -366,7 +414,7 @@ const BudgetManagementScreen = ({
               onChange={(e) => setSearchQuery(e.target.value)}
               className={`w-full pl-8 pr-3 py-1.5 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#D7B797] focus:border-transparent ${darkMode ? 'bg-[#1A1A1A] border-[#2E2E2E] text-[#F2F2F2] placeholder-[#666666]' : 'bg-white border-[#C4B5A5] text-[#0A0A0A] placeholder-[#999999]'}`}
             />
-          </div>
+          </div></>}
 
           {/* Currency Toggle */}
           <div className={`flex items-center rounded-lg p-1 ${darkMode ? 'bg-[#1A1A1A]' : 'bg-[#F2F2F2]'}`}>
@@ -449,7 +497,7 @@ const BudgetManagementScreen = ({
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-3 gap-2">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
         <ExpandableStatCard
           title={t('budget.totalBudget')}
           value={formatCurrency(summaryStats.total, { currency })}
@@ -495,8 +543,43 @@ const BudgetManagementScreen = ({
         />
       </div>
 
-      {/* Data Table */}
-      {viewMode === 'table' && (
+      {/* Data Table / Mobile Cards */}
+      {viewMode === 'table' && isMobile && (
+        <div className="space-y-3">
+          {filteredBudgets.length === 0 ? (
+            <div className="py-8">
+              <EmptyState
+                darkMode={darkMode}
+                title={hasActiveFilters ? t('budget.noMatchingBudgets') : t('budget.noBudgetsYet')}
+                message={hasActiveFilters ? t('budget.tryAdjustingFilters') : t('budget.createFirstBudget')}
+                actionLabel={hasActiveFilters ? undefined : t('budget.createBudget')}
+                onAction={hasActiveFilters ? undefined : () => setShowCreateModal(true)}
+              />
+            </div>
+          ) : (
+            filteredBudgets.map((budget) => (
+              <MobileDataCard
+                key={budget.id}
+                darkMode={darkMode}
+                title={budget.budgetName}
+                subtitle={`FY${budget.fiscalYear} · ${budget.brandName}`}
+                status={budget.status}
+                statusColor={budget.status === 'approved' ? 'success' : budget.status === 'pending' ? 'warning' : 'neutral'}
+                metrics={[
+                  { label: t('budget.groupBrand'), value: budget.groupBrand },
+                  { label: t('budget.amount'), value: formatCurrency(budget.totalBudget, { currency }) },
+                ]}
+                actions={[
+                  { label: t('budget.view'), onClick: () => { setSelectedBudget(budget); setShowViewModal(true); } },
+                  { label: t('budget.allocate'), primary: true, onClick: () => onAllocate?.({ id: budget.id, year: budget.fiscalYear, groupBrand: budget.groupBrand, brandId: budget.brandId, brandName: budget.brandName, totalBudget: budget.totalBudget, budgetName: budget.budgetName }) },
+                ]}
+              />
+            ))
+          )}
+        </div>
+      )}
+
+      {viewMode === 'table' && !isMobile && (
         <div className={`rounded-xl shadow-sm border overflow-hidden ${darkMode ? 'bg-[#121212] border-[#2E2E2E]' : 'bg-white border-[#C4B5A5]'}`}>
           <table className="w-full">
             <thead className={darkMode ? 'bg-[#1A1A1A]' : 'bg-[rgba(160,120,75,0.18)]'}>

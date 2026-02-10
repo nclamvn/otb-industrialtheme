@@ -11,6 +11,8 @@ import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { formatCurrency } from '../utils';
 import { ExpandableStatCard } from '../components/Common';
+import { useIsMobile } from '@/hooks/useIsMobile';
+import { SwipeAction, MobileDataCard, MobileFilterSheet } from '@/components/ui';
 
 /* ═══════════════════════════════════════════════
    STATUS CONFIG
@@ -37,15 +39,17 @@ const ENTITY_ICONS = {
 const ApprovalsScreen = ({ darkMode }) => {
   const { user } = useAuth();
   const { t } = useLanguage();
+  const { isMobile } = useIsMobile();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [entityFilter, setEntityFilter] = useState('all');
   const [levelFilter, setLevelFilter] = useState('all');
-  const [actionModal, setActionModal] = useState(null); // { item, action: 'approve'|'reject' }
+  const [actionModal, setActionModal] = useState(null);
   const [comment, setComment] = useState('');
   const [processing, setProcessing] = useState(false);
+  const [showMobileFilters, setShowMobileFilters] = useState(false);
 
   // Fetch pending approvals
   useEffect(() => {
@@ -131,13 +135,40 @@ const ApprovalsScreen = ({ darkMode }) => {
 
   const bg = darkMode ? 'bg-[#0A0A0A]' : 'bg-gray-50';
   const cardBg = darkMode ? 'bg-[#121212]' : 'bg-white';
-  const border = darkMode ? 'border-[#2E2E2E]' : 'border-gray-200';
+  const border = darkMode ? 'border-[#2E2E2E]' : 'border-gray-300';
   const textPrimary = darkMode ? 'text-[#F2F2F2]' : 'text-gray-900';
-  const textSecondary = darkMode ? 'text-[#999999]' : 'text-gray-600';
-  const textMuted = darkMode ? 'text-[#666666]' : 'text-gray-500';
+  const textSecondary = darkMode ? 'text-[#999999]' : 'text-gray-700';
+  const textMuted = darkMode ? 'text-[#666666]' : 'text-gray-600';
 
   return (
-    <div className={`min-h-screen ${bg} p-4`}>
+    <div className={`min-h-screen ${bg} ${isMobile ? 'p-0' : 'p-4'}`}>
+      {/* Mobile Filter Sheet */}
+      {isMobile && (
+        <MobileFilterSheet
+          isOpen={showMobileFilters}
+          onClose={() => setShowMobileFilters(false)}
+          darkMode={darkMode}
+          title={t('budget.filters')}
+          filters={[
+            { key: 'entityFilter', label: t('approvals.colType'), type: 'select', options: [
+              { value: 'all', label: t('approvals.allTypes') },
+              { value: 'budget', label: t('approvals.typeBudget') },
+              { value: 'planning', label: t('approvals.typePlanning') },
+              { value: 'proposal', label: t('approvals.typeProposal') },
+            ]},
+            { key: 'levelFilter', label: t('approvals.colLevel'), type: 'select', options: [
+              { value: 'all', label: t('approvals.allLevels') },
+              { value: '1', label: 'Level 1' },
+              { value: '2', label: 'Level 2' },
+            ]},
+            { key: 'search', label: t('approvals.searchPlaceholder'), type: 'search' },
+          ]}
+          values={{ entityFilter, levelFilter, search: searchTerm }}
+          onApply={(v) => { setEntityFilter(v.entityFilter || 'all'); setLevelFilter(v.levelFilter || 'all'); setSearchTerm(v.search || ''); }}
+          onReset={() => { setEntityFilter('all'); setLevelFilter('all'); setSearchTerm(''); }}
+        />
+      )}
+
       {/* Compact Header + Filters */}
       <div className={`border ${border} rounded-xl px-3 py-2 mb-3`} style={{
         background: darkMode
@@ -147,7 +178,7 @@ const ApprovalsScreen = ({ darkMode }) => {
       }}>
         <div className="flex items-center gap-3">
           <div className={`w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 ${darkMode ? 'bg-[rgba(215,183,151,0.1)]' : 'bg-[rgba(215,183,151,0.15)]'}`}>
-            <FileCheck size={14} className={darkMode ? 'text-[#D7B797]' : 'text-[#8A6340]'} />
+            <FileCheck size={14} className={darkMode ? 'text-[#D7B797]' : 'text-[#6B4D30]'} />
           </div>
           <div className="flex-shrink-0">
             <h1 className={`text-sm font-semibold font-['Montserrat'] ${textPrimary} leading-tight`}>
@@ -159,55 +190,71 @@ const ApprovalsScreen = ({ darkMode }) => {
           </div>
 
           <div className="flex items-center gap-2 ml-auto">
-            <div className={`flex items-center gap-1.5 px-2 py-1 rounded-lg border ${border} ${darkMode ? 'bg-[#1A1A1A]' : 'bg-gray-50'} w-48`}>
-              <Search size={12} className={textMuted} />
-              <input
-                type="text"
-                placeholder={t('approvals.searchPlaceholder')}
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className={`bg-transparent outline-none text-xs w-full font-['Montserrat'] ${textPrimary} placeholder:${textMuted}`}
-              />
-              {searchTerm && (
-                <button onClick={() => setSearchTerm('')}>
-                  <X size={10} className={textMuted} />
+            {isMobile ? (
+              <button
+                onClick={() => setShowMobileFilters(true)}
+                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg border ${border} text-xs font-medium ${
+                  (entityFilter !== 'all' || levelFilter !== 'all' || searchTerm)
+                    ? darkMode ? 'border-[rgba(215,183,151,0.3)] text-[#D7B797]' : 'border-[rgba(215,183,151,0.4)] text-[#8A6340]'
+                    : darkMode ? 'text-[#999999]' : 'text-[#666666]'
+                }`}
+              >
+                <Filter size={12} />
+                {t('budget.filters')}
+              </button>
+            ) : (
+              <>
+                <div className={`flex items-center gap-1.5 px-2 py-1 rounded-lg border ${border} ${darkMode ? 'bg-[#1A1A1A]' : 'bg-gray-50'} w-48`}>
+                  <Search size={12} className={textMuted} />
+                  <input
+                    type="text"
+                    placeholder={t('approvals.searchPlaceholder')}
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className={`bg-transparent outline-none text-xs w-full font-['Montserrat'] ${textPrimary} placeholder:${textMuted}`}
+                  />
+                  {searchTerm && (
+                    <button onClick={() => setSearchTerm('')}>
+                      <X size={10} className={textMuted} />
+                    </button>
+                  )}
+                </div>
+
+                <div className="relative">
+                  <select
+                    value={entityFilter}
+                    onChange={(e) => setEntityFilter(e.target.value)}
+                    className={`appearance-none px-2 py-1 pr-6 rounded-lg border ${border} ${darkMode ? 'bg-[#1A1A1A]' : 'bg-gray-50'} text-xs font-['Montserrat'] ${textPrimary} outline-none cursor-pointer`}
+                  >
+                    <option value="all">{t('approvals.allTypes')}</option>
+                    <option value="budget">{t('approvals.typeBudget')}</option>
+                    <option value="planning">{t('approvals.typePlanning')}</option>
+                    <option value="proposal">{t('approvals.typeProposal')}</option>
+                  </select>
+                  <ChevronDown size={10} className={`absolute right-1.5 top-1/2 -translate-y-1/2 pointer-events-none ${textMuted}`} />
+                </div>
+
+                <div className="relative">
+                  <select
+                    value={levelFilter}
+                    onChange={(e) => setLevelFilter(e.target.value)}
+                    className={`appearance-none px-2 py-1 pr-6 rounded-lg border ${border} ${darkMode ? 'bg-[#1A1A1A]' : 'bg-gray-50'} text-xs font-['Montserrat'] ${textPrimary} outline-none cursor-pointer`}
+                  >
+                    <option value="all">{t('approvals.allLevels')}</option>
+                    <option value="1">Level 1</option>
+                    <option value="2">Level 2</option>
+                  </select>
+                  <ChevronDown size={10} className={`absolute right-1.5 top-1/2 -translate-y-1/2 pointer-events-none ${textMuted}`} />
+                </div>
+
+                <button
+                  onClick={fetchPendingApprovals}
+                  className={`px-2.5 py-1 rounded-lg border ${border} text-xs font-medium font-['Montserrat'] transition-all ${darkMode ? 'text-[#D7B797] hover:bg-[rgba(215,183,151,0.08)]' : 'text-[#6B4D30] hover:bg-[rgba(215,183,151,0.1)]'}`}
+                >
+                  {t('common.refresh')}
                 </button>
-              )}
-            </div>
-
-            <div className="relative">
-              <select
-                value={entityFilter}
-                onChange={(e) => setEntityFilter(e.target.value)}
-                className={`appearance-none px-2 py-1 pr-6 rounded-lg border ${border} ${darkMode ? 'bg-[#1A1A1A]' : 'bg-gray-50'} text-xs font-['Montserrat'] ${textPrimary} outline-none cursor-pointer`}
-              >
-                <option value="all">{t('approvals.allTypes')}</option>
-                <option value="budget">{t('approvals.typeBudget')}</option>
-                <option value="planning">{t('approvals.typePlanning')}</option>
-                <option value="proposal">{t('approvals.typeProposal')}</option>
-              </select>
-              <ChevronDown size={10} className={`absolute right-1.5 top-1/2 -translate-y-1/2 pointer-events-none ${textMuted}`} />
-            </div>
-
-            <div className="relative">
-              <select
-                value={levelFilter}
-                onChange={(e) => setLevelFilter(e.target.value)}
-                className={`appearance-none px-2 py-1 pr-6 rounded-lg border ${border} ${darkMode ? 'bg-[#1A1A1A]' : 'bg-gray-50'} text-xs font-['Montserrat'] ${textPrimary} outline-none cursor-pointer`}
-              >
-                <option value="all">{t('approvals.allLevels')}</option>
-                <option value="1">Level 1</option>
-                <option value="2">Level 2</option>
-              </select>
-              <ChevronDown size={10} className={`absolute right-1.5 top-1/2 -translate-y-1/2 pointer-events-none ${textMuted}`} />
-            </div>
-
-            <button
-              onClick={fetchPendingApprovals}
-              className={`px-2.5 py-1 rounded-lg border ${border} text-xs font-medium font-['Montserrat'] transition-all ${darkMode ? 'text-[#D7B797] hover:bg-[rgba(215,183,151,0.08)]' : 'text-[#8A6340] hover:bg-[rgba(215,183,151,0.1)]'}`}
-            >
-              {t('common.refresh')}
-            </button>
+              </>
+            )}
           </div>
         </div>
       </div>
@@ -269,7 +316,7 @@ const ApprovalsScreen = ({ darkMode }) => {
       }}>
         {loading ? (
           <div className="flex flex-col items-center justify-center py-20">
-            <Loader2 size={32} className="animate-spin text-[#D7B797]" />
+            <Loader2 size={32} className={`animate-spin ${darkMode ? 'text-[#D7B797]' : 'text-[#6B4D30]'}`} />
             <p className={`text-sm mt-3 ${textSecondary}`}>{t('approvals.loadingApprovals')}</p>
           </div>
         ) : error ? (
@@ -286,7 +333,45 @@ const ApprovalsScreen = ({ darkMode }) => {
             <p className={`text-base font-semibold mt-4 font-['Montserrat'] ${textPrimary}`}>{t('approvals.allCaughtUp')}</p>
             <p className={`text-sm mt-1 ${textSecondary}`}>{t('approvals.noPendingItems')}</p>
           </div>
+        ) : isMobile ? (
+          /* Mobile: Swipeable Cards */
+          <div className="p-3 space-y-3">
+            {filtered.map((item, idx) => {
+              const status = item.data?.status || 'SUBMITTED';
+              const sc = STATUS_CONFIG[status] || STATUS_CONFIG.SUBMITTED;
+              const name = item.data?.name || item.data?.budgetName || `${item.entityType} #${item.entityId}`;
+              const brand = item.data?.brand?.name || item.data?.brandName || '-';
+
+              return (
+                <SwipeAction
+                  key={`${item.entityType}-${item.entityId}-${idx}`}
+                  darkMode={darkMode}
+                  onSwipeRight={() => { setActionModal({ item, action: 'approve' }); setComment(''); }}
+                  onSwipeLeft={() => { setActionModal({ item, action: 'reject' }); setComment(''); }}
+                  rightLabel={t('approvals.approve')}
+                  leftLabel={t('approvals.reject')}
+                >
+                  <MobileDataCard
+                    darkMode={darkMode}
+                    title={name}
+                    subtitle={`${ENTITY_ICONS[item.entityType] || '📋'} ${item.entityType} · ${brand}`}
+                    status={sc.label}
+                    statusColor={sc.color === '#2A9E6A' ? 'success' : sc.color === '#F85149' ? 'critical' : sc.color === '#58A6FF' ? 'info' : 'warning'}
+                    metrics={[
+                      { label: t('approvals.colLevel'), value: `Level ${item.level}` },
+                      { label: t('approvals.colSubmitted'), value: item.submittedAt ? new Date(item.submittedAt).toLocaleDateString('vi-VN') : '-' },
+                    ]}
+                    actions={[
+                      { label: t('approvals.reject'), onClick: () => { setActionModal({ item, action: 'reject' }); setComment(''); } },
+                      { label: t('approvals.approve'), primary: true, onClick: () => { setActionModal({ item, action: 'approve' }); setComment(''); } },
+                    ]}
+                  />
+                </SwipeAction>
+              );
+            })}
+          </div>
         ) : (
+          /* Desktop: Table */
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
@@ -310,7 +395,6 @@ const ApprovalsScreen = ({ darkMode }) => {
                       key={`${item.entityType}-${item.entityId}-${idx}`}
                       className={`border-b ${border} transition-colors ${darkMode ? 'hover:bg-[#1A1A1A]' : 'hover:bg-gray-50'}`}
                     >
-                      {/* Type */}
                       <td className="px-3 py-1.5">
                         <div className="flex items-center gap-2">
                           <span className="text-base">{ENTITY_ICONS[item.entityType] || '📋'}</span>
@@ -319,49 +403,30 @@ const ApprovalsScreen = ({ darkMode }) => {
                           </span>
                         </div>
                       </td>
-
-                      {/* Name */}
                       <td className="px-3 py-1.5">
                         <span className={`text-sm font-medium font-['Montserrat'] ${textPrimary}`}>{name}</span>
                       </td>
-
-                      {/* Brand */}
                       <td className="px-3 py-1.5">
                         <span className={`text-sm font-['Montserrat'] ${textSecondary}`}>{brand}</span>
                       </td>
-
-                      {/* Level */}
                       <td className="px-3 py-1.5">
-                        <span
-                          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold font-['JetBrains_Mono']"
-                          style={{
-                            color: item.level === 1 ? '#58A6FF' : '#A371F7',
-                            backgroundColor: item.level === 1 ? 'rgba(88,166,255,0.12)' : 'rgba(163,113,247,0.12)',
-                          }}
-                        >
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold font-['JetBrains_Mono']"
+                          style={{ color: item.level === 1 ? '#58A6FF' : '#A371F7', backgroundColor: item.level === 1 ? 'rgba(88,166,255,0.12)' : 'rgba(163,113,247,0.12)' }}>
                           L{item.level}
                         </span>
                       </td>
-
-                      {/* Status */}
                       <td className="px-3 py-1.5">
-                        <span
-                          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold font-['JetBrains_Mono']"
-                          style={{ color: sc.color, backgroundColor: sc.bg }}
-                        >
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold font-['JetBrains_Mono']"
+                          style={{ color: sc.color, backgroundColor: sc.bg }}>
                           <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: sc.color }} />
                           {sc.label}
                         </span>
                       </td>
-
-                      {/* Submitted At */}
                       <td className="px-3 py-1.5">
                         <span className={`text-xs font-['JetBrains_Mono'] ${textMuted}`}>
                           {item.submittedAt ? new Date(item.submittedAt).toLocaleDateString('vi-VN') : '-'}
                         </span>
                       </td>
-
-                      {/* Actions */}
                       <td className="px-3 py-1.5">
                         <div className="flex items-center gap-2">
                           <button

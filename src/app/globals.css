@@ -65,10 +65,10 @@
     --popover: 0 0% 100%;
     --popover-foreground: 25 20% 12%;
     --muted: 30 12% 90%;
-    --muted-foreground: 25 10% 35%;
-    --border: 30 15% 72%;
+    --muted-foreground: 25 12% 28%;
+    --border: 30 18% 62%;
     --input: 30 10% 92%;
-    --primary: 30 50% 52%;
+    --primary: 30 55% 42%;
     --primary-foreground: 0 0% 100%;
     --secondary: 152 73% 27%;
     --secondary-foreground: 0 0% 95%;
@@ -76,8 +76,8 @@
     --destructive-foreground: 0 0% 95%;
 
     /* Light Mode Hover */
-    --hover-bg: rgba(160, 120, 75, 0.12);
-    --hover-border: rgba(138, 99, 64, 0.45);
+    --hover-bg: rgba(140, 100, 55, 0.16);
+    --hover-border: rgba(120, 85, 50, 0.55);
     --hover-text: #6B4D30;
   }
 
@@ -403,27 +403,27 @@
 
   /* Light Mode Status Badges */
   .light .ind-badge-critical {
-    background: rgba(204, 31, 31, 0.12);
+    background: rgba(204, 31, 31, 0.16);
     color: #B91C1C;
-    border-color: rgba(204, 31, 31, 0.35);
+    border-color: rgba(204, 31, 31, 0.45);
   }
 
   .light .ind-badge-warning {
-    background: rgba(180, 117, 0, 0.12);
+    background: rgba(180, 117, 0, 0.16);
     color: #92610A;
-    border-color: rgba(180, 117, 0, 0.35);
+    border-color: rgba(180, 117, 0, 0.45);
   }
 
   .light .ind-badge-success {
-    background: rgba(9, 84, 49, 0.12);
+    background: rgba(9, 84, 49, 0.16);
     color: #065F32;
-    border-color: rgba(9, 84, 49, 0.35);
+    border-color: rgba(9, 84, 49, 0.45);
   }
 
   .light .ind-badge-info {
-    background: rgba(26, 93, 201, 0.12);
+    background: rgba(26, 93, 201, 0.16);
     color: #1A5DC9;
-    border-color: rgba(26, 93, 201, 0.35);
+    border-color: rgba(26, 93, 201, 0.45);
   }
 
   /* DAFC Badge (Pill) */
@@ -445,9 +445,9 @@
   }
 
   .light .dafc-badge-gold {
-    background: rgba(138, 99, 64, 0.12);
-    color: #6B4D30;
-    border: 1px solid rgba(138, 99, 64, 0.35);
+    background: rgba(138, 99, 64, 0.18);
+    color: #5A3D22;
+    border: 1px solid rgba(138, 99, 64, 0.45);
   }
 
   .dark .dafc-badge-green,
@@ -458,9 +458,9 @@
   }
 
   .light .dafc-badge-green {
-    background: rgba(9, 84, 49, 0.1);
+    background: rgba(9, 84, 49, 0.14);
     color: #065F32;
-    border: 1px solid rgba(9, 84, 49, 0.3);
+    border: 1px solid rgba(9, 84, 49, 0.4);
   }
 
   /* === Industrial Input === */
@@ -868,6 +868,50 @@ button:active {
 .stagger-3 { animation-delay: 300ms; }
 .stagger-4 { animation-delay: 400ms; }
 .stagger-5 { animation-delay: 500ms; }
+
+/* ===== MOBILE-SPECIFIC STYLES ===== */
+@media (max-width: 767px) {
+  /* Prevent double-tap zoom on interactive elements */
+  button, a, input, select, textarea, [role="button"] {
+    touch-action: manipulation;
+  }
+
+  /* Minimum touch targets */
+  button, [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Increase form input heights for touch */
+  input, select, textarea {
+    min-height: 48px;
+    font-size: 16px !important; /* Prevents iOS zoom on focus */
+  }
+
+  /* Status badges - larger on mobile */
+  .ind-badge, .dafc-badge {
+    font-size: 13px;
+    height: 24px;
+    padding: 0 10px;
+  }
+
+  /* Hide scrollbars on mobile for cleaner look */
+  ::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+  }
+
+  /* Mobile skeleton loading shapes */
+  .skeleton-card {
+    height: 120px;
+    border-radius: 12px;
+  }
+
+  /* Smooth momentum scrolling */
+  .overflow-y-auto, .overflow-x-auto {
+    -webkit-overflow-scrolling: touch;
+  }
+}
 
 /* ===== KEYFRAME ANIMATIONS ===== */
 @keyframes shimmer {

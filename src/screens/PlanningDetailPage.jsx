@@ -11,6 +11,7 @@ import { formatCurrency } from '../utils';
 import { GENDERS, STORES } from '../utils/constants';
 import { masterDataService, planningService } from '../services';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useIsMobile } from '@/hooks/useIsMobile';
 
 const TABS = [
   { id: 'collection', label: 'Collection', icon: Layers },
@@ -88,6 +89,7 @@ const PlanningDetailPage = ({
   onSave
 }) => {
   const { t } = useLanguage();
+  const { isMobile } = useIsMobile();
   const [activeTab, setActiveTab] = useState('collection');
   const [editingCell, setEditingCell] = useState(null);
   const [editValue, setEditValue] = useState('');
@@ -973,7 +975,7 @@ const PlanningDetailPage = ({
                                   <th className="px-3 py-2 text-center text-xs font-semibold text-[#666666] uppercase">{t('planningDetail.pctBuy')}</th>
                                   <th className="px-3 py-2 text-center text-xs font-semibold text-[#666666] uppercase">{t('planningDetail.pctSales')}</th>
                                   <th className="px-3 py-2 text-center text-xs font-semibold text-[#666666] uppercase">{t('planningDetail.pctST')}</th>
-                                  <th className="px-3 py-2 text-center text-xs font-semibold text-[#8A6340] uppercase bg-[rgba(160,120,75,0.28)]">{t('planningDetail.pctProposed')}</th>
+                                  <th className="px-3 py-2 text-center text-xs font-semibold text-[#6B4D30] uppercase bg-[rgba(160,120,75,0.28)]">{t('planningDetail.pctProposed')}</th>
                                   <th className="px-3 py-2 text-center text-xs font-semibold text-[#666666] uppercase">{t('planningDetail.dollarOtbProposed')}</th>
                                   <th className="px-3 py-2 text-center text-xs font-semibold text-[#666666] uppercase">{t('planningDetail.pctVar2025_2026')}</th>
                                   <th className="px-3 py-2 text-center text-xs font-semibold text-[#666666] uppercase">{t('planningDetail.otbSubmitted')}</th>
@@ -1036,7 +1038,7 @@ const PlanningDetailPage = ({
                                   <td className="px-3 py-2 text-center text-[#5C4A32]">{catTotals.buyPct}%</td>
                                   <td className="px-3 py-2 text-center text-[#5C4A32]">{catTotals.salesPct}%</td>
                                   <td className="px-3 py-2 text-center text-[#5C4A32]">{catTotals.stPct}%</td>
-                                  <td className="px-3 py-2 text-center text-[#8A6340] bg-[rgba(160,120,75,0.22)] font-bold">{catTotals.buyProposed}%</td>
+                                  <td className="px-3 py-2 text-center text-[#6B4D30] bg-[rgba(160,120,75,0.22)] font-bold">{catTotals.buyProposed}%</td>
                                   <td className="px-3 py-2 text-center text-[#5C4A32] font-bold">{catTotals.otbProposed.toLocaleString()}</td>
                                   <td className={`px-3 py-2 text-center font-bold ${
                                     catTotals.varPct < 0 ? 'text-red-600' : 'text-[#5C4A32]'
@@ -1226,13 +1228,13 @@ const PlanningDetailPage = ({
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/30 animate-in fade-in duration-500 overflow-x-hidden">
       {/* Header */}
-      <div className="bg-gradient-to-r from-blue-600 to-blue-500 px-8 py-6 shadow-xl relative z-50">
+      <div className="bg-gradient-to-r from-blue-600 to-blue-500 px-4 md:px-8 py-3 md:py-6 shadow-xl relative z-50">
         <div className="absolute inset-0 bg-white/5 backdrop-blur-xl"></div>
         <div className="absolute inset-0 animate-shimmer bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
 
-        <div className="relative flex items-center justify-between">
+        <div className="relative flex flex-wrap items-center justify-between gap-3">
           {/* Left - Back & Title */}
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-3 md:gap-6">
             <button
               onClick={onBack}
               className="p-3 bg-white/20 hover:bg-white/30 rounded-xl text-white transition-all duration-300"
@@ -1251,14 +1253,14 @@ const PlanningDetailPage = ({
           </div>
 
           {/* Center - Budget Info */}
-          <div className="flex items-center gap-8">
-            <div className="text-center px-6 py-2 bg-white/10 rounded-xl backdrop-blur-sm">
+          <div className="flex flex-wrap items-center gap-3 md:gap-8">
+            <div className="text-center px-3 md:px-6 py-2 bg-white/10 rounded-xl backdrop-blur-sm">
               <div className="text-xs text-blue-100 uppercase tracking-wide">{t('planningDetail.totalBudget')}</div>
               <div className="text-2xl font-bold text-white">
                 {formatCurrency(selectedBudgetDetail.budget?.totalBudget || 0)}
               </div>
             </div>
-            <div className="text-center px-6 py-2 bg-white/10 rounded-xl backdrop-blur-sm">
+            <div className="text-center px-3 md:px-6 py-2 bg-white/10 rounded-xl backdrop-blur-sm">
               <div className="text-xs text-blue-100 uppercase tracking-wide">{t('planningDetail.allocated')}</div>
               <div className="text-2xl font-bold text-emerald-300">
                 {formatCurrency(grandTotals.otbValue)}
@@ -1387,11 +1389,11 @@ const PlanningDetailPage = ({
       )}
 
       {/* Main Content */}
-      <div className="flex gap-6 p-6 relative z-10 overflow-hidden">
+      <div className="flex flex-col md:flex-row gap-3 md:gap-6 p-3 md:p-6 relative z-10 overflow-hidden">
         {/* Left - Tabs & Table Content */}
         <div className="flex-1 min-w-0 bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
           {/* Tabs */}
-          <div className="border-b border-slate-200 px-6 bg-slate-50">
+          <div className="border-b border-slate-200 px-3 md:px-6 bg-slate-50 overflow-x-auto">
             <div className="flex gap-1">
               {TABS.map(tab => {
                 const Icon = tab.icon;
@@ -1482,7 +1484,7 @@ const PlanningDetailPage = ({
         </div>
 
         {/* Right - Approval History */}
-        <div className="w-96 shrink-0 bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden flex flex-col">
+        <div className="w-full md:w-96 shrink-0 bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden flex flex-col">
           <div className="bg-gradient-to-r from-slate-700 to-slate-600 px-5 py-4 flex items-center gap-3">
             <History size={20} className="text-white" />
             <h3 className="font-bold text-white">{t('ticketDetail.approvalHistory')}</h3>

@@ -686,3 +686,59 @@ model ApprovalWorkflowStep {
   @@index([brandId])
   @@map("approval_workflow_steps")
 }
+
+// ============================================================================
+// DATA IMPORT
+// ============================================================================
+
+enum ImportTarget {
+  products
+  otb_budget
+  wssi
+  size_profiles
+  forecasts
+  clearance
+  kpi_targets
+  suppliers
+  categories
+}
+
+model ImportedRecord {
+  id         String       @id @default(cuid())
+  target     ImportTarget
+  matchKey   String?      @map("match_key")
+  data       Json
+  sessionId  String       @map("session_id")
+  importedAt DateTime     @default(now()) @map("imported_at")
+  createdAt  DateTime     @default(now()) @map("created_at")
+  updatedAt  DateTime     @updatedAt @map("updated_at")
+
+  @@index([target])
+  @@index([target, matchKey])
+  @@index([target, sessionId])
+  @@index([sessionId])
+  @@index([importedAt])
+  @@map("imported_records")
+}
+
+model ImportSession {
+  id            String       @id @default(cuid())
+  target        ImportTarget
+  userId        String?      @map("user_id")
+  fileName      String?      @map("file_name")
+  totalRows     Int          @default(0) @map("total_rows")
+  insertedCount Int          @default(0) @map("inserted_count")
+  updatedCount  Int          @default(0) @map("updated_count")
+  skippedCount  Int          @default(0) @map("skipped_count")
+  errorCount    Int          @default(0) @map("error_count")
+  status        String       @default("completed")
+  startedAt     DateTime     @default(now()) @map("started_at")
+  completedAt   DateTime?    @map("completed_at")
+  createdAt     DateTime     @default(now()) @map("created_at")
+  updatedAt     DateTime     @updatedAt @map("updated_at")
+
+  @@index([target])
+  @@index([userId])
+  @@index([status])
+  @@map("import_sessions")
+}

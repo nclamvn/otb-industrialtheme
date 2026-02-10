@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useIsMobile } from '@/hooks/useIsMobile';
 import { formatCurrency } from '../utils';
 import { proposalService } from '../services/proposalService';
 import { ExpandableStatCard } from '../components/Common';
@@ -28,6 +29,7 @@ const RECEIPT_STATUS = {
 const ReceiptConfirmationScreen = ({ darkMode }) => {
   const { user } = useAuth();
   const { t } = useLanguage();
+  const { isMobile } = useIsMobile();
   const [receipts, setReceipts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -127,10 +129,10 @@ const ReceiptConfirmationScreen = ({ darkMode }) => {
 
   const bg = darkMode ? 'bg-[#0A0A0A]' : 'bg-gray-50';
   const cardBg = darkMode ? 'bg-[#121212]' : 'bg-white';
-  const border = darkMode ? 'border-[#2E2E2E]' : 'border-gray-200';
+  const border = darkMode ? 'border-[#2E2E2E]' : 'border-gray-300';
   const textPrimary = darkMode ? 'text-[#F2F2F2]' : 'text-gray-900';
-  const textSecondary = darkMode ? 'text-[#999999]' : 'text-gray-600';
-  const textMuted = darkMode ? 'text-[#666666]' : 'text-gray-500';
+  const textSecondary = darkMode ? 'text-[#999999]' : 'text-gray-700';
+  const textMuted = darkMode ? 'text-[#666666]' : 'text-gray-600';
 
   return (
     <div className={`min-h-screen ${bg} p-4`}>
@@ -141,10 +143,10 @@ const ReceiptConfirmationScreen = ({ darkMode }) => {
           : 'linear-gradient(135deg, #ffffff 0%, rgba(215,183,151,0.04) 35%, rgba(215,183,151,0.12) 100%)',
         boxShadow: `inset 0 -1px 0 ${darkMode ? 'rgba(215,183,151,0.08)' : 'rgba(215,183,151,0.05)'}`,
       }}>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           {/* Icon + Title */}
           <div className={`w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 ${darkMode ? 'bg-[rgba(215,183,151,0.1)]' : 'bg-[rgba(215,183,151,0.15)]'}`}>
-            <Receipt size={14} className={darkMode ? 'text-[#D7B797]' : 'text-[#8A6340]'} />
+            <Receipt size={14} className={darkMode ? 'text-[#D7B797]' : 'text-[#6B4D30]'} />
           </div>
           <div className="flex-shrink-0">
             <h1 className={`text-sm font-semibold font-['Montserrat'] ${textPrimary} leading-tight`}>
@@ -156,7 +158,7 @@ const ReceiptConfirmationScreen = ({ darkMode }) => {
           </div>
 
           {/* Inline Filters */}
-          <div className="flex items-center gap-2 ml-auto">
+          <div className="flex flex-wrap items-center gap-2 ml-auto">
             <div className={`flex items-center gap-1.5 px-2 py-1 rounded-lg border ${border} ${darkMode ? 'bg-[#1A1A1A]' : 'bg-gray-50'} w-48`}>
               <Search size={12} className={textMuted} />
               <input
@@ -190,7 +192,7 @@ const ReceiptConfirmationScreen = ({ darkMode }) => {
 
             <button
               onClick={fetchReceipts}
-              className={`px-2.5 py-1 rounded-lg border ${border} text-xs font-medium font-['Montserrat'] transition-all ${darkMode ? 'text-[#D7B797] hover:bg-[rgba(215,183,151,0.08)]' : 'text-[#8A6340] hover:bg-[rgba(215,183,151,0.1)]'}`}
+              className={`px-2.5 py-1 rounded-lg border ${border} text-xs font-medium font-['Montserrat'] transition-all ${darkMode ? 'text-[#D7B797] hover:bg-[rgba(215,183,151,0.08)]' : 'text-[#6B4D30] hover:bg-[rgba(215,183,151,0.1)]'}`}
             >
               {t('common.refresh')}
             </button>
@@ -253,7 +255,7 @@ const ReceiptConfirmationScreen = ({ darkMode }) => {
       }}>
         {loading ? (
           <div className="flex flex-col items-center justify-center py-20">
-            <Loader2 size={32} className="animate-spin text-[#D7B797]" />
+            <Loader2 size={32} className={`animate-spin ${darkMode ? 'text-[#D7B797]' : 'text-[#6B4D30]'}`} />
             <p className={`text-sm mt-3 ${textSecondary}`}>{t('receiptConfirm.loadingReceipts')}</p>
           </div>
         ) : error ? (

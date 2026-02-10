@@ -17,6 +17,7 @@ import { formatCurrency } from '../utils';
 import { budgetService, planningService, proposalService } from '../services';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useIsMobile } from '@/hooks/useIsMobile';
 import RiskScoreCard from '../components/RiskScoreCard';
 
 /* =========================
@@ -51,7 +52,7 @@ const CARD_STYLES_LIGHT = [
 ========================= */
 
 const CollectionBarChart = ({ data, darkMode, t }) => (
-  <div className={`border rounded-xl shadow-sm p-6 ${
+  <div className={`border rounded-xl shadow-sm p-3 md:p-6 ${
     darkMode
       ? 'bg-[#121212] border-[#2E2E2E]'
       : 'bg-white border-gray-200'
@@ -89,7 +90,7 @@ const CollectionBarChart = ({ data, darkMode, t }) => (
 );
 
 const GenderBarChart = ({ data, darkMode, t }) => (
-  <div className={`border rounded-xl shadow-sm p-6 ${
+  <div className={`border rounded-xl shadow-sm p-3 md:p-6 ${
     darkMode
       ? 'bg-[#121212] border-[#2E2E2E]'
       : 'bg-white border-gray-200'
@@ -549,6 +550,7 @@ const StatusTrackingPanel = ({ approvalHistory, ticket, darkMode, t }) => (
 export default function TicketDetailPage({ ticket, onBack, darkMode = true }) {
   const { t } = useLanguage();
   const { user } = useAuth();
+  const { isMobile } = useIsMobile();
   const [collapsed, setCollapsed] = useState({});
   const [loading, setLoading] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
@@ -931,7 +933,7 @@ export default function TicketDetailPage({ ticket, onBack, darkMode = true }) {
   }
 
   return (
-    <div className={`p-6 min-h-screen space-y-6 ${
+    <div className={`p-3 md:p-6 min-h-screen space-y-3 md:space-y-6 ${
       darkMode ? 'bg-[#0A0A0A]' : 'bg-gray-50'
     }`}>
       {/* Back Button & Header */}
@@ -1099,7 +1101,7 @@ export default function TicketDetailPage({ ticket, onBack, darkMode = true }) {
 
       {/* 3. Charts - Collection & Gender (grouped bar: REX, TTP per category) */}
       {(collectionData.length > 0 || genderData.length > 0) && (
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-3 md:gap-6">
           {collectionData.length > 0 && <CollectionBarChart data={collectionData} darkMode={darkMode} t={t} />}
           {genderData.length > 0 && <GenderBarChart data={genderData} darkMode={darkMode} t={t} />}
         </div>

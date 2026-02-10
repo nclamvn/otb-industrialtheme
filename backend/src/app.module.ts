@@ -10,6 +10,7 @@ import { ProposalModule } from './modules/proposal/proposal.module';
 import { AiModule } from './modules/ai/ai.module';
 import { ApprovalWorkflowModule } from './modules/approval-workflow/approval-workflow.module';
 import { AnalyticsModule } from './modules/analytics/analytics.module';
+import { ImportModule } from './modules/import/import.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { AnalyticsModule } from './modules/analytics/analytics.module';
     AiModule,
     ApprovalWorkflowModule,
     AnalyticsModule,
+    ImportModule,
   ],
 })
 export class AppModule {}

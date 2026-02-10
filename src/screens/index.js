@@ -12,3 +12,4 @@ export { default as LoginScreen } from './LoginScreen';
 export { default as SalesPerformanceScreen } from './SalesPerformanceScreen';
 export { default as BudgetAnalyticsScreen } from './BudgetAnalyticsScreen';
 export { default as CategoryTrendsScreen } from './CategoryTrendsScreen';
+export { default as ImportDataScreen } from './ImportDataScreen';

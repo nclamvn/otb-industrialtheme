@@ -2,13 +2,13 @@
 import { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import {
-  DollarSign, Package, BarChart3, Sparkles, TrendingUp,
+  DollarSign, Package, BarChart3, TrendingUp,
   CheckCircle, ChevronRight, ShoppingCart,
-  Bot, Filter, ChevronDown, Wallet, FileCheck,
+  Filter, ChevronDown, Wallet, FileCheck,
   ClipboardList, Receipt, Ticket, Home, LogOut,
   Settings, Crown, PanelLeftClose,
-  Database, Building2, FolderTree, Tag, Wand2,
-  LineChart, PieChart, Activity
+  Database, Building2, FolderTree, Tag,
+  LineChart, PieChart, Activity, Upload
 } from 'lucide-react';
 import { ROUTE_MAP } from '@/utils/routeMap';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -22,7 +22,6 @@ const Sidebar = ({ currentScreen, darkMode, setDarkMode, user, onLogout }) => {
       router.push(route);
     }
   };
-  const [isAIFeaturesOpen, setIsAIFeaturesOpen] = useState(false);
   const [isMasterDataOpen, setIsMasterDataOpen] = useState(false);
   const [isAnalyticsOpen, setIsAnalyticsOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(true);
@@ -72,21 +71,21 @@ const Sidebar = ({ currentScreen, darkMode, setDarkMode, user, onLogout }) => {
   const getIconClass = (itemId) => {
     const isActive = currentScreen === itemId;
     if (isActive) {
-      return 'text-[#D7B797]';
+      return darkMode ? 'text-[#D7B797]' : 'text-[#6B4D30]';
     }
     return darkMode
       ? 'text-[#555555] group-hover:text-[#D7B797]'
-      : 'text-gray-500 group-hover:text-[#8A6340]';
+      : 'text-gray-600 group-hover:text-[#6B4D30]';
   };
 
   const getTextClass = (itemId) => {
     const isActive = currentScreen === itemId;
     if (isActive) {
-      return 'text-[#D7B797] font-bold';
+      return darkMode ? 'text-[#D7B797] font-bold' : 'text-[#5A3D22] font-bold';
     }
     return darkMode
       ? 'text-[#888888] font-medium group-hover:text-[#D7B797]'
-      : 'text-gray-600 font-medium group-hover:text-[#8A6340]';
+      : 'text-gray-700 font-medium group-hover:text-[#6B4D30]';
   };
 
   // Collapsed sidebar item with tooltip
@@ -107,14 +106,16 @@ const Sidebar = ({ currentScreen, darkMode, setDarkMode, user, onLogout }) => {
                 : 'hover:bg-[rgba(215,183,151,0.06)]'
               }`}
             style={isActive ? {
-              background: 'linear-gradient(135deg, rgba(215,183,151,0.08) 0%, rgba(215,183,151,0.16) 100%)',
+              background: darkMode
+                ? 'linear-gradient(135deg, rgba(215,183,151,0.08) 0%, rgba(215,183,151,0.16) 100%)'
+                : 'linear-gradient(135deg, rgba(138,99,64,0.10) 0%, rgba(138,99,64,0.22) 100%)',
             } : undefined}
           >
             {/* Active indicator */}
             {isActive && (
               <div
                 className="absolute left-0 top-1/2 -translate-y-1/2 w-[2px] h-4 rounded-r-full"
-                style={{ background: 'linear-gradient(180deg, #D7B797 0%, #C49A6C 100%)' }}
+                style={{ background: darkMode ? 'linear-gradient(180deg, #D7B797 0%, #C49A6C 100%)' : 'linear-gradient(180deg, #8A6340 0%, #6B4D30 100%)' }}
               />
             )}
 
@@ -123,10 +124,10 @@ const Sidebar = ({ currentScreen, darkMode, setDarkMode, user, onLogout }) => {
               strokeWidth={isActive ? 2.5 : 2}
               className={`transition-all duration-200 ${
                 isActive
-                  ? 'text-[#D7B797]'
-                  : 'text-[#555555] group-hover:text-[#D7B797]'
+                  ? darkMode ? 'text-[#D7B797]' : 'text-[#6B4D30]'
+                  : darkMode ? 'text-[#555555] group-hover:text-[#D7B797]' : 'text-gray-600 group-hover:text-[#6B4D30]'
               }`}
-              style={isActive ? { filter: 'drop-shadow(0 0 4px rgba(215,183,151,0.4))' } : undefined}
+              style={isActive ? { filter: darkMode ? 'drop-shadow(0 0 4px rgba(215,183,151,0.4))' : 'none' } : undefined}
             />
           </button>
 
@@ -136,7 +137,7 @@ const Sidebar = ({ currentScreen, darkMode, setDarkMode, user, onLogout }) => {
               <div className={`px-2.5 py-1 rounded-lg shadow-lg whitespace-nowrap text-[11px] font-medium font-['Montserrat']
                 ${darkMode
                   ? 'bg-[#1A1A1A] text-[#F2F2F2] border border-[#2E2E2E]'
-                  : 'bg-white text-gray-800 border border-gray-200'
+                  : 'bg-white text-gray-800 border border-gray-300'
                 }`}
               >
                 {item.label}
@@ -167,17 +168,17 @@ const Sidebar = ({ currentScreen, darkMode, setDarkMode, user, onLogout }) => {
         background: darkMode
           ? 'linear-gradient(180deg, #0A0A0A 0%, #080808 50%, rgba(13,11,9,1) 100%)'
           : 'linear-gradient(180deg, #ffffff 0%, #fefefe 50%, #fdfbf9 100%)',
-        borderColor: darkMode ? '#1A1A1A' : '#E5E7EB',
+        borderColor: darkMode ? '#1A1A1A' : '#D1D5DB',
       }}
     >
       {/* Logo Header */}
       <div
         className={`h-11 flex items-center justify-center`}
         style={{
-          borderBottom: `1px solid ${darkMode ? '#1A1A1A' : '#E5E7EB'}`,
+          borderBottom: `1px solid ${darkMode ? '#1A1A1A' : '#D1D5DB'}`,
           background: darkMode
             ? 'linear-gradient(135deg, #0A0A0A 0%, rgba(215,183,151,0.03) 100%)'
-            : 'linear-gradient(135deg, #ffffff 0%, rgba(215,183,151,0.05) 100%)',
+            : 'linear-gradient(135deg, #ffffff 0%, rgba(215,183,151,0.12) 100%)',
         }}
       >
         {isCollapsed ? (
@@ -200,7 +201,7 @@ const Sidebar = ({ currentScreen, darkMode, setDarkMode, user, onLogout }) => {
                 backgroundClip: 'text',
                 color: 'transparent',
               } : {
-                color: '#8A6340',
+                color: '#6B4D30',
               }}
             >
               {t('components.otbSystem')}
@@ -210,7 +211,7 @@ const Sidebar = ({ currentScreen, darkMode, setDarkMode, user, onLogout }) => {
               className={`p-1 rounded-md flex-shrink-0 transition-all duration-200 ${
                 darkMode
                   ? 'text-[#555555] hover:text-[#D7B797] hover:bg-[rgba(215,183,151,0.06)]'
-                  : 'text-gray-400 hover:text-[#8A6340] hover:bg-[rgba(215,183,151,0.08)]'
+                  : 'text-gray-500 hover:text-[#6B4D30] hover:bg-[rgba(215,183,151,0.08)]'
               }`}
               title={t('components.collapseSidebar')}
             >
@@ -247,25 +248,8 @@ const Sidebar = ({ currentScreen, darkMode, setDarkMode, user, onLogout }) => {
             <CollapsedMenuItem item={{ id: 'master-brands', label: t('nav.masterData'), icon: Database }} />
             <CollapsedMenuItem item={{ id: 'analytics-sales', label: t('nav.salesPerformance', 'Sales'), icon: LineChart }} />
             <CollapsedMenuItem item={{ id: 'analytics-budget', label: t('nav.budgetAnalytics', 'Budget'), icon: PieChart }} />
-            <CollapsedMenuItem item={{ id: 'analytics-trends', label: t('nav.categoryTrends', 'Trends'), icon: Activity }} showDividerAfter />
-            <div className="relative">
-              <button
-                onMouseEnter={() => setHoveredItem('ai')}
-                onMouseLeave={() => setHoveredItem(null)}
-                className="group w-full flex items-center justify-center h-8 rounded-lg transition-all duration-200 hover:bg-[rgba(163,113,247,0.06)]"
-              >
-                <Sparkles size={15} strokeWidth={2} className="text-[#A371F7]" style={{ filter: 'drop-shadow(0 0 3px rgba(163,113,247,0.3))' }} />
-              </button>
-              {hoveredItem === 'ai' && (
-                <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 z-50 pointer-events-none">
-                  <div className={`px-2.5 py-1 rounded-lg shadow-lg whitespace-nowrap text-[11px] font-medium font-['Montserrat']
-                    ${darkMode ? 'bg-[#1A1A1A] text-[#A371F7] border border-[#2E2E2E]' : 'bg-white text-[#A371F7] border border-gray-200'}`}
-                  >
-                    {t('nav.aiFeatures')}
-                  </div>
-                </div>
-              )}
-            </div>
+            <CollapsedMenuItem item={{ id: 'analytics-trends', label: t('nav.categoryTrends', 'Trends'), icon: Activity }} />
+            <CollapsedMenuItem item={{ id: 'import-data', label: t('nav.importData', 'Import Data'), icon: Upload }} showDividerAfter />
           </div>
         ) : (
           /* Expanded View */
@@ -275,15 +259,17 @@ const Sidebar = ({ currentScreen, darkMode, setDarkMode, user, onLogout }) => {
               onClick={() => navigateTo('home')}
               className="group w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg transition-all duration-200"
               style={currentScreen === 'home' ? {
-                background: 'linear-gradient(135deg, rgba(215,183,151,0.06) 0%, rgba(215,183,151,0.14) 100%)',
-                boxShadow: 'inset 0 0 0 1px rgba(215,183,151,0.1)',
+                background: darkMode
+                  ? 'linear-gradient(135deg, rgba(215,183,151,0.06) 0%, rgba(215,183,151,0.14) 100%)'
+                  : 'linear-gradient(135deg, rgba(138,99,64,0.10) 0%, rgba(138,99,64,0.22) 100%)',
+                boxShadow: darkMode ? 'inset 0 0 0 1px rgba(215,183,151,0.1)' : 'inset 0 0 0 1px rgba(138,99,64,0.18)',
               } : undefined}
             >
               <Home
                 size={15}
                 strokeWidth={2.5}
                 className={`transition-colors duration-150 ${getIconClass('home')}`}
-                style={currentScreen === 'home' ? { filter: 'drop-shadow(0 0 4px rgba(215,183,151,0.4))' } : undefined}
+                style={currentScreen === 'home' ? { filter: darkMode ? 'drop-shadow(0 0 4px rgba(215,183,151,0.4))' : 'none' } : undefined}
               />
               <span className={`text-[13px] font-['Montserrat'] transition-colors duration-150 whitespace-nowrap ${getTextClass('home')}`}>
                 {t('nav.homeDashboard')}
@@ -304,7 +290,7 @@ const Sidebar = ({ currentScreen, darkMode, setDarkMode, user, onLogout }) => {
                       strokeWidth={2.5}
                       className="transition-colors duration-150"
                       style={{
-                        color: darkMode ? '#D7B797' : '#8A6340',
+                        color: darkMode ? '#D7B797' : '#6B4D30',
                         filter: darkMode ? 'drop-shadow(0 0 3px rgba(215,183,151,0.3))' : 'none',
                       }}
                     />
@@ -317,7 +303,7 @@ const Sidebar = ({ currentScreen, darkMode, setDarkMode, user, onLogout }) => {
                         backgroundClip: 'text',
                         color: 'transparent',
                       } : {
-                        color: '#8A6340',
+                        color: '#6B4D30',
                       }}
                     >
                       {group.label}
@@ -326,7 +312,7 @@ const Sidebar = ({ currentScreen, darkMode, setDarkMode, user, onLogout }) => {
                   <ChevronDown
                     size={10}
                     strokeWidth={2.5}
-                    className={`${darkMode ? 'text-[#444444]' : 'text-gray-400'} transition-transform duration-200 ${
+                    className={`${darkMode ? 'text-[#444444]' : 'text-gray-500'} transition-transform duration-200 ${
                       openGroups[group.id] ? 'rotate-180' : ''
                     }`}
                   />
@@ -347,15 +333,17 @@ const Sidebar = ({ currentScreen, darkMode, setDarkMode, user, onLogout }) => {
                           onClick={() => navigateTo(item.id)}
                           className="group w-full flex items-center gap-2 px-2.5 py-1 rounded-md transition-all duration-200"
                           style={isActive ? {
-                            background: 'linear-gradient(135deg, rgba(215,183,151,0.06) 0%, rgba(215,183,151,0.14) 100%)',
-                            boxShadow: 'inset 0 0 0 1px rgba(215,183,151,0.1)',
+                            background: darkMode
+                              ? 'linear-gradient(135deg, rgba(215,183,151,0.06) 0%, rgba(215,183,151,0.14) 100%)'
+                              : 'linear-gradient(135deg, rgba(138,99,64,0.10) 0%, rgba(138,99,64,0.22) 100%)',
+                            boxShadow: darkMode ? 'inset 0 0 0 1px rgba(215,183,151,0.1)' : 'inset 0 0 0 1px rgba(138,99,64,0.18)',
                           } : undefined}
                         >
                           <item.icon
                             size={14}
                             strokeWidth={2.5}
                             className={`transition-colors duration-150 ${getIconClass(item.id)}`}
-                            style={isActive ? { filter: 'drop-shadow(0 0 4px rgba(215,183,151,0.4))' } : undefined}
+                            style={isActive ? { filter: darkMode ? 'drop-shadow(0 0 4px rgba(215,183,151,0.4))' : 'none' } : undefined}
                           />
                           <span className={`text-[13px] font-['Montserrat'] transition-colors duration-150 whitespace-nowrap ${getTextClass(item.id)}`}>
                             {item.label}
@@ -389,7 +377,7 @@ const Sidebar = ({ currentScreen, darkMode, setDarkMode, user, onLogout }) => {
                     strokeWidth={2.5}
                     className="transition-colors duration-150"
                     style={{
-                      color: darkMode ? '#D7B797' : '#8A6340',
+                      color: darkMode ? '#D7B797' : '#6B4D30',
                       filter: darkMode ? 'drop-shadow(0 0 3px rgba(215,183,151,0.3))' : 'none',
                     }}
                   />
@@ -402,7 +390,7 @@ const Sidebar = ({ currentScreen, darkMode, setDarkMode, user, onLogout }) => {
                       backgroundClip: 'text',
                       color: 'transparent',
                     } : {
-                      color: '#8A6340',
+                      color: '#6B4D30',
                     }}
                   >
                     {t('nav.masterData')}
@@ -411,7 +399,7 @@ const Sidebar = ({ currentScreen, darkMode, setDarkMode, user, onLogout }) => {
                 <ChevronDown
                   size={10}
                   strokeWidth={2.5}
-                  className={`${darkMode ? 'text-[#444444]' : 'text-gray-400'} transition-transform duration-200 ${
+                  className={`${darkMode ? 'text-[#444444]' : 'text-gray-500'} transition-transform duration-200 ${
                     isMasterDataOpen ? 'rotate-180' : ''
                   }`}
                 />
@@ -436,15 +424,17 @@ const Sidebar = ({ currentScreen, darkMode, setDarkMode, user, onLogout }) => {
                         onClick={() => navigateTo(item.id)}
                         className="group w-full flex items-center gap-2 px-2.5 py-1 rounded-md transition-all duration-200"
                         style={isActive ? {
-                          background: 'linear-gradient(135deg, rgba(215,183,151,0.06) 0%, rgba(215,183,151,0.14) 100%)',
-                          boxShadow: 'inset 0 0 0 1px rgba(215,183,151,0.1)',
+                          background: darkMode
+                            ? 'linear-gradient(135deg, rgba(215,183,151,0.06) 0%, rgba(215,183,151,0.14) 100%)'
+                            : 'linear-gradient(135deg, rgba(138,99,64,0.10) 0%, rgba(138,99,64,0.22) 100%)',
+                          boxShadow: darkMode ? 'inset 0 0 0 1px rgba(215,183,151,0.1)' : 'inset 0 0 0 1px rgba(138,99,64,0.18)',
                         } : undefined}
                       >
                         <item.icon
                           size={14}
                           strokeWidth={2.5}
                           className={`transition-colors duration-150 ${getIconClass(item.id)}`}
-                          style={isActive ? { filter: 'drop-shadow(0 0 4px rgba(215,183,151,0.4))' } : undefined}
+                          style={isActive ? { filter: darkMode ? 'drop-shadow(0 0 4px rgba(215,183,151,0.4))' : 'none' } : undefined}
                         />
                         <span className={`text-[13px] font-['Montserrat'] transition-colors duration-150 whitespace-nowrap ${getTextClass(item.id)}`}>
                           {item.label}
@@ -468,7 +458,7 @@ const Sidebar = ({ currentScreen, darkMode, setDarkMode, user, onLogout }) => {
                     strokeWidth={2.5}
                     className="transition-colors duration-150"
                     style={{
-                      color: darkMode ? '#D7B797' : '#8A6340',
+                      color: darkMode ? '#D7B797' : '#6B4D30',
                       filter: darkMode ? 'drop-shadow(0 0 3px rgba(215,183,151,0.3))' : 'none',
                     }}
                   />
@@ -481,7 +471,7 @@ const Sidebar = ({ currentScreen, darkMode, setDarkMode, user, onLogout }) => {
                       backgroundClip: 'text',
                       color: 'transparent',
                     } : {
-                      color: '#8A6340',
+                      color: '#6B4D30',
                     }}
                   >
                     {t('nav.analytics')}
@@ -490,7 +480,7 @@ const Sidebar = ({ currentScreen, darkMode, setDarkMode, user, onLogout }) => {
                 <ChevronDown
                   size={10}
                   strokeWidth={2.5}
-                  className={`${darkMode ? 'text-[#444444]' : 'text-gray-400'} transition-transform duration-200 ${
+                  className={`${darkMode ? 'text-[#444444]' : 'text-gray-500'} transition-transform duration-200 ${
                     isAnalyticsOpen ? 'rotate-180' : ''
                   }`}
                 />
@@ -514,15 +504,17 @@ const Sidebar = ({ currentScreen, darkMode, setDarkMode, user, onLogout }) => {
                         onClick={() => navigateTo(item.id)}
                         className="group w-full flex items-center gap-2 px-2.5 py-1 rounded-md transition-all duration-200"
                         style={isActive ? {
-                          background: 'linear-gradient(135deg, rgba(215,183,151,0.06) 0%, rgba(215,183,151,0.14) 100%)',
-                          boxShadow: 'inset 0 0 0 1px rgba(215,183,151,0.1)',
+                          background: darkMode
+                            ? 'linear-gradient(135deg, rgba(215,183,151,0.06) 0%, rgba(215,183,151,0.14) 100%)'
+                            : 'linear-gradient(135deg, rgba(138,99,64,0.10) 0%, rgba(138,99,64,0.22) 100%)',
+                          boxShadow: darkMode ? 'inset 0 0 0 1px rgba(215,183,151,0.1)' : 'inset 0 0 0 1px rgba(138,99,64,0.18)',
                         } : undefined}
                       >
                         <item.icon
                           size={14}
                           strokeWidth={2.5}
                           className={`transition-colors duration-150 ${getIconClass(item.id)}`}
-                          style={isActive ? { filter: 'drop-shadow(0 0 4px rgba(215,183,151,0.4))' } : undefined}
+                          style={isActive ? { filter: darkMode ? 'drop-shadow(0 0 4px rgba(215,183,151,0.4))' : 'none' } : undefined}
                         />
                         <span className={`text-[13px] font-['Montserrat'] transition-colors duration-150 whitespace-nowrap ${getTextClass(item.id)}`}>
                           {item.label}
@@ -534,6 +526,28 @@ const Sidebar = ({ currentScreen, darkMode, setDarkMode, user, onLogout }) => {
               )}
             </div>
 
+            {/* Import Data */}
+            <button
+              onClick={() => navigateTo('import-data')}
+              className="group w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg transition-all duration-200"
+              style={currentScreen === 'import-data' ? {
+                background: darkMode
+                  ? 'linear-gradient(135deg, rgba(215,183,151,0.06) 0%, rgba(215,183,151,0.14) 100%)'
+                  : 'linear-gradient(135deg, rgba(138,99,64,0.10) 0%, rgba(138,99,64,0.22) 100%)',
+                boxShadow: darkMode ? 'inset 0 0 0 1px rgba(215,183,151,0.1)' : 'inset 0 0 0 1px rgba(138,99,64,0.18)',
+              } : undefined}
+            >
+              <Upload
+                size={15}
+                strokeWidth={2.5}
+                className={`transition-colors duration-150 ${getIconClass('import-data')}`}
+                style={currentScreen === 'import-data' ? { filter: darkMode ? 'drop-shadow(0 0 4px rgba(215,183,151,0.4))' : 'none' } : undefined}
+              />
+              <span className={`text-[13px] font-['Montserrat'] transition-colors duration-150 whitespace-nowrap ${getTextClass('import-data')}`}>
+                {t('nav.importData', 'Import Data')}
+              </span>
+            </button>
+
             {/* Gradient Divider */}
             <div className="py-1.5">
               <div className="h-px" style={{
@@ -544,72 +558,13 @@ const Sidebar = ({ currentScreen, darkMode, setDarkMode, user, onLogout }) => {
             </div>
 
             {/* AI Section */}
-            <div>
-              <button
-                onClick={() => setIsAIFeaturesOpen(!isAIFeaturesOpen)}
-                className="group w-full px-2.5 py-1 flex items-center justify-between rounded-md transition-all duration-150 hover:bg-[rgba(163,113,247,0.04)]"
-              >
-                <div className="flex items-center gap-1.5">
-                  <Sparkles
-                    size={13}
-                    strokeWidth={2.5}
-                    className="text-[#A371F7]"
-                    style={{ filter: 'drop-shadow(0 0 3px rgba(163,113,247,0.4))' }}
-                  />
-                  <span
-                    className="text-[10px] font-bold uppercase tracking-wider font-['Montserrat']"
-                    style={darkMode ? {
-                      background: 'linear-gradient(135deg, #A371F7 0%, #818CF8 100%)',
-                      WebkitBackgroundClip: 'text',
-                      WebkitTextFillColor: 'transparent',
-                      backgroundClip: 'text',
-                      color: 'transparent',
-                    } : {
-                      color: '#7C3AED',
-                    }}
-                  >
-                    {t('nav.aiFeatures')}
-                  </span>
-                </div>
-                <ChevronDown
-                  size={10}
-                  strokeWidth={2.5}
-                  className={`${darkMode ? 'text-[#444444]' : 'text-gray-400'} transition-transform duration-200 ${
-                    isAIFeaturesOpen ? 'rotate-180' : ''
-                  }`}
-                />
-              </button>
-
-              {isAIFeaturesOpen && (
-                <div className="space-y-px ml-1.5 pl-2.5 mt-0.5" style={{
-                  borderLeft: '1px solid rgba(163,113,247,0.15)',
-                }}>
-                  {[
-                    { icon: Bot, label: t('nav.aiAssistant') },
-                    { icon: TrendingUp, label: t('nav.smartSuggestions') },
-                    { icon: Wand2, label: t('nav.autoPlanning') },
-                    { icon: Filter, label: t('nav.predictiveAlerts') },
-                  ].map((item, index) => (
-                    <button
-                      key={index}
-                      className="group w-full flex items-center gap-2 px-2.5 py-1 rounded-md transition-all duration-200 hover:bg-[rgba(163,113,247,0.06)]"
-                    >
-                      <item.icon size={14} strokeWidth={2.5} className="text-[#A371F7] transition-colors duration-150" style={{ filter: 'drop-shadow(0 0 2px rgba(163,113,247,0.3))' }} />
-                      <span className={`text-[13px] font-medium font-['Montserrat'] transition-colors duration-150 whitespace-nowrap ${darkMode ? 'text-[#888888] group-hover:text-[#A371F7]' : 'text-gray-600 group-hover:text-[#A371F7]'}`}>
-                        {item.label}
-                      </span>
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
           </div>
         )}
       </nav>
 
       {/* Footer Section - User Profile */}
       <div className="p-2 relative" style={{
-        borderTop: `1px solid ${darkMode ? '#1A1A1A' : '#E5E7EB'}`,
+        borderTop: `1px solid ${darkMode ? '#1A1A1A' : '#D1D5DB'}`,
         background: darkMode
           ? 'linear-gradient(180deg, transparent 0%, rgba(215,183,151,0.02) 100%)'
           : 'linear-gradient(180deg, transparent 0%, rgba(215,183,151,0.03) 100%)',
@@ -624,7 +579,7 @@ const Sidebar = ({ currentScreen, darkMode, setDarkMode, user, onLogout }) => {
                 background: darkMode
                   ? 'linear-gradient(135deg, #121212 0%, rgba(215,183,151,0.03) 40%, rgba(215,183,151,0.08) 100%)'
                   : 'linear-gradient(135deg, #ffffff 0%, rgba(215,183,151,0.04) 35%, rgba(215,183,151,0.10) 100%)',
-                borderColor: darkMode ? '#2E2E2E' : '#E5E7EB',
+                borderColor: darkMode ? '#2E2E2E' : '#D1D5DB',
                 boxShadow: darkMode
                   ? '0 -8px 30px rgba(0,0,0,0.4), inset 0 1px 0 rgba(215,183,151,0.06)'
                   : '0 -8px 30px rgba(0,0,0,0.08), inset 0 1px 0 rgba(215,183,151,0.08)',
@@ -633,7 +588,7 @@ const Sidebar = ({ currentScreen, darkMode, setDarkMode, user, onLogout }) => {
             >
               {/* User Info Header */}
               <div className="p-3" style={{
-                borderBottom: `1px solid ${darkMode ? '#2E2E2E' : '#E5E7EB'}`,
+                borderBottom: `1px solid ${darkMode ? '#2E2E2E' : '#D1D5DB'}`,
                 background: darkMode
                   ? 'linear-gradient(135deg, #0A0A0A 0%, rgba(215,183,151,0.04) 100%)'
                   : 'linear-gradient(135deg, #F9FAFB 0%, rgba(215,183,151,0.06) 100%)',
@@ -643,7 +598,7 @@ const Sidebar = ({ currentScreen, darkMode, setDarkMode, user, onLogout }) => {
                     className="w-9 h-9 rounded-full flex items-center justify-center text-xs font-semibold font-['Montserrat']"
                     style={{
                       border: `2px solid ${darkMode ? '#D7B797' : '#8A6340'}`,
-                      color: darkMode ? '#D7B797' : '#8A6340',
+                      color: darkMode ? '#D7B797' : '#6B4D30',
                       background: darkMode
                         ? 'linear-gradient(135deg, rgba(215,183,151,0.08) 0%, rgba(215,183,151,0.16) 100%)'
                         : 'linear-gradient(135deg, rgba(215,183,151,0.08) 0%, rgba(215,183,151,0.16) 100%)',
@@ -677,7 +632,7 @@ const Sidebar = ({ currentScreen, darkMode, setDarkMode, user, onLogout }) => {
                   }`}
                 >
                   <div className={`p-1 rounded-md ${darkMode ? 'bg-[#1A1A1A]' : 'bg-gray-100'}`}>
-                    <Crown size={14} className={darkMode ? 'text-[#D7B797]' : 'text-[#8A6340]'} style={darkMode ? { filter: 'drop-shadow(0 0 3px rgba(215,183,151,0.4))' } : undefined} />
+                    <Crown size={14} className={darkMode ? 'text-[#D7B797]' : 'text-[#6B4D30]'} style={darkMode ? { filter: 'drop-shadow(0 0 3px rgba(215,183,151,0.4))' } : undefined} />
                   </div>
                   <div className="flex-1 text-left">
                     <div className="text-xs font-medium font-['Montserrat']">{t('userMenu.myProfile')}</div>
@@ -744,7 +699,7 @@ const Sidebar = ({ currentScreen, darkMode, setDarkMode, user, onLogout }) => {
                 className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold font-['Montserrat'] transition-all duration-200"
                 style={{
                   border: `2px solid ${darkMode ? '#D7B797' : '#8A6340'}`,
-                  color: darkMode ? '#D7B797' : '#8A6340',
+                  color: darkMode ? '#D7B797' : '#6B4D30',
                   background: showUserMenu
                     ? 'linear-gradient(135deg, rgba(215,183,151,0.10) 0%, rgba(215,183,151,0.20) 100%)'
                     : 'transparent',
@@ -777,7 +732,7 @@ const Sidebar = ({ currentScreen, darkMode, setDarkMode, user, onLogout }) => {
               border: `1px solid ${
                 showUserMenu
                   ? darkMode ? 'rgba(215,183,151,0.2)' : 'rgba(215,183,151,0.3)'
-                  : darkMode ? '#1A1A1A' : '#E5E7EB'
+                  : darkMode ? '#1A1A1A' : '#D1D5DB'
               }`,
               boxShadow: darkMode ? 'inset 0 1px 0 rgba(215,183,151,0.04)' : 'none',
             }}
@@ -787,7 +742,7 @@ const Sidebar = ({ currentScreen, darkMode, setDarkMode, user, onLogout }) => {
                 className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold font-['Montserrat']"
                 style={{
                   border: `2px solid ${darkMode ? '#D7B797' : '#8A6340'}`,
-                  color: darkMode ? '#D7B797' : '#8A6340',
+                  color: darkMode ? '#D7B797' : '#6B4D30',
                   boxShadow: darkMode ? '0 0 8px rgba(215,183,151,0.15)' : 'none',
                 }}
               >
@@ -813,7 +768,7 @@ const Sidebar = ({ currentScreen, darkMode, setDarkMode, user, onLogout }) => {
 
             <ChevronRight
               size={14}
-              className={`transition-transform duration-200 ${showUserMenu ? 'rotate-90' : ''} ${darkMode ? 'text-[#444444]' : 'text-gray-400'}`}
+              className={`transition-transform duration-200 ${showUserMenu ? 'rotate-90' : ''} ${darkMode ? 'text-[#444444]' : 'text-gray-500'}`}
             />
           </button>
         )}

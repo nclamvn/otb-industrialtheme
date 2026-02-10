@@ -20,6 +20,7 @@ export const ROUTE_MAP = {
   'analytics-sales': '/analytics/sales',
   'analytics-budget': '/analytics/budget',
   'analytics-trends': '/analytics/trends',
+  'import-data': '/import-data',
 };
 
 const PATHNAME_TO_SCREEN = {
@@ -39,6 +40,7 @@ const PATHNAME_TO_SCREEN = {
   '/analytics/sales': 'analytics-sales',
   '/analytics/budget': 'analytics-budget',
   '/analytics/trends': 'analytics-trends',
+  '/import-data': 'import-data',
 };
 
 export const getScreenIdFromPathname = (pathname) => {

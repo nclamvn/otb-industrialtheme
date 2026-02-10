@@ -12,6 +12,7 @@ import { STORES, GENDERS } from '../utils/constants';
 import { budgetService, masterDataService, planningService } from '../services';
 
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useIsMobile } from '@/hooks/useIsMobile';
 
 // Constants
 const SEASON_GROUPS = [
@@ -91,6 +92,7 @@ const EditableCell = React.memo(({ cellKey, value, isEditing, editValue, onStart
 
 const OTBAnalysisScreen = ({ otbContext, onOpenSkuProposal, darkMode = false }) => {
   const { t } = useLanguage();
+  const { isMobile } = useIsMobile();
   const [activeTab, setActiveTab] = useState('collection');
 
   // API data states
@@ -794,7 +796,7 @@ const OTBAnalysisScreen = ({ otbContext, onOpenSkuProposal, darkMode = false }) 
             ? 'bg-[#121212] border-[#2E2E2E]'
             : 'bg-[#F2F2F2] border-[#C4B5A5]'
         }`}>
-          <div className="flex items-center gap-6">
+          <div className="flex flex-wrap items-center gap-3 md:gap-6">
             <div className={`flex items-center gap-2 ${darkMode ? 'text-[#999999]' : 'text-[#666666]'}`}>
               <Filter size={16} />
               <span className="font-medium text-sm font-['Montserrat']">{t('otbAnalysis.filters')}:</span>
@@ -1188,9 +1190,9 @@ const OTBAnalysisScreen = ({ otbContext, onOpenSkuProposal, darkMode = false }) 
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-3 md:space-y-6">
       {/* Header Section - Same style as Planning page */}
-      <div className={`backdrop-blur-xl rounded-2xl shadow-xl border p-6 relative z-[100] ${darkMode ? 'bg-[#121212]/95 border-[#2E2E2E]' : 'bg-gradient-to-br from-white to-[rgba(215,183,151,0.1)] border-[#C4B5A5]'}`}>
+      <div className={`backdrop-blur-xl rounded-2xl shadow-xl border p-3 md:p-6 relative z-[100] ${darkMode ? 'bg-[#121212]/95 border-[#2E2E2E]' : 'bg-gradient-to-br from-white to-[rgba(215,183,151,0.1)] border-[#C4B5A5]'}`}>
         <div className={`absolute top-0 right-0 w-64 h-64 rounded-full blur-3xl ${darkMode ? 'bg-gradient-to-br from-[rgba(215,183,151,0.1)] to-transparent' : 'bg-gradient-to-br from-[rgba(215,183,151,0.2)] to-transparent'}`}></div>
         <div className={`absolute bottom-0 left-0 w-64 h-64 rounded-full blur-3xl ${darkMode ? 'bg-gradient-to-tr from-[rgba(215,183,151,0.05)] to-transparent' : 'bg-gradient-to-tr from-[rgba(215,183,151,0.15)] to-transparent'}`}></div>
 
@@ -1596,7 +1598,7 @@ const OTBAnalysisScreen = ({ otbContext, onOpenSkuProposal, darkMode = false }) 
       {selectedBudget && selectedSeason && selectedSeasonGroup && (
       <div className={`rounded-xl shadow-lg border overflow-hidden ${darkMode ? 'bg-[#121212] border-[#2E2E2E]' : 'bg-white border-[#C4B5A5]'}`}>
         {/* Tabs */}
-        <div className={`border-b px-4 ${darkMode ? 'border-[#2E2E2E] bg-[#1A1A1A]' : 'border-[#D4C8BB] bg-[#F2F2F2]'}`}>
+        <div className={`border-b px-3 md:px-4 overflow-x-auto ${darkMode ? 'border-[#2E2E2E] bg-[#1A1A1A]' : 'border-[#D4C8BB] bg-[#F2F2F2]'}`}>
           <div className="flex gap-0.5">
             {TABS.map(tab => {
               const Icon = tab.icon;

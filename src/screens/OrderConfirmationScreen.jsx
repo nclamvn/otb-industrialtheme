@@ -9,6 +9,7 @@ import {
 import { budgetService, proposalService } from '../services';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useIsMobile } from '@/hooks/useIsMobile';
 import { formatCurrency } from '../utils';
 import api from '../services/api';
 import { ExpandableStatCard } from '../components/Common';
@@ -30,6 +31,7 @@ const ORDER_STATUS = {
 const OrderConfirmationScreen = ({ darkMode }) => {
   const { user } = useAuth();
   const { t } = useLanguage();
+  const { isMobile } = useIsMobile();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -162,7 +164,7 @@ const OrderConfirmationScreen = ({ darkMode }) => {
           : 'linear-gradient(135deg, #ffffff 0%, rgba(215,183,151,0.04) 35%, rgba(215,183,151,0.12) 100%)',
         boxShadow: `inset 0 -1px 0 ${darkMode ? 'rgba(215,183,151,0.08)' : 'rgba(215,183,151,0.05)'}`,
       }}>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           {/* Icon + Title */}
           <div className={`w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 ${darkMode ? 'bg-[rgba(215,183,151,0.1)]' : 'bg-[rgba(215,183,151,0.15)]'}`}>
             <ShoppingCart size={14} className={darkMode ? 'text-[#D7B797]' : 'text-[#6B4D30]'} />
@@ -177,7 +179,7 @@ const OrderConfirmationScreen = ({ darkMode }) => {
           </div>
 
           {/* Inline Filters */}
-          <div className="flex items-center gap-2 ml-auto">
+          <div className="flex flex-wrap items-center gap-2 ml-auto">
             <div className={`flex items-center gap-1.5 px-2 py-1 rounded-lg border ${border} ${darkMode ? 'bg-[#1A1A1A]' : 'bg-gray-50'} w-48`}>
               <Search size={12} className={textMuted} />
               <input

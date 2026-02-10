@@ -11,3 +11,4 @@ export { approvalService } from './approvalService';
 export { aiService } from './aiService';
 export { approvalWorkflowService } from './approvalWorkflowService';
 export { analyticsService } from './analyticsService';
+export { importService } from './importService';

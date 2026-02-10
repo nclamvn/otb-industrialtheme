@@ -73,7 +73,7 @@ const CategoryTrendsScreen = ({ darkMode = false }) => {
   const cardBg = darkMode ? 'bg-[#111]' : 'bg-white';
   const border = darkMode ? 'border-[#222]' : 'border-[#e5e0da]';
   const text = darkMode ? 'text-gray-200' : 'text-gray-800';
-  const subtext = darkMode ? 'text-gray-400' : 'text-gray-500';
+  const subtext = darkMode ? 'text-gray-400' : 'text-gray-600';
   const accent = '#D7B797';
 
   if (loading) return <div className={`flex-1 ${bg} flex items-center justify-center`}><LoadingSpinner /></div>;

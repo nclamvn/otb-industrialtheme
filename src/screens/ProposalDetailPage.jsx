@@ -9,9 +9,11 @@ import {
 import { formatCurrency } from '../utils';
 import { masterDataService, proposalService, budgetService } from '../services';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useIsMobile } from '@/hooks/useIsMobile';
 
 const ProposalDetailPage = ({ proposal, onBack, onSave }) => {
   const { t } = useLanguage();
+  const { isMobile } = useIsMobile();
   const [ticketName, setTicketName] = useState(proposal?.ticketName || proposal?.subCategory?.name || 'New Proposal');
 
   // API data states
@@ -233,8 +235,8 @@ const ProposalDetailPage = ({ proposal, onBack, onSave }) => {
   return (
     <div className="min-h-screen bg-slate-100">
       {/* Compact Header */}
-      <div className="bg-white border-b border-slate-200 px-6 py-4 sticky top-0 z-50">
-        <div className="flex items-center justify-between">
+      <div className="bg-white border-b border-slate-200 px-3 md:px-6 py-3 md:py-4 sticky top-0 z-50">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-4">
             <button onClick={onBack} className="p-2 hover:bg-slate-100 rounded-lg transition-colors">
               <ArrowLeft size={20} className="text-slate-600" />
@@ -276,7 +278,7 @@ const ProposalDetailPage = ({ proposal, onBack, onSave }) => {
           </div>
 
           {/* Center Stats */}
-          <div className="flex items-center gap-6 text-sm">
+          <div className="flex flex-wrap items-center gap-3 md:gap-6 text-sm">
             <div className="flex items-center gap-2">
               <Package size={16} className="text-slate-400" />
               <span className="text-slate-600"><strong className="text-slate-800">{grandTotals.skuCount}</strong> {t('header.kpiSKUs')}</span>
@@ -318,7 +320,7 @@ const ProposalDetailPage = ({ proposal, onBack, onSave }) => {
       )}
 
       {/* Main Content */}
-      <div className="p-6">
+      <div className="p-3 md:p-6">
         {/* Toolbar */}
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-slate-800">{t('proposal.skuCode')}</h2>
@@ -340,6 +342,7 @@ const ProposalDetailPage = ({ proposal, onBack, onSave }) => {
               <p className="text-sm text-slate-400 mt-1">{t('proposal.addSku')}</p>
             </div>
           ) : (
+            <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
                 <tr className="bg-[rgba(160,120,75,0.18)] border-b border-[rgba(160,120,75,0.25)]">
@@ -501,6 +504,7 @@ const ProposalDetailPage = ({ proposal, onBack, onSave }) => {
                 </tr>
               </tbody>
             </table>
+            </div>
           )}
         </div>
       </div>

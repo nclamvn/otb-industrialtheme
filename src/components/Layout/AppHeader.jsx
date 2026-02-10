@@ -205,7 +205,10 @@ const AppHeader = ({
   currentScreen,
   darkMode = true,
   setDarkMode,
-  kpiData = {}
+  kpiData = {},
+  isMobile = false,
+  user,
+  onLogout,
 }) => {
   const router = useRouter();
   const { t, language, setLanguage } = useLanguage();
@@ -307,7 +310,7 @@ const AppHeader = ({
         : 'linear-gradient(180deg, #ffffff 0%, #fdfbf9 100%)',
     }}>
       {/* Main Header */}
-      <div className="h-11 px-4 flex items-center justify-between" style={{
+      <div className={`h-11 ${isMobile ? 'px-3' : 'px-4'} flex items-center justify-between`} style={{
         borderBottom: `1px solid ${darkMode ? '#1A1A1A' : '#E5E7EB'}`,
         background: darkMode
           ? 'linear-gradient(135deg, #0A0A0A 0%, rgba(215,183,151,0.02) 100%)'
@@ -395,7 +398,7 @@ const AppHeader = ({
 
             {/* Search Modal */}
             {showSearch && (
-              <div className={`absolute right-0 top-full mt-2 w-96 rounded-xl shadow-2xl border overflow-hidden z-[9999] ${
+              <div className={`absolute right-0 top-full mt-2 w-[calc(100vw-24px)] sm:w-96 rounded-xl shadow-2xl border overflow-hidden z-[9999] ${
                 darkMode
                   ? 'bg-[#121212] border-[#2E2E2E]'
                   : 'bg-white border-gray-200'
@@ -635,8 +638,8 @@ const AppHeader = ({
         </div>
       </div>
 
-      {/* KPI Tracking Bar - Only show for Planning workflow */}
-      {currentScreen !== 'budget-management' && isInPlanningWorkflow && (
+      {/* KPI Tracking Bar - Only show for Planning workflow, hidden on mobile */}
+      {!isMobile && currentScreen !== 'budget-management' && isInPlanningWorkflow && (
         <div className="px-4 py-1.5" style={{
           borderBottom: `1px solid ${darkMode ? '#1A1A1A' : '#E5E7EB'}`,
           background: darkMode
