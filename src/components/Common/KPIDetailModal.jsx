@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { X, ArrowRight, Download, AlertTriangle, Info } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useKPIBreakdown } from '../../hooks/useKPIBreakdown';
@@ -73,7 +74,11 @@ const KPIDetailModal = ({
     return () => document.removeEventListener('keydown', handler);
   }, [isOpen, onClose]);
 
-  if (!isOpen) return null;
+  // Portal mount point
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
+
+  if (!isOpen || !mounted) return null;
 
   const borderColor = darkMode ? 'border-[#2E2E2E]' : 'border-gray-200';
   const textMuted = darkMode ? 'text-[#666666]' : 'text-gray-500';
@@ -86,13 +91,13 @@ const KPIDetailModal = ({
     ? Math.max(...data.chartData.map(d => d.value), 1)
     : 1;
 
-  return (
+  return createPortal(
     <div
       className="fixed inset-0 z-[100] flex items-center justify-center p-4 animate-fade-in"
       onClick={onClose}
     >
-      {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+      {/* Backdrop - covers entire viewport including sidebar/header */}
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-md" />
 
       {/* Modal Card */}
       <div
@@ -372,7 +377,8 @@ const KPIDetailModal = ({
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 
