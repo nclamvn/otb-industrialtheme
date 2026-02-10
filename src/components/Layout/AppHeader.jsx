@@ -197,8 +197,23 @@ const AppHeader = ({
   const saveButtonRef = useRef(null);
   const [saveMenuPosition, setSaveMenuPosition] = useState({ top: 0, right: 0 });
   const [showSearch, setShowSearch] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const notificationRef = useRef(null);
   const searchRef = useRef(null);
+
+  // Search results from screen config
+  const searchResults = useMemo(() => {
+    if (!searchQuery.trim()) return [];
+    const q = searchQuery.toLowerCase();
+    return Object.entries(SCREEN_CONFIG)
+      .filter(([id, cfg]) => {
+        const label = (cfg.label || '').toLowerCase();
+        const shortLabel = (cfg.shortLabel || '').toLowerCase();
+        return label.includes(q) || shortLabel.includes(q) || id.includes(q);
+      })
+      .map(([id, cfg]) => ({ id, ...cfg }))
+      .slice(0, 8);
+  }, [searchQuery, SCREEN_CONFIG]);
 
   // Budget alerts state
   const [budgetAlerts, setBudgetAlerts] = useState([]);
@@ -231,6 +246,7 @@ const AppHeader = ({
       }
       if (searchRef.current && !searchRef.current.contains(event.target)) {
         setShowSearch(false);
+        setSearchQuery('');
       }
       if (saveButtonRef.current && !saveButtonRef.current.contains(event.target)) {
         setOpenSaveMenu(false);
@@ -249,6 +265,7 @@ const AppHeader = ({
       }
       if (e.key === 'Escape') {
         setShowSearch(false);
+        setSearchQuery('');
         setShowNotifications(false);
       }
     };
@@ -334,7 +351,7 @@ const AppHeader = ({
 
             {/* Search Modal */}
             {showSearch && (
-              <div className={`absolute right-0 top-full mt-2 w-96 rounded-xl shadow-2xl border overflow-hidden z-50 ${
+              <div className={`absolute right-0 top-full mt-2 w-96 rounded-xl shadow-2xl border overflow-hidden z-[9999] ${
                 darkMode
                   ? 'bg-[#121212] border-[#2E2E2E]'
                   : 'bg-white border-gray-200'
@@ -346,15 +363,66 @@ const AppHeader = ({
                       type="text"
                       placeholder={t('header.searchScreens')}
                       autoFocus
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && searchResults.length > 0) {
+                          onNavigate(searchResults[0].id);
+                          setShowSearch(false);
+                          setSearchQuery('');
+                        }
+                      }}
                       className={`flex-1 bg-transparent text-sm outline-none ${
                         darkMode ? 'text-[#F2F2F2] placeholder:text-[#666666]' : 'text-gray-900 placeholder:text-gray-400'
                       }`}
                     />
+                    {searchQuery && (
+                      <button onClick={() => setSearchQuery('')} className={`p-0.5 rounded ${darkMode ? 'text-[#666666] hover:text-[#999999]' : 'text-gray-400 hover:text-gray-600'}`}>
+                        <span className="text-xs">{t('common.clearAll') || 'Clear'}</span>
+                      </button>
+                    )}
                   </div>
                 </div>
-                <div className={`p-2 text-center text-xs ${darkMode ? 'text-[#666666]' : 'text-gray-600'}`}>
-                  {t('header.typeToSearch')} <kbd className="px-1 py-0.5 rounded bg-[#1A1A1A] text-[#999999]">ESC</kbd> {t('header.toClose')}
-                </div>
+                {/* Search Results */}
+                {searchQuery.trim() && searchResults.length > 0 ? (
+                  <div className="py-1 max-h-72 overflow-y-auto">
+                    {searchResults.map((result) => {
+                      const ResultIcon = result.icon || Home;
+                      return (
+                        <button
+                          key={result.id}
+                          onClick={() => {
+                            onNavigate(result.id);
+                            setShowSearch(false);
+                            setSearchQuery('');
+                          }}
+                          className={`w-full flex items-center gap-3 px-4 py-2.5 transition-colors ${
+                            darkMode
+                              ? 'hover:bg-[rgba(215,183,151,0.08)] text-[#F2F2F2]'
+                              : 'hover:bg-gray-50 text-gray-900'
+                          }`}
+                        >
+                          <ResultIcon size={16} className={darkMode ? 'text-[#D7B797]' : 'text-[#8A6340]'} />
+                          <div className="flex-1 text-left">
+                            <div className={`text-sm font-medium font-['Montserrat']`}>{result.label}</div>
+                            {result.step && (
+                              <div className={`text-xs ${darkMode ? 'text-[#666666]' : 'text-gray-500'}`}>Step {result.step}</div>
+                            )}
+                          </div>
+                          <ChevronRight size={14} className={darkMode ? 'text-[#444444]' : 'text-gray-300'} />
+                        </button>
+                      );
+                    })}
+                  </div>
+                ) : searchQuery.trim() ? (
+                  <div className={`px-4 py-6 text-center text-sm ${darkMode ? 'text-[#666666]' : 'text-gray-500'}`}>
+                    {t('common.noResults') || 'No results found'}
+                  </div>
+                ) : (
+                  <div className={`p-2 text-center text-xs ${darkMode ? 'text-[#666666]' : 'text-gray-600'}`}>
+                    {t('header.typeToSearch')} <kbd className={`px-1 py-0.5 rounded ${darkMode ? 'bg-[#1A1A1A] text-[#999999]' : 'bg-gray-100 text-gray-600'}`}>ESC</kbd> {t('header.toClose')}
+                  </div>
+                )}
               </div>
             )}
           </div>

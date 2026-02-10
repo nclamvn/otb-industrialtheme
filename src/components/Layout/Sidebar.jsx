@@ -152,7 +152,7 @@ const Sidebar = ({ currentScreen, darkMode, setDarkMode, user, onLogout }) => {
     <div
       className={`${isCollapsed ? 'w-[60px]' : 'w-[264px]'} h-screen ${
         darkMode ? 'bg-[#0A0A0A] border-[#1A1A1A]' : 'bg-white border-gray-200'
-      } border-r flex flex-col sticky top-0 transition-all duration-300 ease-in-out`}
+      } border-r flex flex-col sticky top-0 z-40 transition-all duration-300 ease-in-out`}
     >
       {/* Logo Header */}
       <div className={`h-14 flex items-center justify-center border-b ${darkMode ? 'border-[#1A1A1A]' : 'border-gray-200'}`}>

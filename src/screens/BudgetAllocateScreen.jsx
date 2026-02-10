@@ -15,10 +15,11 @@ import { useLanguage } from '@/contexts/LanguageContext';
 // Constants - same as BudgetManagementScreen
 const YEARS = [2023, 2024, 2025, 2026];
 
-const GROUP_BRAND_CATEGORIES = [
-  { id: 'A', name: 'Group A', color: 'from-[#D7B797] to-[#8A6340]' },
-  { id: 'B', name: 'Group B', color: 'from-[#127749] to-[#0d5a37]' },
-  { id: 'C', name: 'Group C', color: 'from-[#2A9E6A] to-[#127749]' },
+const GROUP_BRAND_COLORS = [
+  'from-[#D7B797] to-[#8A6340]',
+  'from-[#127749] to-[#0d5a37]',
+  'from-[#2A9E6A] to-[#127749]',
+  'from-[#6366f1] to-[#4338ca]',
 ];
 
 
@@ -38,21 +39,47 @@ const BudgetAllocateScreen = ({
   const [apiBudgets, setApiBudgets] = useState([]);
   const [loadingBudgets, setLoadingBudgets] = useState(false);
   const [brandList, setBrandList] = useState([]);
+  const [groupBrandList, setGroupBrandList] = useState([]);
 
-  // Fetch brands from API
+  // Fetch brands (group brands) from API
   useEffect(() => {
     const fetchBrands = async () => {
       try {
         const brands = await masterDataService.getBrands();
         const list = Array.isArray(brands) ? brands : (brands?.data || []);
-        setBrandList(list.map(b => ({
-          id: b.id || b.brandId,
-          groupBrandId: b.groupBrandId || b.groupBrand || 'A',
-          name: b.name || b.brandName
-        })));
+
+        // Group brands are the top-level items; individual brands may be nested
+        // The API returns group_brands (Ferragamo, Burberry, etc.)
+        const groups = [];
+        const allBrands = [];
+
+        list.forEach((b, idx) => {
+          const id = b.id || b.brandId;
+          const name = b.name || b.brandName || b.code || 'Unknown';
+          const groupId = b.groupBrandId || b.groupId || id;
+
+          // Add to group list (dedupe)
+          if (!groups.find(g => g.id === groupId)) {
+            groups.push({
+              id: groupId,
+              name: b.groupBrand?.name || b.groupName || name,
+              color: GROUP_BRAND_COLORS[idx % GROUP_BRAND_COLORS.length]
+            });
+          }
+
+          allBrands.push({
+            id,
+            groupBrandId: groupId,
+            name
+          });
+        });
+
+        setGroupBrandList(groups);
+        setBrandList(allBrands);
       } catch (err) {
         console.error('Failed to fetch brands:', err);
         setBrandList([]);
+        setGroupBrandList([]);
       }
     };
     fetchBrands();
@@ -146,7 +173,7 @@ const BudgetAllocateScreen = ({
   const filteredBrands = useMemo(() => {
     if (!selectedGroupBrand) return brandList;
     return brandList.filter(b => b.groupBrandId === selectedGroupBrand);
-  }, [selectedGroupBrand]);
+  }, [selectedGroupBrand, brandList]);
 
   // Track if we just applied allocation data to prevent reset (using ref for synchronous access)
   const appliedAllocationRef = useRef(false);
@@ -466,15 +493,15 @@ const BudgetAllocateScreen = ({
       return brandList.filter(b => b.groupBrandId === selectedGroupBrand);
     }
     return brandList;
-  }, [selectedBrand, selectedGroupBrand]);
+  }, [selectedBrand, selectedGroupBrand, brandList]);
 
   // Get groups to display based on filters
   const displayGroups = useMemo(() => {
     if (selectedGroupBrand) {
-      return GROUP_BRAND_CATEGORIES.filter(g => g.id === selectedGroupBrand);
+      return groupBrandList.filter(g => g.id === selectedGroupBrand);
     }
-    return GROUP_BRAND_CATEGORIES;
-  }, [selectedGroupBrand]);
+    return groupBrandList;
+  }, [selectedGroupBrand, groupBrandList]);
 
   // Handle budget selection from dropdown - auto-populate other filters
   const handleBudgetSelect = (budget) => {
@@ -536,7 +563,7 @@ const BudgetAllocateScreen = ({
   const selectedVersion = versions.find(v => v.id === selectedVersionId);
 
   // Get selected group brand object
-  const selectedGroupBrandObj = GROUP_BRAND_CATEGORIES.find(b => b.id === selectedGroupBrand);
+  const selectedGroupBrandObj = groupBrandList.find(b => b.id === selectedGroupBrand);
   const selectedBrandObj = brandList.find(b => b.id === selectedBrand);
   return (
     <>
@@ -762,7 +789,7 @@ const BudgetAllocateScreen = ({
                         <span className="font-medium">{t('budget.allGroupBrands')}</span>
                         {selectedGroupBrand === null && <Check size={14} className="text-[#127749]" />}
                       </div>
-                      {GROUP_BRAND_CATEGORIES.map((group) => (
+                      {groupBrandList.map((group) => (
                         <div
                           key={group.id}
                           onClick={() => { setSelectedGroupBrand(group.id); setIsGroupBrandDropdownOpen(false); }}

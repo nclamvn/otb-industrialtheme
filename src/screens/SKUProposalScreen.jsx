@@ -52,6 +52,29 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
   const [skuCatalog, setSkuCatalog] = useState([]);
   const [skuDataLoading, setSkuDataLoading] = useState(true);
 
+  // Master data for filters (genders, categories)
+  const [masterGenders, setMasterGenders] = useState([]);
+  const [masterCategories, setMasterCategories] = useState([]);
+
+  // Fetch master data for filters
+  useEffect(() => {
+    const fetchMasterData = async () => {
+      try {
+        const [gendersRes, categoriesRes] = await Promise.all([
+          masterDataService.getGenders().catch(() => []),
+          masterDataService.getCategories().catch(() => [])
+        ]);
+        const genders = Array.isArray(gendersRes) ? gendersRes : (gendersRes?.data || []);
+        setMasterGenders(genders.map(g => (g.name || g.code || '').toLowerCase()));
+        const categories = Array.isArray(categoriesRes) ? categoriesRes : (categoriesRes?.data || []);
+        setMasterCategories(categories);
+      } catch (err) {
+        console.error('Failed to fetch master data:', err);
+      }
+    };
+    fetchMasterData();
+  }, []);
+
   // Fetch SKU catalog and proposals from API
   useEffect(() => {
     const fetchSkuData = async () => {
@@ -132,7 +155,7 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
         brandId: budget.brandId,
         brandName: budget.Brand?.name || budget.brandName || 'Unknown',
         totalBudget: budget.totalAmount || budget.totalBudget || 0,
-        budgetName: budget.name || budget.budgetName || 'Untitled',
+        budgetName: budget.budgetCode || budget.name || budget.budgetName || `Budget #${budget.id}`,
         status: (budget.status || 'DRAFT').toLowerCase()
       }));
       setApiBudgets(budgetList);
@@ -297,22 +320,33 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
   }, [apiBudgets]);
 
   const genderOptions = useMemo(() => {
-    const genders = new Set(skuBlocks.map(s => s.gender));
+    const fromBlocks = skuBlocks.map(s => s.gender).filter(Boolean);
+    const fromMaster = masterGenders.filter(Boolean);
+    const genders = new Set([...fromBlocks, ...fromMaster]);
     return ['all', ...Array.from(genders)];
-  }, [skuBlocks]);
+  }, [skuBlocks, masterGenders]);
 
   const categoryOptions = useMemo(() => {
-    const categories = skuBlocks.filter(s => genderFilter === 'all' || s.gender === genderFilter)
-      .map(s => s.category);
-    return ['all', ...Array.from(new Set(categories))];
-  }, [genderFilter, skuBlocks]);
+    const fromBlocks = skuBlocks
+      .filter(s => genderFilter === 'all' || s.gender === genderFilter)
+      .map(s => s.category)
+      .filter(Boolean);
+    const fromMaster = masterCategories.map(c => c.name || c.code || '').filter(Boolean);
+    return ['all', ...Array.from(new Set([...fromBlocks, ...fromMaster]))];
+  }, [genderFilter, skuBlocks, masterCategories]);
 
   const subCategoryOptions = useMemo(() => {
-    const subs = skuBlocks.filter(s => (genderFilter === 'all' || s.gender === genderFilter)
+    const fromBlocks = skuBlocks
+      .filter(s => (genderFilter === 'all' || s.gender === genderFilter)
         && (categoryFilter === 'all' || s.category === categoryFilter))
-      .map(s => s.subCategory);
-    return ['all', ...Array.from(new Set(subs))];
-  }, [genderFilter, categoryFilter, skuBlocks]);
+      .map(s => s.subCategory)
+      .filter(Boolean);
+    // Also extract sub-categories from master data
+    const fromMaster = masterCategories
+      .flatMap(c => (c.subCategories || []).map(sc => sc.name || sc.code || ''))
+      .filter(Boolean);
+    return ['all', ...Array.from(new Set([...fromBlocks, ...fromMaster]))];
+  }, [genderFilter, categoryFilter, skuBlocks, masterCategories]);
 
   const filteredSkuBlocks = useMemo(() => {
     return skuBlocks.filter(block => {

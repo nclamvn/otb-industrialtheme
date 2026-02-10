@@ -7,7 +7,7 @@
 
 ---
 
-## Cap nhat lan cuoi: 09/02/2026 (Session 10 - Node 22/24 Compatibility Fix)
+## Cap nhat lan cuoi: 10/02/2026 (Session 11 - QA Bug Fixes)
 
 ---
 
@@ -631,6 +631,61 @@ npm run dev
 
 ---
 
+## SESSION 10/02/2026 - Session 11
+
+### Thay doi chinh: QA Bug Fixes (6 bugs tu customer feedback)
+
+1. **BUG-001: User Menu z-index (HIGH)**
+   - Root cause: Sidebar container thieu `z-index`, user menu popup bi de duoi main content
+   - Fix: Them `z-40` vao Sidebar container div
+   - File: `src/components/Layout/Sidebar.jsx`
+
+2. **BUG-002: Budget Allocation khong hien data (CRITICAL)**
+   - Root cause: `GROUP_BRAND_CATEGORIES` hardcode IDs 'A','B','C' nhung API tra ve numeric/UUID groupBrandId
+   - Fix: Fetch group brands tu API dynamically, bo hardcoded GROUP_BRAND_CATEGORIES
+   - Them state `groupBrandList` + fetch tu `masterDataService.getBrands()`
+   - `displayGroups` gio dung `groupBrandList` thay vi hardcoded array
+   - File: `src/screens/BudgetAllocateScreen.jsx`
+
+3. **BUG-003: Budget name hien "Untitled" (CRITICAL)**
+   - Root cause: SKUProposalScreen dung `budget.name || budget.budgetName` nhung backend tra ve `budgetCode`
+   - Fix: Them `budget.budgetCode` lam field dau tien trong mapping
+   - File: `src/screens/SKUProposalScreen.jsx`
+
+4. **BUG-004: SKU data khong load (HIGH)**
+   - Root cause: `skuBlocks` chi populate tu proposals; neu chua co proposal thi empty
+   - Fix: Fetch master data (genders, categories) tu API de populate filter options
+   - Them `masterGenders`, `masterCategories` state + fetch tu masterDataService
+   - File: `src/screens/SKUProposalScreen.jsx`
+
+5. **BUG-005: Global Search khong hoat dong (MEDIUM)**
+   - Root cause: Search input chi la UI shell, chua co handler
+   - Fix: Them `searchQuery` state + `searchResults` memo filter SCREEN_CONFIG
+   - Search results hien danh sach screens match, click de navigate
+   - Ho tro Enter de navigate ket qua dau tien, ESC de dong
+   - File: `src/components/Layout/AppHeader.jsx`
+
+6. **BUG-006: Gender dropdown trong (HIGH)**
+   - Root cause: `genderOptions` derived tu empty `skuBlocks` thay vi master data
+   - Fix: Merge genders tu `skuBlocks` + `masterGenders` (tu API /master/genders)
+   - Tuong tu cho categoryOptions va subCategoryOptions
+   - File: `src/screens/SKUProposalScreen.jsx`
+
+### Build Verification
+- 17 static + 3 dynamic routes (20 total), 0 errors
+- postbuild copy assets thanh cong
+
+### Files da cap nhat (4 files)
+```
+# Modified files
+src/components/Layout/Sidebar.jsx         # z-40 cho sidebar container (BUG-001)
+src/screens/BudgetAllocateScreen.jsx      # Dynamic group brands tu API (BUG-002)
+src/screens/SKUProposalScreen.jsx         # budgetCode mapping + master data filters (BUG-003,004,006)
+src/components/Layout/AppHeader.jsx       # Implement search logic (BUG-005)
+```
+
+---
+
 ## SESSION 09/02/2026 - Session 10
 
 ### Thay doi chinh
@@ -843,11 +898,14 @@ src/locales/vi.js                             # 105+ new keys
 - [x] ~~3 missing screens (Approvals, Order Confirm, Receipt Confirm)~~ → Done Session 8
 - [x] ~~Azure deployment config~~ → Done Session 8
 - [x] ~~Backend security vulnerabilities~~ → 0 vulnerabilities (Session 8)
+- [x] ~~QA Bug Fixes (6 bugs)~~ → Done Session 11
 - [ ] TicketDetailPage.jsx still has MOCK_SKU_DATA and MOCK_DETAIL_DATA (fallback)
+- [ ] TicketScreen.jsx: TODO - Implement create ticket API call (line 546)
 - [ ] Azure Portal manual config (Node 22 LTS, `node .next/standalone/server.js` / `node dist/src/main.js`, env vars)
 - [ ] E2E testing (test suite co san, chua chay)
 - [ ] Performance tuning
 - [ ] Mobile responsive testing
+- [ ] Hardcoded years (2025) o nhieu noi can dynamic
 
 ---
 
