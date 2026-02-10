@@ -20,9 +20,8 @@ export const SEASON_CONFIG = {
 };
 
 export const COLLECTIONS = [
-  { id: 'col1', name: 'Spring Elegance' },
-  { id: 'col2', name: 'Urban Classic' },
-  { id: 'col3', name: 'Summer Breeze' }
+  { id: 'col1', name: 'Carry Over' },
+  { id: 'col2', name: 'Seasonal' }
 ];
 
 export const GENDERS = [
@@ -31,9 +30,21 @@ export const GENDERS = [
 ];
 
 export const CATEGORIES = [
-  { id: 'cat1', name: 'Bags', genderId: 'gen2' },
-  { id: 'cat2', name: 'Shoes', genderId: 'gen1' },
-  { id: 'cat3', name: 'Accessories', genderId: 'gen3' }
+  { id: 'women_rtw', name: "Women's RTW", genderId: 'gen2' },
+  { id: 'women_hard_acc', name: "Women's Hard Accessories", genderId: 'gen2' },
+  { id: 'men_rtw', name: "Men's RTW", genderId: 'gen1' },
+  { id: 'men_hard_acc', name: "Men's Hard Accessories", genderId: 'gen1' }
+];
+
+export const SUB_CATEGORIES = [
+  { id: 'w_outerwear', name: 'W Outerwear', categoryId: 'women_rtw' },
+  { id: 'w_tailoring', name: 'W Tailoring', categoryId: 'women_rtw' },
+  { id: 'w_tops', name: 'W Tops', categoryId: 'women_rtw' },
+  { id: 'w_bags', name: 'W Bags', categoryId: 'women_hard_acc' },
+  { id: 'm_outerwear', name: 'M Outerwear', categoryId: 'men_rtw' },
+  { id: 'm_tailoring', name: 'M Tailoring', categoryId: 'men_rtw' },
+  { id: 'm_tops', name: 'M Tops', categoryId: 'men_rtw' },
+  { id: 'm_bags', name: 'M Bags', categoryId: 'men_hard_acc' }
 ];
 
 export const CURRENT_YEAR = 2025;

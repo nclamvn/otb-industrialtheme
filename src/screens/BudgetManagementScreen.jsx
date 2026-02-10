@@ -6,7 +6,6 @@ import {
   Wallet, CircleCheckBig, Hourglass
 } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { GROUP_BRANDS } from '../utils/constants';
 import { formatCurrency } from '../utils/formatters';
 import { budgetService, masterDataService } from '../services';
 import { LoadingSpinner, ErrorMessage, EmptyState, ExpandableStatCard } from '../components/Common';
@@ -14,13 +13,6 @@ import BudgetAlertsBanner from '../components/BudgetAlertsBanner';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 const YEARS = [2023, 2024, 2025, 2026];
-
-// Group Brand Categories (parent level)
-const GROUP_BRAND_CATEGORIES = [
-  { id: 'A', name: 'Group A' },
-  { id: 'B', name: 'Group B' },
-  { id: 'C', name: 'Group C' },
-];
 
 const CARD_ACCENTS = {
   total:     { color: '#D7B797', darkGrad: 'rgba(215,183,151,0.06)', lightGrad: 'rgba(180,140,95,0.10)', iconDark: 'rgba(215,183,151,0.07)', iconLight: 'rgba(160,120,75,0.08)' },
@@ -49,6 +41,24 @@ const BudgetManagementScreen = ({
   // Master data for create form
   const [apiBrands, setApiBrands] = useState([]);
   const [apiStores, setApiStores] = useState([]);
+
+  // Derived brand list and group categories from API
+  const brandList = useMemo(() => apiBrands.map(b => ({
+    id: b.id,
+    code: b.code,
+    name: b.name,
+    groupId: b.groupId || 'A',
+    color: b.colorConfig?.gradient || 'from-gray-400 to-gray-600',
+  })), [apiBrands]);
+
+  const groupBrandCategories = useMemo(() => {
+    const groups = {};
+    brandList.forEach(b => {
+      const gid = b.groupId || 'A';
+      if (!groups[gid]) groups[gid] = { id: gid, name: `Group ${gid}` };
+    });
+    return Object.values(groups).sort((a, b) => a.id.localeCompare(b.id));
+  }, [brandList]);
 
   // Fetch budgets from API
   const fetchBudgets = useCallback(async () => {
@@ -277,7 +287,7 @@ const BudgetManagementScreen = ({
             >
               <span className="text-sm font-medium">
                 {selectedGroupBrand
-                  ? GROUP_BRAND_CATEGORIES.find(g => g.id === selectedGroupBrand)?.name
+                  ? groupBrandCategories.find(g => g.id === selectedGroupBrand)?.name
                   : t('budget.allGroupBrands')}
               </span>
               <ChevronDown size={16} className="opacity-50 shrink-0" />
@@ -290,7 +300,7 @@ const BudgetManagementScreen = ({
                 >
                   {t('budget.allGroupBrands')}
                 </button>
-                {GROUP_BRAND_CATEGORIES.map(group => (
+                {groupBrandCategories.map(group => (
                   <button
                     key={group.id}
                     onClick={() => { setSelectedGroupBrand(group.id); setGroupBrandDropdownOpen(false); }}
@@ -321,7 +331,7 @@ const BudgetManagementScreen = ({
                 }`}
             >
               <span className="text-sm font-medium">
-                {selectedBrand ? GROUP_BRANDS.find(b => b.id === selectedBrand)?.name : t('budget.allBrands')}
+                {selectedBrand ? brandList.find(b => b.id === selectedBrand)?.name : t('budget.allBrands')}
               </span>
               <ChevronDown size={16} className="opacity-50 shrink-0" />
             </button>
@@ -333,7 +343,7 @@ const BudgetManagementScreen = ({
                 >
                   {t('budget.allBrands')}
                 </button>
-                {GROUP_BRANDS.map(brand => (
+                {brandList.map(brand => (
                   <button
                     key={brand.id}
                     onClick={() => { setSelectedBrand(brand.id); setBrandDropdownOpen(false); }}
@@ -745,7 +755,7 @@ const BudgetManagementScreen = ({
                     }
                     className={`w-full px-4 py-2.5 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#D7B797] focus:border-[#D7B797] ${darkMode ? 'bg-[#1A1A1A] border-[#2E2E2E] text-[#F2F2F2]' : 'bg-white border-[#C4B5A5] text-[#0A0A0A]'}`}
                   >
-                    {GROUP_BRAND_CATEGORIES.map((group) => (
+                    {groupBrandCategories.map((group) => (
                       <option key={group.id} value={group.id}>
                         {group.name}
                       </option>

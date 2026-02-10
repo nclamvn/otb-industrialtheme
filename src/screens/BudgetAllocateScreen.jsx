@@ -40,6 +40,7 @@ const BudgetAllocateScreen = ({
   const [loadingBudgets, setLoadingBudgets] = useState(false);
   const [brandList, setBrandList] = useState([]);
   const [groupBrandList, setGroupBrandList] = useState([]);
+  const [categoryData, setCategoryData] = useState([]);
 
   // Fetch brands (group brands) from API
   useEffect(() => {
@@ -83,6 +84,11 @@ const BudgetAllocateScreen = ({
       }
     };
     fetchBrands();
+    // Fetch categories
+    masterDataService.getCategories().then(res => {
+      const data = res.data || res || [];
+      setCategoryData(Array.isArray(data) ? data : []);
+    }).catch(() => setCategoryData([]));
   }, []);
 
   // Fetch budgets on mount (with Strict Mode ignore pattern)
@@ -1409,6 +1415,67 @@ const BudgetAllocateScreen = ({
               </div>
             );
           })}
+        </div>
+      )}
+      {/* Category Breakdown Table */}
+      {selectedBudget && categoryData.length > 0 && (
+        <div className={`mt-4 rounded-xl shadow-sm border overflow-hidden ${darkMode ? 'bg-[#121212] border-[#2E2E2E]' : 'bg-white border-[#2E2E2E]/20'}`}>
+          <div className={`px-5 py-3 border-b flex items-center gap-3 ${darkMode ? 'border-[#2E2E2E] bg-[rgba(215,183,151,0.06)]' : 'border-[#2E2E2E]/10 bg-[rgba(215,183,151,0.08)]'}`}>
+            <Layers size={18} className={darkMode ? 'text-[#D7B797]' : 'text-[#8A6340]'} />
+            <h3 className={`font-bold text-sm font-['Montserrat'] ${darkMode ? 'text-[#F2F2F2]' : 'text-[#0A0A0A]'}`}>
+              {t('budget.categoryBreakdown') || 'Category Breakdown'}
+            </h3>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[700px]">
+              <thead>
+                <tr className={`text-xs font-semibold uppercase tracking-wider ${darkMode ? 'bg-[#1A1A1A] text-[#999]' : 'bg-gray-50 text-gray-500'}`}>
+                  <th className="text-left px-5 py-3 w-40">{t('common.gender') || 'Gender'}</th>
+                  <th className="text-left px-5 py-3 w-56">{t('common.category') || 'Category'}</th>
+                  <th className="text-left px-5 py-3">{t('common.subCategories') || 'Sub-Categories'}</th>
+                  <th className="text-center px-5 py-3 w-32"># Sub-Cat</th>
+                </tr>
+              </thead>
+              <tbody>
+                {categoryData.map((gender) => {
+                  const cats = gender.categories || [];
+                  return cats.map((cat, cIdx) => (
+                    <tr
+                      key={`${gender.id}-${cat.id}`}
+                      className={`border-t text-sm ${darkMode ? 'border-[#2E2E2E] hover:bg-[rgba(215,183,151,0.04)]' : 'border-gray-100 hover:bg-gray-50'}`}
+                    >
+                      {cIdx === 0 && (
+                        <td
+                          rowSpan={cats.length}
+                          className={`px-5 py-3 font-semibold align-top font-['Montserrat'] ${darkMode ? 'text-[#D7B797]' : 'text-[#8A6340]'}`}
+                        >
+                          {gender.name}
+                        </td>
+                      )}
+                      <td className={`px-5 py-3 font-medium font-['Montserrat'] ${darkMode ? 'text-[#F2F2F2]' : 'text-[#0A0A0A]'}`}>
+                        {cat.name}
+                      </td>
+                      <td className={`px-5 py-3 ${darkMode ? 'text-[#999]' : 'text-gray-600'}`}>
+                        <div className="flex flex-wrap gap-1.5">
+                          {(cat.subCategories || []).map(sub => (
+                            <span
+                              key={sub.id}
+                              className={`inline-block px-2.5 py-1 rounded-full text-xs font-medium ${darkMode ? 'bg-[rgba(215,183,151,0.1)] text-[#D7B797] border border-[rgba(215,183,151,0.2)]' : 'bg-[rgba(215,183,151,0.15)] text-[#8A6340] border border-[rgba(215,183,151,0.3)]'}`}
+                            >
+                              {sub.name}
+                            </span>
+                          ))}
+                        </div>
+                      </td>
+                      <td className={`px-5 py-3 text-center font-['JetBrains_Mono'] font-medium ${darkMode ? 'text-[#F2F2F2]' : 'text-[#0A0A0A]'}`}>
+                        {(cat.subCategories || []).length}
+                      </td>
+                    </tr>
+                  ));
+                })}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
     </>

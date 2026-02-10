@@ -27,73 +27,6 @@ import RiskScoreCard from '../components/RiskScoreCard';
 const REX_COLOR = '#D7B797';
 const TTP_COLOR = '#127749';
 
-// Mock SKU data for demo
-const MOCK_SKU_DATA = [
-  {
-    gender: 'female',
-    productType: 'W OUTERWEAR',
-    subCategory: 'Jackets & Coats',
-    pctBuyPropose: 35,
-    otbPropose: 2500000000,
-    items: [
-      { sku: '8116333', name: 'FITZROVIA DK SHT', theme: 'AUGUST (08)', color: 'WINE RED', composition: '100% COTTON', srp: 87900000, order: 6, rex: 3, ttp: 3, ttlValue: 527400000, productType: 'W OUTERWEAR' },
-      { sku: '8116334', name: 'CHELSEA TRENCH', theme: 'AUGUST (08)', color: 'CAMEL', composition: '100% WOOL', srp: 125000000, order: 4, rex: 2, ttp: 2, ttlValue: 500000000, productType: 'W OUTERWEAR' },
-      { sku: '8116335', name: 'KENSINGTON COAT', theme: 'SEPTEMBER (09)', color: 'BLACK', composition: '80% WOOL 20% CASHMERE', srp: 185000000, order: 3, rex: 2, ttp: 1, ttlValue: 555000000, productType: 'W OUTERWEAR' },
-    ]
-  },
-  {
-    gender: 'female',
-    productType: 'W KNITWEAR',
-    subCategory: 'Sweaters',
-    pctBuyPropose: 25,
-    otbPropose: 1800000000,
-    items: [
-      { sku: '8117001', name: 'CASHMERE CREW', theme: 'AUGUST (08)', color: 'IVORY', composition: '100% CASHMERE', srp: 45000000, order: 8, rex: 4, ttp: 4, ttlValue: 360000000, productType: 'W KNITWEAR' },
-      { sku: '8117002', name: 'MERINO TURTLENECK', theme: 'SEPTEMBER (09)', color: 'BURGUNDY', composition: '100% MERINO WOOL', srp: 35000000, order: 10, rex: 5, ttp: 5, ttlValue: 350000000, productType: 'W KNITWEAR' },
-    ]
-  },
-  {
-    gender: 'male',
-    productType: 'M OUTERWEAR',
-    subCategory: 'Jackets',
-    pctBuyPropose: 40,
-    otbPropose: 3200000000,
-    items: [
-      { sku: '8118001', name: 'WESTMINSTER TRENCH', theme: 'AUGUST (08)', color: 'HONEY', composition: '100% COTTON GABARDINE', srp: 95000000, order: 5, rex: 3, ttp: 2, ttlValue: 475000000, productType: 'M OUTERWEAR' },
-      { sku: '8118002', name: 'PADDED JACKET', theme: 'SEPTEMBER (09)', color: 'NAVY', composition: 'NYLON/DOWN FILL', srp: 75000000, order: 6, rex: 3, ttp: 3, ttlValue: 450000000, productType: 'M OUTERWEAR' },
-      { sku: '8118003', name: 'QUILTED VEST', theme: 'AUGUST (08)', color: 'ARCHIVE BEIGE', composition: 'NYLON/POLYESTER', srp: 42000000, order: 8, rex: 4, ttp: 4, ttlValue: 336000000, productType: 'M OUTERWEAR' },
-    ]
-  },
-  {
-    gender: 'male',
-    productType: 'M ACCESSORIES',
-    subCategory: 'Bags',
-    pctBuyPropose: 20,
-    otbPropose: 1500000000,
-    items: [
-      { sku: '8119001', name: 'TB MESSENGER BAG', theme: 'CORE', color: 'BLACK', composition: '100% LEATHER', srp: 55000000, order: 5, rex: 3, ttp: 2, ttlValue: 275000000, productType: 'M ACCESSORIES' },
-      { sku: '8119002', name: 'CHECK BACKPACK', theme: 'AUGUST (08)', color: 'VINTAGE CHECK', composition: 'CANVAS/LEATHER', srp: 48000000, order: 6, rex: 3, ttp: 3, ttlValue: 288000000, productType: 'M ACCESSORIES' },
-    ]
-  }
-];
-
-// Mock detail data for demo
-const MOCK_DETAIL_DATA = {
-  id: 1,
-  fiscalYear: 2025,
-  groupBrand: { name: 'BURBERRY', code: 'BBY' },
-  seasonGroupId: 'SS',
-  seasonType: 'Main',
-  totalBudget: 15000000000,
-  status: 'APPROVED',
-  createdBy: { name: 'Nguyễn Văn A' },
-  createdAt: '2025-01-15',
-  details: [
-    { store: { name: 'REX' }, budgetAmount: 9000000000 },
-    { store: { name: 'TTP' }, budgetAmount: 6000000000 }
-  ]
-};
-
 // Card styles using DAFC tokens
 const CARD_STYLES_DARK = [
   'from-[rgba(215,183,151,0.12)] to-[rgba(215,183,151,0.05)] border-[rgba(215,183,151,0.25)]',
@@ -837,16 +770,12 @@ export default function TicketDetailPage({ ticket, onBack, darkMode = true }) {
 
         setDetailData(data);
       } catch (err) {
-        console.error('Failed to fetch ticket detail, using mock data:', err);
-        // Use mock data as fallback
-        setDetailData(MOCK_DETAIL_DATA);
-        setSkuData(MOCK_SKU_DATA);
-        // Default collapse all mock SKU groups
-        const defaultCollapsed = {};
-        MOCK_SKU_DATA.forEach(block => {
-          defaultCollapsed[`${block.productType}_${block.gender}`] = true;
-        });
-        setCollapsed(defaultCollapsed);
+        console.error('Failed to fetch ticket detail:', err);
+        toast.error('Failed to load detail data');
+        // Use ticket's inline data if available
+        if (ticket.data) {
+          setDetailData(ticket.data);
+        }
       } finally {
         setLoading(false);
       }
