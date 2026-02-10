@@ -735,6 +735,181 @@ async function main() {
   }
   console.log(`  ✅ ${allocationData.length} allocation history records`);
 
+  // ─── SKU PERFORMANCE (Analytics) ──────────────────────────────────────
+  const allSkusFull = await prisma.skuCatalog.findMany({ select: { id: true, skuCode: true, srp: true, productType: true } });
+  const perfRecords: any[] = [];
+  for (const sku of allSkusFull) {
+    const srp = Number(sku.srp);
+    for (const sg of ['SS', 'FW']) {
+      for (const fy of [2024, 2025]) {
+        const storeEntries = [
+          { id: storeREX.id, factor: 0.6 },
+          { id: storeTTP.id, factor: 0.4 },
+          { id: null, factor: 1.0 },
+        ];
+        for (const st of storeEntries) {
+          const baseBought = 20 + Math.floor(Math.random() * 100);
+          const bought = Math.round(baseBought * st.factor);
+          const stPct = 55 + Math.random() * 37;
+          const sold = Math.round(bought * stPct / 100);
+          const avgPrice = srp * (0.85 + Math.random() * 0.15);
+          const revenue = sold * avgPrice;
+          const grossMargin = 45 + Math.random() * 23;
+          const markdown = 5 + Math.random() * 30;
+          const weeks = 4 + Math.floor(Math.random() * 16);
+          const perfScore = 35 + Math.floor(Math.random() * 60);
+          const velScore = 30 + Math.floor(Math.random() * 60);
+          const margScore = 40 + Math.floor(Math.random() * 45);
+          perfRecords.push({
+            skuId: sku.id, skuCode: sku.skuCode, seasonGroup: sg, fiscalYear: fy,
+            storeId: st.id, quantityBought: bought, quantitySold: sold,
+            sellThroughPct: +stPct.toFixed(2), avgSellingPrice: Math.round(avgPrice),
+            totalRevenue: Math.round(revenue), grossMarginPct: +grossMargin.toFixed(2),
+            markdownPct: +markdown.toFixed(2), weeksToSellThru: weeks,
+            performanceScore: perfScore, velocityScore: velScore, marginScore: margScore,
+          });
+        }
+      }
+    }
+  }
+  for (let i = 0; i < perfRecords.length; i += 50) {
+    await prisma.skuPerformance.createMany({ data: perfRecords.slice(i, i + 50) });
+  }
+  console.log(`  ✅ ${perfRecords.length} SKU performance records`);
+
+  // ─── ATTRIBUTE TRENDS (Analytics) ─────────────────────────────────────
+  const trendRecords: any[] = [];
+  const colorTrends = [
+    { value: 'BLACK', score: 85 }, { value: 'HONEY', score: 80 }, { value: 'WINE RED', score: 75 },
+    { value: 'NAVY', score: 70 }, { value: 'IVORY', score: 65 }, { value: 'NERO', score: 82 },
+    { value: 'BONE', score: 60 }, { value: 'LIPSTICK', score: 58 }, { value: 'GOLD', score: 72 },
+    { value: 'MAHOGANY', score: 55 }, { value: 'BURGUNDY', score: 68 }, { value: 'TAN', score: 52 },
+  ];
+  for (const ct of colorTrends) {
+    for (const sg of ['SS', 'FW']) {
+      for (const fy of [2024, 2025]) {
+        trendRecords.push({
+          attributeType: 'color', attributeValue: ct.value, category: null,
+          seasonGroup: sg, fiscalYear: fy,
+          totalSkus: 3 + Math.floor(Math.random() * 12),
+          avgSellThrough: +(ct.score * 0.9 + Math.random() * 6 - 3).toFixed(2),
+          avgMargin: +(ct.score * 0.7 + Math.random() * 4 - 2).toFixed(2),
+          trendScore: ct.score + Math.floor(Math.random() * 6) - 3,
+          yoyGrowth: fy === 2025 ? +(-10 + Math.random() * 30).toFixed(2) : null,
+        });
+      }
+    }
+  }
+  const compositionTrends = [
+    { value: 'Calfskin Leather', score: 88 }, { value: '100% Cashmere', score: 82 },
+    { value: 'Virgin Wool', score: 78 }, { value: '100% Silk', score: 75 },
+    { value: 'Cotton Gabardine', score: 70 }, { value: 'Patent Leather', score: 65 },
+    { value: 'GG Supreme Canvas', score: 72 },
+  ];
+  for (const ct of compositionTrends) {
+    for (const sg of ['SS', 'FW']) {
+      for (const fy of [2024, 2025]) {
+        trendRecords.push({
+          attributeType: 'composition', attributeValue: ct.value, category: null,
+          seasonGroup: sg, fiscalYear: fy,
+          totalSkus: 2 + Math.floor(Math.random() * 8),
+          avgSellThrough: +(ct.score * 0.85 + Math.random() * 6 - 3).toFixed(2),
+          avgMargin: +(ct.score * 0.65 + Math.random() * 4 - 2).toFixed(2),
+          trendScore: ct.score + Math.floor(Math.random() * 6) - 3,
+          yoyGrowth: fy === 2025 ? +(-8 + Math.random() * 25).toFixed(2) : null,
+        });
+      }
+    }
+  }
+  const productTypeTrends = [
+    { value: 'W Bags', cat: "Women's Hard Accessories", score: 90 },
+    { value: 'W Outerwear', cat: "Women's RTW", score: 85 },
+    { value: 'W Tops', cat: "Women's RTW", score: 78 },
+    { value: 'W Tailoring', cat: "Women's RTW", score: 72 },
+    { value: 'M Bags', cat: "Men's Hard Accessories", score: 80 },
+    { value: 'M Outerwear', cat: "Men's RTW", score: 75 },
+    { value: 'M Tops', cat: "Men's RTW", score: 70 },
+    { value: 'M Tailoring', cat: "Men's RTW", score: 65 },
+  ];
+  for (const pt of productTypeTrends) {
+    for (const sg of ['SS', 'FW']) {
+      for (const fy of [2024, 2025]) {
+        trendRecords.push({
+          attributeType: 'product_type', attributeValue: pt.value, category: pt.cat,
+          seasonGroup: sg, fiscalYear: fy,
+          totalSkus: 2 + Math.floor(Math.random() * 10),
+          avgSellThrough: +(pt.score * 0.88 + Math.random() * 6 - 3).toFixed(2),
+          avgMargin: +(pt.score * 0.68 + Math.random() * 4 - 2).toFixed(2),
+          trendScore: pt.score + Math.floor(Math.random() * 6) - 3,
+          yoyGrowth: fy === 2025 ? +(-5 + Math.random() * 20).toFixed(2) : null,
+        });
+      }
+    }
+  }
+  for (let i = 0; i < trendRecords.length; i += 50) {
+    await prisma.attributeTrend.createMany({ data: trendRecords.slice(i, i + 50) });
+  }
+  console.log(`  ✅ ${trendRecords.length} attribute trend records`);
+
+  // ─── BUDGET SNAPSHOTS (Analytics) ─────────────────────────────────────
+  const snapshotRecords: any[] = [];
+  const snapshotBudgets = createdBudgets.filter(b => b.fiscalYear === 2025);
+  for (const budget of snapshotBudgets) {
+    const total = Number(budget.totalBudget);
+    const startUtil = 0.15 + Math.random() * 0.2;
+    const endUtil = 0.55 + Math.random() * 0.25;
+    for (let dayOffset = 29; dayOffset >= 0; dayOffset--) {
+      const progress = (29 - dayOffset) / 29;
+      const utilPct = startUtil + (endUtil - startUtil) * progress;
+      const committed = Math.round(total * utilPct);
+      const planned = Math.round(total * Math.min(utilPct + 0.05 + Math.random() * 0.1, 1));
+      const snapDate = new Date();
+      snapDate.setDate(snapDate.getDate() - dayOffset);
+      snapDate.setHours(0, 0, 0, 0);
+      snapshotRecords.push({
+        budgetId: budget.id, snapshotDate: snapDate,
+        totalCommitted: committed, totalPlanned: planned,
+        utilizationPct: +(utilPct * 100).toFixed(2),
+      });
+    }
+  }
+  for (const snap of snapshotRecords) {
+    await prisma.budgetSnapshot.create({ data: snap });
+  }
+  console.log(`  ✅ ${snapshotRecords.length} budget snapshots`);
+
+  // ─── BUDGET ALERTS (Analytics) ────────────────────────────────────────
+  const alertBudgets = createdBudgets.filter(b => b.fiscalYear === 2025);
+  const alertRecords: any[] = [];
+  const alertTemplates = [
+    { alertType: 'over_budget', severity: 'critical', title: 'Budget Overspend Alert', msgFn: (b: any) => `${b.budgetCode} committed proposals exceed allocated budget by ${(5 + Math.random() * 10).toFixed(1)}%. Review and adjust proposals immediately.` },
+    { alertType: 'over_budget', severity: 'critical', title: 'Budget Threshold Exceeded', msgFn: (b: any) => `${b.budgetCode} store allocation is at ${(102 + Math.random() * 8).toFixed(0)}% utilization.` },
+    { alertType: 'pace_warning', severity: 'warning', title: 'Slow Commitment Pace', msgFn: (b: any) => `${b.budgetCode} has only ${(25 + Math.random() * 20).toFixed(0)}% of budget committed with 60% of the buying window elapsed.` },
+    { alertType: 'pace_warning', severity: 'warning', title: 'Commitment Pace Below Target', msgFn: (b: any) => `${b.budgetCode} commitment rate is below seasonal average. Consider accelerating submissions.` },
+    { alertType: 'category_imbalance', severity: 'warning', title: 'Category Allocation Imbalance', msgFn: (b: any) => `${b.budgetCode} W Bags allocation is ${(8 + Math.random() * 12).toFixed(0)}% above target vs historical mix.` },
+    { alertType: 'under_utilized', severity: 'info', title: 'Under-Utilized Budget', msgFn: (b: any) => `${b.budgetCode} has ${(30 + Math.random() * 20).toFixed(0)}% remaining budget with buying window closing soon.` },
+    { alertType: 'under_utilized', severity: 'info', title: 'Budget Utilization Below Average', msgFn: (b: any) => `${b.budgetCode} utilization is ${(10 + Math.random() * 15).toFixed(0)}% below peer group average.` },
+  ];
+  for (const budget of alertBudgets) {
+    const numAlerts = 2 + Math.floor(Math.random() * 3);
+    const shuffled = [...alertTemplates].sort(() => Math.random() - 0.5).slice(0, numAlerts);
+    for (const tpl of shuffled) {
+      const total = Number(budget.totalBudget);
+      alertRecords.push({
+        budgetId: budget.id, alertType: tpl.alertType, severity: tpl.severity,
+        title: tpl.title, message: tpl.msgFn(budget),
+        metricValue: Math.round(total * (0.8 + Math.random() * 0.3)),
+        threshold: Math.round(total * (0.9 + Math.random() * 0.1)),
+        category: tpl.alertType === 'category_imbalance' ? 'W Bags' : null,
+        isRead: Math.random() > 0.6, isDismissed: false,
+      });
+    }
+  }
+  for (const alert of alertRecords) {
+    await prisma.budgetAlert.create({ data: alert });
+  }
+  console.log(`  ✅ ${alertRecords.length} budget alerts`);
+
   // ─── APPROVAL WORKFLOW STEPS ────────────────────────────────────────────
   for (const brand of [brandFER, brandBUR, brandGUC, brandPRA]) {
     await prisma.approvalWorkflowStep.upsert({

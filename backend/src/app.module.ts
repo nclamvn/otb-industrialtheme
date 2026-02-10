@@ -9,6 +9,7 @@ import { PlanningModule } from './modules/planning/planning.module';
 import { ProposalModule } from './modules/proposal/proposal.module';
 import { AiModule } from './modules/ai/ai.module';
 import { ApprovalWorkflowModule } from './modules/approval-workflow/approval-workflow.module';
+import { AnalyticsModule } from './modules/analytics/analytics.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { ApprovalWorkflowModule } from './modules/approval-workflow/approval-wor
     ProposalModule,
     AiModule,
     ApprovalWorkflowModule,
+    AnalyticsModule,
   ],
 })
 export class AppModule {}
