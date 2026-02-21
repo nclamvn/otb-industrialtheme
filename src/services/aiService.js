@@ -1,30 +1,51 @@
 // ═══════════════════════════════════════════════════════════════════════════
 // AI Service - Size Curve Optimizer + Budget Variance Alerts
+// Gracefully returns empty/default data when AI endpoints are unavailable
 // ═══════════════════════════════════════════════════════════════════════════
 import api from './api';
+
+const safeGet = async (url, config) => {
+  try {
+    const response = await api.get(url, config);
+    return response.data.data || response.data;
+  } catch {
+    return null;
+  }
+};
+
+const safePost = async (url, data) => {
+  try {
+    const response = await api.post(url, data);
+    return response.data.data || response.data;
+  } catch {
+    return null;
+  }
+};
+
+const safePatch = async (url, data) => {
+  try {
+    const response = await api.patch(url, data);
+    return response.data.data || response.data;
+  } catch {
+    return null;
+  }
+};
 
 export const aiService = {
   // ── Size Curve Optimizer ─────────────────────────────────────────────
 
   async getSizeCurve(category, storeId, totalOrderQty = 100) {
-    const response = await api.get(`/ai/size-curve/${encodeURIComponent(category)}/${storeId}`, {
+    return safeGet(`/ai/size-curve/${encodeURIComponent(category)}/${storeId}`, {
       params: { totalOrderQty },
     });
-    return response.data.data || response.data;
   },
 
   async calculateSizeCurve(data) {
-    const response = await api.post('/ai/size-curve/calculate', data);
-    return response.data.data || response.data;
+    return safePost('/ai/size-curve/calculate', data);
   },
 
   async compareSizeCurve(skuId, storeId, userSizing) {
-    const response = await api.post('/ai/size-curve/compare', {
-      skuId,
-      storeId,
-      userSizing,
-    });
-    return response.data.data || response.data;
+    return safePost('/ai/size-curve/compare', { skuId, storeId, userSizing });
   },
 
   // ── Budget Variance Alerts ───────────────────────────────────────────
@@ -33,92 +54,74 @@ export const aiService = {
     const params = {};
     if (options.budgetId) params.budgetId = options.budgetId;
     if (options.unreadOnly) params.unreadOnly = 'true';
-    const response = await api.get('/ai/alerts', { params });
-    return response.data.data || response.data;
+    return safeGet('/ai/alerts', { params }) || [];
   },
 
   async markAlertRead(alertId) {
-    const response = await api.patch(`/ai/alerts/${alertId}/read`);
-    return response.data.data || response.data;
+    return safePatch(`/ai/alerts/${alertId}/read`);
   },
 
   async dismissAlert(alertId) {
-    const response = await api.patch(`/ai/alerts/${alertId}/dismiss`);
-    return response.data.data || response.data;
+    return safePatch(`/ai/alerts/${alertId}/dismiss`);
   },
 
   async triggerAlertCheck() {
-    const response = await api.post('/ai/alerts/check');
-    return response.data;
+    return safePost('/ai/alerts/check');
   },
 
   // ── OTB Auto-Allocation ────────────────────────────────────────────
 
   async generateAllocation(input) {
-    const response = await api.post('/ai/allocation/generate', input);
-    return response.data.data || response.data;
+    return safePost('/ai/allocation/generate', input);
   },
 
   async getAllocationRecommendations(budgetDetailId) {
-    const response = await api.get(`/ai/allocation/${budgetDetailId}`);
-    return response.data.data || response.data;
+    return safeGet(`/ai/allocation/${budgetDetailId}`);
   },
 
   async applyAllocationRecommendations(budgetDetailId, dimensionType = null) {
     const url = dimensionType
       ? `/ai/allocation/${budgetDetailId}/apply?dimensionType=${dimensionType}`
       : `/ai/allocation/${budgetDetailId}/apply`;
-    const response = await api.post(url);
-    return response.data.data || response.data;
+    return safePost(url);
   },
 
   async compareAllocation(budgetDetailId, userAllocation) {
-    const response = await api.post('/ai/allocation/compare', {
-      budgetDetailId,
-      userAllocation,
-    });
-    return response.data.data || response.data;
+    return safePost('/ai/allocation/compare', { budgetDetailId, userAllocation });
   },
 
   // ── Risk Scoring ─────────────────────────────────────────────────────
 
   async assessRisk(entityType, entityId) {
-    const response = await api.post(`/ai/risk/assess/${entityType}/${entityId}`);
-    return response.data;
+    return safePost(`/ai/risk/assess/${entityType}/${entityId}`);
   },
 
   async getRiskAssessment(entityType, entityId) {
-    const response = await api.get(`/ai/risk/${entityType}/${entityId}`);
-    return response.data;
+    return safeGet(`/ai/risk/${entityType}/${entityId}`);
   },
 
   async refreshRiskAssessment(entityType, entityId) {
-    const response = await api.post(`/ai/risk/${entityType}/${entityId}/refresh`);
-    return response.data;
+    return safePost(`/ai/risk/${entityType}/${entityId}/refresh`);
   },
 
   // ── SKU Recommender ──────────────────────────────────────────────────
 
   async generateSkuRecommendations(input) {
-    const response = await api.post('/ai/sku-recommend/generate', input);
-    return response.data.data || response.data;
+    return safePost('/ai/sku-recommend/generate', input);
   },
 
   async getSkuRecommendations(budgetDetailId, category = null) {
     const url = category
       ? `/ai/sku-recommend/${budgetDetailId}?category=${encodeURIComponent(category)}`
       : `/ai/sku-recommend/${budgetDetailId}`;
-    const response = await api.get(url);
-    return response.data.data || response.data;
+    return safeGet(url);
   },
 
   async updateSkuRecommendationStatus(recommendationId, status) {
-    const response = await api.patch(`/ai/sku-recommend/${recommendationId}/status`, { status });
-    return response.data.data || response.data;
+    return safePatch(`/ai/sku-recommend/${recommendationId}/status`, { status });
   },
 
   async addSelectedSkusToProposal(budgetDetailId, proposalId) {
-    const response = await api.post(`/ai/sku-recommend/${budgetDetailId}/add-to-proposal/${proposalId}`);
-    return response.data.data || response.data;
+    return safePost(`/ai/sku-recommend/${budgetDetailId}/add-to-proposal/${proposalId}`);
   },
 };

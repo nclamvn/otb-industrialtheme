@@ -73,23 +73,15 @@ const BudgetAlertsBanner = ({ budgetId, darkMode = true }) => {
   }, [budgetId]);
 
   const fetchAlerts = async () => {
-    try {
-      const data = await aiService.getBudgetAlerts({ budgetId, unreadOnly: true });
-      setAlerts(Array.isArray(data) ? data : []);
-    } catch (error) {
-      console.error('Failed to fetch alerts:', error);
-    }
+    const data = await aiService.getBudgetAlerts({ budgetId, unreadOnly: true });
+    setAlerts(Array.isArray(data) ? data : []);
     setLoading(false);
   };
 
   const handleDismiss = async (alertId, e) => {
     e.stopPropagation();
-    try {
-      await aiService.dismissAlert(alertId);
-      setAlerts(prev => prev.filter(a => a.id !== alertId));
-    } catch (error) {
-      console.error('Failed to dismiss alert:', error);
-    }
+    await aiService.dismissAlert(alertId);
+    setAlerts(prev => prev.filter(a => a.id !== alertId));
   };
 
   const getTheme = (severity) => SEVERITY_THEMES[severity] || SEVERITY_THEMES.info;

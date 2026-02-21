@@ -34,23 +34,15 @@ const SizeCurveAdvisor = ({
 
   const fetchRecommendation = async () => {
     setLoading(true);
-    try {
-      const data = await aiService.getSizeCurve(category, storeId, totalQty);
-      setRecommendation(data);
-    } catch (error) {
-      console.error('Failed to fetch size curve:', error);
-    }
+    const data = await aiService.getSizeCurve(category, storeId, totalQty);
+    if (data) setRecommendation(data);
     setLoading(false);
   };
 
   const compareWithUser = async () => {
     if (!skuId) return;
-    try {
-      const data = await aiService.compareSizeCurve(skuId, storeId, userSizing);
-      setComparison(data);
-    } catch (error) {
-      console.error('Failed to compare:', error);
-    }
+    const data = await aiService.compareSizeCurve(skuId, storeId, userSizing);
+    if (data) setComparison(data);
   };
 
   const handleApply = () => {
