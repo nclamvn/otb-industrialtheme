@@ -8,7 +8,7 @@ import {
 } from 'lucide-react';
 import { formatCurrency } from '../utils';
 import { masterDataService, proposalService, budgetService } from '../services';
-import { STORES as DEFAULT_STORES } from '../utils/constants';
+// Stores loaded dynamically from API; minimal fallback for offline
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useIsMobile } from '@/hooks/useIsMobile';
 
@@ -143,7 +143,9 @@ const ProposalDetailPage = ({ proposal, onBack, onSave }) => {
     );
   }, [skuList, skuSearchQuery]);
 
-  const storeList = allStores.length > 0 ? allStores : DEFAULT_STORES;
+  const storeList = allStores.length > 0
+    ? allStores
+    : [{ id: 'rex', code: 'REX', name: 'REX' }, { id: 'ttp', code: 'TTP', name: 'TTP' }];
 
   const handleGoToStep2 = () => {
     const data = {};
@@ -743,7 +745,7 @@ const ProposalDetailPage = ({ proposal, onBack, onSave }) => {
                             {t('proposal.storeQuantities') || 'Store Quantities'}
                             <span className="ml-2 text-purple-600 font-mono normal-case">= {totalStoreQty}</span>
                           </label>
-                          <div className="grid grid-cols-5 gap-2">
+                          <div className="grid gap-2" style={{ gridTemplateColumns: `repeat(${Math.min(storeList.length, 6)}, minmax(0, 1fr))` }}>
                             {storeList.map(store => (
                               <div key={store.id || store.code} className="text-center">
                                 <div className="text-[9px] font-semibold text-slate-400 mb-0.5">{store.code || store.name}</div>
