@@ -2,12 +2,13 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import {
-  ArrowLeft, Save, Plus, Trash2, Search,
+  ArrowLeft, ArrowRight, Save, Plus, Trash2, Search,
   Package, DollarSign, ShoppingCart, Store, ChevronDown, ChevronRight,
   Check, X, AlertCircle, Send, Hash
 } from 'lucide-react';
 import { formatCurrency } from '../utils';
 import { masterDataService, proposalService, budgetService } from '../services';
+import { STORES as DEFAULT_STORES } from '../utils/constants';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useIsMobile } from '@/hooks/useIsMobile';
 
@@ -114,6 +115,8 @@ const ProposalDetailPage = ({ proposal, onBack, onSave }) => {
   const [selectedSkusToAdd, setSelectedSkusToAdd] = useState([]);
   const [editingCell, setEditingCell] = useState(null);
   const [editValue, setEditValue] = useState('');
+  const [addSkuStep, setAddSkuStep] = useState(1);
+  const [skuFormData, setSkuFormData] = useState({});
 
   // Calculate totals
   const calculateSkuTotals = (sku) => {
@@ -140,15 +143,48 @@ const ProposalDetailPage = ({ proposal, onBack, onSave }) => {
     );
   }, [skuList, skuSearchQuery]);
 
+  const storeList = allStores.length > 0 ? allStores : DEFAULT_STORES;
+
+  const handleGoToStep2 = () => {
+    const data = {};
+    selectedSkusToAdd.forEach(skuId => {
+      const masterSku = skuMasterData.find(s => s.id === skuId);
+      const defaultStoreQty = {};
+      storeList.forEach(s => { defaultStoreQty[s.code || s.id] = 0; });
+      data[skuId] = {
+        order: 0,
+        storeQty: defaultStoreQty,
+        customerTarget: 'New',
+        unitCost: masterSku?.unitCost || 0,
+        composition: masterSku?.composition || '',
+      };
+    });
+    setSkuFormData(data);
+    setAddSkuStep(2);
+  };
+
   const handleAddSkus = () => {
     const newSkus = selectedSkusToAdd.map(skuId => {
       const masterSku = skuMasterData.find(s => s.id === skuId);
-      return { ...masterSku, stores: [{ storeId: 'rex', quantity: 0 }] };
+      const fd = skuFormData[skuId] || {};
+      const stores = storeList
+        .filter(s => (fd.storeQty?.[s.code || s.id] || 0) > 0)
+        .map(s => ({ storeId: s.id, quantity: fd.storeQty?.[s.code || s.id] || 0 }));
+      if (stores.length === 0) stores.push({ storeId: storeList[0]?.id || 'rex', quantity: fd.order || 0 });
+      return {
+        ...masterSku,
+        unitCost: fd.unitCost ?? masterSku?.unitCost ?? 0,
+        composition: fd.composition || masterSku?.composition || '',
+        customerTarget: fd.customerTarget || 'New',
+        stores,
+      };
     });
     setSkuList(prev => [...prev, ...newSkus]);
     setSelectedSkusToAdd([]);
     setShowAddSkuModal(false);
     setSkuSearchQuery('');
+    setAddSkuStep(1);
+    setSkuFormData({});
   };
 
   const handleRemoveSku = (skuId) => setSkuList(prev => prev.filter(s => s.id !== skuId));
@@ -509,89 +545,276 @@ const ProposalDetailPage = ({ proposal, onBack, onSave }) => {
         </div>
       </div>
 
-      {/* Add SKU Modal */}
+      {/* Add SKU Modal — Two-step flow */}
       {showAddSkuModal && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[70vh] overflow-hidden">
-            <div className="p-4 border-b border-slate-200">
+          <div className={`bg-white rounded-xl shadow-xl w-full max-h-[85vh] overflow-hidden flex flex-col ${addSkuStep === 2 ? 'max-w-3xl' : 'max-w-2xl'}`}>
+            {/* Modal Header */}
+            <div className="p-4 border-b border-slate-200 shrink-0">
               <div className="flex items-center justify-between">
-                <h2 className="text-lg font-bold text-slate-800">{t('proposal.addSku')}</h2>
-                <button onClick={() => { setShowAddSkuModal(false); setSelectedSkusToAdd([]); setSkuSearchQuery(''); }} className="p-1.5 hover:bg-slate-100 rounded-lg">
-                  <X size={18} className="text-slate-500" />
-                </button>
+                <div className="flex items-center gap-2">
+                  {addSkuStep === 2 && (
+                    <button onClick={() => setAddSkuStep(1)} className="p-1.5 hover:bg-slate-100 rounded-lg">
+                      <ArrowLeft size={16} className="text-slate-500" />
+                    </button>
+                  )}
+                  <div>
+                    <h2 className="text-lg font-bold text-slate-800">
+                      {addSkuStep === 1 ? t('proposal.addSku') : (t('proposal.skuDetails') || 'SKU Details')}
+                    </h2>
+                    <p className="text-xs text-slate-500 mt-0.5">
+                      {addSkuStep === 1
+                        ? (t('proposal.selectSkus') || 'Select SKUs to add')
+                        : `${selectedSkusToAdd.length} SKU${selectedSkusToAdd.length > 1 ? 's' : ''} — ${t('proposal.fillDetails') || 'Fill in order details'}`
+                      }
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1 mr-1">
+                    <div className={`w-2 h-2 rounded-full ${addSkuStep === 1 ? 'bg-purple-600' : 'bg-slate-300'}`} />
+                    <div className={`w-2 h-2 rounded-full ${addSkuStep === 2 ? 'bg-purple-600' : 'bg-slate-300'}`} />
+                  </div>
+                  <button onClick={() => { setShowAddSkuModal(false); setSelectedSkusToAdd([]); setSkuSearchQuery(''); setAddSkuStep(1); setSkuFormData({}); }} className="p-1.5 hover:bg-slate-100 rounded-lg">
+                    <X size={18} className="text-slate-500" />
+                  </button>
+                </div>
               </div>
-              <div className="mt-3 relative">
-                <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                <input
-                  type="text"
-                  placeholder={`${t('common.search')}...`}
-                  value={skuSearchQuery}
-                  onChange={(e) => setSkuSearchQuery(e.target.value)}
-                  className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
-                />
-              </div>
+
+              {/* Search — Step 1 only */}
+              {addSkuStep === 1 && (
+                <div className="mt-3 relative">
+                  <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <input
+                    type="text"
+                    placeholder={`${t('common.search')}...`}
+                    value={skuSearchQuery}
+                    onChange={(e) => setSkuSearchQuery(e.target.value)}
+                    className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    autoFocus
+                  />
+                </div>
+              )}
             </div>
 
-            <div className="max-h-[380px] overflow-y-auto p-3">
-              {availableSkus.length === 0 ? (
-                <div className="text-center py-8 text-slate-500">
-                  <Package size={28} className="mx-auto mb-2 opacity-50" />
-                  <p className="text-sm">{t('skuProposal.noSkuData')}</p>
-                </div>
-              ) : (
-                <div className="space-y-1">
-                  {availableSkus.map(sku => {
-                    const isSelected = selectedSkusToAdd.includes(sku.id);
-                    return (
-                      <div
-                        key={sku.id}
-                        onClick={() => {
-                          if (isSelected) setSelectedSkusToAdd(prev => prev.filter(id => id !== sku.id));
-                          else setSelectedSkusToAdd(prev => [...prev, sku.id]);
-                        }}
-                        className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
-                          isSelected ? 'border-purple-500 bg-purple-50' : 'border-slate-200 hover:border-purple-300'
-                        }`}
-                      >
-                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${isSelected ? 'border-purple-500 bg-purple-500' : 'border-slate-300'}`}>
-                          {isSelected && <Check size={12} className="text-white" />}
-                        </div>
-                        <img src={sku.imageUrl} alt={sku.name} className="w-12 h-12 rounded-lg object-cover bg-slate-100" />
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2">
-                            <span className="text-xs font-bold text-purple-600">{sku.code}</span>
-                            <span className="text-xs text-slate-400">{sku.productType}</span>
+            {/* ===== STEP 1: Select SKUs ===== */}
+            {addSkuStep === 1 && (
+              <>
+                <div className="flex-1 overflow-y-auto p-3 min-h-0">
+                  {availableSkus.length === 0 ? (
+                    <div className="text-center py-8 text-slate-500">
+                      <Package size={28} className="mx-auto mb-2 opacity-50" />
+                      <p className="text-sm">{t('skuProposal.noSkuData')}</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-1">
+                      {availableSkus.map(sku => {
+                        const isSelected = selectedSkusToAdd.includes(sku.id);
+                        return (
+                          <div
+                            key={sku.id}
+                            onClick={() => {
+                              if (isSelected) setSelectedSkusToAdd(prev => prev.filter(id => id !== sku.id));
+                              else setSelectedSkusToAdd(prev => [...prev, sku.id]);
+                            }}
+                            className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
+                              isSelected ? 'border-purple-500 bg-purple-50' : 'border-slate-200 hover:border-purple-300'
+                            }`}
+                          >
+                            <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${isSelected ? 'border-purple-500 bg-purple-500' : 'border-slate-300'}`}>
+                              {isSelected && <Check size={12} className="text-white" />}
+                            </div>
+                            <img src={sku.imageUrl} alt={sku.name} className="w-12 h-12 rounded-lg object-cover bg-slate-100"
+                              onError={(e) => { e.target.onerror = null; e.target.src = 'https://placehold.co/48x48/f1f5f9/64748b?text=SKU'; }}
+                            />
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2">
+                                <span className="text-xs font-bold text-purple-600">{sku.code}</span>
+                                <span className="text-xs text-slate-400">{sku.productType}</span>
+                              </div>
+                              <div className="font-medium text-slate-800 text-sm truncate">{sku.name}</div>
+                            </div>
+                            <div className="text-right">
+                              <div className="text-xs text-slate-400">{t('proposal.unitCost')}</div>
+                              <div className="font-semibold text-purple-600 text-sm">{formatCurrency(sku.unitCost)}</div>
+                            </div>
                           </div>
-                          <div className="font-medium text-slate-800 text-sm truncate">{sku.name}</div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+
+                {/* Footer Step 1 */}
+                <div className="p-4 border-t border-slate-200 flex items-center justify-between bg-slate-50 shrink-0">
+                  <span className="text-sm text-slate-600">{selectedSkusToAdd.length} selected</span>
+                  <div className="flex items-center gap-2">
+                    <button onClick={() => { setShowAddSkuModal(false); setSelectedSkusToAdd([]); setSkuSearchQuery(''); }} className="px-4 py-2 text-slate-600 hover:bg-slate-200 rounded-lg text-sm font-medium">
+                      {t('common.cancel')}
+                    </button>
+                    <button
+                      onClick={handleGoToStep2}
+                      disabled={selectedSkusToAdd.length === 0}
+                      className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium ${
+                        selectedSkusToAdd.length > 0 ? 'bg-purple-600 text-white hover:bg-purple-700' : 'bg-slate-200 text-slate-400 cursor-not-allowed'
+                      }`}
+                    >
+                      {t('common.next') || 'Next'} ({selectedSkusToAdd.length})
+                      <ArrowRight size={14} />
+                    </button>
+                  </div>
+                </div>
+              </>
+            )}
+
+            {/* ===== STEP 2: Fill Details ===== */}
+            {addSkuStep === 2 && (
+              <>
+                <div className="flex-1 overflow-y-auto p-4 min-h-0 space-y-4">
+                  {selectedSkusToAdd.map(skuId => {
+                    const masterSku = skuMasterData.find(s => s.id === skuId);
+                    const fd = skuFormData[skuId];
+                    if (!masterSku || !fd) return null;
+                    const totalStoreQty = Object.values(fd.storeQty || {}).reduce((s, v) => s + v, 0);
+                    const ttl = (fd.order + totalStoreQty) * fd.unitCost;
+
+                    return (
+                      <div key={skuId} className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                        {/* SKU Header */}
+                        <div className="flex items-center gap-3 mb-3">
+                          <img src={masterSku.imageUrl} alt={masterSku.name} className="w-10 h-10 rounded-lg object-cover bg-slate-100"
+                            onError={(e) => { e.target.onerror = null; e.target.src = 'https://placehold.co/40x40/f1f5f9/64748b?text=SKU'; }}
+                          />
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs font-bold text-purple-600 font-mono">{masterSku.code}</span>
+                              <span className="text-xs text-slate-400">{masterSku.productType}</span>
+                            </div>
+                            <div className="font-medium text-slate-800 text-sm truncate">{masterSku.name}</div>
+                          </div>
+                          {ttl > 0 && (
+                            <div className="text-right shrink-0">
+                              <div className="text-[10px] text-slate-400 uppercase">TTL Value</div>
+                              <div className="text-sm font-semibold text-emerald-600 font-mono">{formatCurrency(ttl)}</div>
+                            </div>
+                          )}
                         </div>
-                        <div className="text-right">
-                          <div className="text-xs text-slate-400">{t('proposal.unitCost')}</div>
-                          <div className="font-semibold text-purple-600 text-sm">{formatCurrency(sku.unitCost)}</div>
+
+                        {/* Row 1: Order + Unit Cost + Customer Target */}
+                        <div className="grid grid-cols-3 gap-3 mb-3">
+                          <div>
+                            <label className="block text-[10px] text-slate-500 uppercase tracking-wider mb-1">{t('proposal.order') || 'Order'}</label>
+                            <input
+                              type="number"
+                              min="0"
+                              value={fd.order || ''}
+                              onChange={(e) => setSkuFormData(prev => ({ ...prev, [skuId]: { ...prev[skuId], order: parseInt(e.target.value) || 0 } }))}
+                              placeholder="0"
+                              className="w-full px-2.5 py-1.5 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 font-mono bg-white"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-[10px] text-slate-500 uppercase tracking-wider mb-1">{t('proposal.unitCost') || 'Unit Cost'}</label>
+                            <input
+                              type="number"
+                              min="0"
+                              value={fd.unitCost || ''}
+                              onChange={(e) => setSkuFormData(prev => ({ ...prev, [skuId]: { ...prev[skuId], unitCost: parseFloat(e.target.value) || 0 } }))}
+                              placeholder="0"
+                              className="w-full px-2.5 py-1.5 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 font-mono bg-white"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-[10px] text-slate-500 uppercase tracking-wider mb-1">{t('proposal.customerTarget') || 'Customer'}</label>
+                            <select
+                              value={fd.customerTarget}
+                              onChange={(e) => setSkuFormData(prev => ({ ...prev, [skuId]: { ...prev[skuId], customerTarget: e.target.value } }))}
+                              className="w-full px-2.5 py-1.5 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white"
+                            >
+                              <option value="New">New</option>
+                              <option value="Existing">Existing</option>
+                            </select>
+                          </div>
+                        </div>
+
+                        {/* Row 2: Store Quantities */}
+                        <div className="mb-3">
+                          <label className="block text-[10px] text-slate-500 uppercase tracking-wider mb-1.5">
+                            {t('proposal.storeQuantities') || 'Store Quantities'}
+                            <span className="ml-2 text-purple-600 font-mono normal-case">= {totalStoreQty}</span>
+                          </label>
+                          <div className="grid grid-cols-5 gap-2">
+                            {storeList.map(store => (
+                              <div key={store.id || store.code} className="text-center">
+                                <div className="text-[9px] font-semibold text-slate-400 mb-0.5">{store.code || store.name}</div>
+                                <input
+                                  type="number"
+                                  min="0"
+                                  value={fd.storeQty?.[store.code || store.id] || ''}
+                                  onChange={(e) => {
+                                    const code = store.code || store.id;
+                                    setSkuFormData(prev => ({
+                                      ...prev,
+                                      [skuId]: {
+                                        ...prev[skuId],
+                                        storeQty: { ...prev[skuId].storeQty, [code]: parseInt(e.target.value) || 0 }
+                                      }
+                                    }));
+                                  }}
+                                  placeholder="0"
+                                  className="w-full px-1.5 py-1.5 text-sm text-center border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 font-mono bg-white"
+                                />
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Row 3: Composition */}
+                        <div>
+                          <label className="block text-[10px] text-slate-500 uppercase tracking-wider mb-1">{t('proposal.composition') || 'Composition'}</label>
+                          <input
+                            type="text"
+                            value={fd.composition || ''}
+                            onChange={(e) => setSkuFormData(prev => ({ ...prev, [skuId]: { ...prev[skuId], composition: e.target.value } }))}
+                            placeholder="e.g. 100% Cotton"
+                            className="w-full px-2.5 py-1.5 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white"
+                          />
                         </div>
                       </div>
                     );
                   })}
                 </div>
-              )}
-            </div>
 
-            <div className="p-4 border-t border-slate-200 flex items-center justify-between bg-slate-50">
-              <span className="text-sm text-slate-600">{selectedSkusToAdd.length}</span>
-              <div className="flex items-center gap-2">
-                <button onClick={() => { setShowAddSkuModal(false); setSelectedSkusToAdd([]); }} className="px-4 py-2 text-slate-600 hover:bg-slate-200 rounded-lg text-sm font-medium">
-                  {t('common.cancel')}
-                </button>
-                <button
-                  onClick={handleAddSkus}
-                  disabled={selectedSkusToAdd.length === 0}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium ${
-                    selectedSkusToAdd.length > 0 ? 'bg-purple-600 text-white hover:bg-purple-700' : 'bg-slate-200 text-slate-400 cursor-not-allowed'
-                  }`}
-                >
-                  {t('proposal.addSku')}
-                </button>
-              </div>
-            </div>
+                {/* Footer Step 2 */}
+                <div className="p-4 border-t border-slate-200 flex items-center justify-between bg-slate-50 shrink-0">
+                  <div className="text-sm text-slate-600 flex items-center gap-1">
+                    <ShoppingCart size={14} />
+                    {selectedSkusToAdd.length} SKU{selectedSkusToAdd.length > 1 ? 's' : ''}
+                    {' • TTL: '}
+                    <span className="font-semibold text-emerald-600 font-mono">
+                      {formatCurrency(selectedSkusToAdd.reduce((sum, skuId) => {
+                        const fd = skuFormData[skuId];
+                        if (!fd) return sum;
+                        const totalQty = fd.order + Object.values(fd.storeQty || {}).reduce((s, v) => s + v, 0);
+                        return sum + totalQty * fd.unitCost;
+                      }, 0))}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button onClick={() => setAddSkuStep(1)} className="px-4 py-2 text-slate-600 hover:bg-slate-200 rounded-lg text-sm font-medium">
+                      {t('common.back') || 'Back'}
+                    </button>
+                    <button
+                      onClick={handleAddSkus}
+                      className="flex items-center gap-1.5 px-4 py-2 bg-purple-600 text-white hover:bg-purple-700 rounded-lg text-sm font-medium"
+                    >
+                      <Check size={14} />
+                      {t('proposal.addSku')} ({selectedSkusToAdd.length})
+                    </button>
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         </div>
       )}
