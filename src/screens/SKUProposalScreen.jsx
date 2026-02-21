@@ -512,45 +512,6 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
         <div className="flex items-center justify-between mb-4">
           
 
-          {/* Context Banner from OTB Analysis */}
-          {contextBanner && (
-            <div className={`flex items-start md:items-center gap-3 px-3 md:px-4 py-2.5 rounded-xl border w-full ${darkMode ? 'bg-[rgba(215,183,151,0.08)] border-[rgba(215,183,151,0.25)]' : 'bg-[rgba(160,120,75,0.12)] border-[rgba(215,183,151,0.3)]'}`}>
-              <div className="flex-1 min-w-0">
-                <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
-                  <div className="flex flex-col">
-                    <span className={`text-xs ${darkMode ? 'text-[#999999]' : 'text-[#666666]'}`}>{t('skuProposal.budget')}</span>
-                    <span className={`font-semibold font-['Montserrat'] text-xs md:text-sm truncate ${darkMode ? 'text-[#D7B797]' : 'text-[#8A6340]'}`}>{contextBanner.budgetName || 'N/A'}</span>
-                  </div>
-                  <div className={`w-px h-8 hidden md:block ${darkMode ? 'bg-[rgba(215,183,151,0.25)]' : 'bg-[rgba(215,183,151,0.4)]'}`}></div>
-                  <div className="flex flex-col">
-                    <span className={`text-xs ${darkMode ? 'text-[#999999]' : 'text-[#666666]'}`}>{t('skuProposal.season')}</span>
-                    <span className={`font-semibold font-['Montserrat'] text-xs md:text-sm ${darkMode ? 'text-[#D7B797]' : 'text-[#8A6340]'}`}>{contextBanner.seasonGroup} - {contextBanner.season}</span>
-                  </div>
-                  <div className={`w-px h-8 hidden md:block ${darkMode ? 'bg-[rgba(215,183,151,0.25)]' : 'bg-[rgba(215,183,151,0.4)]'}`}></div>
-                  <div className="flex flex-col">
-                    <span className={`text-xs ${darkMode ? 'text-[#999999]' : 'text-[#666666]'}`}>{t('skuProposal.category')}</span>
-                    <span className={`font-semibold font-['Montserrat'] text-xs md:text-sm ${darkMode ? 'text-[#D7B797]' : 'text-[#8A6340]'}`}>{contextBanner.gender} / {contextBanner.category} / {contextBanner.subCategory}</span>
-                  </div>
-                  {contextBanner.otbData && (
-                    <>
-                      <div className={`w-px h-8 hidden md:block ${darkMode ? 'bg-[rgba(215,183,151,0.25)]' : 'bg-[rgba(215,183,151,0.4)]'}`}></div>
-                      <div className="flex flex-col">
-                        <span className={`text-xs ${darkMode ? 'text-[#999999]' : 'text-[#666666]'}`}>{t('skuProposal.totalValue')}</span>
-                        <span className={`font-semibold font-['JetBrains_Mono'] text-xs md:text-sm ${darkMode ? 'text-[#2A9E6A]' : 'text-[#127749]'}`}>{formatCurrency(contextBanner.otbData.otbProposed || 0)}</span>
-                      </div>
-                    </>
-                  )}
-                </div>
-              </div>
-              <button
-                onClick={() => setContextBanner(null)}
-                className={`flex-shrink-0 p-1 rounded-lg transition-colors ${darkMode ? 'hover:bg-[rgba(215,183,151,0.15)]' : 'hover:bg-[rgba(215,183,151,0.2)]'}`}
-                title="Dismiss"
-              >
-                <X size={16} className={darkMode ? 'text-[#999999]' : 'text-[#666666]'} />
-              </button>
-            </div>
-          )}
         </div>
 
         {/* Mobile: Filter button + active filter chips */}
