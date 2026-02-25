@@ -309,6 +309,23 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
     return Object.values(choiceData).reduce((sum, val) => sum + (parseInt(val) || 0), 0);
   };
 
+  const choiceIdToKey = (id) => {
+    if (id === 'choice-a') return 'choiceA';
+    if (id === 'choice-b') return 'choiceB';
+    if (id === 'choice-c') return 'choiceC';
+    return 'choiceA';
+  };
+
+  // Check if sizing is complete for a given SKU item (any final choice has non-zero quantities)
+  const isSizingComplete = (blockKey, itemIdx) => {
+    const sizing = getSizing(blockKey, itemIdx);
+    const finalChoice = sizingChoices.find(c => c.isFinal);
+    if (!finalChoice) return false;
+    const choiceKey = choiceIdToKey(finalChoice.id);
+    const choiceData = sizing[choiceKey];
+    return choiceData && Object.values(choiceData).some(v => parseInt(v) > 0);
+  };
+
   const handleOpenSizing = (blockKey, itemIdx, item) => {
     setSizingPopup({ open: true, blockKey, itemIdx, item });
   };
@@ -1380,7 +1397,6 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
                           <th className={`px-3 py-2 text-center text-xs font-semibold font-['Montserrat'] ${darkMode ? 'text-[#D7B797]' : 'text-[#8A6340]'}`}>TTP</th>
                           <th className={`px-3 py-2 text-right text-xs font-semibold font-['Montserrat'] ${darkMode ? 'text-[#D7B797]' : 'text-[#8A6340]'}`}>TTL value</th>
                           <th className={`px-3 py-2 text-center text-xs font-semibold font-['Montserrat'] ${darkMode ? 'text-[#D7B797]' : 'text-[#8A6340]'}`}>Customer target</th>
-                          <th className={`px-3 py-2 text-center text-xs font-semibold w-16 ${darkMode ? 'text-[#D7B797]' : 'text-[#8A6340]'}`}></th>
                         </tr>
                       </thead>
                       <tbody>
@@ -1392,8 +1408,34 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
                           return (
                           <tr key={`${item.sku}_${idx}`} className={`${darkMode ? 'border-b border-[#2E2E2E]' : 'border-b border-[rgba(215,183,151,0.15)]'} ${item.isNew ? (darkMode ? 'bg-[rgba(42,158,106,0.1)]' : 'bg-[rgba(18,119,73,0.05)]') : ''}`}>
                             <td className="px-3 py-2">
-                              <div className={`w-10 h-10 rounded-md border flex items-center justify-center ${darkMode ? 'bg-[#1A1A1A] border-[#2E2E2E]' : 'bg-[rgba(160,120,75,0.12)] border-[rgba(215,183,151,0.25)]'}`}>
-                                <ImageIcon size={16} className={darkMode ? 'text-[#666666]' : 'text-[#999999]'} />
+                              <div className="relative mx-auto w-fit">
+                                <div className={`w-10 h-10 rounded-md border flex items-center justify-center ${darkMode ? 'bg-[#1A1A1A] border-[#2E2E2E]' : 'bg-[rgba(160,120,75,0.12)] border-[rgba(215,183,151,0.25)]'}`}>
+                                  <ImageIcon size={16} className={darkMode ? 'text-[#666666]' : 'text-[#999999]'} />
+                                </div>
+                                {/* Action icons — top-right corner of image */}
+                                <div className="absolute -top-1 -right-6 flex flex-col gap-0.5">
+                                  <button
+                                    type="button"
+                                    onClick={() => handleOpenSizing(key, idx, item)}
+                                    className={`p-0.5 rounded transition-colors relative ${darkMode ? 'text-[#999999] hover:text-[#D7B797] hover:bg-[rgba(215,183,151,0.15)]' : 'text-[#666666] hover:text-[#6B4D30] hover:bg-[rgba(160,120,75,0.18)]'}`}
+                                    title="Sizing"
+                                  >
+                                    <Ruler size={12} />
+                                    {isSizingComplete(key, idx) && (
+                                      <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-[#2A9E6A] rounded-full flex items-center justify-center">
+                                        <Check size={6} className="text-white" />
+                                      </span>
+                                    )}
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleDeleteSkuRow(key, idx)}
+                                    className={`p-0.5 rounded transition-colors ${darkMode ? 'text-[#999999] hover:text-[#F85149] hover:bg-[rgba(248,81,73,0.15)]' : 'text-[#666666] hover:text-[#F85149] hover:bg-[rgba(248,81,73,0.1)]'}`}
+                                    title={t('proposal.deleteSku')}
+                                  >
+                                    <Trash2 size={12} />
+                                  </button>
+                                </div>
                               </div>
                             </td>
                             {item.isNew ? (
@@ -1487,32 +1529,12 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
                                 <option value="Existing">Existing</option>
                               </select>
                             </td>
-                            <td className="px-3 py-2 text-center">
-                              <div className="flex items-center justify-center gap-1">
-                                <button
-                                  type="button"
-                                  onClick={() => handleOpenSizing(key, idx, item)}
-                                  className={`p-1.5 rounded-md transition-colors ${darkMode ? 'text-[#999999] hover:text-[#D7B797] hover:bg-[rgba(215,183,151,0.1)]' : 'text-[#666666] hover:text-[#8A6340] hover:bg-[rgba(160,120,75,0.18)]'}`}
-                                  title="Sizing"
-                                >
-                                  <Ruler size={16} />
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={() => handleDeleteSkuRow(key, idx)}
-                                  className={`p-1.5 rounded-md transition-colors ${darkMode ? 'text-[#999999] hover:text-[#F85149] hover:bg-[rgba(248,81,73,0.1)]' : 'text-[#666666] hover:text-[#F85149] hover:bg-[rgba(248,81,73,0.1)]'}`}
-                                  title={t('proposal.deleteSku')}
-                                >
-                                  <Trash2 size={16} />
-                                </button>
-                              </div>
-                            </td>
                           </tr>
                         );
                         })}
                         {/* Add new row button */}
                         <tr className={`border-t border-dashed ${darkMode ? 'border-[#2E2E2E] bg-[rgba(215,183,151,0.03)]' : 'border-[rgba(215,183,151,0.3)] bg-[rgba(215,183,151,0.03)]'}`}>
-                          <td colSpan={15} className="px-3 py-3">
+                          <td colSpan={14} className="px-3 py-3">
                             <button
                               type="button"
                               onClick={() => handleAddSkuRow(key)}
