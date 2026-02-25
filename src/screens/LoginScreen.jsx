@@ -37,10 +37,10 @@ const LoginScreen = () => {
 
   // Demo accounts for quick login
   const demoAccounts = [
-    { email: 'admin@dafc.com', password: 'dafc@2026', role: 'Admin', color: 'text-[#D7B797]' },
-    { email: 'merch@dafc.com', password: 'dafc@2026', role: 'Merchandiser', color: 'text-emerald-400' },
-    { email: 'manager@dafc.com', password: 'dafc@2026', role: 'Manager', color: 'text-blue-400' },
-    { email: 'finance@dafc.com', password: 'dafc@2026', role: 'Finance', color: 'text-purple-400' },
+    { email: 'admin@dafc.com', password: 'dafc@2026', role: 'Admin', color: 'text-[#C4975A]' },
+    { email: 'merch@dafc.com', password: 'dafc@2026', role: 'Merchandiser', color: 'text-[#1B6B45]' },
+    { email: 'manager@dafc.com', password: 'dafc@2026', role: 'Manager', color: 'text-[#2563EB]' },
+    { email: 'finance@dafc.com', password: 'dafc@2026', role: 'Finance', color: 'text-[#7D5A28]' },
   ];
 
   const handleDemoLogin = (account) => {
@@ -50,7 +50,7 @@ const LoginScreen = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center p-4">
+    <div className="min-h-screen bg-[#FAF8F5] flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         {/* Logo & Title */}
         <div className="text-center mb-8">
@@ -59,30 +59,30 @@ const LoginScreen = () => {
             alt="DAFC"
             className="h-16 w-auto mx-auto mb-4"
           />
-          <h1 className="text-2xl font-bold text-white">{t('login.title')}</h1>
-          <p className="text-slate-400 mt-2">{t('login.subtitle')}</p>
+          <h1 className="text-2xl font-bold text-[#2C2417]">{t('login.title')}</h1>
+          <p className="text-[#6B5D4F] mt-2">{t('login.subtitle')}</p>
         </div>
 
         {/* Login Form */}
-        <div className="bg-[#121212]/90 border border-[#2E2E2E] rounded-2xl p-8 shadow-xl backdrop-blur-sm">
-          <h2 className="text-xl font-semibold text-white mb-6">{t('login.signIn')}</h2>
+        <div className="bg-white border border-[#E8E2DB] rounded-2xl p-8 shadow-[0_4px_24px_rgba(44,36,23,0.06)]">
+          <h2 className="text-xl font-semibold text-[#2C2417] mb-6">{t('login.signIn')}</h2>
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label className="block text-sm font-medium text-slate-400 mb-2">
+              <label className="block text-sm font-medium text-[#6B5D4F] mb-2">
                 {t('login.email')}
               </label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-3 bg-[#1A1A1A] border border-[#2E2E2E] rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-[#D7B797] focus:ring-1 focus:ring-[#D7B797] transition-all"
+                className="w-full px-4 py-3 bg-[#FBF9F7] border border-[#E8E2DB] rounded-xl text-[#2C2417] placeholder-[#8C8178] focus:outline-none focus:border-[#C4975A] focus:ring-1 focus:ring-[#C4975A] transition-all"
                 placeholder={t('login.emailPlaceholder')}
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-slate-400 mb-2">
+              <label className="block text-sm font-medium text-[#6B5D4F] mb-2">
                 {t('login.password')}
               </label>
               <div className="relative">
@@ -90,13 +90,13 @@ const LoginScreen = () => {
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-4 py-3 bg-[#1A1A1A] border border-[#2E2E2E] rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-[#D7B797] focus:ring-1 focus:ring-[#D7B797] transition-all pr-12"
+                  className="w-full px-4 py-3 bg-[#FBF9F7] border border-[#E8E2DB] rounded-xl text-[#2C2417] placeholder-[#8C8178] focus:outline-none focus:border-[#C4975A] focus:ring-1 focus:ring-[#C4975A] transition-all pr-12"
                   placeholder={t('login.passwordPlaceholder')}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#8C8178] hover:text-[#6B5D4F]"
                 >
                   {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                 </button>
@@ -104,7 +104,7 @@ const LoginScreen = () => {
             </div>
 
             {localError && (
-              <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-sm">
+              <div className="p-3 bg-[#DC3545]/10 border border-[#DC3545]/20 rounded-xl text-[#DC3545] text-sm">
                 {localError}
               </div>
             )}
@@ -112,7 +112,7 @@ const LoginScreen = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3.5 bg-[#D7B797] hover:bg-[#c9a27a] text-white font-semibold rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg shadow-[#D7B797]/20"
+              className="w-full py-3.5 bg-[#C4975A] hover:bg-[#A67B3D] text-white font-semibold rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg shadow-[#C4975A]/20"
             >
               {loading ? (
                 <>
@@ -129,16 +129,16 @@ const LoginScreen = () => {
           </form>
 
           {/* Demo Accounts */}
-          <div className="mt-8 pt-6 border-t border-[#2E2E2E]">
-            <p className="text-sm text-slate-500 mb-4">{t('login.quickLogin')}</p>
+          <div className="mt-8 pt-6 border-t border-[#E8E2DB]">
+            <p className="text-sm text-[#8C8178] mb-4">{t('login.quickLogin')}</p>
             <div className="grid grid-cols-2 gap-2">
               {demoAccounts.map((account) => (
                 <button
                   key={account.email}
                   onClick={() => handleDemoLogin(account)}
-                  className="flex items-center justify-between px-3 py-2.5 bg-[#1A1A1A] hover:bg-[#2E2E2E] border border-[#2E2E2E] rounded-lg transition-colors text-sm group"
+                  className="flex items-center justify-between px-3 py-2.5 bg-[#FBF9F7] hover:bg-[#F0EBE5] border border-[#E8E2DB] rounded-lg transition-colors text-sm group"
                 >
-                  <span className="text-slate-300 truncate">{account.email.split('@')[0]}</span>
+                  <span className="text-[#6B5D4F] truncate">{account.email.split('@')[0]}</span>
                   <span className={`font-medium ${account.color}`}>{account.role}</span>
                 </button>
               ))}
@@ -147,7 +147,7 @@ const LoginScreen = () => {
         </div>
 
         {/* Footer */}
-        <p className="text-center text-slate-500 text-sm mt-8">
+        <p className="text-center text-[#8C8178] text-sm mt-8">
           {t('login.footer')}
         </p>
       </div>

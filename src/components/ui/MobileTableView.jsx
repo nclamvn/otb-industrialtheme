@@ -7,7 +7,6 @@ export default function MobileTableView({
   columns = [],
   renderDesktopTable,
   mapRowToCard,
-  darkMode = true,
   emptyMessage = 'No data available',
   onRowClick,
 }) {
@@ -19,7 +18,7 @@ export default function MobileTableView({
 
   if (data.length === 0) {
     return (
-      <div className={`py-12 text-center text-sm ${darkMode ? 'text-content-muted' : 'text-gray-500'}`}>
+      <div className="py-12 text-center text-sm text-[#8C8178]">
         {emptyMessage}
       </div>
     );
@@ -32,7 +31,6 @@ export default function MobileTableView({
         return (
           <MobileDataCard
             key={cardProps.key || index}
-            darkMode={darkMode}
             onClick={onRowClick ? () => onRowClick(row) : undefined}
             {...cardProps}
           />

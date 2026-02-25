@@ -9,7 +9,6 @@ export default function BottomSheet({
   onClose,
   children,
   title,
-  darkMode = true,
   snapPoint = 'full',
   showHandle = true,
 }) {
@@ -42,7 +41,7 @@ export default function BottomSheet({
         <>
           {/* Backdrop */}
           <motion.div
-            className="fixed inset-0 z-[100] bg-black/50"
+            className="fixed inset-0 z-[100] bg-black/40"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -52,13 +51,11 @@ export default function BottomSheet({
 
           {/* Sheet */}
           <motion.div
-            className={`fixed bottom-0 left-0 right-0 z-[101] rounded-t-2xl overflow-hidden flex flex-col ${
-              darkMode ? 'bg-surface-secondary' : 'bg-white'
-            }`}
+            className="fixed bottom-0 left-0 right-0 z-[101] rounded-t-2xl overflow-hidden flex flex-col bg-white"
             style={{
               maxHeight: `${SNAP_POINTS[snapPoint] * 100}vh`,
               y,
-              boxShadow: '0 -4px 30px rgba(0,0,0,0.3)',
+              boxShadow: '0 -4px 30px rgba(44,36,23,0.12)',
             }}
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
@@ -76,16 +73,14 @@ export default function BottomSheet({
                 className="flex justify-center pt-3 pb-2 cursor-grab active:cursor-grabbing touch-none"
                 onPointerDown={(e) => dragControls.start(e)}
               >
-                <div className={`w-10 h-1 rounded-full ${darkMode ? 'bg-[#3D3D3D]' : 'bg-gray-300'}`} />
+                <div className="w-10 h-1 rounded-full bg-[#D4CBBC]" />
               </div>
             )}
 
             {/* Title */}
             {title && (
-              <div className={`px-5 pb-3 border-b ${darkMode ? 'border-border' : 'border-gray-200'}`}>
-                <h3 className={`text-base font-semibold font-['Montserrat'] ${
-                  darkMode ? 'text-content' : 'text-gray-900'
-                }`}>
+              <div className="px-5 pb-3 border-b border-[#E8E2DB]">
+                <h3 className="text-base font-semibold font-['Montserrat'] text-[#2C2417]">
                   {title}
                 </h3>
               </div>

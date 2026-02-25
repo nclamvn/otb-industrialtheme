@@ -9,7 +9,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useIsMobile } from '@/hooks/useIsMobile';
 
-const ProfileScreen = ({ user: propUser, darkMode = true, onUpdateUser }) => {
+const ProfileScreen = ({ user: propUser, onUpdateUser }) => {
   const { user: authUser } = useAuth();
   const { t } = useLanguage();
   const { isMobile } = useIsMobile();
@@ -47,21 +47,13 @@ const ProfileScreen = ({ user: propUser, darkMode = true, onUpdateUser }) => {
   };
 
   const InfoCard = ({ icon: Icon, label, value, field, editable = true }) => (
-    <div className={`p-4 rounded-xl border transition-all duration-200 ${
-      darkMode
-        ? 'bg-[#121212] border-[#2E2E2E] hover:border-[rgba(215,183,151,0.2)]'
-        : 'bg-white border-gray-300 hover:border-[rgba(215,183,151,0.3)]'
-    }`}>
+    <div className="p-4 rounded-xl border transition-all duration-200 bg-[#FFFFFF] border-[#E8E2DB] hover:border-[#D4B082]">
       <div className="flex items-start gap-3">
-        <div className={`p-2 rounded-lg ${
-          darkMode ? 'bg-[#1A1A1A]' : 'bg-gray-100'
-        }`}>
-          <Icon size={18} className={darkMode ? 'text-[#D7B797]' : 'text-[#6B4D30]'} />
+        <div className="p-2 rounded-lg bg-[#F0EBE5]">
+          <Icon size={18} className="text-[#C4975A]" />
         </div>
         <div className="flex-1 min-w-0">
-          <div className={`text-xs font-medium uppercase tracking-wider mb-1 ${
-            darkMode ? 'text-[#666666]' : 'text-gray-700'
-          }`}>
+          <div className="text-xs font-medium uppercase tracking-wider mb-1 text-[#6B5D4F]">
             {label}
           </div>
           {isEditing && editable ? (
@@ -69,16 +61,10 @@ const ProfileScreen = ({ user: propUser, darkMode = true, onUpdateUser }) => {
               type={field === 'email' ? 'email' : 'text'}
               value={formData[field] || ''}
               onChange={(e) => setFormData({ ...formData, [field]: e.target.value })}
-              className={`w-full px-3 py-2 rounded-lg border text-sm font-medium outline-none transition-all ${
-                darkMode
-                  ? 'bg-[#0A0A0A] border-[#2E2E2E] text-[#F2F2F2] focus:border-[#D7B797]'
-                  : 'bg-gray-50 border-gray-300 text-gray-900 focus:border-[#8A6340]'
-              }`}
+              className="w-full px-3 py-2 rounded-lg border text-sm font-medium outline-none transition-all bg-[#FBF9F7] border-[#E8E2DB] text-[#2C2417] focus:border-[#C4975A]"
             />
           ) : (
-            <div className={`text-sm font-medium ${
-              darkMode ? 'text-[#F2F2F2]' : 'text-gray-900'
-            }`}>
+            <div className="text-sm font-medium text-[#2C2417]">
               {value || '-'}
             </div>
           )}
@@ -92,12 +78,10 @@ const ProfileScreen = ({ user: propUser, darkMode = true, onUpdateUser }) => {
       {/* Page Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className={`text-lg font-semibold font-['Montserrat'] ${
-            darkMode ? 'text-[#F2F2F2]' : 'text-gray-900'
-          }`}>
+          <h1 className="text-lg font-semibold font-['Montserrat'] text-[#2C2417]">
             {t('profile.title')}
           </h1>
-          <p className={`text-xs mt-0.5 ${darkMode ? 'text-[#666666]' : 'text-gray-700'}`}>
+          <p className="text-xs mt-0.5 text-[#6B5D4F]">
             {t('profile.subtitle')}
           </p>
         </div>
@@ -105,11 +89,7 @@ const ProfileScreen = ({ user: propUser, darkMode = true, onUpdateUser }) => {
         {!isEditing ? (
           <button
             onClick={() => setIsEditing(true)}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-              darkMode
-                ? 'bg-[rgba(215,183,151,0.1)] text-[#D7B797] border border-[rgba(215,183,151,0.2)] hover:bg-[rgba(215,183,151,0.15)]'
-                : 'bg-[rgba(215,183,151,0.15)] text-[#6B4D30] border border-[rgba(215,183,151,0.3)] hover:bg-[rgba(215,183,151,0.2)]'
-            }`}
+            className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all bg-[#EDE0D0] text-[#A67B3D] border border-[#D4B082] hover:bg-[#D4B082] hover:text-[#7D5A28]"
           >
             <Edit3 size={16} />
             {t('profile.editProfile')}
@@ -118,11 +98,7 @@ const ProfileScreen = ({ user: propUser, darkMode = true, onUpdateUser }) => {
           <div className="flex items-center gap-2">
             <button
               onClick={handleCancel}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                darkMode
-                  ? 'bg-[#1A1A1A] text-[#999999] border border-[#2E2E2E] hover:text-[#F2F2F2]'
-                  : 'bg-gray-100 text-gray-700 border border-gray-300 hover:text-gray-900'
-              }`}
+              className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all bg-[#F0EBE5] text-[#6B5D4F] border border-[#E8E2DB] hover:text-[#2C2417]"
             >
               <X size={16} />
               {t('common.cancel')}
@@ -130,11 +106,7 @@ const ProfileScreen = ({ user: propUser, darkMode = true, onUpdateUser }) => {
             <button
               onClick={handleSave}
               disabled={saving}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                darkMode
-                  ? 'bg-[#127749] text-white hover:bg-[#0d5c38]'
-                  : 'bg-[#127749] text-white hover:bg-[#0d5c38]'
-              } ${saving ? 'opacity-50 cursor-not-allowed' : ''}`}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all bg-[#1B6B45] text-white hover:bg-[#155a39] ${saving ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
               {saving ? (
                 <>
@@ -153,64 +125,42 @@ const ProfileScreen = ({ user: propUser, darkMode = true, onUpdateUser }) => {
       </div>
 
       {/* Profile Card */}
-      <div className={`rounded-xl border overflow-hidden ${
-        darkMode ? 'bg-[#0A0A0A] border-[#1A1A1A]' : 'bg-gray-50 border-gray-300'
-      }`}>
+      <div className="rounded-xl border overflow-hidden bg-[#FBF9F7] border-[#E8E2DB]">
         {/* Header with Avatar */}
-        <div className={`p-3 md:p-6 border-b ${
-          darkMode
-            ? 'bg-gradient-to-r from-[rgba(215,183,151,0.08)] to-[rgba(18,119,73,0.08)] border-[#1A1A1A]'
-            : 'bg-gradient-to-r from-[rgba(215,183,151,0.15)] to-[rgba(18,119,73,0.1)] border-gray-300'
-        }`}>
+        <div className="p-3 md:p-6 border-b bg-gradient-to-r from-[rgba(196,151,90,0.08)] to-[rgba(27,107,69,0.06)] border-[#E8E2DB]">
           <div className="flex items-center gap-5">
             {/* Avatar */}
             <div className="relative group">
-              <div className={`w-20 h-20 rounded-full flex items-center justify-center text-2xl font-bold font-['Montserrat'] border-3 ${
-                darkMode
-                  ? 'border-[#D7B797] text-[#D7B797]'
-                  : 'border-[#8A6340] text-[#6B4D30]'
-              }`}
-              style={{ borderWidth: '3px' }}
+              <div className="w-20 h-20 rounded-full flex items-center justify-center text-2xl font-bold font-['Montserrat'] border-[#C4975A] text-[#A67B3D]"
+              style={{ borderWidth: '3px', borderStyle: 'solid' }}
               >
                 {user?.name?.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() || 'U'}
               </div>
               {/* Online indicator */}
-              <div className={`absolute bottom-1 right-1 w-4 h-4 rounded-full bg-[#2A9E6A] border-2 ${
-                darkMode ? 'border-[#0A0A0A]' : 'border-gray-50'
-              }`} />
+              <div className="absolute bottom-1 right-1 w-4 h-4 rounded-full bg-[#1B6B45] border-2 border-[#FBF9F7]" />
               {/* Camera overlay on hover */}
-              <div className={`absolute inset-0 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer ${
-                darkMode ? 'bg-black/50' : 'bg-black/40'
-              }`}>
+              <div className="absolute inset-0 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer bg-black/40">
                 <Camera size={24} className="text-white" />
               </div>
             </div>
 
             {/* Name & Role */}
             <div className="flex-1">
-              <h2 className={`text-xl font-bold font-['Montserrat'] ${
-                darkMode ? 'text-[#F2F2F2]' : 'text-gray-900'
-              }`}>
+              <h2 className="text-xl font-bold font-['Montserrat'] text-[#2C2417]">
                 {user?.name || 'User'}
               </h2>
               <div className="flex items-center gap-2 mt-1">
-                <Shield size={14} className={darkMode ? 'text-[#D7B797]' : 'text-[#6B4D30]'} />
-                <span className={`text-sm ${darkMode ? 'text-[#999999]' : 'text-gray-700'}`}>
+                <Shield size={14} className="text-[#C4975A]" />
+                <span className="text-sm text-[#6B5D4F]">
                   {user?.role?.name || 'User'}
                 </span>
               </div>
               <div className="flex items-center gap-2 mt-2">
-                <div className={`flex items-center gap-1.5 px-2 py-1 rounded-full text-xs font-medium ${
-                  darkMode
-                    ? 'bg-[rgba(42,158,106,0.15)] text-[#2A9E6A]'
-                    : 'bg-green-100 text-green-700'
-                }`}>
+                <div className="flex items-center gap-1.5 px-2 py-1 rounded-full text-xs font-medium bg-[rgba(27,107,69,0.1)] text-[#1B6B45]">
                   <CheckCircle size={12} />
                   Active
                 </div>
-                <div className={`flex items-center gap-1.5 px-2 py-1 rounded-full text-xs ${
-                  darkMode ? 'bg-[#1A1A1A] text-[#666666]' : 'bg-gray-200 text-gray-700'
-                }`}>
+                <div className="flex items-center gap-1.5 px-2 py-1 rounded-full text-xs bg-[#F0EBE5] text-[#6B5D4F]">
                   <Calendar size={12} />
                   Joined {user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A'}
                 </div>
@@ -233,62 +183,48 @@ const ProfileScreen = ({ user: propUser, darkMode = true, onUpdateUser }) => {
       </div>
 
       {/* Security Section */}
-      <div className={`rounded-xl border p-3 md:p-6 ${
-        darkMode ? 'border-[#2E2E2E]' : 'border-gray-300'
-      }`} style={{
-        background: darkMode
-          ? 'linear-gradient(135deg, #121212 0%, rgba(215,183,151,0.03) 40%, rgba(215,183,151,0.10) 100%)'
-          : 'linear-gradient(135deg, #ffffff 0%, rgba(215,183,151,0.04) 35%, rgba(215,183,151,0.12) 100%)',
-        boxShadow: `inset 0 -1px 0 ${darkMode ? 'rgba(215,183,151,0.08)' : 'rgba(215,183,151,0.05)'}`,
+      <div className="rounded-xl border p-3 md:p-6 border-[#E8E2DB]" style={{
+        background: 'linear-gradient(135deg, #FFFFFF 0%, rgba(196,151,90,0.04) 35%, rgba(196,151,90,0.10) 100%)',
+        boxShadow: 'inset 0 -1px 0 rgba(44,36,23,0.06)',
       }}>
-        <h3 className={`text-base font-semibold font-['Montserrat'] mb-4 ${
-          darkMode ? 'text-[#F2F2F2]' : 'text-gray-900'
-        }`}>
+        <h3 className="text-base font-semibold font-['Montserrat'] mb-4 text-[#2C2417]">
           {t('profile.security')}
         </h3>
         <div className="space-y-3">
-          <button className={`w-full flex items-center justify-between p-4 rounded-lg border transition-all ${
-            darkMode
-              ? 'bg-[#0A0A0A] border-[#2E2E2E] hover:border-[rgba(215,183,151,0.2)]'
-              : 'bg-gray-50 border-gray-300 hover:border-[rgba(215,183,151,0.3)]'
-          }`}>
+          <button className="w-full flex items-center justify-between p-4 rounded-lg border transition-all bg-[#FBF9F7] border-[#E8E2DB] hover:border-[#D4B082]">
             <div className="flex items-center gap-3">
-              <div className={`p-2 rounded-lg ${darkMode ? 'bg-[#1A1A1A]' : 'bg-gray-100'}`}>
-                <Key size={18} className={darkMode ? 'text-[#999999]' : 'text-gray-700'} />
+              <div className="p-2 rounded-lg bg-[#F0EBE5]">
+                <Key size={18} className="text-[#8C8178]" />
               </div>
               <div className="text-left">
-                <div className={`text-sm font-medium ${darkMode ? 'text-[#F2F2F2]' : 'text-gray-900'}`}>
+                <div className="text-sm font-medium text-[#2C2417]">
                   {t('profile.changePassword')}
                 </div>
-                <div className={`text-xs ${darkMode ? 'text-[#666666]' : 'text-gray-700'}`}>
+                <div className="text-xs text-[#6B5D4F]">
                   {t('profile.updatePasswordRegularly')}
                 </div>
               </div>
             </div>
-            <div className={`text-xs ${darkMode ? 'text-[#666666]' : 'text-gray-700'}`}>
+            <div className="text-xs text-[#6B5D4F]">
               →
             </div>
           </button>
 
-          <button className={`w-full flex items-center justify-between p-4 rounded-lg border transition-all ${
-            darkMode
-              ? 'bg-[#0A0A0A] border-[#2E2E2E] hover:border-[rgba(215,183,151,0.2)]'
-              : 'bg-gray-50 border-gray-300 hover:border-[rgba(215,183,151,0.3)]'
-          }`}>
+          <button className="w-full flex items-center justify-between p-4 rounded-lg border transition-all bg-[#FBF9F7] border-[#E8E2DB] hover:border-[#D4B082]">
             <div className="flex items-center gap-3">
-              <div className={`p-2 rounded-lg ${darkMode ? 'bg-[#1A1A1A]' : 'bg-gray-100'}`}>
-                <Bell size={18} className={darkMode ? 'text-[#999999]' : 'text-gray-700'} />
+              <div className="p-2 rounded-lg bg-[#F0EBE5]">
+                <Bell size={18} className="text-[#8C8178]" />
               </div>
               <div className="text-left">
-                <div className={`text-sm font-medium ${darkMode ? 'text-[#F2F2F2]' : 'text-gray-900'}`}>
+                <div className="text-sm font-medium text-[#2C2417]">
                   {t('profile.notificationPreferences')}
                 </div>
-                <div className={`text-xs ${darkMode ? 'text-[#666666]' : 'text-gray-700'}`}>
+                <div className="text-xs text-[#6B5D4F]">
                   {t('profile.manageNotifications')}
                 </div>
               </div>
             </div>
-            <div className={`text-xs ${darkMode ? 'text-[#666666]' : 'text-gray-700'}`}>
+            <div className="text-xs text-[#6B5D4F]">
               →
             </div>
           </button>

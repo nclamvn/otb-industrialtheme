@@ -66,7 +66,7 @@ const getTypeConfig = (t) => ({
   },
 });
 
-const MasterDataScreen = ({ type = 'brands', darkMode = false }) => {
+const MasterDataScreen = ({ type = 'brands' }) => {
   const { t } = useLanguage();
   const { isMobile } = useIsMobile();
   const [data, setData] = useState([]);
@@ -125,10 +125,10 @@ const MasterDataScreen = ({ type = 'brands', darkMode = false }) => {
     return (
       <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
         isActive
-          ? darkMode ? 'bg-[rgba(18,119,73,0.15)] text-[#2A9E6A]' : 'bg-[rgba(18,119,73,0.1)] text-[#127749]'
-          : darkMode ? 'bg-[rgba(248,81,73,0.1)] text-[#FF7B72]' : 'bg-red-50 text-red-600'
+          ? 'bg-[rgba(27,107,69,0.1)] text-[#1B6B45]'
+          : 'bg-red-50 text-[#DC3545]'
       }`}>
-        <div className={`w-1.5 h-1.5 rounded-full mr-1.5 ${isActive ? 'bg-[#2A9E6A]' : 'bg-red-400'}`} />
+        <div className={`w-1.5 h-1.5 rounded-full mr-1.5 ${isActive ? 'bg-[#1B6B45]' : 'bg-[#DC3545]'}`} />
         {value}
       </span>
     );
@@ -137,28 +137,22 @@ const MasterDataScreen = ({ type = 'brands', darkMode = false }) => {
   return (
     <div className="space-y-3">
       {/* Header + Search - Merged compact */}
-      <div className={`rounded-lg border overflow-hidden ${
-        darkMode ? 'border-[#2E2E2E]' : 'border-[#C4B5A5]'
-      }`} style={{
-        background: darkMode
-          ? 'linear-gradient(135deg, #121212 0%, rgba(215,183,151,0.03) 40%, rgba(215,183,151,0.10) 100%)'
-          : 'linear-gradient(135deg, #ffffff 0%, rgba(215,183,151,0.05) 35%, rgba(215,183,151,0.14) 100%)',
-        boxShadow: `inset 0 -1px 0 ${darkMode ? 'rgba(215,183,151,0.06)' : 'rgba(215,183,151,0.08)'}`,
+      <div className="rounded-lg border overflow-hidden border-[#E8E2DB]" style={{
+        background: 'linear-gradient(135deg, #FFFFFF 0%, rgba(196,151,90,0.05) 35%, rgba(196,151,90,0.14) 100%)',
+        boxShadow: 'inset 0 -1px 0 rgba(44,36,23,0.06)',
       }}>
         <div className="flex flex-wrap items-center justify-between gap-2 px-3 py-2">
           <div className="flex items-center gap-2.5">
             <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{
-              background: darkMode
-                ? 'linear-gradient(135deg, rgba(215,183,151,0.10) 0%, rgba(215,183,151,0.20) 100%)'
-                : 'linear-gradient(135deg, rgba(160,120,75,0.12) 0%, rgba(160,120,75,0.22) 100%)',
+              background: 'linear-gradient(135deg, rgba(196,151,90,0.12) 0%, rgba(196,151,90,0.22) 100%)',
             }}>
-              <Icon size={14} className={darkMode ? 'text-[#D7B797]' : 'text-[#6B4D30]'} style={darkMode ? { filter: 'drop-shadow(0 0 3px rgba(215,183,151,0.4))' } : undefined} />
+              <Icon size={14} className="text-[#A67B3D]" />
             </div>
             <div>
-              <h1 className={`text-sm font-bold font-['Montserrat'] leading-tight ${darkMode ? 'text-[#F2F2F2]' : 'text-[#0A0A0A]'}`}>
+              <h1 className="text-sm font-bold font-['Montserrat'] leading-tight text-[#2C2417]">
                 {config.title}
               </h1>
-              <p className={`text-[10px] font-['JetBrains_Mono'] ${darkMode ? 'text-[#666666]' : 'text-[#999999]'}`}>
+              <p className="text-[10px] font-['JetBrains_Mono'] text-[#8C8178]">
                 {loading ? t('common.loading') : t('masterData.records', { count: filteredData.length })}
               </p>
             </div>
@@ -167,22 +161,18 @@ const MasterDataScreen = ({ type = 'brands', darkMode = false }) => {
           <div className="flex items-center gap-2">
             {/* Inline Search */}
             <div className="relative">
-              <Search size={13} className={`absolute left-2.5 top-1/2 -translate-y-1/2 ${darkMode ? 'text-[#555555]' : 'text-[#999999]'}`} />
+              <Search size={13} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[#8C8178]" />
               <input
                 type="text"
                 value={searchTerm}
                 onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
                 placeholder={`${t('masterData.search')} ${config.title.toLowerCase()}...`}
-                className={`w-40 md:w-56 pl-8 pr-7 py-1 border rounded-md text-xs font-['Montserrat'] transition-all focus:outline-none focus:ring-1 focus:ring-[#D7B797] ${
-                  darkMode
-                    ? 'bg-[#0A0A0A] border-[#1A1A1A] text-[#F2F2F2] placeholder-[#444444]'
-                    : 'bg-white border-[#C4B5A5] text-[#0A0A0A] placeholder-[#999999]'
-                }`}
+                className="w-40 md:w-56 pl-8 pr-7 py-1 border rounded-md text-xs font-['Montserrat'] transition-all focus:outline-none focus:ring-1 focus:ring-[#D4B082] bg-[#FFFFFF] border-[#E8E2DB] text-[#2C2417] placeholder-[#8C8178]"
               />
               {searchTerm && (
                 <button
                   onClick={() => { setSearchTerm(''); setCurrentPage(1); }}
-                  className={`absolute right-2 top-1/2 -translate-y-1/2 ${darkMode ? 'text-[#555555] hover:text-[#999999]' : 'text-[#999999] hover:text-[#666666]'}`}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-[#8C8178] hover:text-[#6B5D4F]"
                 >
                   <X size={12} />
                 </button>
@@ -192,11 +182,7 @@ const MasterDataScreen = ({ type = 'brands', darkMode = false }) => {
             <button
               onClick={fetchData}
               disabled={loading}
-              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md font-medium text-xs font-['Montserrat'] transition-all ${
-                darkMode
-                  ? 'text-[#888888] hover:text-[#D7B797] hover:bg-[rgba(215,183,151,0.06)] border border-[#1A1A1A]'
-                  : 'text-[#666666] hover:text-[#6B4D30] hover:bg-[rgba(107,77,48,0.12)] border border-[#C4B5A5]'
-              }`}
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-md font-medium text-xs font-['Montserrat'] transition-all text-[#6B5D4F] hover:text-[#A67B3D] hover:bg-[rgba(196,151,90,0.12)] border border-[#E8E2DB]"
             >
               <RefreshCw size={12} className={loading ? 'animate-spin' : ''} />
               {t('masterData.refresh')}
@@ -206,32 +192,28 @@ const MasterDataScreen = ({ type = 'brands', darkMode = false }) => {
       </div>
 
       {/* Data Table */}
-      <div className={`rounded-lg border overflow-hidden ${
-        darkMode ? 'border-[#2E2E2E]' : 'border-[#C4B5A5]'
-      }`} style={{
-        background: darkMode
-          ? 'linear-gradient(135deg, #121212 0%, rgba(215,183,151,0.02) 40%, rgba(215,183,151,0.06) 100%)'
-          : 'linear-gradient(135deg, #ffffff 0%, rgba(215,183,151,0.03) 35%, rgba(215,183,151,0.08) 100%)',
+      <div className="rounded-lg border overflow-hidden border-[#E8E2DB]" style={{
+        background: 'linear-gradient(135deg, #FFFFFF 0%, rgba(196,151,90,0.03) 35%, rgba(196,151,90,0.08) 100%)',
       }}>
         {loading ? (
           <div className="p-10 text-center">
-            <RefreshCw size={24} className={`animate-spin mx-auto mb-3 ${darkMode ? 'text-[#D7B797]' : 'text-[#6B4D30]'}`} />
-            <p className={`text-xs font-['Montserrat'] ${darkMode ? 'text-[#666666]' : 'text-[#999999]'}`}>{t('masterData.loadingData')}</p>
+            <RefreshCw size={24} className="animate-spin mx-auto mb-3 text-[#A67B3D]" />
+            <p className="text-xs font-['Montserrat'] text-[#8C8178]">{t('masterData.loadingData')}</p>
           </div>
         ) : error ? (
           <div className="p-10 text-center">
-            <p className="text-red-400 mb-3 text-xs font-['Montserrat']">{error}</p>
+            <p className="text-[#DC3545] mb-3 text-xs font-['Montserrat']">{error}</p>
             <button
               onClick={fetchData}
-              className="px-3 py-1.5 bg-[#D7B797] text-[#0A0A0A] rounded-md font-medium text-xs font-['Montserrat'] hover:bg-[#C4A480] transition-colors"
+              className="px-3 py-1.5 bg-[#C4975A] text-[#FFFFFF] rounded-md font-medium text-xs font-['Montserrat'] hover:bg-[#A67B3D] transition-colors"
             >
               {t('masterData.tryAgain')}
             </button>
           </div>
         ) : filteredData.length === 0 ? (
           <div className="p-10 text-center">
-            <Icon size={32} className={`mx-auto mb-3 ${darkMode ? 'text-[#2E2E2E]' : 'text-[#2E2E2E]/30'}`} />
-            <p className={`text-xs font-['Montserrat'] ${darkMode ? 'text-[#666666]' : 'text-[#999999]'}`}>
+            <Icon size={32} className="mx-auto mb-3 text-[#D4CBBC]" />
+            <p className="text-xs font-['Montserrat'] text-[#8C8178]">
               {searchTerm ? t('masterData.noResultsFound') : t('masterData.noDataAvailable')}
             </p>
           </div>
@@ -240,18 +222,14 @@ const MasterDataScreen = ({ type = 'brands', darkMode = false }) => {
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className={darkMode ? 'bg-[#0A0A0A]' : 'bg-[rgba(160,120,75,0.08)]'}>
-                    <th className={`px-3 py-2 text-left text-[10px] font-semibold uppercase tracking-wider font-['Montserrat'] w-10 ${
-                      darkMode ? 'text-[#666666]' : 'text-[#999999]'
-                    }`}>
+                  <tr className="bg-[#FBF9F7]">
+                    <th className="px-3 py-2 text-left text-[10px] font-semibold uppercase tracking-wider font-['Montserrat'] w-10 text-[#8C8178]">
                       #
                     </th>
                     {config.columns.map((col) => (
                       <th
                         key={col.key}
-                        className={`px-3 py-2 text-left text-[10px] font-semibold uppercase tracking-wider font-['Montserrat'] ${
-                          darkMode ? 'text-[#666666]' : 'text-[#999999]'
-                        }`}
+                        className="px-3 py-2 text-left text-[10px] font-semibold uppercase tracking-wider font-['Montserrat'] text-[#8C8178]"
                         style={{ width: col.width }}
                       >
                         {col.label}
@@ -263,13 +241,9 @@ const MasterDataScreen = ({ type = 'brands', darkMode = false }) => {
                   {paginatedData.map((item, index) => (
                     <tr
                       key={item.id || index}
-                      className={`border-t transition-colors ${
-                        darkMode
-                          ? 'border-[#1A1A1A] hover:bg-[rgba(215,183,151,0.03)]'
-                          : 'border-[#D4C8BB] hover:bg-[rgba(215,183,151,0.05)]'
-                      }`}
+                      className="border-t transition-colors border-[#E8E2DB] hover:bg-[rgba(196,151,90,0.05)]"
                     >
-                      <td className={`px-3 py-1.5 text-xs font-['JetBrains_Mono'] ${darkMode ? 'text-[#444444]' : 'text-[#BBBBBB]'}`}>
+                      <td className="px-3 py-1.5 text-xs font-['JetBrains_Mono'] text-[#D4CBBC]">
                         {(currentPage - 1) * pageSize + index + 1}
                       </td>
                       {config.columns.map((col) => {
@@ -281,7 +255,7 @@ const MasterDataScreen = ({ type = 'brands', darkMode = false }) => {
                             key={col.key}
                             className={`px-3 py-1.5 text-xs ${
                               col.mono ? "font-['JetBrains_Mono']" : "font-['Montserrat']"
-                            } ${darkMode ? 'text-[#F2F2F2]' : 'text-[#0A0A0A]'}`}
+                            } text-[#2C2417]`}
                           >
                             {col.badge ? renderBadge(displayValue) : displayValue}
                           </td>
@@ -295,31 +269,25 @@ const MasterDataScreen = ({ type = 'brands', darkMode = false }) => {
 
             {/* Pagination */}
             {totalPages > 1 && (
-              <div className={`flex items-center justify-between px-3 py-1.5 border-t ${
-                darkMode ? 'border-[#1A1A1A]' : 'border-[#D4C8BB]'
-              }`}>
-                <p className={`text-[10px] font-['JetBrains_Mono'] ${darkMode ? 'text-[#666666]' : 'text-[#999999]'}`}>
+              <div className="flex items-center justify-between px-3 py-1.5 border-t border-[#E8E2DB]">
+                <p className="text-[10px] font-['JetBrains_Mono'] text-[#8C8178]">
                   {(currentPage - 1) * pageSize + 1}–{Math.min(currentPage * pageSize, filteredData.length)} of {filteredData.length}
                 </p>
                 <div className="flex items-center gap-1">
                   <button
                     onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                     disabled={currentPage === 1}
-                    className={`p-1 rounded-md transition-colors disabled:opacity-30 disabled:cursor-not-allowed ${
-                      darkMode ? 'hover:bg-[rgba(215,183,151,0.06)] text-[#888888]' : 'hover:bg-[rgba(160,120,75,0.12)] text-[#666666]'
-                    }`}
+                    className="p-1 rounded-md transition-colors disabled:opacity-30 disabled:cursor-not-allowed hover:bg-[rgba(196,151,90,0.12)] text-[#6B5D4F]"
                   >
                     <ChevronLeft size={14} />
                   </button>
-                  <span className={`px-2 py-0.5 text-[10px] font-['JetBrains_Mono'] ${darkMode ? 'text-[#F2F2F2]' : 'text-[#0A0A0A]'}`}>
+                  <span className="px-2 py-0.5 text-[10px] font-['JetBrains_Mono'] text-[#2C2417]">
                     {currentPage} / {totalPages}
                   </span>
                   <button
                     onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
                     disabled={currentPage === totalPages}
-                    className={`p-1 rounded-md transition-colors disabled:opacity-30 disabled:cursor-not-allowed ${
-                      darkMode ? 'hover:bg-[rgba(215,183,151,0.06)] text-[#888888]' : 'hover:bg-[rgba(160,120,75,0.12)] text-[#666666]'
-                    }`}
+                    className="p-1 rounded-md transition-colors disabled:opacity-30 disabled:cursor-not-allowed hover:bg-[rgba(196,151,90,0.12)] text-[#6B5D4F]"
                   >
                     <ChevronRight size={14} />
                   </button>

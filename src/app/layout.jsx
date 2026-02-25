@@ -33,7 +33,7 @@ export default function RootLayout({ children }) {
   return (
     <html
       lang="en"
-      className={`dark ${montserrat.variable} ${jetbrainsMono.variable}`}
+      className={`${montserrat.variable} ${jetbrainsMono.variable}`}
       suppressHydrationWarning
     >
       <body>

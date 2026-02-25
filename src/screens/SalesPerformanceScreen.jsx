@@ -11,7 +11,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 const SEASONS = ['SS', 'FW'];
 const YEARS = [2023, 2024, 2025];
 
-const SalesPerformanceScreen = ({ darkMode = false }) => {
+const SalesPerformanceScreen = () => {
   const { t } = useLanguage();
 
   const [seasonGroup, setSeasonGroup] = useState('SS');
@@ -66,12 +66,12 @@ const SalesPerformanceScreen = ({ darkMode = false }) => {
     Math.max(...salesByDimension.map(d => Number(d.allocatedAmount || 0)), 1)
   , [salesByDimension]);
 
-  const bg = darkMode ? 'bg-[#0A0A0A]' : 'bg-[#fdfbf9]';
-  const cardBg = darkMode ? 'bg-[#111]' : 'bg-white';
-  const border = darkMode ? 'border-[#222]' : 'border-[#e5e0da]';
-  const text = darkMode ? 'text-gray-200' : 'text-gray-800';
-  const subtext = darkMode ? 'text-gray-400' : 'text-gray-600';
-  const accent = '#D7B797';
+  const bg = 'bg-[#FAF8F5]';
+  const cardBg = 'bg-[#FFFFFF]';
+  const border = 'border-[#E8E2DB]';
+  const text = 'text-[#2C2417]';
+  const subtext = 'text-[#6B5D4F]';
+  const accent = '#C4975A';
 
   if (loading) return <div className={`flex-1 ${bg} flex items-center justify-center`}><LoadingSpinner /></div>;
   if (error) return <div className={`flex-1 ${bg} p-6`}><ErrorMessage message={error} onRetry={fetchData} /></div>;
@@ -102,10 +102,10 @@ const SalesPerformanceScreen = ({ darkMode = false }) => {
       {/* KPI Cards */}
       <div className="grid grid-cols-4 gap-4 mb-6">
         {[
-          { label: t('analytics.totalRevenue', 'Total Revenue'), value: formatCurrency(kpis.totalRevenue), icon: DollarSign, color: '#D7B797' },
-          { label: t('analytics.avgSellThrough', 'Avg Sell-Through'), value: `${kpis.avgSellThrough.toFixed(1)}%`, icon: Target, color: '#2A9E6A' },
-          { label: t('analytics.avgGrossMargin', 'Avg Gross Margin'), value: `${kpis.avgMargin.toFixed(1)}%`, icon: TrendingUp, color: '#3B82F6' },
-          { label: t('analytics.topScore', 'Top Score'), value: kpis.topScore, icon: Award, color: '#E3B341' },
+          { label: t('analytics.totalRevenue', 'Total Revenue'), value: formatCurrency(kpis.totalRevenue), icon: DollarSign, color: '#C4975A' },
+          { label: t('analytics.avgSellThrough', 'Avg Sell-Through'), value: `${kpis.avgSellThrough.toFixed(1)}%`, icon: Target, color: '#1B6B45' },
+          { label: t('analytics.avgGrossMargin', 'Avg Gross Margin'), value: `${kpis.avgMargin.toFixed(1)}%`, icon: TrendingUp, color: '#2563EB' },
+          { label: t('analytics.topScore', 'Top Score'), value: kpis.topScore, icon: Award, color: '#D4B082' },
         ].map((kpi, i) => (
           <div key={i} className={`${cardBg} border ${border} rounded-xl p-4`}>
             <div className="flex items-center justify-between mb-2">
@@ -122,7 +122,7 @@ const SalesPerformanceScreen = ({ darkMode = false }) => {
         {/* Top SKUs */}
         <div className={`${cardBg} border ${border} rounded-xl p-4`}>
           <h3 className="font-semibold mb-3 flex items-center gap-2">
-            <TrendingUp size={16} className="text-green-500" />
+            <TrendingUp size={16} className="text-[#1B6B45]" />
             {t('analytics.topSkus', 'Top Performing SKUs')}
           </h3>
           <div className="overflow-x-auto">
@@ -156,7 +156,7 @@ const SalesPerformanceScreen = ({ darkMode = false }) => {
         {/* Bottom SKUs */}
         <div className={`${cardBg} border ${border} rounded-xl p-4`}>
           <h3 className="font-semibold mb-3 flex items-center gap-2">
-            <TrendingDown size={16} className="text-red-500" />
+            <TrendingDown size={16} className="text-[#DC3545]" />
             {t('analytics.bottomSkus', 'Bottom Performing SKUs')}
           </h3>
           <div className="overflow-x-auto">
@@ -174,7 +174,7 @@ const SalesPerformanceScreen = ({ darkMode = false }) => {
                   <tr key={i} className={`border-t ${border}`}>
                     <td className="py-2 font-mono text-xs">{sku.skuCode}</td>
                     <td className="py-2 text-right">
-                      <span className="inline-block px-2 py-0.5 rounded text-xs font-semibold bg-red-500/10 text-red-500">
+                      <span className="inline-block px-2 py-0.5 rounded text-xs font-semibold bg-[#DC3545]/10 text-[#DC3545]">
                         {sku.performanceScore}
                       </span>
                     </td>
@@ -197,9 +197,9 @@ const SalesPerformanceScreen = ({ darkMode = false }) => {
             return (
               <div key={i} className="flex items-center gap-3">
                 <span className={`text-sm w-36 truncate ${subtext}`}>{dim.dimensionValue}</span>
-                <div className="flex-1 h-7 rounded-lg overflow-hidden" style={{ backgroundColor: darkMode ? '#1a1a1a' : '#f3f0ec' }}>
+                <div className="flex-1 h-7 rounded-lg overflow-hidden" style={{ backgroundColor: '#F0EBE5' }}>
                   <div className="h-full rounded-lg flex items-center px-2" style={{ width: `${Math.max(pct, 5)}%`, backgroundColor: accent }}>
-                    <span className="text-xs font-semibold text-black whitespace-nowrap">{Number(dim.allocatedPct).toFixed(1)}%</span>
+                    <span className="text-xs font-semibold text-white whitespace-nowrap">{Number(dim.allocatedPct).toFixed(1)}%</span>
                   </div>
                 </div>
                 <span className="text-xs w-28 text-right">{formatCurrency(Number(dim.allocatedAmount))}</span>

@@ -2,18 +2,17 @@
 
 import React, { useState } from 'react';
 import {
-  Sun, Moon, Monitor, Globe, Bell, BellOff, Lock, Eye, EyeOff,
-  Palette, Type, Zap, Database, HardDrive, Trash2, Download,
+  Globe, Bell, BellOff, Lock, Eye, EyeOff,
+  Type, Zap, Database, HardDrive, Trash2, Download,
   ChevronRight, Check, Info, AlertTriangle
 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useIsMobile } from '@/hooks/useIsMobile';
 
-const SettingsScreen = ({ darkMode = true, setDarkMode, user }) => {
+const SettingsScreen = ({ user }) => {
   const { t, language, setLanguage } = useLanguage();
   const { isMobile } = useIsMobile();
   const [settings, setSettings] = useState({
-    theme: darkMode ? 'dark' : 'light',
     notifications: {
       email: true,
       push: true,
@@ -42,29 +41,20 @@ const SettingsScreen = ({ darkMode = true, setDarkMode, user }) => {
       setLanguage(value);
     } else {
       setSettings(prev => ({ ...prev, [key]: value }));
-      if (key === 'theme') {
-        setDarkMode && setDarkMode(value === 'dark');
-      }
     }
   };
 
   const SettingSection = ({ title, description, children }) => (
-    <div className={`rounded-xl border overflow-hidden ${
-      darkMode ? 'border-[#2E2E2E]' : 'border-gray-300'
-    }`} style={{
-      background: darkMode
-        ? 'linear-gradient(135deg, #121212 0%, rgba(215,183,151,0.03) 40%, rgba(215,183,151,0.08) 100%)'
-        : 'linear-gradient(135deg, #ffffff 0%, rgba(215,183,151,0.04) 35%, rgba(215,183,151,0.10) 100%)',
-      boxShadow: `inset 0 -1px 0 ${darkMode ? 'rgba(215,183,151,0.06)' : 'rgba(215,183,151,0.04)'}`,
+    <div className="rounded-xl border overflow-hidden border-[#E8E2DB]" style={{
+      background: 'linear-gradient(135deg, #FFFFFF 0%, rgba(215,183,151,0.04) 35%, rgba(215,183,151,0.10) 100%)',
+      boxShadow: 'inset 0 -1px 0 rgba(44,36,23,0.06)',
     }}>
-      <div className={`px-3 md:px-5 py-3 md:py-4 border-b ${darkMode ? 'border-[#2E2E2E]' : 'border-gray-300'}`}>
-        <h3 className={`text-base font-semibold font-['Montserrat'] ${
-          darkMode ? 'text-[#F2F2F2]' : 'text-gray-900'
-        }`}>
+      <div className="px-3 md:px-5 py-3 md:py-4 border-b border-[#E8E2DB]">
+        <h3 className="text-base font-semibold font-['Montserrat'] text-[#2C2417]">
           {title}
         </h3>
         {description && (
-          <p className={`text-xs mt-0.5 ${darkMode ? 'text-[#666666]' : 'text-gray-700'}`}>
+          <p className="text-xs mt-0.5 text-[#6B5D4F]">
             {description}
           </p>
         )}
@@ -80,21 +70,17 @@ const SettingsScreen = ({ darkMode = true, setDarkMode, user }) => {
       onClick={onClick}
       className={`flex items-center gap-4 p-3 rounded-lg transition-all ${
         onClick ? 'cursor-pointer' : ''
-      } ${
-        darkMode
-          ? 'hover:bg-[rgba(215,183,151,0.05)]'
-          : 'hover:bg-gray-50'
-      }`}
+      } hover:bg-[#FBF9F7]`}
     >
-      <div className={`p-2 rounded-lg ${darkMode ? 'bg-[#1A1A1A]' : 'bg-gray-100'}`}>
-        <Icon size={18} className={darkMode ? 'text-[#D7B797]' : 'text-[#6B4D30]'} />
+      <div className="p-2 rounded-lg bg-[#FBF9F7]">
+        <Icon size={18} className="text-[#C4975A]" />
       </div>
       <div className="flex-1 min-w-0">
-        <div className={`text-sm font-medium ${darkMode ? 'text-[#F2F2F2]' : 'text-gray-900'}`}>
+        <div className="text-sm font-medium text-[#2C2417]">
           {label}
         </div>
         {description && (
-          <div className={`text-xs mt-0.5 ${darkMode ? 'text-[#666666]' : 'text-gray-700'}`}>
+          <div className="text-xs mt-0.5 text-[#6B5D4F]">
             {description}
           </div>
         )}
@@ -108,8 +94,8 @@ const SettingsScreen = ({ darkMode = true, setDarkMode, user }) => {
       onClick={() => onChange(!enabled)}
       className={`relative w-11 h-6 rounded-full transition-all duration-200 ${
         enabled
-          ? 'bg-[#127749]'
-          : darkMode ? 'bg-[#2E2E2E]' : 'bg-gray-300'
+          ? 'bg-[#1B6B45]'
+          : 'bg-[#D4CBBC]'
       }`}
     >
       <div className={`absolute top-1 w-4 h-4 rounded-full bg-white shadow transition-all duration-200 ${
@@ -118,72 +104,20 @@ const SettingsScreen = ({ darkMode = true, setDarkMode, user }) => {
     </button>
   );
 
-  const ThemeOption = ({ value, icon: Icon, label, current }) => (
-    <button
-      onClick={() => updateSetting(null, 'theme', value)}
-      className={`flex-1 flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all ${
-        current === value
-          ? darkMode
-            ? 'border-[#D7B797] bg-[rgba(215,183,151,0.1)]'
-            : 'border-[#8A6340] bg-[rgba(215,183,151,0.15)]'
-          : darkMode
-            ? 'border-[#2E2E2E] hover:border-[#3E3E3E]'
-            : 'border-gray-300 hover:border-gray-400'
-      }`}
-    >
-      <Icon size={24} className={
-        current === value
-          ? darkMode ? 'text-[#D7B797]' : 'text-[#6B4D30]'
-          : darkMode ? 'text-[#666666]' : 'text-gray-700'
-      } />
-      <span className={`text-sm font-medium ${
-        current === value
-          ? darkMode ? 'text-[#D7B797]' : 'text-[#6B4D30]'
-          : darkMode ? 'text-[#999999]' : 'text-gray-700'
-      }`}>
-        {label}
-      </span>
-      {current === value && (
-        <div className={`absolute top-2 right-2 w-5 h-5 rounded-full flex items-center justify-center ${
-          darkMode ? 'bg-[#D7B797]' : 'bg-[#8A6340]'
-        }`}>
-          <Check size={12} className="text-white" />
-        </div>
-      )}
-    </button>
-  );
-
   return (
     <div className="space-y-3 md:space-y-6">
       {/* Page Header */}
       <div>
-        <h1 className={`text-lg font-semibold font-['Montserrat'] ${
-          darkMode ? 'text-[#F2F2F2]' : 'text-gray-900'
-        }`}>
+        <h1 className="text-lg font-semibold font-['Montserrat'] text-[#2C2417]">
           {t('settings.title')}
         </h1>
-        <p className={`text-xs mt-0.5 ${darkMode ? 'text-[#666666]' : 'text-gray-700'}`}>
+        <p className="text-xs mt-0.5 text-[#6B5D4F]">
           {t('settings.subtitle')}
         </p>
       </div>
 
       {/* Appearance */}
       <SettingSection title={t('settings.appearance')} description={t('settings.customizeAppLooks')}>
-        <div className="p-3">
-          <div className={`text-xs font-medium uppercase tracking-wider mb-3 ${
-            darkMode ? 'text-[#666666]' : 'text-gray-700'
-          }`}>
-            {t('settings.theme')}
-          </div>
-          <div className="grid grid-cols-3 gap-2 md:gap-3">
-            <ThemeOption value="light" icon={Sun} label={t('settings.light')} current={settings.theme} />
-            <ThemeOption value="dark" icon={Moon} label={t('settings.dark')} current={settings.theme} />
-            <ThemeOption value="system" icon={Monitor} label={t('settings.system')} current={settings.theme} />
-          </div>
-        </div>
-
-        <div className={`mx-3 h-px ${darkMode ? 'bg-[#2E2E2E]' : 'bg-gray-100'}`} />
-
         <SettingRow
           icon={Zap}
           label={t('settings.animations')}
@@ -217,11 +151,7 @@ const SettingsScreen = ({ darkMode = true, setDarkMode, user }) => {
           <select
             value={language}
             onChange={(e) => updateSetting(null, 'language', e.target.value)}
-            className={`pl-3 pr-8 py-1.5 rounded-lg text-sm font-medium border outline-none cursor-pointer ${
-              darkMode
-                ? 'bg-[#1A1A1A] border-[#2E2E2E] text-[#F2F2F2]'
-                : 'bg-gray-100 border-gray-300 text-gray-900'
-            }`}
+            className="pl-3 pr-8 py-1.5 rounded-lg text-sm font-medium border outline-none cursor-pointer bg-[#FBF9F7] border-[#E8E2DB] text-[#2C2417]"
           >
             <option value="vi">{t('settings.vietnamese')}</option>
             <option value="en">{t('settings.english')}</option>
@@ -298,7 +228,7 @@ const SettingsScreen = ({ darkMode = true, setDarkMode, user }) => {
           description={t('settings.exportDataDesc')}
           onClick={() => alert(t('settings.exportComingSoon'))}
         >
-          <ChevronRight size={18} className={darkMode ? 'text-[#666666]' : 'text-gray-700'} />
+          <ChevronRight size={18} className="text-[#8C8178]" />
         </SettingRow>
 
         <SettingRow
@@ -307,7 +237,7 @@ const SettingsScreen = ({ darkMode = true, setDarkMode, user }) => {
           description={t('settings.clearCacheDesc')}
           onClick={() => alert(t('settings.cacheCleared'))}
         >
-          <ChevronRight size={18} className={darkMode ? 'text-[#666666]' : 'text-gray-700'} />
+          <ChevronRight size={18} className="text-[#8C8178]" />
         </SettingRow>
       </SettingSection>
 
@@ -323,20 +253,14 @@ const SettingsScreen = ({ darkMode = true, setDarkMode, user }) => {
             }
           }}
         >
-          <span className={`text-xs font-medium px-2 py-1 rounded ${
-            darkMode
-              ? 'bg-[rgba(248,81,73,0.1)] text-[#FF7B72]'
-              : 'bg-red-100 text-red-600'
-          }`}>
+          <span className="text-xs font-medium px-2 py-1 rounded bg-red-100 text-[#DC3545]">
             {t('common.irreversible')}
           </span>
         </SettingRow>
       </SettingSection>
 
       {/* App Info */}
-      <div className={`rounded-xl border p-3 md:p-5 ${
-        darkMode ? 'bg-[#0A0A0A] border-[#1A1A1A]' : 'bg-gray-50 border-gray-300'
-      }`}>
+      <div className="rounded-xl border p-3 md:p-5 bg-[#FBF9F7] border-[#E8E2DB]">
         <div className="flex items-center gap-3">
           <img
             src="/dafc-logo.png"
@@ -344,20 +268,14 @@ const SettingsScreen = ({ darkMode = true, setDarkMode, user }) => {
             className="h-10 w-auto object-contain"
           />
           <div className="flex-1">
-            <div className={`text-sm font-semibold font-['Montserrat'] ${
-              darkMode ? 'text-[#F2F2F2]' : 'text-gray-900'
-            }`}>
+            <div className="text-sm font-semibold font-['Montserrat'] text-[#2C2417]">
               {t('settings.otbSystem')}
             </div>
-            <div className={`text-xs ${darkMode ? 'text-[#666666]' : 'text-gray-700'}`}>
+            <div className="text-xs text-[#6B5D4F]">
               {t('settings.versionLabel')}
             </div>
           </div>
-          <div className={`flex items-center gap-1.5 px-2 py-1 rounded-full text-xs ${
-            darkMode
-              ? 'bg-[rgba(42,158,106,0.15)] text-[#2A9E6A]'
-              : 'bg-green-100 text-green-700'
-          }`}>
+          <div className="flex items-center gap-1.5 px-2 py-1 rounded-full text-xs bg-green-100 text-[#1B6B45]">
             <Check size={12} />
             {t('settings.upToDate')}
           </div>

@@ -23,69 +23,57 @@ import { useLanguage } from '@/contexts/LanguageContext';
 
 const RISK_LEVELS = {
   low: {
-    color: '#127749',
-    bgAlpha: 'rgba(18,119,73,0.12)',
-    borderAlpha: 'rgba(18,119,73,0.25)',
-    darkGrad: 'rgba(18,119,73,0.16)',
-    darkMid: 'rgba(18,119,73,0.05)',
-    lightGrad: 'rgba(18,119,73,0.18)',
-    lightMid: 'rgba(18,119,73,0.06)',
-    glowDark: 'rgba(18,119,73,0.12)',
-    glowLight: 'rgba(18,119,73,0.08)',
+    color: '#1B6B45',
+    bgAlpha: 'rgba(27,107,69,0.12)',
+    borderAlpha: 'rgba(27,107,69,0.25)',
+    grad: 'rgba(27,107,69,0.18)',
+    mid: 'rgba(27,107,69,0.06)',
+    glow: 'rgba(27,107,69,0.08)',
     labelKey: 'ai.lowRisk',
     Icon: ShieldCheck,
   },
   medium: {
-    color: '#D7B797',
-    bgAlpha: 'rgba(215,183,151,0.12)',
-    borderAlpha: 'rgba(215,183,151,0.25)',
-    darkGrad: 'rgba(215,183,151,0.16)',
-    darkMid: 'rgba(215,183,151,0.05)',
-    lightGrad: 'rgba(215,183,151,0.20)',
-    lightMid: 'rgba(215,183,151,0.06)',
-    glowDark: 'rgba(215,183,151,0.12)',
-    glowLight: 'rgba(215,183,151,0.08)',
+    color: '#C4975A',
+    bgAlpha: 'rgba(196,151,90,0.12)',
+    borderAlpha: 'rgba(196,151,90,0.25)',
+    grad: 'rgba(196,151,90,0.20)',
+    mid: 'rgba(196,151,90,0.06)',
+    glow: 'rgba(196,151,90,0.08)',
     labelKey: 'ai.mediumRisk',
     Icon: Shield,
   },
   high: {
-    color: '#E67E22',
-    bgAlpha: 'rgba(230,126,34,0.12)',
-    borderAlpha: 'rgba(230,126,34,0.25)',
-    darkGrad: 'rgba(230,126,34,0.16)',
-    darkMid: 'rgba(230,126,34,0.05)',
-    lightGrad: 'rgba(230,126,34,0.18)',
-    lightMid: 'rgba(230,126,34,0.06)',
-    glowDark: 'rgba(230,126,34,0.12)',
-    glowLight: 'rgba(230,126,34,0.08)',
+    color: '#D97706',
+    bgAlpha: 'rgba(217,119,6,0.12)',
+    borderAlpha: 'rgba(217,119,6,0.25)',
+    grad: 'rgba(217,119,6,0.18)',
+    mid: 'rgba(217,119,6,0.06)',
+    glow: 'rgba(217,119,6,0.08)',
     labelKey: 'ai.highRisk',
     Icon: ShieldAlert,
   },
   critical: {
-    color: '#F85149',
-    bgAlpha: 'rgba(248,81,73,0.12)',
-    borderAlpha: 'rgba(248,81,73,0.25)',
-    darkGrad: 'rgba(248,81,73,0.16)',
-    darkMid: 'rgba(248,81,73,0.05)',
-    lightGrad: 'rgba(248,81,73,0.18)',
-    lightMid: 'rgba(248,81,73,0.06)',
-    glowDark: 'rgba(248,81,73,0.12)',
-    glowLight: 'rgba(248,81,73,0.08)',
+    color: '#DC3545',
+    bgAlpha: 'rgba(220,53,69,0.12)',
+    borderAlpha: 'rgba(220,53,69,0.25)',
+    grad: 'rgba(220,53,69,0.18)',
+    mid: 'rgba(220,53,69,0.06)',
+    glow: 'rgba(220,53,69,0.08)',
     labelKey: 'ai.criticalRisk',
     Icon: ShieldClose,
   },
 };
 
 function getFactorStatusIcon(score) {
-  if (score <= 3) return { Icon: CheckCircle, color: '#2A9E6A' };
-  if (score <= 6) return { Icon: AlertTriangle, color: '#D7B797' };
-  return { Icon: ShieldAlert, color: '#F85149' };
+  if (score <= 3) return { Icon: CheckCircle, color: '#1B6B45' };
+  if (score <= 6) return { Icon: AlertTriangle, color: '#C4975A' };
+  return { Icon: ShieldAlert, color: '#DC3545' };
 }
 
 function getFactorBarColor(score) {
-  if (score <= 3) return '#127749';
-  if (score <= 6) return '#D7B797';
-  return '#F85149';
+  if (score <= 3) return '#1B6B45';
+  if (score <= 6) return '#C4975A';
+  return '#DC3545';
 }
 
 export default function RiskScoreCard({
@@ -210,41 +198,39 @@ export default function RiskScoreCard({
   if (loading && !assessment) {
     return (
       <div
-        className="border rounded-xl shadow-sm p-5"
+        className="border rounded-xl p-5"
         style={{
-          background: darkMode
-            ? 'linear-gradient(135deg, #121212 0%, rgba(215,183,151,0.05) 40%, rgba(215,183,151,0.16) 100%)'
-            : 'linear-gradient(135deg, #ffffff 0%, rgba(215,183,151,0.06) 35%, rgba(215,183,151,0.20) 100%)',
-          borderColor: darkMode ? '#2E2E2E' : '#E5E7EB',
-          boxShadow: `inset 0 -1px 0 ${darkMode ? 'rgba(215,183,151,0.12)' : 'rgba(215,183,151,0.08)'}`,
+          background: 'linear-gradient(135deg, #FFFFFF 0%, rgba(196,151,90,0.06) 35%, rgba(196,151,90,0.20) 100%)',
+          borderColor: '#E8E2DB',
+          boxShadow: '0 1px 3px rgba(44,36,23,0.06), inset 0 -1px 0 rgba(196,151,90,0.08)',
         }}
       >
         <div className="animate-pulse space-y-4">
           <div className="flex items-center gap-3">
             <div
               className="w-10 h-10 rounded-full"
-              style={{ backgroundColor: darkMode ? '#1A1A1A' : '#F3F4F6' }}
+              style={{ backgroundColor: '#FBF9F7' }}
             />
             <div className="flex-1 space-y-2">
               <div
                 className="h-4 rounded w-1/3"
-                style={{ backgroundColor: darkMode ? '#1A1A1A' : '#F3F4F6' }}
+                style={{ backgroundColor: '#FBF9F7' }}
               />
               <div
                 className="h-3 rounded w-1/2"
-                style={{ backgroundColor: darkMode ? '#1A1A1A' : '#F3F4F6' }}
+                style={{ backgroundColor: '#FBF9F7' }}
               />
             </div>
           </div>
           <div className="flex items-center justify-center py-6">
             <div
               className="w-24 h-24 rounded-full"
-              style={{ backgroundColor: darkMode ? '#1A1A1A' : '#F3F4F6' }}
+              style={{ backgroundColor: '#FBF9F7' }}
             />
           </div>
           <div
             className="h-12 rounded-lg"
-            style={{ backgroundColor: darkMode ? '#1A1A1A' : '#F3F4F6' }}
+            style={{ backgroundColor: '#FBF9F7' }}
           />
         </div>
       </div>
@@ -257,20 +243,18 @@ export default function RiskScoreCard({
   if (error && !assessment) {
     return (
       <div
-        className="border rounded-xl shadow-sm p-5"
+        className="border rounded-xl p-5"
         style={{
-          background: darkMode
-            ? 'linear-gradient(135deg, #121212 0%, rgba(248,81,73,0.05) 40%, rgba(248,81,73,0.16) 100%)'
-            : 'linear-gradient(135deg, #ffffff 0%, rgba(248,81,73,0.06) 35%, rgba(248,81,73,0.18) 100%)',
-          borderColor: darkMode ? '#2E2E2E' : '#E5E7EB',
-          boxShadow: `inset 0 -1px 0 ${darkMode ? 'rgba(248,81,73,0.12)' : 'rgba(248,81,73,0.08)'}`,
+          background: 'linear-gradient(135deg, #FFFFFF 0%, rgba(220,53,69,0.06) 35%, rgba(220,53,69,0.18) 100%)',
+          borderColor: '#E8E2DB',
+          boxShadow: '0 1px 3px rgba(44,36,23,0.06), inset 0 -1px 0 rgba(220,53,69,0.08)',
         }}
       >
         <div className="flex flex-col items-center gap-3 py-4">
-          <Info size={28} style={{ color: darkMode ? '#666666' : '#9CA3AF' }} />
+          <Info size={28} style={{ color: '#8C8178' }} />
           <p
             className="text-sm text-center"
-            style={{ color: darkMode ? '#999999' : '#6B7280' }}
+            style={{ color: '#6B5D4F' }}
           >
             {error}
           </p>
@@ -280,7 +264,7 @@ export default function RiskScoreCard({
             style={{
               backgroundColor: riskConfig.bgAlpha,
               border: `1px solid ${riskConfig.borderAlpha}`,
-              color: '#D7B797',
+              color: '#C4975A',
               fontFamily: 'Montserrat, sans-serif',
             }}
           >
@@ -298,20 +282,18 @@ export default function RiskScoreCard({
   if (!assessment) {
     return (
       <div
-        className="border rounded-xl shadow-sm p-5"
+        className="border rounded-xl p-5"
         style={{
-          background: darkMode
-            ? 'linear-gradient(135deg, #121212 0%, rgba(215,183,151,0.05) 40%, rgba(215,183,151,0.16) 100%)'
-            : 'linear-gradient(135deg, #ffffff 0%, rgba(215,183,151,0.06) 35%, rgba(215,183,151,0.20) 100%)',
-          borderColor: darkMode ? '#2E2E2E' : '#E5E7EB',
-          boxShadow: `inset 0 -1px 0 ${darkMode ? 'rgba(215,183,151,0.12)' : 'rgba(215,183,151,0.08)'}`,
+          background: 'linear-gradient(135deg, #FFFFFF 0%, rgba(196,151,90,0.06) 35%, rgba(196,151,90,0.20) 100%)',
+          borderColor: '#E8E2DB',
+          boxShadow: '0 1px 3px rgba(44,36,23,0.06), inset 0 -1px 0 rgba(196,151,90,0.08)',
         }}
       >
         <div className="flex flex-col items-center gap-3 py-4">
-          <Shield size={28} style={{ color: darkMode ? '#666666' : '#9CA3AF' }} />
+          <Shield size={28} style={{ color: '#8C8178' }} />
           <p
             className="text-sm text-center"
-            style={{ color: darkMode ? '#999999' : '#6B7280' }}
+            style={{ color: '#6B5D4F' }}
           >
             {t('ai.noRiskAssessment')}
           </p>
@@ -319,9 +301,9 @@ export default function RiskScoreCard({
             onClick={calculateRisk}
             className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all"
             style={{
-              backgroundColor: 'rgba(215,183,151,0.12)',
-              border: '1px solid rgba(215,183,151,0.25)',
-              color: '#D7B797',
+              backgroundColor: 'rgba(196,151,90,0.12)',
+              border: '1px solid rgba(196,151,90,0.25)',
+              color: '#C4975A',
               fontFamily: 'Montserrat, sans-serif',
             }}
           >
@@ -338,13 +320,11 @@ export default function RiskScoreCard({
   // ════════════════════════════════════════════════════════════════════
   return (
     <div
-      className="border rounded-xl shadow-sm overflow-hidden sm:col-span-2"
+      className="border rounded-xl overflow-hidden sm:col-span-2"
       style={{
-        background: darkMode
-          ? `linear-gradient(135deg, #121212 0%, ${riskConfig.darkMid} 40%, ${riskConfig.darkGrad} 100%)`
-          : `linear-gradient(135deg, #ffffff 0%, ${riskConfig.lightMid} 35%, ${riskConfig.lightGrad} 100%)`,
-        borderColor: darkMode ? '#2E2E2E' : '#E5E7EB',
-        boxShadow: `inset 0 -1px 0 ${darkMode ? riskConfig.glowDark : riskConfig.glowLight}`,
+        background: `linear-gradient(135deg, #FFFFFF 0%, ${riskConfig.mid} 35%, ${riskConfig.grad} 100%)`,
+        borderColor: '#E8E2DB',
+        boxShadow: `0 1px 3px rgba(44,36,23,0.06), inset 0 -1px 0 ${riskConfig.glow}`,
       }}
     >
       {/* ── Header ─────────────────────────────────────────────────── */}
@@ -363,7 +343,7 @@ export default function RiskScoreCard({
             <h3
               className="text-xs font-semibold uppercase tracking-wider"
               style={{
-                color: darkMode ? '#666666' : '#6B7280',
+                color: '#8C8178',
                 fontFamily: 'Montserrat, sans-serif',
               }}
             >
@@ -383,8 +363,8 @@ export default function RiskScoreCard({
             <span
               className="px-2 py-0.5 text-[10px] font-bold rounded-full"
               style={{
-                backgroundColor: 'rgba(215,183,151,0.15)',
-                color: '#D7B797',
+                backgroundColor: 'rgba(196,151,90,0.15)',
+                color: '#C4975A',
               }}
             >
               {t('ai.stale')}
@@ -402,7 +382,7 @@ export default function RiskScoreCard({
                 cy="54"
                 r={circleRadius}
                 fill="none"
-                stroke={darkMode ? '#1A1A1A' : '#F3F4F6'}
+                stroke="#E8E2DB"
                 strokeWidth="8"
               />
               {/* Progress circle */}
@@ -436,7 +416,7 @@ export default function RiskScoreCard({
               <span
                 className="text-[10px] uppercase tracking-wide"
                 style={{
-                  color: darkMode ? '#666666' : '#9CA3AF',
+                  color: '#8C8178',
                   fontFamily: 'Montserrat, sans-serif',
                 }}
               >
@@ -451,9 +431,9 @@ export default function RiskScoreCard({
           <div
             className="rounded-lg px-4 py-3 mt-3 text-sm"
             style={{
-              backgroundColor: darkMode ? '#1A1A1A' : '#F9FAFB',
-              border: `1px solid ${darkMode ? '#2E2E2E' : '#E5E7EB'}`,
-              color: darkMode ? '#999999' : '#6B7280',
+              backgroundColor: '#FBF9F7',
+              border: '1px solid #E8E2DB',
+              color: '#6B5D4F',
             }}
           >
             {assessment.recommendation}
@@ -465,9 +445,9 @@ export default function RiskScoreCard({
           onClick={() => setExpanded((p) => !p)}
           className="w-full flex items-center justify-center gap-2 mt-4 py-2 rounded-lg text-xs font-semibold transition-all"
           style={{
-            backgroundColor: darkMode ? 'rgba(215,183,151,0.06)' : 'rgba(215,183,151,0.1)',
-            border: `1px solid ${darkMode ? '#2E2E2E' : '#E5E7EB'}`,
-            color: '#D7B797',
+            backgroundColor: 'rgba(196,151,90,0.1)',
+            border: '1px solid #E8E2DB',
+            color: '#C4975A',
             fontFamily: 'Montserrat, sans-serif',
           }}
         >
@@ -492,7 +472,7 @@ export default function RiskScoreCard({
         <div
           className="px-5 pb-5 space-y-4"
           style={{
-            borderTop: `1px solid ${darkMode ? '#2E2E2E' : '#E5E7EB'}`,
+            borderTop: '1px solid #E8E2DB',
             paddingTop: 20,
           }}
         >
@@ -502,7 +482,7 @@ export default function RiskScoreCard({
               <h4
                 className="text-xs font-semibold uppercase tracking-wider"
                 style={{
-                  color: darkMode ? '#666666' : '#9CA3AF',
+                  color: '#8C8178',
                   fontFamily: 'Montserrat, sans-serif',
                 }}
               >
@@ -519,8 +499,8 @@ export default function RiskScoreCard({
                     key={idx}
                     className="rounded-lg p-3"
                     style={{
-                      backgroundColor: darkMode ? '#1A1A1A' : '#F9FAFB',
-                      border: `1px solid ${darkMode ? '#2E2E2E' : '#E5E7EB'}`,
+                      backgroundColor: '#FBF9F7',
+                      border: '1px solid #E8E2DB',
                     }}
                   >
                     {/* Factor header */}
@@ -532,7 +512,7 @@ export default function RiskScoreCard({
                       <span
                         className="flex-1 text-sm font-medium"
                         style={{
-                          color: darkMode ? '#F2F2F2' : '#1F2937',
+                          color: '#2C2417',
                           fontFamily: 'Montserrat, sans-serif',
                         }}
                       >
@@ -553,7 +533,7 @@ export default function RiskScoreCard({
                     <div
                       className="w-full h-1.5 rounded-full overflow-hidden"
                       style={{
-                        backgroundColor: darkMode ? '#0A0A0A' : '#E5E7EB',
+                        backgroundColor: '#E8E2DB',
                       }}
                     >
                       <div
@@ -570,7 +550,7 @@ export default function RiskScoreCard({
                     {factor.details && (
                       <p
                         className="text-xs mt-2"
-                        style={{ color: darkMode ? '#999999' : '#6B7280' }}
+                        style={{ color: '#6B5D4F' }}
                       >
                         {factor.details}
                       </p>
@@ -580,7 +560,7 @@ export default function RiskScoreCard({
                     {factor.recommendation && (
                       <p
                         className="text-xs mt-1 italic"
-                        style={{ color: darkMode ? '#D7B797' : '#92724B' }}
+                        style={{ color: '#92724B' }}
                       >
                         {factor.recommendation}
                       </p>
@@ -597,7 +577,7 @@ export default function RiskScoreCard({
               <h4
                 className="text-xs font-semibold uppercase tracking-wider"
                 style={{
-                  color: darkMode ? '#666666' : '#9CA3AF',
+                  color: '#8C8178',
                   fontFamily: 'Montserrat, sans-serif',
                 }}
               >
@@ -608,21 +588,15 @@ export default function RiskScoreCard({
                   key={idx}
                   className="flex items-start gap-2 rounded-lg px-3 py-2 text-xs"
                   style={{
-                    backgroundColor: darkMode
-                      ? 'rgba(248,81,73,0.08)'
-                      : 'rgba(248,81,73,0.06)',
-                    border: `1px solid ${
-                      darkMode
-                        ? 'rgba(248,81,73,0.2)'
-                        : 'rgba(248,81,73,0.15)'
-                    }`,
-                    color: darkMode ? '#FF7B72' : '#DC2626',
+                    backgroundColor: 'rgba(220,53,69,0.06)',
+                    border: '1px solid rgba(220,53,69,0.15)',
+                    color: '#DC3545',
                   }}
                 >
                   <AlertTriangle
                     size={14}
                     className="shrink-0 mt-0.5"
-                    style={{ color: darkMode ? '#FF7B72' : '#DC2626' }}
+                    style={{ color: '#DC3545' }}
                   />
                   <span>{typeof warning === 'string' ? warning : warning.message || JSON.stringify(warning)}</span>
                 </div>
@@ -636,15 +610,9 @@ export default function RiskScoreCard({
             disabled={refreshing}
             className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-semibold transition-all disabled:opacity-50"
             style={{
-              backgroundColor: darkMode
-                ? 'rgba(215,183,151,0.1)'
-                : 'rgba(215,183,151,0.15)',
-              border: `1px solid ${
-                darkMode
-                  ? 'rgba(215,183,151,0.25)'
-                  : 'rgba(215,183,151,0.4)'
-              }`,
-              color: '#D7B797',
+              backgroundColor: 'rgba(196,151,90,0.15)',
+              border: '1px solid rgba(196,151,90,0.4)',
+              color: '#C4975A',
               fontFamily: 'Montserrat, sans-serif',
             }}
           >

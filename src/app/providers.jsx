@@ -2,25 +2,25 @@
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { LanguageProvider } from '@/contexts/LanguageContext';
-import { AppProvider, useAppContext } from '@/contexts/AppContext';
+import { AppProvider } from '@/contexts/AppContext';
 
 function ToasterWithTheme() {
-  const { darkMode } = useAppContext();
   return (
     <Toaster
       position="top-right"
       toastOptions={{
         duration: 4000,
         style: {
-          background: darkMode ? '#1e293b' : '#ffffff',
-          color: darkMode ? '#f1f5f9' : '#0f172a',
-          border: darkMode ? '1px solid #334155' : '1px solid #e2e8f0',
+          background: '#FFFFFF',
+          color: '#2C2417',
+          border: '1px solid #E8E2DB',
+          boxShadow: '0 4px 12px rgba(44,36,23,0.10)',
         },
         success: {
-          iconTheme: { primary: '#10b981', secondary: '#ffffff' },
+          iconTheme: { primary: '#1B6B45', secondary: '#FFFFFF' },
         },
         error: {
-          iconTheme: { primary: '#ef4444', secondary: '#ffffff' },
+          iconTheme: { primary: '#DC3545', secondary: '#FFFFFF' },
         },
       }}
     />

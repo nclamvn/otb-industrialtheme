@@ -11,12 +11,12 @@ import { useLanguage } from '@/contexts/LanguageContext';
 const SEASONS = ['SS', 'FW'];
 
 const severityConfig = {
-  critical: { icon: AlertTriangle, color: '#EF4444', bg: 'bg-red-500/10', label: 'Critical' },
-  warning: { icon: AlertCircle, color: '#F59E0B', bg: 'bg-yellow-500/10', label: 'Warning' },
-  info: { icon: Info, color: '#3B82F6', bg: 'bg-blue-500/10', label: 'Info' },
+  critical: { icon: AlertTriangle, color: '#DC3545', bg: 'bg-red-500/10', label: 'Critical' },
+  warning: { icon: AlertCircle, color: '#D97706', bg: 'bg-yellow-500/10', label: 'Warning' },
+  info: { icon: Info, color: '#2563EB', bg: 'bg-blue-500/10', label: 'Info' },
 };
 
-const BudgetAnalyticsScreen = ({ darkMode = false }) => {
+const BudgetAnalyticsScreen = () => {
   const { t } = useLanguage();
 
   const [seasonGroup, setSeasonGroup] = useState('SS');
@@ -86,12 +86,12 @@ const BudgetAnalyticsScreen = ({ darkMode = false }) => {
     return groups;
   }, [alerts]);
 
-  const bg = darkMode ? 'bg-[#0A0A0A]' : 'bg-[#fdfbf9]';
-  const cardBg = darkMode ? 'bg-[#111]' : 'bg-white';
-  const border = darkMode ? 'border-[#222]' : 'border-[#e5e0da]';
-  const text = darkMode ? 'text-gray-200' : 'text-gray-800';
-  const subtext = darkMode ? 'text-gray-400' : 'text-gray-600';
-  const accent = '#D7B797';
+  const bg = 'bg-[#FAF8F5]';
+  const cardBg = 'bg-white';
+  const border = 'border-[#E8E2DB]';
+  const text = 'text-[#2C2417]';
+  const subtext = 'text-[#6B5D4F]';
+  const accent = '#C4975A';
 
   if (loading) return <div className={`flex-1 ${bg} flex items-center justify-center`}><LoadingSpinner /></div>;
   if (error) return <div className={`flex-1 ${bg} p-6`}><ErrorMessage message={error} onRetry={fetchData} /></div>;
@@ -123,10 +123,10 @@ const BudgetAnalyticsScreen = ({ darkMode = false }) => {
       {/* KPI Cards */}
       <div className="grid grid-cols-4 gap-4 mb-6">
         {[
-          { label: t('analytics.totalBudget', 'Total Budget'), value: formatCurrency(summary.totalBudget || 0), icon: Wallet, color: '#D7B797' },
-          { label: t('analytics.avgUtilization', 'Avg Utilization'), value: `${(summary.avgUtilization || 0).toFixed(1)}%`, icon: Percent, color: '#2A9E6A' },
-          { label: t('analytics.unreadAlerts', 'Unread Alerts'), value: summary.unreadAlerts || 0, icon: Bell, color: '#EF4444' },
-          { label: t('analytics.allocEfficiency', 'Alloc Efficiency'), value: `${(summary.avgEfficiency || 0).toFixed(1)}%`, icon: Zap, color: '#E3B341' },
+          { label: t('analytics.totalBudget', 'Total Budget'), value: formatCurrency(summary.totalBudget || 0), icon: Wallet, color: '#C4975A' },
+          { label: t('analytics.avgUtilization', 'Avg Utilization'), value: `${(summary.avgUtilization || 0).toFixed(1)}%`, icon: Percent, color: '#1B6B45' },
+          { label: t('analytics.unreadAlerts', 'Unread Alerts'), value: summary.unreadAlerts || 0, icon: Bell, color: '#DC3545' },
+          { label: t('analytics.allocEfficiency', 'Alloc Efficiency'), value: `${(summary.avgEfficiency || 0).toFixed(1)}%`, icon: Zap, color: '#D4B082' },
         ].map((kpi, i) => (
           <div key={i} className={`${cardBg} border ${border} rounded-xl p-4`}>
             <div className="flex items-center justify-between mb-2">
@@ -173,7 +173,7 @@ const BudgetAnalyticsScreen = ({ darkMode = false }) => {
         {/* Alerts */}
         <div className={`${cardBg} border ${border} rounded-xl p-4`}>
           <h3 className="font-semibold mb-3 flex items-center gap-2">
-            <Bell size={16} style={{ color: '#EF4444' }} />
+            <Bell size={16} style={{ color: '#DC3545' }} />
             {t('analytics.budgetAlerts', 'Budget Alerts')} ({alerts.length})
           </h3>
           <div className="space-y-2 max-h-80 overflow-y-auto">
@@ -204,7 +204,7 @@ const BudgetAnalyticsScreen = ({ darkMode = false }) => {
         {/* Allocation Efficiency */}
         <div className={`${cardBg} border ${border} rounded-xl p-4`}>
           <h3 className="font-semibold mb-3 flex items-center gap-2">
-            <Zap size={16} style={{ color: '#E3B341' }} />
+            <Zap size={16} style={{ color: '#D4B082' }} />
             {t('analytics.allocEfficiencyTable', 'Allocation Efficiency')}
           </h3>
           <div className="overflow-x-auto max-h-80 overflow-y-auto">

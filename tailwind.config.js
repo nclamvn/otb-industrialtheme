@@ -3,7 +3,6 @@ module.exports = {
   content: [
     "./src/**/*.{js,jsx}",
   ],
-  darkMode: 'class',
   theme: {
     screens: {
       xs: '375px',
@@ -19,94 +18,95 @@ module.exports = {
         // Brand Colors
         dafc: {
           gold: {
-            DEFAULT: '#D7B797',
-            light: '#E8D4C0',
-            dark: '#B89970',
-            darker: '#8A6340',
+            DEFAULT: '#C4975A',
+            light: '#D4B082',
+            lighter: '#EDE0D0',
+            dark: '#A67B3D',
+            darker: '#7D5A28',
           },
           green: {
-            DEFAULT: '#127749',
+            DEFAULT: '#1B6B45',
             light: '#2A9E6A',
             dark: '#095431',
           },
         },
 
-        // Surface Colors (Dark Theme)
+        // Surface Colors (Light Theme)
         surface: {
-          DEFAULT: '#121212',
-          secondary: '#1A1A1A',
-          elevated: '#242424',
-          overlay: 'rgba(36, 36, 36, 0.5)',
+          DEFAULT: '#FFFFFF',
+          secondary: '#FBF9F7',
+          elevated: '#FFFFFF',
+          overlay: 'rgba(44, 36, 23, 0.4)',
         },
-        canvas: '#000000',
+        canvas: '#FAF8F5',
 
         // Content/Text Colors
         content: {
-          DEFAULT: '#F2F2F2',
-          secondary: '#999999',
-          muted: '#666666',
-          inverse: '#000000',
+          DEFAULT: '#2C2417',
+          secondary: '#6B5D4F',
+          muted: '#8C8178',
+          inverse: '#FFFFFF',
         },
 
         // Border Colors
         border: {
-          DEFAULT: '#2E2E2E',
-          muted: '#1A1A1A',
-          emphasis: '#3D3D3D',
+          DEFAULT: '#E8E2DB',
+          muted: '#F0EBE5',
+          emphasis: '#D4CBBC',
         },
 
         // Status Colors
         status: {
           critical: {
-            DEFAULT: '#F85149',
-            muted: 'rgba(248, 81, 73, 0.15)',
-            text: '#FF7B72',
+            DEFAULT: '#DC3545',
+            muted: 'rgba(220, 53, 69, 0.1)',
+            text: '#DC3545',
           },
           warning: {
-            DEFAULT: '#D29922',
-            muted: 'rgba(210, 153, 34, 0.15)',
-            text: '#E3B341',
+            DEFAULT: '#D97706',
+            muted: 'rgba(217, 119, 6, 0.1)',
+            text: '#D97706',
           },
           success: {
-            DEFAULT: '#127749',
-            muted: 'rgba(18, 119, 73, 0.15)',
-            text: '#2A9E6A',
+            DEFAULT: '#1B6B45',
+            muted: 'rgba(27, 107, 69, 0.1)',
+            text: '#1B6B45',
           },
           info: {
-            DEFAULT: '#58A6FF',
-            muted: 'rgba(88, 166, 255, 0.15)',
-            text: '#79C0FF',
+            DEFAULT: '#2563EB',
+            muted: 'rgba(37, 99, 235, 0.1)',
+            text: '#2563EB',
           },
           neutral: {
-            DEFAULT: '#8B949E',
-            muted: 'rgba(139, 148, 158, 0.15)',
+            DEFAULT: '#8C8178',
+            muted: 'rgba(140, 129, 120, 0.1)',
           },
         },
 
         // Data Visualization
         data: {
-          positive: '#127749',
-          negative: '#F85149',
-          neutral: '#8B949E',
+          positive: '#1B6B45',
+          negative: '#DC3545',
+          neutral: '#8C8178',
         },
 
         // Chart Colors
         chart: {
-          1: '#D7B797',
-          2: '#2A9E6A',
-          3: '#D29922',
-          4: '#A371F7',
-          5: '#F85149',
-          6: '#8B949E',
-          7: '#58A6FF',
-          8: '#48CAE4',
+          1: '#C4975A',
+          2: '#1B6B45',
+          3: '#D97706',
+          4: '#7C3AED',
+          5: '#DC3545',
+          6: '#8C8178',
+          7: '#2563EB',
+          8: '#0891B2',
         },
 
         // AI/Special Colors
         ai: {
-          DEFAULT: '#A371F7',
-          muted: 'rgba(163, 113, 247, 0.15)',
-          text: '#D2A8FF',
+          DEFAULT: '#7C3AED',
+          muted: 'rgba(124, 58, 237, 0.1)',
+          text: '#7C3AED',
         },
       },
 
@@ -168,7 +168,7 @@ module.exports = {
         'btn': '32px',
       },
 
-      // ===== BORDER RADIUS (Flat Design) =====
+      // ===== BORDER RADIUS =====
       borderRadius: {
         'none': '0',
         'sm': '2px',
@@ -181,19 +181,19 @@ module.exports = {
         'pill': '99px',
       },
 
-      // ===== SHADOWS (Flat Design - Minimal) =====
+      // ===== SHADOWS (Warm Light Theme) =====
       boxShadow: {
-        'sm': 'none',
-        'DEFAULT': 'none',
-        'md': 'none',
-        'lg': 'none',
-        'xl': 'none',
-        '2xl': 'none',
-        'focus': '0 0 0 3px rgba(215, 183, 151, 0.3)',
-        'glow': '0 0 20px rgba(215, 183, 151, 0.3)',
-        'card': '0 4px 24px rgba(0, 0, 0, 0.12)',
-        'elevated': '0 8px 32px rgba(0, 0, 0, 0.24)',
-        'tooltip': '0 4px 12px rgba(0, 0, 0, 0.5)',
+        'sm': '0 1px 2px rgba(44,36,23,0.04)',
+        'DEFAULT': '0 2px 8px rgba(44,36,23,0.06)',
+        'md': '0 4px 16px rgba(44,36,23,0.06)',
+        'lg': '0 8px 24px rgba(44,36,23,0.08)',
+        'xl': '0 12px 32px rgba(44,36,23,0.10)',
+        '2xl': '0 16px 48px rgba(44,36,23,0.12)',
+        'focus': '0 0 0 3px rgba(196, 151, 90, 0.25)',
+        'glow': '0 0 20px rgba(196, 151, 90, 0.15)',
+        'card': '0 2px 8px rgba(44,36,23,0.06)',
+        'elevated': '0 8px 24px rgba(44,36,23,0.10)',
+        'tooltip': '0 4px 12px rgba(44,36,23,0.12)',
         'none': 'none',
       },
 

@@ -16,7 +16,7 @@ const ATTR_TYPES = [
   { value: 'product_type', label: 'Product Type' },
 ];
 
-const CategoryTrendsScreen = ({ darkMode = false }) => {
+const CategoryTrendsScreen = () => {
   const { t } = useLanguage();
 
   const [seasonGroup, setSeasonGroup] = useState('SS');
@@ -69,12 +69,12 @@ const CategoryTrendsScreen = ({ darkMode = false }) => {
     Math.max(...trendAttributes.map(a => a.trendScore || 0), 1)
   , [trendAttributes]);
 
-  const bg = darkMode ? 'bg-[#0A0A0A]' : 'bg-[#fdfbf9]';
-  const cardBg = darkMode ? 'bg-[#111]' : 'bg-white';
-  const border = darkMode ? 'border-[#222]' : 'border-[#e5e0da]';
-  const text = darkMode ? 'text-gray-200' : 'text-gray-800';
-  const subtext = darkMode ? 'text-gray-400' : 'text-gray-600';
-  const accent = '#D7B797';
+  const bg = 'bg-[#FAF8F5]';
+  const cardBg = 'bg-[#FFFFFF]';
+  const border = 'border-[#E8E2DB]';
+  const text = 'text-[#2C2417]';
+  const subtext = 'text-[#6B5D4F]';
+  const accent = '#C4975A';
 
   if (loading) return <div className={`flex-1 ${bg} flex items-center justify-center`}><LoadingSpinner /></div>;
   if (error) return <div className={`flex-1 ${bg} p-6`}><ErrorMessage message={error} onRetry={fetchData} /></div>;
@@ -109,9 +109,9 @@ const CategoryTrendsScreen = ({ darkMode = false }) => {
       {/* KPI Cards */}
       <div className="grid grid-cols-3 gap-4 mb-6">
         {[
-          { label: t('analytics.totalAttributes', 'Total Attributes'), value: kpis.totalAttrs, icon: BarChart3, color: '#D7B797' },
-          { label: t('analytics.avgTrendScore', 'Avg Trend Score'), value: kpis.avgTrendScore.toFixed(0), icon: Activity, color: '#2A9E6A' },
-          { label: t('analytics.avgYoyGrowth', 'Avg YoY Growth'), value: `${kpis.avgYoyGrowth >= 0 ? '+' : ''}${kpis.avgYoyGrowth.toFixed(1)}%`, icon: kpis.avgYoyGrowth >= 0 ? ArrowUpRight : ArrowDownRight, color: kpis.avgYoyGrowth >= 0 ? '#2A9E6A' : '#EF4444' },
+          { label: t('analytics.totalAttributes', 'Total Attributes'), value: kpis.totalAttrs, icon: BarChart3, color: '#C4975A' },
+          { label: t('analytics.avgTrendScore', 'Avg Trend Score'), value: kpis.avgTrendScore.toFixed(0), icon: Activity, color: '#1B6B45' },
+          { label: t('analytics.avgYoyGrowth', 'Avg YoY Growth'), value: `${kpis.avgYoyGrowth >= 0 ? '+' : ''}${kpis.avgYoyGrowth.toFixed(1)}%`, icon: kpis.avgYoyGrowth >= 0 ? ArrowUpRight : ArrowDownRight, color: kpis.avgYoyGrowth >= 0 ? '#1B6B45' : '#DC3545' },
         ].map((kpi, i) => (
           <div key={i} className={`${cardBg} border ${border} rounded-xl p-4`}>
             <div className="flex items-center justify-between mb-2">
@@ -139,7 +139,7 @@ const CategoryTrendsScreen = ({ darkMode = false }) => {
                 <span className="text-xs px-1.5 py-0.5 rounded" style={{ backgroundColor: `${typeColor}22`, color: typeColor }}>
                   {attr.attributeType}
                 </span>
-                <div className="flex-1 h-5 rounded overflow-hidden" style={{ backgroundColor: darkMode ? '#1a1a1a' : '#f3f0ec' }}>
+                <div className="flex-1 h-5 rounded overflow-hidden" style={{ backgroundColor: '#F0EBE5' }}>
                   <div className="h-full rounded flex items-center px-2" style={{ width: `${Math.max(pct, 8)}%`, backgroundColor: typeColor }}>
                     <span className="text-xs font-bold text-white">{attr.trendScore}</span>
                   </div>
@@ -177,7 +177,7 @@ const CategoryTrendsScreen = ({ darkMode = false }) => {
                       </td>
                       <td className="py-2 text-right">{row.trendScore}</td>
                       <td className="py-2 text-right">
-                        <span className={`inline-flex items-center gap-0.5 text-xs font-semibold ${growth >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                        <span className={`inline-flex items-center gap-0.5 text-xs font-semibold ${growth >= 0 ? 'text-[#1B6B45]' : 'text-[#DC3545]'}`}>
                           {growth >= 0 ? <ArrowUpRight size={12} /> : <ArrowDownRight size={12} />}
                           {growth >= 0 ? '+' : ''}{growth.toFixed(1)}%
                         </span>

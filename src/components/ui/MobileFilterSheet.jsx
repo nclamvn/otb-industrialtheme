@@ -10,7 +10,6 @@ export default function MobileFilterSheet({
   values = {},
   onApply,
   onReset,
-  darkMode = true,
   title = 'Filters',
 }) {
   const [localValues, setLocalValues] = useState(values);
@@ -44,11 +43,7 @@ export default function MobileFilterSheet({
           <select
             value={value}
             onChange={(e) => handleChange(filter.key, e.target.value)}
-            className={`w-full h-12 px-3 rounded-lg border text-sm font-['Montserrat'] appearance-none ${
-              darkMode
-                ? 'bg-surface-elevated border-border text-content'
-                : 'bg-gray-50 border-gray-200 text-gray-900'
-            }`}
+            className="w-full h-12 px-3 rounded-lg border text-sm font-['Montserrat'] appearance-none bg-[#FBF9F7] border-[#E8E2DB] text-[#2C2417]"
           >
             <option value="">{filter.placeholder || `Select ${filter.label}`}</option>
             {(filter.options || []).map(opt => (
@@ -64,11 +59,7 @@ export default function MobileFilterSheet({
             value={value}
             onChange={(e) => handleChange(filter.key, e.target.value)}
             placeholder={filter.placeholder || `Search ${filter.label}`}
-            className={`w-full h-12 px-3 rounded-lg border text-sm font-['Montserrat'] ${
-              darkMode
-                ? 'bg-surface-elevated border-border text-content placeholder:text-content-muted'
-                : 'bg-gray-50 border-gray-200 text-gray-900 placeholder:text-gray-400'
-            }`}
+            className="w-full h-12 px-3 rounded-lg border text-sm font-['Montserrat'] bg-[#FBF9F7] border-[#E8E2DB] text-[#2C2417] placeholder:text-[#8C8178]"
           />
         );
 
@@ -78,11 +69,7 @@ export default function MobileFilterSheet({
             type="date"
             value={value}
             onChange={(e) => handleChange(filter.key, e.target.value)}
-            className={`w-full h-12 px-3 rounded-lg border text-sm font-['Montserrat'] ${
-              darkMode
-                ? 'bg-surface-elevated border-border text-content'
-                : 'bg-gray-50 border-gray-200 text-gray-900'
-            }`}
+            className="w-full h-12 px-3 rounded-lg border text-sm font-['Montserrat'] bg-[#FBF9F7] border-[#E8E2DB] text-[#2C2417]"
           />
         );
 
@@ -91,9 +78,7 @@ export default function MobileFilterSheet({
           <button
             onClick={() => handleChange(filter.key, !value)}
             className={`relative w-12 h-7 rounded-full transition-colors duration-200 ${
-              value
-                ? 'bg-dafc-gold'
-                : darkMode ? 'bg-surface-elevated' : 'bg-gray-200'
+              value ? 'bg-[#C4975A]' : 'bg-[#E8E2DB]'
             }`}
           >
             <div className={`absolute top-0.5 w-6 h-6 rounded-full bg-white shadow transition-transform duration-200 ${
@@ -108,13 +93,11 @@ export default function MobileFilterSheet({
   };
 
   return (
-    <BottomSheet isOpen={isOpen} onClose={onClose} title={title} darkMode={darkMode} snapPoint="half">
+    <BottomSheet isOpen={isOpen} onClose={onClose} title={title} snapPoint="half">
       <div className="px-5 py-4 space-y-5">
         {filters.map((filter) => (
           <div key={filter.key}>
-            <label className={`block text-xs font-semibold font-['Montserrat'] uppercase tracking-wider mb-2 ${
-              darkMode ? 'text-content-secondary' : 'text-gray-600'
-            }`}>
+            <label className="block text-xs font-semibold font-['Montserrat'] uppercase tracking-wider mb-2 text-[#6B5D4F]">
               {filter.label}
             </label>
             {renderFilter(filter)}
@@ -123,23 +106,17 @@ export default function MobileFilterSheet({
       </div>
 
       {/* Action Buttons */}
-      <div className={`sticky bottom-0 px-5 py-4 border-t flex gap-3 ${
-        darkMode ? 'bg-surface-secondary border-border' : 'bg-white border-gray-200'
-      }`}>
+      <div className="sticky bottom-0 px-5 py-4 border-t flex gap-3 bg-white border-[#E8E2DB]">
         <button
           onClick={handleReset}
-          className={`flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-semibold font-['Montserrat'] transition-colors ${
-            darkMode
-              ? 'bg-surface-elevated text-content-secondary active:bg-border'
-              : 'bg-gray-100 text-gray-600 active:bg-gray-200'
-          }`}
+          className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-semibold font-['Montserrat'] transition-colors bg-[#FBF9F7] text-[#6B5D4F] active:bg-[#E8E2DB]"
         >
           <RotateCcw size={14} />
           Reset
         </button>
         <button
           onClick={handleApply}
-          className="flex-1 py-3 rounded-xl text-sm font-semibold font-['Montserrat'] bg-dafc-gold text-[#0A0A0A] active:bg-dafc-gold-dark transition-colors"
+          className="flex-1 py-3 rounded-xl text-sm font-semibold font-['Montserrat'] bg-[#C4975A] text-white active:bg-[#A67B3D] transition-colors"
         >
           Apply Filters
         </button>

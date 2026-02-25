@@ -5,59 +5,41 @@ import { aiService } from '../services/aiService';
 
 const SEVERITY_THEMES = {
   critical: {
-    color: '#F85149',
-    gradDark: 'linear-gradient(135deg, #121212 0%, rgba(248,81,73,0.05) 40%, rgba(248,81,73,0.18) 100%)',
-    gradLight: 'linear-gradient(135deg, #ffffff 0%, rgba(220,50,47,0.06) 35%, rgba(220,50,47,0.16) 100%)',
-    borderDark: 'rgba(248,81,73,0.25)',
-    borderLight: 'rgba(200,50,50,0.25)',
-    glowDark: '0 0 20px rgba(248,81,73,0.08), 0 4px 16px rgba(0,0,0,0.2)',
-    glowLight: '0 0 20px rgba(220,50,47,0.06), 0 4px 16px rgba(0,0,0,0.04)',
+    color: '#DC3545',
+    grad: 'linear-gradient(135deg, #ffffff 0%, rgba(220,53,69,0.06) 35%, rgba(220,53,69,0.16) 100%)',
+    border: 'rgba(220,53,69,0.25)',
+    glow: '0 0 20px rgba(220,53,69,0.06), 0 4px 16px rgba(0,0,0,0.04)',
     Icon: AlertCircle,
     WatermarkIcon: ShieldAlert,
-    iconBgDark: 'rgba(248,81,73,0.15)',
-    iconBgLight: 'rgba(220,50,47,0.10)',
-    textDark: '#FF7B72',
-    textLight: '#C53030',
-    subDark: 'rgba(255,123,114,0.75)',
-    subLight: '#9B2C2C',
-    badgeBg: 'linear-gradient(135deg, #F85149 0%, #DC2626 100%)',
+    iconBg: 'rgba(220,53,69,0.10)',
+    text: '#C53030',
+    sub: '#9B2C2C',
+    badgeBg: 'linear-gradient(135deg, #DC3545 0%, #DC2626 100%)',
     badgeText: '#FFFFFF',
   },
   warning: {
-    color: '#E3B341',
-    gradDark: 'linear-gradient(135deg, #121212 0%, rgba(215,183,151,0.05) 40%, rgba(227,179,65,0.16) 100%)',
-    gradLight: 'linear-gradient(135deg, #ffffff 0%, rgba(180,140,50,0.06) 35%, rgba(200,160,60,0.16) 100%)',
-    borderDark: 'rgba(215,183,151,0.25)',
-    borderLight: 'rgba(180,140,50,0.25)',
-    glowDark: '0 0 20px rgba(215,183,151,0.08), 0 4px 16px rgba(0,0,0,0.2)',
-    glowLight: '0 0 20px rgba(180,140,50,0.06), 0 4px 16px rgba(0,0,0,0.04)',
+    color: '#D97706',
+    grad: 'linear-gradient(135deg, #ffffff 0%, rgba(217,119,6,0.06) 35%, rgba(217,119,6,0.16) 100%)',
+    border: 'rgba(217,119,6,0.25)',
+    glow: '0 0 20px rgba(217,119,6,0.06), 0 4px 16px rgba(0,0,0,0.04)',
     Icon: AlertTriangle,
     WatermarkIcon: Bell,
-    iconBgDark: 'rgba(215,183,151,0.15)',
-    iconBgLight: 'rgba(180,140,50,0.10)',
-    textDark: '#D7B797',
-    textLight: '#92600A',
-    subDark: 'rgba(215,183,151,0.75)',
-    subLight: '#7C4F0A',
-    badgeBg: 'linear-gradient(135deg, #D7B797 0%, #C49A6C 100%)',
-    badgeText: '#1A1A1A',
+    iconBg: 'rgba(217,119,6,0.10)',
+    text: '#92600A',
+    sub: '#7C4F0A',
+    badgeBg: 'linear-gradient(135deg, #C4975A 0%, #C49A6C 100%)',
+    badgeText: '#2C2417',
   },
   info: {
     color: '#818CF8',
-    gradDark: 'linear-gradient(135deg, #121212 0%, rgba(99,102,241,0.05) 40%, rgba(99,102,241,0.16) 100%)',
-    gradLight: 'linear-gradient(135deg, #ffffff 0%, rgba(80,90,220,0.06) 35%, rgba(80,90,220,0.14) 100%)',
-    borderDark: 'rgba(99,102,241,0.25)',
-    borderLight: 'rgba(80,90,220,0.25)',
-    glowDark: '0 0 20px rgba(99,102,241,0.08), 0 4px 16px rgba(0,0,0,0.2)',
-    glowLight: '0 0 20px rgba(80,90,220,0.06), 0 4px 16px rgba(0,0,0,0.04)',
+    grad: 'linear-gradient(135deg, #ffffff 0%, rgba(80,90,220,0.06) 35%, rgba(80,90,220,0.14) 100%)',
+    border: 'rgba(80,90,220,0.25)',
+    glow: '0 0 20px rgba(80,90,220,0.06), 0 4px 16px rgba(0,0,0,0.04)',
     Icon: Info,
     WatermarkIcon: Info,
-    iconBgDark: 'rgba(99,102,241,0.15)',
-    iconBgLight: 'rgba(80,90,220,0.10)',
-    textDark: '#A5B4FC',
-    textLight: '#3730A3',
-    subDark: 'rgba(165,180,252,0.75)',
-    subLight: '#4338CA',
+    iconBg: 'rgba(80,90,220,0.10)',
+    text: '#3730A3',
+    sub: '#4338CA',
     badgeBg: 'linear-gradient(135deg, #818CF8 0%, #6366F1 100%)',
     badgeText: '#FFFFFF',
   },
@@ -103,15 +85,15 @@ const BudgetAlertsBanner = ({ budgetId, darkMode = true }) => {
         onClick={() => setExpanded(!expanded)}
         className="relative overflow-hidden rounded-lg cursor-pointer transition-all duration-300 group"
         style={{
-          background: darkMode ? theme.gradDark : theme.gradLight,
-          border: `1px solid ${darkMode ? theme.borderDark : theme.borderLight}`,
-          boxShadow: darkMode ? theme.glowDark : theme.glowLight,
+          background: theme.grad,
+          border: `1px solid ${theme.border}`,
+          boxShadow: theme.glow,
         }}
       >
         {/* Watermark Icon */}
         <div
           className="absolute -right-2 -bottom-2 transition-all duration-500 group-hover:scale-110 pointer-events-none"
-          style={{ opacity: darkMode ? 0.03 : 0.04 }}
+          style={{ opacity: 0.04 }}
         >
           <WatermarkIcon size={64} color={theme.color} strokeWidth={0.8} />
         </div>
@@ -127,7 +109,7 @@ const BudgetAlertsBanner = ({ budgetId, darkMode = true }) => {
             {/* Icon compact */}
             <div
               className="w-7 h-7 rounded-lg flex items-center justify-center backdrop-blur-sm shrink-0"
-              style={{ backgroundColor: darkMode ? theme.iconBgDark : theme.iconBgLight }}
+              style={{ backgroundColor: theme.iconBg }}
             >
               <TopIcon size={14} color={theme.color} />
             </div>
@@ -135,13 +117,13 @@ const BudgetAlertsBanner = ({ budgetId, darkMode = true }) => {
               <div className="flex items-center gap-2 flex-wrap">
                 <span
                   className="font-semibold font-['Montserrat'] text-xs leading-tight"
-                  style={{ color: darkMode ? theme.textDark : theme.textLight }}
+                  style={{ color: theme.text }}
                 >
                   {topAlert.title}
                 </span>
                 <span
                   className="text-xs leading-snug truncate"
-                  style={{ color: darkMode ? theme.subDark : theme.subLight }}
+                  style={{ color: theme.sub }}
                 >
                   {topAlert.message}
                 </span>
@@ -183,7 +165,7 @@ const BudgetAlertsBanner = ({ budgetId, darkMode = true }) => {
             <ChevronRight
               size={14}
               className={`transition-transform duration-300 ${expanded ? 'rotate-90' : ''}`}
-              color={darkMode ? '#666666' : '#999999'}
+              color="#8C8178"
             />
           </div>
         </div>
@@ -201,8 +183,8 @@ const BudgetAlertsBanner = ({ budgetId, darkMode = true }) => {
                 key={alert.id}
                 className="relative overflow-hidden rounded-xl transition-all duration-200 group/item hover:shadow-md"
                 style={{
-                  background: darkMode ? t.gradDark : t.gradLight,
-                  border: `1px solid ${darkMode ? t.borderDark : t.borderLight}`,
+                  background: t.grad,
+                  border: `1px solid ${t.border}`,
                 }}
               >
                 {/* Subtle left accent */}
@@ -215,25 +197,25 @@ const BudgetAlertsBanner = ({ budgetId, darkMode = true }) => {
                   <div className="flex items-start gap-3">
                     <div
                       className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 mt-0.5"
-                      style={{ backgroundColor: darkMode ? t.iconBgDark : t.iconBgLight }}
+                      style={{ backgroundColor: t.iconBg }}
                     >
                       <AlertIcon size={15} color={t.color} />
                     </div>
                     <div className="min-w-0">
                       <div
                         className="font-semibold text-sm font-['Montserrat']"
-                        style={{ color: darkMode ? t.textDark : t.textLight }}
+                        style={{ color: t.text }}
                       >
                         {alert.title}
                       </div>
                       <div
                         className="text-xs mt-1 leading-relaxed"
-                        style={{ color: darkMode ? t.subDark : t.subLight }}
+                        style={{ color: t.sub }}
                       >
                         {alert.message}
                       </div>
                       {alert.budget && (
-                        <div className={`text-[11px] mt-1.5 font-['JetBrains_Mono'] ${darkMode ? 'text-[#555555]' : 'text-gray-400'}`}>
+                        <div className="text-[11px] mt-1.5 font-['JetBrains_Mono'] text-[#8C8178]">
                           {alert.budget.groupBrand?.name} — {alert.budget.budgetCode}
                         </div>
                       )}
@@ -244,10 +226,10 @@ const BudgetAlertsBanner = ({ budgetId, darkMode = true }) => {
                     onClick={(e) => handleDismiss(alert.id, e)}
                     className="p-1.5 rounded-lg transition-all duration-200 shrink-0 opacity-0 group-hover/item:opacity-100"
                     style={{
-                      backgroundColor: darkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)',
+                      backgroundColor: 'rgba(0,0,0,0.04)',
                     }}
                   >
-                    <X size={14} color={darkMode ? '#666666' : '#999999'} />
+                    <X size={14} color="#8C8178" />
                   </button>
                 </div>
               </div>

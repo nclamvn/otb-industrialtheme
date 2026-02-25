@@ -17,9 +17,9 @@ import { MobileFilterSheet, MobileDataCard } from '@/components/ui';
 const YEARS = [2023, 2024, 2025, 2026];
 
 const CARD_ACCENTS = {
-  total:     { color: '#D7B797', darkGrad: 'rgba(215,183,151,0.06)', lightGrad: 'rgba(180,140,95,0.10)', iconDark: 'rgba(215,183,151,0.07)', iconLight: 'rgba(160,120,75,0.08)' },
-  allocated: { color: '#2A9E6A', darkGrad: 'rgba(42,158,106,0.06)',  lightGrad: 'rgba(22,120,70,0.08)',  iconDark: 'rgba(42,158,106,0.07)', iconLight: 'rgba(22,120,70,0.07)' },
-  remaining: { color: '#E3B341', darkGrad: 'rgba(227,179,65,0.06)',  lightGrad: 'rgba(200,150,30,0.09)', iconDark: 'rgba(227,179,65,0.07)', iconLight: 'rgba(180,130,20,0.07)' },
+  total:     { color: '#C4975A', grad: 'rgba(180,140,95,0.10)', icon: 'rgba(160,120,75,0.08)' },
+  allocated: { color: '#1B6B45', grad: 'rgba(22,120,70,0.08)',  icon: 'rgba(22,120,70,0.07)' },
+  remaining: { color: '#D97706', grad: 'rgba(200,150,30,0.09)', icon: 'rgba(180,130,20,0.07)' },
 };
 
 const BudgetManagementScreen = ({
@@ -52,7 +52,7 @@ const BudgetManagementScreen = ({
     code: b.code,
     name: b.name,
     groupId: b.groupId || 'A',
-    color: b.colorConfig?.gradient || 'from-gray-400 to-gray-600',
+    color: b.colorConfig?.gradient || 'from-stone-400 to-stone-600',
   })), [apiBrands]);
 
   const groupBrandCategories = useMemo(() => {
@@ -192,8 +192,8 @@ const BudgetManagementScreen = ({
 
   const DetailRow = ({ label, value, strong }) => (
   <div className="flex justify-between gap-4">
-    <span className={darkMode ? 'text-[#999999]' : 'text-[#666666]'}>{label}</span>
-    <span className={`text-right ${strong ? 'font-semibold text-[#2A9E6A] font-[\'JetBrains_Mono\']' : ''}`}>
+    <span className="text-[#8C8178]">{label}</span>
+    <span className={`text-right ${strong ? 'font-semibold text-[#1B6B45] font-[\'JetBrains_Mono\']' : ''}`}>
       {value}
     </span>
   </div>
@@ -250,7 +250,7 @@ const BudgetManagementScreen = ({
       )}
 
       {/* Filters Section */}
-      <div className={`rounded-lg shadow-sm border px-3 py-2 ${darkMode ? 'bg-[#121212] border-[#2E2E2E]' : 'bg-white border-[#C4B5A5]'}`}>
+      <div className="rounded-lg shadow-sm border px-3 py-2 bg-white border-[#E8E2DB]">
         <div className="flex flex-wrap items-center gap-2">
           {isMobile ? (
             <>
@@ -258,8 +258,8 @@ const BudgetManagementScreen = ({
                 onClick={() => setShowMobileFilters(true)}
                 className={`flex items-center gap-1.5 px-3 py-1.5 border rounded-lg text-xs font-medium ${
                   hasActiveFilters
-                    ? darkMode ? 'border-[rgba(215,183,151,0.3)] bg-[rgba(215,183,151,0.08)] text-[#D7B797]' : 'border-[rgba(215,183,151,0.4)] bg-[rgba(215,183,151,0.1)] text-[#8A6340]'
-                    : darkMode ? 'border-[#2E2E2E] text-[#999999]' : 'border-[#C4B5A5] text-[#666666]'
+                    ? 'border-[rgba(196,151,90,0.4)] bg-[rgba(196,151,90,0.1)] text-[#8A6340]'
+                    : 'border-[#E8E2DB] text-[#8C8178]'
                 }`}
               >
                 <Filter size={14} />
@@ -270,9 +270,9 @@ const BudgetManagementScreen = ({
             </>
           ) : (
             <>
-              <Filter size={14} className={`shrink-0 ${darkMode ? 'text-[#999999]' : 'text-[#666666]'}`} />
-              <span className={`text-xs font-medium font-['Montserrat'] shrink-0 ${darkMode ? 'text-[#999999]' : 'text-[#666666]'}`}>{t('budget.filters')}</span>
-              <div className={`h-5 w-px shrink-0 ${darkMode ? 'bg-[#2E2E2E]' : 'bg-[#C4B5A5]/50'}`}></div>
+              <Filter size={14} className="shrink-0 text-[#8C8178]" />
+              <span className="text-xs font-medium font-['Montserrat'] shrink-0 text-[#8C8178]">{t('budget.filters')}</span>
+              <div className="h-5 w-px shrink-0 bg-[#E8E2DB]"></div>
             </>
           )}
           {/* Desktop filters - hidden on mobile */}
@@ -284,22 +284,18 @@ const BudgetManagementScreen = ({
                 setBrandDropdownOpen(false);
               }}
               className={`flex items-center justify-between gap-2 px-3 py-1.5 border rounded-lg transition-colors min-w-[110px] ${selectedYear
-                ? darkMode
-                  ? 'bg-[rgba(215,183,151,0.08)] border-[rgba(215,183,151,0.25)] text-[#D7B797]'
-                  : 'bg-[rgba(160,120,75,0.18)] border-[rgba(215,183,151,0.4)] text-[#8A6340]'
-                : darkMode
-                  ? 'bg-[#1A1A1A] border-[#2E2E2E] text-[#F2F2F2] hover:bg-[rgba(215,183,151,0.08)] hover:border-[rgba(215,183,151,0.25)]'
-                  : 'bg-white border-[#C4B5A5] text-[#0A0A0A] hover:bg-[rgba(160,120,75,0.18)] hover:border-[rgba(215,183,151,0.4)]'
+                ? 'bg-[rgba(160,120,75,0.18)] border-[rgba(196,151,90,0.4)] text-[#8A6340]'
+                : 'bg-white border-[#E8E2DB] text-[#2C2417] hover:bg-[rgba(160,120,75,0.18)] hover:border-[rgba(196,151,90,0.4)]'
                 }`}
             >
               <span className="text-sm font-medium">{selectedYear ? `FY${selectedYear}` : t('budget.allYears')}</span>
               <ChevronDown size={16} className="opacity-50 shrink-0" />
             </button>
             {yearDropdownOpen && (
-              <div className={`absolute top-full left-0 mt-1 rounded-lg shadow-lg border py-1 z-20 min-w-[140px] ${darkMode ? 'bg-[#1A1A1A] border-[#2E2E2E]' : 'bg-white border-[#C4B5A5]'}`}>
+              <div className="absolute top-full left-0 mt-1 rounded-lg shadow-lg border py-1 z-20 min-w-[140px] bg-white border-[#E8E2DB]">
                 <button
                   onClick={() => { setSelectedYear(null); setYearDropdownOpen(false); }}
-                  className={`w-full px-4 py-2 text-left text-sm transition-colors ${darkMode ? 'hover:bg-[rgba(215,183,151,0.08)]' : 'hover:bg-[rgba(160,120,75,0.18)]'} ${!selectedYear ? (darkMode ? 'text-[#D7B797] font-medium' : 'text-[#8A6340] font-medium') : darkMode ? 'text-[#F2F2F2]' : 'text-[#0A0A0A]'}`}
+                  className={`w-full px-4 py-2 text-left text-sm transition-colors hover:bg-[rgba(160,120,75,0.18)] ${!selectedYear ? 'text-[#8A6340] font-medium' : 'text-[#2C2417]'}`}
                 >
                   {t('budget.allYears')}
                 </button>
@@ -307,7 +303,7 @@ const BudgetManagementScreen = ({
                   <button
                     key={year}
                     onClick={() => { setSelectedYear(year); setYearDropdownOpen(false); }}
-                    className={`w-full px-4 py-2 text-left text-sm transition-colors ${darkMode ? 'hover:bg-[rgba(215,183,151,0.08)]' : 'hover:bg-[rgba(160,120,75,0.18)]'} ${selectedYear === year ? (darkMode ? 'text-[#D7B797] font-medium' : 'text-[#8A6340] font-medium') : darkMode ? 'text-[#F2F2F2]' : 'text-[#0A0A0A]'}`}
+                    className={`w-full px-4 py-2 text-left text-sm transition-colors hover:bg-[rgba(160,120,75,0.18)] ${selectedYear === year ? 'text-[#8A6340] font-medium' : 'text-[#2C2417]'}`}
                   >
                     FY{year}
                   </button>
@@ -325,12 +321,8 @@ const BudgetManagementScreen = ({
                 setBrandDropdownOpen(false);
               }}
               className={`flex items-center justify-between gap-2 px-3 py-1.5 border rounded-lg transition-colors min-w-[130px] ${selectedGroupBrand
-                ? darkMode
-                  ? 'bg-[rgba(215,183,151,0.08)] border-[rgba(215,183,151,0.25)] text-[#D7B797]'
-                  : 'bg-[rgba(160,120,75,0.18)] border-[rgba(215,183,151,0.4)] text-[#8A6340]'
-                : darkMode
-                  ? 'bg-[#1A1A1A] border-[#2E2E2E] text-[#F2F2F2] hover:bg-[rgba(215,183,151,0.08)] hover:border-[rgba(215,183,151,0.25)]'
-                  : 'bg-white border-[#C4B5A5] text-[#0A0A0A] hover:bg-[rgba(160,120,75,0.18)] hover:border-[rgba(215,183,151,0.4)]'
+                ? 'bg-[rgba(160,120,75,0.18)] border-[rgba(196,151,90,0.4)] text-[#8A6340]'
+                : 'bg-white border-[#E8E2DB] text-[#2C2417] hover:bg-[rgba(160,120,75,0.18)] hover:border-[rgba(196,151,90,0.4)]'
                 }`}
             >
               <span className="text-sm font-medium">
@@ -341,10 +333,10 @@ const BudgetManagementScreen = ({
               <ChevronDown size={16} className="opacity-50 shrink-0" />
             </button>
             {groupBrandDropdownOpen && (
-              <div className={`absolute top-full left-0 mt-1 rounded-lg shadow-lg border py-1 z-20 min-w-[150px] ${darkMode ? 'bg-[#1A1A1A] border-[#2E2E2E]' : 'bg-white border-[#C4B5A5]'}`}>
+              <div className="absolute top-full left-0 mt-1 rounded-lg shadow-lg border py-1 z-20 min-w-[150px] bg-white border-[#E8E2DB]">
                 <button
                   onClick={() => { setSelectedGroupBrand(null); setGroupBrandDropdownOpen(false); }}
-                  className={`w-full px-4 py-2 text-left text-sm transition-colors ${darkMode ? 'hover:bg-[rgba(215,183,151,0.08)]' : 'hover:bg-[rgba(160,120,75,0.18)]'} ${!selectedGroupBrand ? (darkMode ? 'text-[#D7B797] font-medium' : 'text-[#8A6340] font-medium') : darkMode ? 'text-[#F2F2F2]' : 'text-[#0A0A0A]'}`}
+                  className={`w-full px-4 py-2 text-left text-sm transition-colors hover:bg-[rgba(160,120,75,0.18)] ${!selectedGroupBrand ? 'text-[#8A6340] font-medium' : 'text-[#2C2417]'}`}
                 >
                   {t('budget.allGroupBrands')}
                 </button>
@@ -352,7 +344,7 @@ const BudgetManagementScreen = ({
                   <button
                     key={group.id}
                     onClick={() => { setSelectedGroupBrand(group.id); setGroupBrandDropdownOpen(false); }}
-                    className={`w-full px-4 py-2 text-left text-sm transition-colors ${darkMode ? 'hover:bg-[rgba(215,183,151,0.08)]' : 'hover:bg-[rgba(160,120,75,0.18)]'} ${selectedGroupBrand === group.id ? (darkMode ? 'text-[#D7B797] font-medium' : 'text-[#8A6340] font-medium') : darkMode ? 'text-[#F2F2F2]' : 'text-[#0A0A0A]'}`}
+                    className={`w-full px-4 py-2 text-left text-sm transition-colors hover:bg-[rgba(160,120,75,0.18)] ${selectedGroupBrand === group.id ? 'text-[#8A6340] font-medium' : 'text-[#2C2417]'}`}
                   >
                     {group.name}
                   </button>
@@ -370,12 +362,8 @@ const BudgetManagementScreen = ({
                 setGroupBrandDropdownOpen(false);
               }}
               className={`flex items-center justify-between gap-2 px-3 py-1.5 border rounded-lg transition-colors min-w-[110px] ${selectedBrand
-                ? darkMode
-                  ? 'bg-[rgba(215,183,151,0.08)] border-[rgba(215,183,151,0.25)] text-[#D7B797]'
-                  : 'bg-[rgba(160,120,75,0.18)] border-[rgba(215,183,151,0.4)] text-[#8A6340]'
-                : darkMode
-                  ? 'bg-[#1A1A1A] border-[#2E2E2E] text-[#F2F2F2] hover:bg-[rgba(215,183,151,0.08)] hover:border-[rgba(215,183,151,0.25)]'
-                  : 'bg-white border-[#C4B5A5] text-[#0A0A0A] hover:bg-[rgba(160,120,75,0.18)] hover:border-[rgba(215,183,151,0.4)]'
+                ? 'bg-[rgba(160,120,75,0.18)] border-[rgba(196,151,90,0.4)] text-[#8A6340]'
+                : 'bg-white border-[#E8E2DB] text-[#2C2417] hover:bg-[rgba(160,120,75,0.18)] hover:border-[rgba(196,151,90,0.4)]'
                 }`}
             >
               <span className="text-sm font-medium">
@@ -384,10 +372,10 @@ const BudgetManagementScreen = ({
               <ChevronDown size={16} className="opacity-50 shrink-0" />
             </button>
             {brandDropdownOpen && (
-              <div className={`absolute top-full left-0 mt-1 rounded-lg shadow-lg border py-1 z-20 min-w-[140px] ${darkMode ? 'bg-[#1A1A1A] border-[#2E2E2E]' : 'bg-white border-[#C4B5A5]'}`}>
+              <div className="absolute top-full left-0 mt-1 rounded-lg shadow-lg border py-1 z-20 min-w-[140px] bg-white border-[#E8E2DB]">
                 <button
                   onClick={() => { setSelectedBrand(null); setBrandDropdownOpen(false); }}
-                  className={`w-full px-4 py-2 text-left text-sm transition-colors ${darkMode ? 'hover:bg-[rgba(215,183,151,0.08)]' : 'hover:bg-[rgba(160,120,75,0.18)]'} ${!selectedBrand ? (darkMode ? 'text-[#D7B797] font-medium' : 'text-[#8A6340] font-medium') : darkMode ? 'text-[#F2F2F2]' : 'text-[#0A0A0A]'}`}
+                  className={`w-full px-4 py-2 text-left text-sm transition-colors hover:bg-[rgba(160,120,75,0.18)] ${!selectedBrand ? 'text-[#8A6340] font-medium' : 'text-[#2C2417]'}`}
                 >
                   {t('budget.allBrands')}
                 </button>
@@ -395,7 +383,7 @@ const BudgetManagementScreen = ({
                   <button
                     key={brand.id}
                     onClick={() => { setSelectedBrand(brand.id); setBrandDropdownOpen(false); }}
-                    className={`w-full px-4 py-2 text-left text-sm transition-colors ${darkMode ? 'hover:bg-[rgba(215,183,151,0.08)]' : 'hover:bg-[rgba(160,120,75,0.18)]'} ${selectedBrand === brand.id ? (darkMode ? 'text-[#D7B797] font-medium' : 'text-[#8A6340] font-medium') : darkMode ? 'text-[#F2F2F2]' : 'text-[#0A0A0A]'}`}
+                    className={`w-full px-4 py-2 text-left text-sm transition-colors hover:bg-[rgba(160,120,75,0.18)] ${selectedBrand === brand.id ? 'text-[#8A6340] font-medium' : 'text-[#2C2417]'}`}
                   >
                     {brand.name}
                   </button>
@@ -406,28 +394,24 @@ const BudgetManagementScreen = ({
 
           {/* Search */}
           <div className="relative flex-1 min-w-[160px]">
-            <Search size={14} className={`absolute left-2.5 top-1/2 -translate-y-1/2 ${darkMode ? 'text-[#666666]' : 'text-[#999999]'}`} />
+            <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[#6B5D4F]" />
             <input
               type="text"
               placeholder={t('budget.searchBudgets')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className={`w-full pl-8 pr-3 py-1.5 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#D7B797] focus:border-transparent ${darkMode ? 'bg-[#1A1A1A] border-[#2E2E2E] text-[#F2F2F2] placeholder-[#666666]' : 'bg-white border-[#C4B5A5] text-[#0A0A0A] placeholder-[#999999]'}`}
+              className="w-full pl-8 pr-3 py-1.5 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#C4975A] focus:border-transparent bg-white border-[#E8E2DB] text-[#2C2417] placeholder-[#6B5D4F]"
             />
           </div></>}
 
           {/* Currency Toggle */}
-          <div className={`flex items-center rounded-lg p-1 ${darkMode ? 'bg-[#1A1A1A]' : 'bg-[#F2F2F2]'}`}>
+          <div className="flex items-center rounded-lg p-1 bg-[#FBF9F7]">
             <button
               onClick={() => setCurrency('VND')}
               className={`px-3 py-1.5 rounded-md text-xs font-semibold font-['JetBrains_Mono'] transition-all ${
                 currency === 'VND'
-                  ? darkMode
-                    ? 'bg-[#D7B797] text-[#0A0A0A] shadow-sm'
-                    : 'bg-[#D7B797] text-[#0A0A0A] shadow-sm'
-                  : darkMode
-                    ? 'text-[#666666] hover:text-[#F2F2F2]'
-                    : 'text-[#999999] hover:text-[#0A0A0A]'
+                  ? 'bg-[#C4975A] text-white shadow-sm'
+                  : 'text-[#6B5D4F] hover:text-[#2C2417]'
               }`}
             >
               VND
@@ -436,12 +420,8 @@ const BudgetManagementScreen = ({
               onClick={() => setCurrency('USD')}
               className={`px-3 py-1.5 rounded-md text-xs font-semibold font-['JetBrains_Mono'] transition-all ${
                 currency === 'USD'
-                  ? darkMode
-                    ? 'bg-[#127749] text-white shadow-sm'
-                    : 'bg-[#127749] text-white shadow-sm'
-                  : darkMode
-                    ? 'text-[#666666] hover:text-[#F2F2F2]'
-                    : 'text-[#999999] hover:text-[#0A0A0A]'
+                  ? 'bg-[#1B6B45] text-white shadow-sm'
+                  : 'text-[#6B5D4F] hover:text-[#2C2417]'
               }`}
             >
               USD
@@ -449,13 +429,13 @@ const BudgetManagementScreen = ({
           </div>
 
           {/* View Toggle */}
-          {/* <div className={`flex items-center gap-1 rounded-lg p-1 ml-auto ${darkMode ? 'bg-[#1A1A1A]' : 'bg-[#F2F2F2]'}`}>
+          {/* <div className="flex items-center gap-1 rounded-lg p-1 ml-auto bg-[#FBF9F7]">
             <button
               onClick={() => setViewMode('table')}
               className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
                 viewMode === 'table'
-                  ? darkMode ? 'bg-[#2E2E2E] text-[#F2F2F2] shadow-sm' : 'bg-white text-[#0A0A0A] shadow-sm'
-                  : darkMode ? 'text-[#999999] hover:text-[#F2F2F2]' : 'text-[#666666] hover:text-[#0A0A0A]'
+                  ? 'bg-white text-[#2C2417] shadow-sm'
+                  : 'text-[#8C8178] hover:text-[#2C2417]'
               }`}
             >
               <Table size={16} />
@@ -465,8 +445,8 @@ const BudgetManagementScreen = ({
               onClick={() => setViewMode('charts')}
               className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
                 viewMode === 'charts'
-                  ? darkMode ? 'bg-[#2E2E2E] text-[#F2F2F2] shadow-sm' : 'bg-white text-[#0A0A0A] shadow-sm'
-                  : darkMode ? 'text-[#999999] hover:text-[#F2F2F2]' : 'text-[#666666] hover:text-[#0A0A0A]'
+                  ? 'bg-white text-[#2C2417] shadow-sm'
+                  : 'text-[#8C8178] hover:text-[#2C2417]'
               }`}
             >
               <PieChart size={16} />
@@ -477,9 +457,7 @@ const BudgetManagementScreen = ({
           {hasActiveFilters && (
             <button
               onClick={clearFilters}
-              className={`flex items-center gap-1 text-xs font-medium transition-colors shrink-0 ${
-                darkMode ? 'text-[#999999] hover:text-[#D7B797]' : 'text-[#666666] hover:text-[#8A6340]'
-              }`}
+              className="flex items-center gap-1 text-xs font-medium transition-colors shrink-0 text-[#8C8178] hover:text-[#8A6340]"
             >
               <X size={12} />
               {t('budget.clearAll')}
@@ -488,7 +466,7 @@ const BudgetManagementScreen = ({
 
           <button
             onClick={() => setShowCreateModal(true)}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-[#127749] text-white rounded-lg hover:bg-[#2A9E6A] transition-colors shadow-sm text-xs font-medium font-['Montserrat'] shrink-0"
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-[#1B6B45] text-white rounded-lg hover:bg-[#1B6B45]/90 transition-colors shadow-sm text-xs font-medium font-['Montserrat'] shrink-0"
           >
             <Plus size={14} />
             {t('budget.createBudget')}
@@ -520,9 +498,9 @@ const BudgetManagementScreen = ({
           progress={Number(summaryStats.approvedPct)}
           progressLabel={t('budget.allocated')}
           badges={[
-            { label: 'Approved', value: summaryStats.statusCounts.approved, color: '#2A9E6A' },
-            { label: 'Pending', value: summaryStats.statusCounts.pending, color: '#D29922' },
-            { label: 'Draft', value: summaryStats.statusCounts.draft, color: '#666666' },
+            { label: 'Approved', value: summaryStats.statusCounts.approved, color: '#1B6B45' },
+            { label: 'Pending', value: summaryStats.statusCounts.pending, color: '#D97706' },
+            { label: 'Draft', value: summaryStats.statusCounts.draft, color: '#8C8178' },
           ]}
           expandTitle={t('home.kpiDetail.byStatus')}
         />
@@ -536,8 +514,8 @@ const BudgetManagementScreen = ({
           progress={Number(summaryStats.remainingPct)}
           progressLabel={t('budget.remaining')}
           breakdown={[
-            { label: 'Draft', value: summaryStats.draft, displayValue: formatCurrency(summaryStats.draft, { currency }), pct: summaryStats.total > 0 ? Math.round((summaryStats.draft / summaryStats.total) * 100) : 0, color: '#666666' },
-            { label: 'Pending', value: summaryStats.pending, displayValue: formatCurrency(summaryStats.pending, { currency }), pct: summaryStats.total > 0 ? Math.round((summaryStats.pending / summaryStats.total) * 100) : 0, color: '#D29922' },
+            { label: 'Draft', value: summaryStats.draft, displayValue: formatCurrency(summaryStats.draft, { currency }), pct: summaryStats.total > 0 ? Math.round((summaryStats.draft / summaryStats.total) * 100) : 0, color: '#8C8178' },
+            { label: 'Pending', value: summaryStats.pending, displayValue: formatCurrency(summaryStats.pending, { currency }), pct: summaryStats.total > 0 ? Math.round((summaryStats.pending / summaryStats.total) * 100) : 0, color: '#D97706' },
           ]}
           expandTitle={t('home.kpiDetail.breakdown')}
         />
@@ -580,58 +558,54 @@ const BudgetManagementScreen = ({
       )}
 
       {viewMode === 'table' && !isMobile && (
-        <div className={`rounded-xl shadow-sm border overflow-hidden ${darkMode ? 'bg-[#121212] border-[#2E2E2E]' : 'bg-white border-[#C4B5A5]'}`}>
+        <div className="rounded-xl shadow-sm border overflow-hidden bg-white border-[#E8E2DB]">
           <table className="w-full">
-            <thead className={darkMode ? 'bg-[#1A1A1A]' : 'bg-[rgba(160,120,75,0.18)]'}>
+            <thead className="bg-[rgba(160,120,75,0.18)]">
               <tr>
-                <th className={`text-left px-3 py-2 text-xs font-semibold tracking-wider font-['Montserrat'] ${darkMode ? 'text-[#999999]' : 'text-[#666666]'}`}>
+                <th className="text-left px-3 py-2 text-xs font-semibold tracking-wider font-['Montserrat'] text-[#6B5D4F]">
                   {t('budget.fiscalYear')}
                 </th>
-                <th className={`text-left px-3 py-2 text-xs font-semibold tracking-wider font-['Montserrat'] ${darkMode ? 'text-[#999999]' : 'text-[#666666]'}`}>
+                <th className="text-left px-3 py-2 text-xs font-semibold tracking-wider font-['Montserrat'] text-[#6B5D4F]">
                   {t('budget.groupBrand')}
                 </th>
-                <th className={`text-left px-3 py-2 text-xs font-semibold tracking-wider font-['Montserrat'] ${darkMode ? 'text-[#999999]' : 'text-[#666666]'}`}>
+                <th className="text-left px-3 py-2 text-xs font-semibold tracking-wider font-['Montserrat'] text-[#6B5D4F]">
                   {t('budget.brand')}
                 </th>
-                <th className={`text-left px-3 py-2 text-xs font-semibold tracking-wider font-['Montserrat'] ${darkMode ? 'text-[#999999]' : 'text-[#666666]'}`}>
+                <th className="text-left px-3 py-2 text-xs font-semibold tracking-wider font-['Montserrat'] text-[#6B5D4F]">
                   {t('budget.budgetName')}
                 </th>
-                <th className={`text-left px-3 py-2 text-xs font-semibold tracking-wider font-['Montserrat'] ${darkMode ? 'text-[#999999]' : 'text-[#666666]'}`}>
+                <th className="text-left px-3 py-2 text-xs font-semibold tracking-wider font-['Montserrat'] text-[#6B5D4F]">
                   {t('budget.amount')}
                 </th>
-                <th className={`text-right px-3 py-2 text-xs font-semibold tracking-wider font-['Montserrat'] ${darkMode ? 'text-[#999999]' : 'text-[#666666]'}`}>
+                <th className="text-right px-3 py-2 text-xs font-semibold tracking-wider font-['Montserrat'] text-[#6B5D4F]">
                   {t('common.actions')}
                 </th>
               </tr>
             </thead>
-            <tbody className={darkMode ? 'divide-y divide-[#2E2E2E]' : 'divide-y divide-[#2E2E2E]/10'}>
+            <tbody className="divide-y divide-[#E8E2DB]">
               {filteredBudgets.map((budget) => (
                 <tr
                   key={budget.id}
-                  className={`transition-colors ${darkMode ? 'hover:bg-[rgba(215,183,151,0.08)]' : 'hover:bg-[rgba(160,120,75,0.18)]'}`}
+                  className="transition-colors hover:bg-[rgba(160,120,75,0.18)]"
                 >
                   <td className="px-3 py-2">
-                    <span className={`text-sm font-medium ${darkMode ? 'text-[#F2F2F2]' : 'text-[#0A0A0A]'}`}>FY{budget.fiscalYear}</span>
+                    <span className="text-sm font-medium text-[#2C2417]">FY{budget.fiscalYear}</span>
                   </td>
                   <td className="px-3 py-2">
-                    <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${darkMode ? 'bg-[#2E2E2E] text-[#F2F2F2]' : 'bg-[#F2F2F2] text-[#0A0A0A]'}`}>
+                    <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-[#FBF9F7] text-[#2C2417]">
                       {budget.groupBrand}
                     </span>
                   </td>
                   <td className="px-3 py-2">
-                    <span className={`text-sm ${darkMode ? 'text-[#999999]' : 'text-[#666666]'}`}>{budget.brandName}</span>
+                    <span className="text-sm text-[#8C8178]">{budget.brandName}</span>
                   </td>
                   <td className="px-3 py-2">
-                    <span className={`text-sm font-medium cursor-pointer transition-colors ${
-                      darkMode
-                        ? 'text-[#D7B797] hover:text-[#D7B797]/80 hover:underline'
-                        : 'text-[#8A6340] hover:text-[#8A6340]/80 hover:underline'
-                    }`}>
+                    <span className="text-sm font-medium cursor-pointer transition-colors text-[#8A6340] hover:text-[#8A6340]/80 hover:underline">
                       {budget.budgetName}
                     </span>
                   </td>
                   <td className="px-3 py-2">
-                    <span className={`text-sm font-semibold font-['JetBrains_Mono'] ${darkMode ? 'text-[#F2F2F2]' : 'text-[#0A0A0A]'}`}>{formatCurrency(budget.totalBudget, { currency })}</span>
+                    <span className="text-sm font-semibold font-['JetBrains_Mono'] text-[#2C2417]">{formatCurrency(budget.totalBudget, { currency })}</span>
                   </td>
                   <td className="px-3 py-2">
                     <div className="flex items-center justify-end gap-2">
@@ -641,11 +615,7 @@ const BudgetManagementScreen = ({
                           setSelectedBudget(budget);
                           setShowViewModal(true);
                         }}
-                        className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded-md transition
-                          ${darkMode
-                            ? 'text-[#999999] hover:text-[#F2F2F2] hover:bg-[#2E2E2E]'
-                            : 'text-[#666666] hover:text-[#0A0A0A] hover:bg-[#F2F2F2]'
-                          }`}
+                        className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded-md transition text-[#8C8178] hover:text-[#2C2417] hover:bg-[#FBF9F7]"
                       >
                         <Eye size={14} />
                         {t('budget.view')}
@@ -665,11 +635,7 @@ const BudgetManagementScreen = ({
                             budgetName: budget.budgetName,
                           })
                         }
-                        className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-md transition
-        ${darkMode
-                            ? 'bg-[rgba(215,183,151,0.08)] text-[#D7B797] hover:bg-[rgba(160,120,75,0.18)] border border-[rgba(215,183,151,0.25)]'
-                            : 'bg-[rgba(160,120,75,0.18)] text-[#8A6340] hover:bg-[rgba(215,183,151,0.25)] border border-[rgba(215,183,151,0.4)]'
-                          }`}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-md transition bg-[rgba(160,120,75,0.18)] text-[#8A6340] hover:bg-[rgba(196,151,90,0.25)] border border-[rgba(196,151,90,0.4)]"
                       >
                         <Split size={14} />
                         {t('budget.allocate')}
@@ -697,11 +663,7 @@ const BudgetManagementScreen = ({
                 <div className="text-center">
                   <button
                     onClick={clearFilters}
-                    className={`text-sm font-medium transition-colors ${
-                      darkMode
-                        ? 'text-[#D7B797] hover:text-[#D7B797]/80'
-                        : 'text-[#8A6340] hover:text-[#8A6340]/80'
-                    }`}
+                    className="text-sm font-medium transition-colors text-[#8A6340] hover:text-[#8A6340]/80"
                   >
                     {t('common.clearAllFilters')}
                   </button>
@@ -723,18 +685,16 @@ const BudgetManagementScreen = ({
           {/* Modal */}
           <div className="relative flex min-h-screen items-center justify-center p-4">
             <div
-              className={`w-full max-w-lg rounded-2xl shadow-xl overflow-hidden
-          ${darkMode ? 'bg-[#121212] text-[#F2F2F2]' : 'bg-white text-[#0A0A0A]'}`}
+              className="w-full max-w-lg rounded-2xl shadow-xl overflow-hidden bg-white text-[#2C2417]"
             >
               {/* Header */}
               <div
-                className={`flex items-center justify-between px-6 py-4 border-b
-            ${darkMode ? 'border-[#2E2E2E]' : 'border-[#C4B5A5]'}`}
+                className="flex items-center justify-between px-6 py-4 border-b border-[#E8E2DB]"
               >
                 <h3 className="text-lg font-semibold font-['Montserrat']">{t('budget.budgetDetail')}</h3>
                 <button
                   onClick={() => setShowViewModal(false)}
-                  className={`p-2 rounded-lg transition-colors ${darkMode ? 'hover:bg-[#2E2E2E]' : 'hover:bg-[#F2F2F2]'}`}
+                  className="p-2 rounded-lg transition-colors hover:bg-[#FBF9F7]"
                 >
                   <X size={18} />
                 </button>
@@ -758,15 +718,11 @@ const BudgetManagementScreen = ({
 
               {/* Footer */}
               <div
-                className={`flex justify-end px-6 py-4 border-t
-            ${darkMode ? 'border-[#2E2E2E]' : 'border-[#C4B5A5]'}`}
+                className="flex justify-end px-6 py-4 border-t border-[#E8E2DB]"
               >
                 <button
                   onClick={() => setShowViewModal(false)}
-                  className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors
-              ${darkMode
-                ? 'bg-[#2E2E2E] hover:bg-[#1A1A1A] text-[#F2F2F2]'
-                : 'bg-[#F2F2F2] hover:bg-[#E5E5E5] text-[#0A0A0A]'}`}
+                  className="px-4 py-2 text-sm font-medium rounded-lg transition-colors bg-[#FBF9F7] hover:bg-[#E8E2DB] text-[#2C2417]"
                 >
                   {t('common.close')}
                 </button>
@@ -779,10 +735,10 @@ const BudgetManagementScreen = ({
 
       {/* Charts View Placeholder */}
       {viewMode === 'charts' && (
-        <div className={`rounded-xl shadow-sm border p-12 ${darkMode ? 'bg-[#121212] border-[#2E2E2E]' : 'bg-white border-[#C4B5A5]'}`}>
+        <div className="rounded-xl shadow-sm border p-12 bg-white border-[#E8E2DB]">
           <div className="text-center">
-            <PieChart size={48} className={`mx-auto mb-4 ${darkMode ? 'text-[#2E2E2E]' : 'text-[#999999]'}`} />
-            <p className={darkMode ? 'text-[#666666]' : 'text-[#999999]'}>{t('common.chartsComingSoon')}</p>
+            <PieChart size={48} className="mx-auto mb-4 text-[#6B5D4F]" />
+            <p className="text-[#6B5D4F]">{t('common.chartsComingSoon')}</p>
           </div>
         </div>
       )}
@@ -790,12 +746,12 @@ const BudgetManagementScreen = ({
       {/* Create Budget Modal */}
       {showCreateModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className={`rounded-2xl shadow-xl w-full max-w-lg max-h-[calc(100vh-2rem)] overflow-hidden ${darkMode ? 'bg-[#121212]' : 'bg-white'}`}>
-            <div className={`flex items-center justify-between p-6 border-b ${darkMode ? 'border-[#2E2E2E]' : 'border-[#C4B5A5]'}`}>
-              <h3 className={`text-lg font-semibold font-['Montserrat'] ${darkMode ? 'text-[#F2F2F2]' : 'text-[#0A0A0A]'}`}>{t('budget.createNewBudget')}</h3>
+          <div className="rounded-2xl shadow-xl w-full max-w-lg max-h-[calc(100vh-2rem)] overflow-hidden bg-white">
+            <div className="flex items-center justify-between p-6 border-b border-[#E8E2DB]">
+              <h3 className="text-lg font-semibold font-['Montserrat'] text-[#2C2417]">{t('budget.createNewBudget')}</h3>
               <button
                 onClick={() => setShowCreateModal(false)}
-                className={`p-2 rounded-lg transition-colors ${darkMode ? 'text-[#666666] hover:text-[#F2F2F2] hover:bg-[#2E2E2E]' : 'text-[#999999] hover:text-[#0A0A0A] hover:bg-[#F2F2F2]'}`}
+                className="p-2 rounded-lg transition-colors text-[#6B5D4F] hover:text-[#2C2417] hover:bg-[#FBF9F7]"
               >
                 <X size={20} />
               </button>
@@ -805,8 +761,8 @@ const BudgetManagementScreen = ({
               <div className="grid grid-cols-3 gap-4">
                 {/* Fiscal Year */}
                 <div>
-                  <label className={`block text-sm font-medium mb-2 font-['Montserrat'] ${darkMode ? 'text-[#F2F2F2]' : 'text-[#0A0A0A]'}`}>
-                    {t('budget.fiscalYear')} <span className="text-[#F85149]">{t('common.required')}</span>
+                  <label className="block text-sm font-medium mb-2 font-['Montserrat'] text-[#2C2417]">
+                    {t('budget.fiscalYear')} <span className="text-[#DC3545]">{t('common.required')}</span>
                   </label>
                   <select
                     value={newBudgetForm.fiscalYear}
@@ -816,7 +772,7 @@ const BudgetManagementScreen = ({
                         fiscalYear: parseInt(e.target.value),
                       })
                     }
-                    className={`w-full px-4 py-2.5 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#D7B797] focus:border-[#D7B797] ${darkMode ? 'bg-[#1A1A1A] border-[#2E2E2E] text-[#F2F2F2]' : 'bg-white border-[#C4B5A5] text-[#0A0A0A]'}`}
+                    className="w-full px-4 py-2.5 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#C4975A] focus:border-[#C4975A] bg-white border-[#E8E2DB] text-[#2C2417]"
                   >
                     {YEARS.map((year) => (
                       <option key={year} value={year}>
@@ -828,15 +784,15 @@ const BudgetManagementScreen = ({
 
                 {/* Group Brand */}
                 <div>
-                  <label className={`block text-sm font-medium mb-2 font-['Montserrat'] ${darkMode ? 'text-[#F2F2F2]' : 'text-[#0A0A0A]'}`}>
-                    {t('budget.groupBrand')} <span className="text-[#F85149]">{t('common.required')}</span>
+                  <label className="block text-sm font-medium mb-2 font-['Montserrat'] text-[#2C2417]">
+                    {t('budget.groupBrand')} <span className="text-[#DC3545]">{t('common.required')}</span>
                   </label>
                   <select
                     value={newBudgetForm.groupBrand}
                     onChange={(e) =>
                       setNewBudgetForm({ ...newBudgetForm, groupBrand: e.target.value })
                     }
-                    className={`w-full px-4 py-2.5 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#D7B797] focus:border-[#D7B797] ${darkMode ? 'bg-[#1A1A1A] border-[#2E2E2E] text-[#F2F2F2]' : 'bg-white border-[#C4B5A5] text-[#0A0A0A]'}`}
+                    className="w-full px-4 py-2.5 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#C4975A] focus:border-[#C4975A] bg-white border-[#E8E2DB] text-[#2C2417]"
                   >
                     {groupBrandCategories.map((group) => (
                       <option key={group.id} value={group.id}>
@@ -848,15 +804,15 @@ const BudgetManagementScreen = ({
 
                 {/* Brand */}
                 <div>
-                  <label className={`block text-sm font-medium mb-2 font-['Montserrat'] ${darkMode ? 'text-[#F2F2F2]' : 'text-[#0A0A0A]'}`}>
-                    {t('budget.brand')} <span className="text-[#F85149]">{t('common.required')}</span>
+                  <label className="block text-sm font-medium mb-2 font-['Montserrat'] text-[#2C2417]">
+                    {t('budget.brand')} <span className="text-[#DC3545]">{t('common.required')}</span>
                   </label>
                   <select
                     value={newBudgetForm.brandId}
                     onChange={(e) =>
                       setNewBudgetForm({ ...newBudgetForm, brandId: e.target.value })
                     }
-                    className={`w-full px-4 py-2.5 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#D7B797] focus:border-[#D7B797] ${darkMode ? 'bg-[#1A1A1A] border-[#2E2E2E] text-[#F2F2F2]' : 'bg-white border-[#C4B5A5] text-[#0A0A0A]'}`}
+                    className="w-full px-4 py-2.5 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#C4975A] focus:border-[#C4975A] bg-white border-[#E8E2DB] text-[#2C2417]"
                   >
                     <option value="">{t('budget.selectBrand')}</option>
                     {apiBrands.map((brand) => (
@@ -871,26 +827,26 @@ const BudgetManagementScreen = ({
               {/* Season Group & Season Type */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className={`block text-sm font-medium mb-2 font-['Montserrat'] ${darkMode ? 'text-[#F2F2F2]' : 'text-[#0A0A0A]'}`}>
-                    {t('otbAnalysis.seasonGroup')} <span className="text-[#F85149]">{t('common.required')}</span>
+                  <label className="block text-sm font-medium mb-2 font-['Montserrat'] text-[#2C2417]">
+                    {t('otbAnalysis.seasonGroup')} <span className="text-[#DC3545]">{t('common.required')}</span>
                   </label>
                   <select
                     value={newBudgetForm.seasonGroup}
                     onChange={(e) => setNewBudgetForm({ ...newBudgetForm, seasonGroup: e.target.value })}
-                    className={`w-full px-4 py-2.5 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#D7B797] focus:border-[#D7B797] ${darkMode ? 'bg-[#1A1A1A] border-[#2E2E2E] text-[#F2F2F2]' : 'bg-white border-[#C4B5A5] text-[#0A0A0A]'}`}
+                    className="w-full px-4 py-2.5 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#C4975A] focus:border-[#C4975A] bg-white border-[#E8E2DB] text-[#2C2417]"
                   >
                     <option value="SS">Spring Summer</option>
                     <option value="FW">Fall Winter</option>
                   </select>
                 </div>
                 <div>
-                  <label className={`block text-sm font-medium mb-2 font-['Montserrat'] ${darkMode ? 'text-[#F2F2F2]' : 'text-[#0A0A0A]'}`}>
-                    {t('otbAnalysis.season')} <span className="text-[#F85149]">{t('common.required')}</span>
+                  <label className="block text-sm font-medium mb-2 font-['Montserrat'] text-[#2C2417]">
+                    {t('otbAnalysis.season')} <span className="text-[#DC3545]">{t('common.required')}</span>
                   </label>
                   <select
                     value={newBudgetForm.seasonType}
                     onChange={(e) => setNewBudgetForm({ ...newBudgetForm, seasonType: e.target.value })}
-                    className={`w-full px-4 py-2.5 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#D7B797] focus:border-[#D7B797] ${darkMode ? 'bg-[#1A1A1A] border-[#2E2E2E] text-[#F2F2F2]' : 'bg-white border-[#C4B5A5] text-[#0A0A0A]'}`}
+                    className="w-full px-4 py-2.5 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#C4975A] focus:border-[#C4975A] bg-white border-[#E8E2DB] text-[#2C2417]"
                   >
                     <option value="pre">Pre</option>
                     <option value="main">Main / Show</option>
@@ -900,22 +856,22 @@ const BudgetManagementScreen = ({
 
               {/* Budget Name */}
               <div>
-                <label className={`block text-sm font-medium mb-2 font-['Montserrat'] ${darkMode ? 'text-[#F2F2F2]' : 'text-[#0A0A0A]'}`}>
-                  {t('budget.budgetName')} <span className="text-[#F85149]">{t('common.required')}</span>
+                <label className="block text-sm font-medium mb-2 font-['Montserrat'] text-[#2C2417]">
+                  {t('budget.budgetName')} <span className="text-[#DC3545]">{t('common.required')}</span>
                 </label>
                 <input
                   type="text"
                   value={newBudgetForm.name}
                   onChange={(e) => setNewBudgetForm({ ...newBudgetForm, name: e.target.value })}
                   placeholder={t('budget.enterBudgetName')}
-                  className={`w-full px-4 py-2.5 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#D7B797] focus:border-[#D7B797] ${darkMode ? 'bg-[#1A1A1A] border-[#2E2E2E] text-[#F2F2F2] placeholder-[#666666]' : 'bg-white border-[#C4B5A5] text-[#0A0A0A] placeholder-[#999999]'}`}
+                  className="w-full px-4 py-2.5 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#C4975A] focus:border-[#C4975A] bg-white border-[#E8E2DB] text-[#2C2417] placeholder-[#6B5D4F]"
                 />
               </div>
 
               {/* Total Budget */}
               <div>
-                <label className={`block text-sm font-medium mb-2 font-['Montserrat'] ${darkMode ? 'text-[#F2F2F2]' : 'text-[#0A0A0A]'}`}>
-                  {t('budget.amountVND')} <span className="text-[#F85149]">{t('common.required')}</span>
+                <label className="block text-sm font-medium mb-2 font-['Montserrat'] text-[#2C2417]">
+                  {t('budget.amountVND')} <span className="text-[#DC3545]">{t('common.required')}</span>
                 </label>
                 <input
                   type="text"
@@ -925,10 +881,10 @@ const BudgetManagementScreen = ({
                     setNewBudgetForm({ ...newBudgetForm, totalBudget: value });
                   }}
                   placeholder={t('budget.enterTotalBudgetAmount')}
-                  className={`w-full px-4 py-2.5 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#D7B797] focus:border-[#D7B797] ${darkMode ? 'bg-[#1A1A1A] border-[#2E2E2E] text-[#F2F2F2] placeholder-[#666666]' : 'bg-white border-[#C4B5A5] text-[#0A0A0A] placeholder-[#999999]'}`}
+                  className="w-full px-4 py-2.5 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#C4975A] focus:border-[#C4975A] bg-white border-[#E8E2DB] text-[#2C2417] placeholder-[#6B5D4F]"
                 />
                 {newBudgetForm.totalBudget && (
-                  <p className={`text-xs mt-1 font-['JetBrains_Mono'] ${darkMode ? 'text-[#666666]' : 'text-[#999999]'}`}>
+                  <p className="text-xs mt-1 font-['JetBrains_Mono'] text-[#6B5D4F]">
                     {formatCurrency(parseInt(newBudgetForm.totalBudget) || 0, { currency })}
                   </p>
                 )}
@@ -938,7 +894,7 @@ const BudgetManagementScreen = ({
 
               {/* Description */}
               <div>
-                <label className={`block text-sm font-medium mb-2 font-['Montserrat'] ${darkMode ? 'text-[#F2F2F2]' : 'text-[#0A0A0A]'}`}>
+                <label className="block text-sm font-medium mb-2 font-['Montserrat'] text-[#2C2417]">
                   {t('common.description')}
                 </label>
                 <textarea
@@ -946,17 +902,17 @@ const BudgetManagementScreen = ({
                   onChange={(e) => setNewBudgetForm({ ...newBudgetForm, description: e.target.value })}
                   placeholder={t('budget.enterDescription')}
                   rows={3}
-                  className={`w-full px-4 py-2.5 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#D7B797] focus:border-[#D7B797] resize-none ${darkMode ? 'bg-[#1A1A1A] border-[#2E2E2E] text-[#F2F2F2] placeholder-[#666666]' : 'bg-white border-[#C4B5A5] text-[#0A0A0A] placeholder-[#999999]'}`}
+                  className="w-full px-4 py-2.5 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#C4975A] focus:border-[#C4975A] resize-none bg-white border-[#E8E2DB] text-[#2C2417] placeholder-[#6B5D4F]"
                 />
               </div>
             </div>
-            <div className={`flex items-center justify-end gap-3 p-6 border-t ${darkMode ? 'border-[#2E2E2E] bg-[#0A0A0A]' : 'border-[#C4B5A5] bg-[#F2F2F2]'} rounded-b-2xl`}>
+            <div className="flex items-center justify-end gap-3 p-6 border-t border-[#E8E2DB] bg-[#FBF9F7] rounded-b-2xl">
               <button
                 onClick={() => {
                   setShowCreateModal(false);
                   setNewBudgetForm({ fiscalYear: 2026, groupBrand: 'A', brandId: apiBrands[0]?.id || '', seasonGroup: 'SS', seasonType: 'pre', name: '', totalBudget: '', description: '' });
                 }}
-                className={`px-5 py-2.5 text-sm font-medium rounded-lg transition-colors ${darkMode ? 'text-[#999999] hover:bg-[#2E2E2E]' : 'text-[#666666] hover:bg-[#E5E5E5]'}`}
+                className="px-5 py-2.5 text-sm font-medium rounded-lg transition-colors text-[#8C8178] hover:bg-[#E8E2DB]"
               >
                 {t('common.cancel')}
               </button>
@@ -1002,8 +958,8 @@ const BudgetManagementScreen = ({
                 disabled={!newBudgetForm.totalBudget || !newBudgetForm.name || creating}
                 className={`px-5 py-2.5 text-sm font-medium text-white rounded-lg transition-colors flex items-center gap-2 ${
                   !newBudgetForm.totalBudget || !newBudgetForm.name || creating
-                    ? 'bg-[#2E2E2E] cursor-not-allowed text-[#666666]'
-                    : 'bg-[#127749] hover:bg-[#2A9E6A]'
+                    ? 'bg-[#E8E2DB] cursor-not-allowed text-[#8C8178]'
+                    : 'bg-[#1B6B45] hover:bg-[#1B6B45]/90'
                 }`}
               >
                 {creating && <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />}

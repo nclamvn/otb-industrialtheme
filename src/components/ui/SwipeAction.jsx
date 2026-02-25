@@ -11,9 +11,8 @@ export default function SwipeAction({
   onSwipeLeft,
   rightLabel = 'Approve',
   leftLabel = 'Reject',
-  rightColor = '#127749',
-  leftColor = '#F85149',
-  darkMode = true,
+  rightColor = '#1B6B45',
+  leftColor = '#DC3545',
   disabled = false,
 }) {
   const x = useMotionValue(0);

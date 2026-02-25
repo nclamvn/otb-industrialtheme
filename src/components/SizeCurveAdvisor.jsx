@@ -58,8 +58,8 @@ const SizeCurveAdvisor = ({
   if (loading) {
     return (
       <div className="flex items-center gap-2 text-sm mt-3">
-        <Sparkles className={`w-4 h-4 animate-pulse ${darkMode ? 'text-purple-400' : 'text-purple-500'}`} />
-        <span className={darkMode ? 'text-[#999999]' : 'text-gray-500'}>{t('ai.analyzingSizePatterns')}</span>
+        <Sparkles className="w-4 h-4 animate-pulse text-purple-500" />
+        <span className="text-[#6B5D4F]">{t('ai.analyzingSizePatterns')}</span>
       </div>
     );
   }
@@ -67,19 +67,15 @@ const SizeCurveAdvisor = ({
   if (!recommendation || totalQty === 0) return null;
 
   return (
-    <div className={`mt-4 p-4 rounded-xl border ${
-      darkMode ? 'border-purple-800/40' : 'border-purple-200'
-    }`} style={{
-      background: darkMode
-        ? 'linear-gradient(135deg, #121212 0%, rgba(147,51,234,0.06) 40%, rgba(99,102,241,0.16) 100%)'
-        : 'linear-gradient(135deg, #ffffff 0%, rgba(147,51,234,0.06) 35%, rgba(99,102,241,0.18) 100%)',
-      boxShadow: `inset 0 -1px 0 ${darkMode ? 'rgba(99,102,241,0.12)' : 'rgba(99,102,241,0.08)'}`,
+    <div className="mt-4 p-4 rounded-xl border border-purple-200" style={{
+      background: 'linear-gradient(135deg, #FFFFFF 0%, rgba(147,51,234,0.06) 35%, rgba(99,102,241,0.18) 100%)',
+      boxShadow: 'inset 0 -1px 0 rgba(99,102,241,0.08), 0 1px 3px rgba(44,36,23,0.06)',
     }}>
       {/* Header */}
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
-          <Sparkles className={`w-5 h-5 ${darkMode ? 'text-purple-400' : 'text-purple-600'}`} />
-          <span className={`font-semibold font-['Montserrat'] ${darkMode ? 'text-purple-200' : 'text-purple-900'}`}>
+          <Sparkles className="w-5 h-5 text-purple-600" />
+          <span className="font-semibold font-['Montserrat'] text-purple-900">
             {t('ai.sizeAdvisor')}
           </span>
         </div>
@@ -87,10 +83,10 @@ const SizeCurveAdvisor = ({
         {comparison && (
           <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-medium ${
             comparison.alignment === 'good'
-              ? darkMode ? 'bg-[rgba(42,158,106,0.15)] text-[#2A9E6A]' : 'bg-emerald-100 text-emerald-700'
+              ? 'bg-emerald-100 text-[#1B6B45]'
               : comparison.alignment === 'warning'
-              ? darkMode ? 'bg-[rgba(215,183,151,0.15)] text-[#D7B797]' : 'bg-amber-100 text-amber-700'
-              : darkMode ? 'bg-[rgba(248,81,73,0.15)] text-[#FF7B72]' : 'bg-red-100 text-red-700'
+              ? 'bg-amber-100 text-[#D97706]'
+              : 'bg-red-100 text-[#DC3545]'
           }`}>
             {comparison.alignment === 'good' && <CheckCircle className="w-4 h-4" />}
             {comparison.alignment !== 'good' && <AlertTriangle className="w-4 h-4" />}
@@ -101,7 +97,7 @@ const SizeCurveAdvisor = ({
 
       {/* Suggestion */}
       {comparison && (
-        <p className={`text-sm mb-3 ${darkMode ? 'text-[#999999]' : 'text-gray-600'}`}>
+        <p className="text-sm mb-3 text-[#6B5D4F]">
           {comparison.suggestion}
         </p>
       )}
@@ -115,14 +111,14 @@ const SizeCurveAdvisor = ({
 
           return (
             <div key={rec.sizeCode} className="text-center">
-              <div className={`text-xs font-medium mb-1 ${darkMode ? 'text-[#999999]' : 'text-gray-500'}`}>
+              <div className="text-xs font-medium mb-1 text-[#6B5D4F]">
                 {rec.sizeCode}
               </div>
 
               {/* Bars */}
               <div className="h-16 flex items-end justify-center gap-1 mb-1">
                 <div
-                  className={`w-3 rounded-t ${darkMode ? 'bg-[#666666]' : 'bg-gray-400'}`}
+                  className="w-3 rounded-t bg-[#8C8178]"
                   style={{ height: `${Math.max(Math.min(userPct, 100) * 0.6, 2)}px` }}
                   title={`Your: ${userPct.toFixed(0)}%`}
                 />
@@ -135,12 +131,12 @@ const SizeCurveAdvisor = ({
 
               {/* Values */}
               <div className="text-xs">
-                <span className={darkMode ? 'text-[#999999]' : 'text-gray-600'}>{userQty}</span>
-                <span className={`mx-1 ${darkMode ? 'text-[#444444]' : 'text-gray-400'}`}>→</span>
+                <span className="text-[#6B5D4F]">{userQty}</span>
+                <span className="mx-1 text-[#E8E2DB]">&rarr;</span>
                 <span className={`font-medium ${
                   deviation > 10
-                    ? darkMode ? 'text-[#D7B797]' : 'text-amber-600'
-                    : darkMode ? 'text-purple-400' : 'text-purple-600'
+                    ? 'text-[#D97706]'
+                    : 'text-purple-600'
                 }`}>
                   {rec.recommendedQty}
                 </span>
@@ -151,9 +147,9 @@ const SizeCurveAdvisor = ({
       </div>
 
       {/* Legend */}
-      <div className={`flex items-center justify-center gap-4 text-xs mb-3 ${darkMode ? 'text-[#666666]' : 'text-gray-500'}`}>
+      <div className="flex items-center justify-center gap-4 text-xs mb-3 text-[#6B5D4F]">
         <span className="flex items-center gap-1">
-          <div className={`w-2 h-2 rounded ${darkMode ? 'bg-[#666666]' : 'bg-gray-400'}`} /> {t('ai.yourInput')}
+          <div className="w-2 h-2 rounded bg-[#8C8178]" /> {t('ai.yourInput')}
         </span>
         <span className="flex items-center gap-1">
           <div className="w-2 h-2 bg-purple-500 rounded" /> {t('ai.aiRecommended')}
@@ -164,9 +160,7 @@ const SizeCurveAdvisor = ({
       <div className="flex items-center justify-between">
         <button
           onClick={() => setShowDetails(!showDetails)}
-          className={`text-xs flex items-center gap-1 hover:underline ${
-            darkMode ? 'text-purple-400' : 'text-purple-600'
-          }`}
+          className="text-xs flex items-center gap-1 hover:underline text-purple-600"
         >
           <Info className="w-3 h-3" />
           {showDetails ? t('ai.hideReasoning') : t('ai.showReasoning')}
@@ -183,22 +177,22 @@ const SizeCurveAdvisor = ({
 
       {/* Detailed Reasoning */}
       {showDetails && (
-        <div className={`mt-3 pt-3 border-t ${darkMode ? 'border-purple-800/40' : 'border-purple-200'}`}>
+        <div className="mt-3 pt-3 border-t border-purple-200">
           <div className="space-y-2">
             {recommendation.map(rec => (
               <div key={rec.sizeCode} className="flex items-start gap-2 text-xs">
-                <span className={`font-medium w-12 ${darkMode ? 'text-[#F2F2F2]' : 'text-gray-700'}`}>
+                <span className="font-medium w-12 text-[#2C2417]">
                   {rec.sizeCode}:
                 </span>
-                <span className={`flex-1 ${darkMode ? 'text-[#999999]' : 'text-gray-500'}`}>
+                <span className="flex-1 text-[#6B5D4F]">
                   {rec.reasoning}
                 </span>
                 <span className={`px-1.5 py-0.5 rounded text-xs shrink-0 ${
                   rec.confidence >= 0.8
-                    ? darkMode ? 'bg-[rgba(42,158,106,0.15)] text-[#2A9E6A]' : 'bg-emerald-100 text-emerald-700'
+                    ? 'bg-emerald-100 text-[#1B6B45]'
                     : rec.confidence >= 0.5
-                    ? darkMode ? 'bg-[rgba(215,183,151,0.15)] text-[#D7B797]' : 'bg-amber-100 text-amber-700'
-                    : darkMode ? 'bg-[#1A1A1A] text-[#999999]' : 'bg-gray-100 text-gray-600'
+                    ? 'bg-amber-100 text-[#D97706]'
+                    : 'bg-[#FBF9F7] text-[#6B5D4F]'
                 }`}>
                   {t('ai.conf', { pct: (rec.confidence * 100).toFixed(0) })}
                 </span>

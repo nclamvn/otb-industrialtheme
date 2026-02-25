@@ -8,7 +8,7 @@ import { useLanguage } from '../contexts/LanguageContext';
 import { useIsMobile } from '@/hooks/useIsMobile';
 import { useDataImport } from '../hooks/useDataImport';
 
-const ImportDataScreen = ({ darkMode }) => {
+const ImportDataScreen = () => {
   const { t } = useLanguage();
   const { isMobile } = useIsMobile();
   const {
@@ -57,17 +57,13 @@ const ImportDataScreen = ({ darkMode }) => {
   };
 
   // ─── Styles ───────────────────────────────────────────────────────
-  const cardBg = darkMode
-    ? 'bg-[#111111] border-[#1E1E1E]'
-    : 'bg-white border-gray-300';
-  const textPrimary = darkMode ? 'text-[#F2F2F2]' : 'text-gray-900';
-  const textSecondary = darkMode ? 'text-[#888888]' : 'text-gray-600';
-  const textMuted = darkMode ? 'text-[#555555]' : 'text-gray-600';
-  const inputBg = darkMode
-    ? 'bg-[#0A0A0A] border-[#2E2E2E] text-[#F2F2F2] placeholder-[#555555]'
-    : 'bg-white border-gray-300 text-gray-900 placeholder-gray-400';
-  const tableBorder = darkMode ? 'border-[#1E1E1E]' : 'border-gray-300';
-  const hoverBg = darkMode ? 'hover:bg-[#1A1A1A]' : 'hover:bg-gray-50';
+  const cardBg = 'bg-white border-[#E8E2DB]';
+  const textPrimary = 'text-[#2C2417]';
+  const textSecondary = 'text-[#6B5D4F]';
+  const textMuted = 'text-[#8C8178]';
+  const inputBg = 'bg-white border-[#E8E2DB] text-[#2C2417] placeholder-[#8C8178]';
+  const tableBorder = 'border-[#E8E2DB]';
+  const hoverBg = 'hover:bg-[#FBF9F7]';
 
   // ─── Upload Tab ───────────────────────────────────────────────────
   const renderUploadTab = () => (
@@ -86,7 +82,7 @@ const ImportDataScreen = ({ darkMode }) => {
             <select
               value={target}
               onChange={(e) => setTarget(e.target.value)}
-              className={`w-full text-xs rounded-lg border px-2.5 py-2 ${inputBg} focus:outline-none focus:ring-1 focus:ring-[#D7B797]`}
+              className={`w-full text-xs rounded-lg border px-2.5 py-2 ${inputBg} focus:outline-none focus:ring-1 focus:ring-[#C4975A]`}
             >
               {IMPORT_TARGETS.map(opt => (
                 <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -102,7 +98,7 @@ const ImportDataScreen = ({ darkMode }) => {
             <select
               value={importMode}
               onChange={(e) => setImportMode(e.target.value)}
-              className={`w-full text-xs rounded-lg border px-2.5 py-2 ${inputBg} focus:outline-none focus:ring-1 focus:ring-[#D7B797]`}
+              className={`w-full text-xs rounded-lg border px-2.5 py-2 ${inputBg} focus:outline-none focus:ring-1 focus:ring-[#C4975A]`}
             >
               <option value="upsert">Upsert (Insert or Update)</option>
               <option value="insert">Insert Only</option>
@@ -118,7 +114,7 @@ const ImportDataScreen = ({ darkMode }) => {
             <select
               value={duplicateHandling}
               onChange={(e) => setDuplicateHandling(e.target.value)}
-              className={`w-full text-xs rounded-lg border px-2.5 py-2 ${inputBg} focus:outline-none focus:ring-1 focus:ring-[#D7B797]`}
+              className={`w-full text-xs rounded-lg border px-2.5 py-2 ${inputBg} focus:outline-none focus:ring-1 focus:ring-[#C4975A]`}
             >
               {DUPLICATE_MODES.map(opt => (
                 <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -136,7 +132,7 @@ const ImportDataScreen = ({ darkMode }) => {
               value={matchKeys.join(', ')}
               onChange={(e) => setMatchKeys(e.target.value.split(',').map(s => s.trim()).filter(Boolean))}
               placeholder="e.g. sku, code"
-              className={`w-full text-xs rounded-lg border px-2.5 py-2 ${inputBg} focus:outline-none focus:ring-1 focus:ring-[#D7B797]`}
+              className={`w-full text-xs rounded-lg border px-2.5 py-2 ${inputBg} focus:outline-none focus:ring-1 focus:ring-[#C4975A]`}
             />
           </div>
         </div>
@@ -147,11 +143,7 @@ const ImportDataScreen = ({ darkMode }) => {
         onDrop={handleDrop}
         onDragOver={(e) => e.preventDefault()}
         onClick={() => fileInputRef.current?.click()}
-        className={`rounded-xl border-2 border-dashed p-4 md:p-8 flex flex-col items-center justify-center cursor-pointer transition-all duration-200 ${
-          darkMode
-            ? 'border-[#2E2E2E] hover:border-[#D7B797] hover:bg-[rgba(215,183,151,0.04)]'
-            : 'border-gray-300 hover:border-[#8A6340] hover:bg-[rgba(215,183,151,0.04)]'
-        }`}
+        className="rounded-xl border-2 border-dashed p-4 md:p-8 flex flex-col items-center justify-center cursor-pointer transition-all duration-200 border-[#E8E2DB] hover:border-[#C4975A] hover:bg-[rgba(196,151,90,0.04)]"
       >
         <input
           ref={fileInputRef}
@@ -174,7 +166,7 @@ const ImportDataScreen = ({ darkMode }) => {
         <div className={`rounded-xl border p-4 ${cardBg}`}>
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
-              <FileSpreadsheet size={16} className={darkMode ? 'text-[#D7B797]' : 'text-[#6B4D30]'} />
+              <FileSpreadsheet size={16} className="text-[#A67B3D]" />
               <span className={`text-sm font-medium ${textPrimary}`}>{file.name}</span>
               <span className={`text-xs ${textMuted}`}>
                 ({parsedData.length} {t('import.rows', 'rows')}, {headers.length} {t('import.columns', 'columns')})
@@ -182,7 +174,7 @@ const ImportDataScreen = ({ darkMode }) => {
             </div>
             <button
               onClick={resetUpload}
-              className={`p-1.5 rounded-lg transition-colors ${darkMode ? 'hover:bg-[#1A1A1A] text-[#888888]' : 'hover:bg-gray-100 text-gray-600'}`}
+              className={`p-1.5 rounded-lg transition-colors hover:bg-[#FBF9F7] text-[#6B5D4F]`}
             >
               <X size={14} />
             </button>
@@ -190,10 +182,10 @@ const ImportDataScreen = ({ darkMode }) => {
 
           {/* Preview Table */}
           {previewRows.length > 0 && (
-            <div className="overflow-x-auto rounded-lg border ${tableBorder}">
+            <div className={`overflow-x-auto rounded-lg border ${tableBorder}`}>
               <table className="w-full text-xs">
                 <thead>
-                  <tr className={darkMode ? 'bg-[#0A0A0A]' : 'bg-gray-50'}>
+                  <tr className="bg-[#FBF9F7]">
                     <th className={`px-3 py-2 text-left font-semibold ${textSecondary} border-b ${tableBorder}`}>#</th>
                     {headers.slice(0, 8).map(h => (
                       <th key={h} className={`px-3 py-2 text-left font-semibold ${textSecondary} border-b ${tableBorder}`}>
@@ -238,7 +230,7 @@ const ImportDataScreen = ({ darkMode }) => {
                 onClick={startImport}
                 disabled={parsedData.length === 0}
                 className="flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold text-white transition-all duration-200 disabled:opacity-50"
-                style={{ background: 'linear-gradient(135deg, #D7B797 0%, #C49A6C 100%)' }}
+                style={{ background: 'linear-gradient(135deg, #C4975A 0%, #A67B3D 100%)' }}
               >
                 <Play size={14} />
                 {t('import.startImport', 'Start Import')} ({parsedData.length} {t('import.rows', 'rows')})
@@ -246,7 +238,7 @@ const ImportDataScreen = ({ darkMode }) => {
             ) : (
               <button
                 onClick={abortImport}
-                className="flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold text-white bg-red-600 hover:bg-red-700 transition-colors"
+                className="flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold text-white bg-[#DC3545] hover:bg-red-700 transition-colors"
               >
                 <Pause size={14} />
                 {t('import.abort', 'Abort')}
@@ -262,12 +254,12 @@ const ImportDataScreen = ({ darkMode }) => {
                   </span>
                   <span className={textPrimary}>{progress.percent}%</span>
                 </div>
-                <div className={`h-2 rounded-full overflow-hidden ${darkMode ? 'bg-[#1A1A1A]' : 'bg-gray-200'}`}>
+                <div className="h-2 rounded-full overflow-hidden bg-[#F0EBE5]">
                   <div
                     className="h-full rounded-full transition-all duration-300"
                     style={{
                       width: `${progress.percent}%`,
-                      background: 'linear-gradient(90deg, #D7B797 0%, #C49A6C 100%)',
+                      background: 'linear-gradient(90deg, #C4975A 0%, #A67B3D 100%)',
                     }}
                   />
                 </div>
@@ -281,7 +273,7 @@ const ImportDataScreen = ({ darkMode }) => {
       {result && (
         <div className={`rounded-xl border p-4 ${cardBg}`}>
           <div className="flex items-center gap-2 mb-3">
-            <CheckCircle size={16} className="text-green-500" />
+            <CheckCircle size={16} className="text-[#1B6B45]" />
             <span className={`text-sm font-semibold ${textPrimary}`}>
               {t('import.importComplete', 'Import Complete')}
             </span>
@@ -289,12 +281,12 @@ const ImportDataScreen = ({ darkMode }) => {
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3">
             {[
               { label: t('import.totalRows', 'Total Rows'), value: result.totalRows, color: textPrimary },
-              { label: t('import.inserted', 'Inserted'), value: result.inserted, color: 'text-green-500' },
-              { label: t('import.updated', 'Updated'), value: result.updated, color: 'text-blue-500' },
-              { label: t('import.skipped', 'Skipped'), value: result.skipped, color: 'text-yellow-500' },
-              { label: t('import.errors', 'Errors'), value: result.errors, color: 'text-red-500' },
+              { label: t('import.inserted', 'Inserted'), value: result.inserted, color: 'text-[#1B6B45]' },
+              { label: t('import.updated', 'Updated'), value: result.updated, color: 'text-[#2563EB]' },
+              { label: t('import.skipped', 'Skipped'), value: result.skipped, color: 'text-[#D97706]' },
+              { label: t('import.errors', 'Errors'), value: result.errors, color: 'text-[#DC3545]' },
             ].map(item => (
-              <div key={item.label} className={`rounded-lg p-3 ${darkMode ? 'bg-[#0A0A0A]' : 'bg-gray-50'}`}>
+              <div key={item.label} className="rounded-lg p-3 bg-[#FBF9F7]">
                 <div className={`text-xs ${textSecondary}`}>{item.label}</div>
                 <div className={`text-lg font-bold font-['Montserrat'] ${item.color}`}>{item.value}</div>
               </div>
@@ -305,7 +297,7 @@ const ImportDataScreen = ({ darkMode }) => {
               <p className={`text-xs font-medium ${textSecondary} mb-1`}>
                 {t('import.errorDetails', 'Error Details')}:
               </p>
-              <div className={`max-h-32 overflow-y-auto text-xs space-y-1 ${darkMode ? 'text-red-400' : 'text-red-600'}`}>
+              <div className="max-h-32 overflow-y-auto text-xs space-y-1 text-[#DC3545]">
                 {result.errorDetails.slice(0, 10).map((err, i) => (
                   <div key={i}>Row {err.row}: {err.error}</div>
                 ))}
@@ -320,12 +312,12 @@ const ImportDataScreen = ({ darkMode }) => {
 
       {/* Error Alert */}
       {error && (
-        <div className={`rounded-xl border p-4 flex items-start gap-3 ${darkMode ? 'bg-[#1A0A0A] border-red-900' : 'bg-red-50 border-red-200'}`}>
-          <AlertCircle size={16} className="text-red-500 mt-0.5 flex-shrink-0" />
+        <div className="rounded-xl border p-4 flex items-start gap-3 bg-red-50 border-red-200">
+          <AlertCircle size={16} className="text-[#DC3545] mt-0.5 flex-shrink-0" />
           <div className="flex-1">
-            <p className={`text-sm ${darkMode ? 'text-red-400' : 'text-red-700'}`}>{error}</p>
+            <p className="text-sm text-red-700">{error}</p>
           </div>
-          <button onClick={() => setError(null)} className="text-red-500 hover:text-red-700">
+          <button onClick={() => setError(null)} className="text-[#DC3545] hover:text-red-700">
             <X size={14} />
           </button>
         </div>
@@ -348,7 +340,7 @@ const ImportDataScreen = ({ darkMode }) => {
             <select
               value={viewTarget}
               onChange={(e) => { setViewTarget(e.target.value); setCurrentPage(1); }}
-              className={`text-xs rounded-lg border px-2.5 py-2 ${inputBg} focus:outline-none focus:ring-1 focus:ring-[#D7B797]`}
+              className={`text-xs rounded-lg border px-2.5 py-2 ${inputBg} focus:outline-none focus:ring-1 focus:ring-[#C4975A]`}
             >
               {IMPORT_TARGETS.map(opt => (
                 <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -362,20 +354,20 @@ const ImportDataScreen = ({ darkMode }) => {
                 value={searchTerm}
                 onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
                 placeholder={t('import.searchRecords', 'Search records...')}
-                className={`w-full text-xs rounded-lg border pl-8 pr-3 py-2 ${inputBg} focus:outline-none focus:ring-1 focus:ring-[#D7B797]`}
+                className={`w-full text-xs rounded-lg border pl-8 pr-3 py-2 ${inputBg} focus:outline-none focus:ring-1 focus:ring-[#C4975A]`}
               />
             </div>
 
             <button
               onClick={() => fetchData({ target: viewTarget, page: currentPage, search: searchTerm })}
-              className={`p-2 rounded-lg border transition-colors ${darkMode ? 'border-[#2E2E2E] hover:bg-[#1A1A1A]' : 'border-gray-300 hover:bg-gray-50'}`}
+              className="p-2 rounded-lg border transition-colors border-[#E8E2DB] hover:bg-[#FBF9F7]"
             >
               <RefreshCw size={14} className={textSecondary} />
             </button>
 
             <button
               onClick={() => setConfirmClear(viewTarget)}
-              className="p-2 rounded-lg border border-red-300 text-red-500 hover:bg-red-50 dark:border-red-800 dark:hover:bg-red-900/20 transition-colors"
+              className="p-2 rounded-lg border border-red-300 text-[#DC3545] hover:bg-red-50 transition-colors"
               title={t('import.clearAll', 'Clear all data')}
             >
               <Trash2 size={14} />
@@ -385,17 +377,17 @@ const ImportDataScreen = ({ darkMode }) => {
 
         {/* Confirm Clear Dialog */}
         {confirmClear && (
-          <div className={`rounded-xl border p-4 flex items-center justify-between ${darkMode ? 'bg-[#1A0A0A] border-red-900' : 'bg-red-50 border-red-200'}`}>
+          <div className="rounded-xl border p-4 flex items-center justify-between bg-red-50 border-red-200">
             <div className="flex items-center gap-2">
-              <AlertCircle size={16} className="text-red-500" />
-              <span className={`text-sm ${darkMode ? 'text-red-400' : 'text-red-700'}`}>
+              <AlertCircle size={16} className="text-[#DC3545]" />
+              <span className="text-sm text-red-700">
                 {t('import.confirmClear', 'Clear all records for')} <strong>{confirmClear}</strong>? {t('common.irreversible')}
               </span>
             </div>
             <div className="flex gap-2">
               <button
                 onClick={() => setConfirmClear(null)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-medium ${darkMode ? 'bg-[#1A1A1A] text-[#888888]' : 'bg-gray-200 text-gray-700'}`}
+                className="px-3 py-1.5 rounded-lg text-xs font-medium bg-[#F0EBE5] text-[#6B5D4F]"
               >
                 {t('common.cancel')}
               </button>
@@ -405,7 +397,7 @@ const ImportDataScreen = ({ darkMode }) => {
                   setConfirmClear(null);
                   fetchData({ target: viewTarget, page: 1, search: '' });
                 }}
-                className="px-3 py-1.5 rounded-lg text-xs font-medium bg-red-600 text-white hover:bg-red-700"
+                className="px-3 py-1.5 rounded-lg text-xs font-medium bg-[#DC3545] text-white hover:bg-red-700"
               >
                 {t('common.confirm')}
               </button>
@@ -430,7 +422,7 @@ const ImportDataScreen = ({ darkMode }) => {
               <div className="overflow-x-auto">
                 <table className="w-full text-xs">
                   <thead>
-                    <tr className={darkMode ? 'bg-[#0A0A0A]' : 'bg-gray-50'}>
+                    <tr className="bg-[#FBF9F7]">
                       <th className={`px-3 py-2 text-left font-semibold ${textSecondary} border-b ${tableBorder}`}>#</th>
                       {dataHeaders.slice(0, 10).map(h => (
                         <th key={h} className={`px-3 py-2 text-left font-semibold ${textSecondary} border-b ${tableBorder}`}>
@@ -471,7 +463,7 @@ const ImportDataScreen = ({ darkMode }) => {
                   <button
                     onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                     disabled={currentPage <= 1}
-                    className={`p-1.5 rounded-lg transition-colors disabled:opacity-30 ${darkMode ? 'hover:bg-[#1A1A1A]' : 'hover:bg-gray-100'}`}
+                    className="p-1.5 rounded-lg transition-colors disabled:opacity-30 hover:bg-[#FBF9F7]"
                   >
                     <ChevronLeft size={14} className={textSecondary} />
                   </button>
@@ -479,7 +471,7 @@ const ImportDataScreen = ({ darkMode }) => {
                   <button
                     onClick={() => setCurrentPage(p => Math.min(viewData.totalPages, p + 1))}
                     disabled={currentPage >= viewData.totalPages}
-                    className={`p-1.5 rounded-lg transition-colors disabled:opacity-30 ${darkMode ? 'hover:bg-[#1A1A1A]' : 'hover:bg-gray-100'}`}
+                    className="p-1.5 rounded-lg transition-colors disabled:opacity-30 hover:bg-[#FBF9F7]"
                   >
                     <ChevronRight size={14} className={textSecondary} />
                   </button>
@@ -503,7 +495,7 @@ const ImportDataScreen = ({ darkMode }) => {
               <div className="flex items-center justify-between mb-3">
                 <h4 className={`text-sm font-semibold font-['Montserrat'] ${textPrimary}`}>{targetLabel}</h4>
                 {stat.totalRecords > 0 && (
-                  <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
+                  <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-green-100 text-[#1B6B45]">
                     {stat.totalRecords} records
                   </span>
                 )}
@@ -526,13 +518,13 @@ const ImportDataScreen = ({ darkMode }) => {
                 </div>
 
                 {Object.keys(stat.fieldCounts || {}).length > 0 && (
-                  <div className="pt-2 mt-2" style={{ borderTop: `1px solid ${darkMode ? '#1E1E1E' : '#D1D5DB'}` }}>
+                  <div className="pt-2 mt-2" style={{ borderTop: '1px solid #E8E2DB' }}>
                     <p className={`text-[10px] font-medium mb-1 ${textMuted}`}>{t('import.fields', 'Fields')}:</p>
                     <div className="flex flex-wrap gap-1">
                       {Object.keys(stat.fieldCounts).slice(0, 8).map(field => (
                         <span
                           key={field}
-                          className={`text-[10px] px-1.5 py-0.5 rounded ${darkMode ? 'bg-[#1A1A1A] text-[#888888]' : 'bg-gray-100 text-gray-700'}`}
+                          className="text-[10px] px-1.5 py-0.5 rounded bg-[#FBF9F7] text-[#6B5D4F]"
                         >
                           {field}
                         </span>
@@ -549,13 +541,13 @@ const ImportDataScreen = ({ darkMode }) => {
                 <div className="flex gap-2 mt-3">
                   <button
                     onClick={() => { setViewTarget(stat.target); setActiveTab('data'); }}
-                    className={`flex-1 text-[10px] font-medium py-1.5 rounded-lg transition-colors ${darkMode ? 'bg-[#1A1A1A] text-[#D7B797] hover:bg-[#222222]' : 'bg-gray-100 text-[#6B4D30] hover:bg-gray-200'}`}
+                    className="flex-1 text-[10px] font-medium py-1.5 rounded-lg transition-colors bg-[#FBF9F7] text-[#A67B3D] hover:bg-[#F0EBE5]"
                   >
                     {t('common.view')}
                   </button>
                   <button
                     onClick={() => setConfirmClear(stat.target)}
-                    className="text-[10px] font-medium py-1.5 px-3 rounded-lg border border-red-300 text-red-500 hover:bg-red-50 dark:border-red-800 dark:hover:bg-red-900/20 transition-colors"
+                    className="text-[10px] font-medium py-1.5 px-3 rounded-lg border border-red-300 text-[#DC3545] hover:bg-red-50 transition-colors"
                   >
                     {t('common.clearAll')}
                   </button>
@@ -568,15 +560,15 @@ const ImportDataScreen = ({ darkMode }) => {
 
       {/* Global clear confirm */}
       {confirmClear && (
-        <div className={`rounded-xl border p-4 flex items-center justify-between ${darkMode ? 'bg-[#1A0A0A] border-red-900' : 'bg-red-50 border-red-200'}`}>
+        <div className="rounded-xl border p-4 flex items-center justify-between bg-red-50 border-red-200">
           <div className="flex items-center gap-2">
-            <AlertCircle size={16} className="text-red-500" />
-            <span className={`text-sm ${darkMode ? 'text-red-400' : 'text-red-700'}`}>
+            <AlertCircle size={16} className="text-[#DC3545]" />
+            <span className="text-sm text-red-700">
               {t('import.confirmClear', 'Clear all records for')} <strong>{confirmClear}</strong>? {t('common.irreversible')}
             </span>
           </div>
           <div className="flex gap-2">
-            <button onClick={() => setConfirmClear(null)} className={`px-3 py-1.5 rounded-lg text-xs font-medium ${darkMode ? 'bg-[#1A1A1A] text-[#888888]' : 'bg-gray-200 text-gray-700'}`}>
+            <button onClick={() => setConfirmClear(null)} className="px-3 py-1.5 rounded-lg text-xs font-medium bg-[#F0EBE5] text-[#6B5D4F]">
               {t('common.cancel')}
             </button>
             <button
@@ -585,7 +577,7 @@ const ImportDataScreen = ({ darkMode }) => {
                 setConfirmClear(null);
                 fetchAllStats();
               }}
-              className="px-3 py-1.5 rounded-lg text-xs font-medium bg-red-600 text-white hover:bg-red-700"
+              className="px-3 py-1.5 rounded-lg text-xs font-medium bg-[#DC3545] text-white hover:bg-red-700"
             >
               {t('common.confirm')}
             </button>
@@ -597,7 +589,7 @@ const ImportDataScreen = ({ darkMode }) => {
 
   // ─── Main Render ──────────────────────────────────────────────────
   return (
-    <div className={`min-h-screen p-4 ${darkMode ? 'bg-[#0A0A0A]' : 'bg-gray-50'}`}>
+    <div className="min-h-screen p-4 bg-[#FAF8F5]">
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div>
@@ -611,7 +603,7 @@ const ImportDataScreen = ({ darkMode }) => {
       </div>
 
       {/* Tabs */}
-      <div className={`flex gap-1 p-1 rounded-xl mb-4 ${darkMode ? 'bg-[#111111]' : 'bg-gray-100'}`}>
+      <div className="flex gap-1 p-1 rounded-xl mb-4 bg-[#F0EBE5]">
         {[
           { id: 'upload', label: t('import.upload', 'Upload'), icon: Upload },
           { id: 'data', label: t('import.viewData', 'View Data'), icon: FileSpreadsheet },
@@ -622,10 +614,8 @@ const ImportDataScreen = ({ darkMode }) => {
             onClick={() => setActiveTab(tab.id)}
             className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-medium transition-all duration-200 ${
               activeTab === tab.id
-                ? darkMode
-                  ? 'bg-[#1A1A1A] text-[#D7B797] shadow-sm'
-                  : 'bg-white text-[#6B4D30] shadow-sm'
-                : `${textSecondary} hover:${darkMode ? 'text-[#F2F2F2]' : 'text-gray-700'}`
+                ? 'bg-white text-[#A67B3D] shadow-sm'
+                : `${textSecondary} hover:text-[#2C2417]`
             }`}
           >
             <tab.icon size={14} />

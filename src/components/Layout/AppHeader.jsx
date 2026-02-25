@@ -21,8 +21,6 @@ import {
   TrendingUp,
   Bell,
   XCircle,
-  Sun,
-  Moon,
   ChevronRight,
   Sparkles,
   Home,
@@ -183,21 +181,21 @@ const PLANNING_STEPS = [
 const getAlertIcon = (severity) => {
   switch (severity) {
     case 'critical':
-      return <XCircle size={14} className="text-[#F85149]" />;
+      return <XCircle size={14} className="text-[#DC3545]" />;
     case 'warning':
-      return <Clock size={14} className="text-[#E3B341]" />;
+      return <Clock size={14} className="text-[#D97706]" />;
     case 'info':
-      return <CheckCircle size={14} className="text-[#2A9E6A]" />;
+      return <CheckCircle size={14} className="text-[#1B6B45]" />;
     default:
-      return <Bell size={14} className="text-[#D7B797]" />;
+      return <Bell size={14} className="text-[#C4975A]" />;
   }
 };
 
-const getAlertBg = (severity, darkMode) => {
+const getAlertBg = (severity) => {
   const styles = {
-    critical: darkMode ? 'bg-[rgba(248,81,73,0.08)]' : 'bg-red-50',
-    warning: darkMode ? 'bg-[rgba(227,179,65,0.08)]' : 'bg-amber-50',
-    info: darkMode ? 'bg-[rgba(42,158,106,0.08)]' : 'bg-green-50',
+    critical: 'bg-red-50',
+    warning: 'bg-amber-50',
+    info: 'bg-green-50',
   };
   return styles[severity] || '';
 };
@@ -306,16 +304,12 @@ const AppHeader = ({
 
   return (
     <div className="sticky top-0 z-40" style={{
-      background: darkMode
-        ? 'linear-gradient(180deg, #0A0A0A 0%, rgba(13,11,9,1) 100%)'
-        : 'linear-gradient(180deg, #ffffff 0%, #fdfbf9 100%)',
+      background: 'linear-gradient(180deg, #FFFFFF 0%, #FBF9F7 100%)',
     }}>
       {/* Main Header */}
       <div className={`h-11 ${isMobile ? 'px-3' : 'px-4'} flex items-center justify-between`} style={{
-        borderBottom: `1px solid ${darkMode ? '#1A1A1A' : '#E5E7EB'}`,
-        background: darkMode
-          ? 'linear-gradient(135deg, #0A0A0A 0%, rgba(215,183,151,0.02) 100%)'
-          : 'linear-gradient(135deg, #ffffff 0%, rgba(215,183,151,0.04) 100%)',
+        borderBottom: '1px solid #E8E2DB',
+        background: 'linear-gradient(135deg, #FFFFFF 0%, rgba(196,151,90,0.04) 100%)',
       }}>
         {/* Left - Page Title */}
         <div className="flex items-center gap-2.5">
@@ -324,20 +318,17 @@ const AppHeader = ({
             <div
               className="w-7 h-7 rounded-lg flex items-center justify-center transition-all duration-300"
               style={{
-                background: darkMode
-                  ? 'linear-gradient(135deg, rgba(215,183,151,0.10) 0%, rgba(215,183,151,0.20) 100%)'
-                  : 'linear-gradient(135deg, rgba(215,183,151,0.12) 0%, rgba(215,183,151,0.22) 100%)',
-                border: `1px solid ${darkMode ? 'rgba(215,183,151,0.15)' : 'rgba(215,183,151,0.25)'}`,
-                boxShadow: darkMode ? '0 0 8px rgba(215,183,151,0.08)' : 'none',
+                background: 'linear-gradient(135deg, rgba(196,151,90,0.12) 0%, rgba(196,151,90,0.22) 100%)',
+                border: '1px solid rgba(196,151,90,0.25)',
               }}
             >
-              <CurrentIcon size={14} strokeWidth={2} className="text-[#D7B797]" style={{ filter: darkMode ? 'drop-shadow(0 0 3px rgba(215,183,151,0.4))' : 'none' }} />
+              <CurrentIcon size={14} strokeWidth={2} className="text-[#C4975A]" />
             </div>
             <div
-              className="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full bg-[#2A9E6A]"
+              className="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full bg-[#1B6B45]"
               style={{
-                border: `1.5px solid ${darkMode ? '#0A0A0A' : '#ffffff'}`,
-                boxShadow: '0 0 4px rgba(42,158,106,0.5)',
+                border: '1.5px solid #FFFFFF',
+                boxShadow: '0 0 4px rgba(27,107,69,0.5)',
               }}
             />
           </div>
@@ -345,26 +336,20 @@ const AppHeader = ({
           {/* Title & Breadcrumb */}
           <div>
             <div className="flex items-center gap-1.5">
-              <h1 className={`text-sm font-semibold font-['Montserrat'] tracking-tight ${
-                darkMode ? 'text-[#F2F2F2]' : 'text-gray-900'
-              }`}>
+              <h1 className="text-sm font-semibold font-['Montserrat'] tracking-tight text-[#2C2417]">
                 {currentConfig.label || 'Dashboard'}
               </h1>
               {currentConfig.step && (
-                <span className={`px-1.5 py-px rounded text-[9px] font-medium font-['JetBrains_Mono'] uppercase tracking-wider ${
-                  darkMode
-                    ? 'bg-[rgba(215,183,151,0.12)] text-[#D7B797] border border-[rgba(215,183,151,0.15)]'
-                    : 'bg-[rgba(215,183,151,0.15)] text-[#8A6340] border border-[rgba(215,183,151,0.25)]'
-                }`}>
+                <span className="px-1.5 py-px rounded text-[9px] font-medium font-['JetBrains_Mono'] uppercase tracking-wider bg-[rgba(196,151,90,0.15)] text-[#7D5A28] border border-[rgba(196,151,90,0.25)]">
                   {t('common.step')} {currentConfig.step}
                 </span>
               )}
             </div>
             {currentConfig.step && (
               <div className="flex items-center gap-1">
-                <span className={`text-[10px] ${darkMode ? 'text-[#555555]' : 'text-gray-500'}`}>{t('header.planningBreadcrumb')}</span>
-                <ChevronRight size={10} className={darkMode ? 'text-[#333333]' : 'text-gray-300'} />
-                <span className={`text-[10px] font-medium ${darkMode ? 'text-[#888888]' : 'text-gray-600'}`}>
+                <span className="text-[10px] text-[#8C8178]">{t('header.planningBreadcrumb')}</span>
+                <ChevronRight size={10} className="text-[#E8E2DB]" />
+                <span className="text-[10px] font-medium text-[#6B5D4F]">
                   {currentConfig.shortLabel}
                 </span>
               </div>
@@ -378,35 +363,25 @@ const AppHeader = ({
           <div className="relative" ref={searchRef}>
             <button
               onClick={() => setShowSearch(!showSearch)}
-              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md border transition-all duration-200 ${
-                darkMode
-                  ? 'border-[#1A1A1A] hover:border-[rgba(215,183,151,0.2)] hover:bg-[rgba(160,120,75,0.06)]'
-                  : 'border-gray-200 hover:border-[rgba(215,183,151,0.4)] hover:bg-[rgba(160,120,75,0.06)]'
-              }`}
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-md border transition-all duration-200 border-[#E8E2DB] hover:border-[rgba(196,151,90,0.4)] hover:bg-[rgba(196,151,90,0.06)]"
             >
-              <Search size={13} className={darkMode ? 'text-[#555555]' : 'text-gray-500'} />
-              <span className={`text-[11px] hidden sm:block ${darkMode ? 'text-[#555555]' : 'text-gray-500'}`}>
+              <Search size={13} className="text-[#8C8178]" />
+              <span className="text-[11px] hidden sm:block text-[#8C8178]">
                 {t('header.searchPlaceholder')}
               </span>
-              <kbd className={`hidden sm:flex items-center gap-0.5 px-1 py-px rounded text-[9px] font-['JetBrains_Mono'] ${
-                darkMode
-                  ? 'bg-[#0A0A0A] text-[#444444] border border-[#1A1A1A]'
-                  : 'bg-gray-100 text-gray-400 border border-gray-200'
-              }`}>
+              <kbd className="hidden sm:flex items-center gap-0.5 px-1 py-px rounded text-[9px] font-['JetBrains_Mono'] bg-[#FBF9F7] text-[#8C8178] border border-[#E8E2DB]">
                 <Command size={8} />K
               </kbd>
             </button>
 
             {/* Search Modal */}
             {showSearch && (
-              <div className={`absolute right-0 top-full mt-2 w-[calc(100vw-24px)] sm:w-96 rounded-xl shadow-2xl border overflow-hidden z-[9999] ${
-                darkMode
-                  ? 'bg-[#121212] border-[#2E2E2E]'
-                  : 'bg-white border-gray-200'
-              }`}>
-                <div className={`p-3 border-b ${darkMode ? 'border-[#2E2E2E]' : 'border-gray-100'}`}>
+              <div className="absolute right-0 top-full mt-2 w-[calc(100vw-24px)] sm:w-96 rounded-xl shadow-2xl border overflow-hidden z-[9999] bg-white border-[#E8E2DB]"
+                style={{ boxShadow: '0 8px 32px rgba(44,36,23,0.06)' }}
+              >
+                <div className="p-3 border-b border-[#E8E2DB]">
                   <div className="flex items-center gap-3">
-                    <Search size={18} className={darkMode ? 'text-[#666666]' : 'text-gray-600'} />
+                    <Search size={18} className="text-[#6B5D4F]" />
                     <input
                       type="text"
                       placeholder={t('header.searchScreens')}
@@ -420,12 +395,10 @@ const AppHeader = ({
                           setSearchQuery('');
                         }
                       }}
-                      className={`flex-1 bg-transparent text-sm outline-none ${
-                        darkMode ? 'text-[#F2F2F2] placeholder:text-[#666666]' : 'text-gray-900 placeholder:text-gray-400'
-                      }`}
+                      className="flex-1 bg-transparent text-sm outline-none text-[#2C2417] placeholder:text-[#8C8178]"
                     />
                     {searchQuery && (
-                      <button onClick={() => setSearchQuery('')} className={`p-0.5 rounded ${darkMode ? 'text-[#666666] hover:text-[#999999]' : 'text-gray-400 hover:text-gray-600'}`}>
+                      <button onClick={() => setSearchQuery('')} className="p-0.5 rounded text-[#8C8178] hover:text-[#6B5D4F]">
                         <span className="text-xs">{t('common.clearAll') || 'Clear'}</span>
                       </button>
                     )}
@@ -444,31 +417,27 @@ const AppHeader = ({
                             setShowSearch(false);
                             setSearchQuery('');
                           }}
-                          className={`w-full flex items-center gap-3 px-4 py-2.5 transition-colors ${
-                            darkMode
-                              ? 'hover:bg-[rgba(215,183,151,0.08)] text-[#F2F2F2]'
-                              : 'hover:bg-gray-50 text-gray-900'
-                          }`}
+                          className="w-full flex items-center gap-3 px-4 py-2.5 transition-colors hover:bg-[#FBF9F7] text-[#2C2417]"
                         >
-                          <ResultIcon size={16} className={darkMode ? 'text-[#D7B797]' : 'text-[#8A6340]'} />
+                          <ResultIcon size={16} className="text-[#C4975A]" />
                           <div className="flex-1 text-left">
-                            <div className={`text-sm font-medium font-['Montserrat']`}>{result.label}</div>
+                            <div className="text-sm font-medium font-['Montserrat']">{result.label}</div>
                             {result.step && (
-                              <div className={`text-xs ${darkMode ? 'text-[#666666]' : 'text-gray-500'}`}>Step {result.step}</div>
+                              <div className="text-xs text-[#8C8178]">Step {result.step}</div>
                             )}
                           </div>
-                          <ChevronRight size={14} className={darkMode ? 'text-[#444444]' : 'text-gray-300'} />
+                          <ChevronRight size={14} className="text-[#E8E2DB]" />
                         </button>
                       );
                     })}
                   </div>
                 ) : searchQuery.trim() ? (
-                  <div className={`px-4 py-6 text-center text-sm ${darkMode ? 'text-[#666666]' : 'text-gray-500'}`}>
+                  <div className="px-4 py-6 text-center text-sm text-[#8C8178]">
                     {t('common.noResults') || 'No results found'}
                   </div>
                 ) : (
-                  <div className={`p-2 text-center text-xs ${darkMode ? 'text-[#666666]' : 'text-gray-600'}`}>
-                    {t('header.typeToSearch')} <kbd className={`px-1 py-0.5 rounded ${darkMode ? 'bg-[#1A1A1A] text-[#999999]' : 'bg-gray-100 text-gray-600'}`}>ESC</kbd> {t('header.toClose')}
+                  <div className="p-2 text-center text-xs text-[#6B5D4F]">
+                    {t('header.typeToSearch')} <kbd className="px-1 py-0.5 rounded bg-[#FBF9F7] text-[#6B5D4F] border border-[#E8E2DB]">ESC</kbd> {t('header.toClose')}
                   </div>
                 )}
               </div>
@@ -477,41 +446,18 @@ const AppHeader = ({
 
           {/* Divider */}
           <div className="w-px h-4 mx-1" style={{
-            background: darkMode
-              ? 'linear-gradient(180deg, transparent 0%, rgba(215,183,151,0.15) 50%, transparent 100%)'
-              : 'linear-gradient(180deg, transparent 0%, rgba(215,183,151,0.25) 50%, transparent 100%)',
+            background: 'linear-gradient(180deg, transparent 0%, rgba(196,151,90,0.25) 50%, transparent 100%)',
           }} />
 
           {/* Language Toggle */}
           <button
             onClick={() => setLanguage(language === 'en' ? 'vi' : 'en')}
-            className={`relative p-1.5 rounded-md transition-all duration-200 group ${
-              darkMode
-                ? 'hover:bg-[rgba(215,183,151,0.06)]'
-                : 'hover:bg-[rgba(160,120,75,0.08)]'
-            }`}
+            className="relative p-1.5 rounded-md transition-all duration-200 group hover:bg-[rgba(196,151,90,0.08)]"
             title={language === 'en' ? 'Chuyển sang Tiếng Việt' : 'Switch to English'}
           >
-            <span className={`text-[11px] font-bold font-['JetBrains_Mono'] ${darkMode ? 'text-[#D7B797]' : 'text-[#8A6340]'}`}>
+            <span className="text-[11px] font-bold font-['JetBrains_Mono'] text-[#7D5A28]">
               {language === 'en' ? 'EN' : 'VN'}
             </span>
-          </button>
-
-          {/* Dark Mode Toggle */}
-          <button
-            onClick={() => setDarkMode && setDarkMode(!darkMode)}
-            className={`relative p-1.5 rounded-md transition-all duration-200 group ${
-              darkMode
-                ? 'hover:bg-[rgba(215,183,151,0.06)]'
-                : 'hover:bg-[rgba(160,120,75,0.08)]'
-            }`}
-            title={darkMode ? t('header.darkModeTitle') : t('header.lightModeTitle')}
-          >
-            {darkMode ? (
-              <Moon size={15} strokeWidth={2} className="text-[#D7B797] transition-transform group-hover:-rotate-12" style={{ filter: 'drop-shadow(0 0 3px rgba(215,183,151,0.3))' }} />
-            ) : (
-              <Sun size={15} strokeWidth={2} className="text-[#8A6340] transition-transform group-hover:rotate-45" />
-            )}
           </button>
 
           {/* Notification Bell */}
@@ -520,26 +466,22 @@ const AppHeader = ({
               onClick={() => setShowNotifications(!showNotifications)}
               className={`relative p-1.5 rounded-md transition-all duration-200 ${
                 showNotifications
-                  ? darkMode
-                    ? 'bg-[rgba(215,183,151,0.10)]'
-                    : 'bg-[rgba(215,183,151,0.12)]'
-                  : darkMode
-                    ? 'hover:bg-[rgba(215,183,151,0.06)]'
-                    : 'hover:bg-[rgba(160,120,75,0.08)]'
+                  ? 'bg-[rgba(196,151,90,0.12)]'
+                  : 'hover:bg-[rgba(196,151,90,0.08)]'
               }`}
             >
               <Bell size={15} strokeWidth={2} className={
                 showNotifications
-                  ? 'text-[#D7B797]'
-                  : darkMode ? 'text-[#888888]' : 'text-gray-600'
-              } style={showNotifications ? { filter: 'drop-shadow(0 0 3px rgba(215,183,151,0.4))' } : undefined} />
+                  ? 'text-[#C4975A]'
+                  : 'text-[#6B5D4F]'
+              } style={showNotifications ? { filter: 'drop-shadow(0 0 3px rgba(196,151,90,0.4))' } : undefined} />
 
               {/* Badge */}
               {budgetAlerts.length > 0 && (
                 <span className={`absolute -top-1 -right-1 min-w-[14px] h-[14px] px-0.5 rounded-full text-white text-[8px] flex items-center justify-center font-['JetBrains_Mono'] font-bold shadow-lg ${
                   hasCritical
-                    ? 'bg-gradient-to-r from-[#F85149] to-[#FF6B6B] shadow-[rgba(248,81,73,0.3)] animate-pulse'
-                    : 'bg-gradient-to-r from-[#D7B797] to-[#C4A584] shadow-[rgba(215,183,151,0.3)]'
+                    ? 'bg-gradient-to-r from-[#DC3545] to-[#E85D6B] shadow-[rgba(220,53,69,0.3)] animate-pulse'
+                    : 'bg-gradient-to-r from-[#C4975A] to-[#A67B3D] shadow-[rgba(196,151,90,0.3)]'
                 }`}>
                   {budgetAlerts.length > 9 ? '9+' : budgetAlerts.length}
                 </span>
@@ -548,28 +490,22 @@ const AppHeader = ({
 
             {/* Notification Dropdown */}
             {showNotifications && (
-              <div className={`absolute right-0 top-full mt-2 w-80 rounded-xl shadow-2xl border overflow-hidden z-50 ${
-                darkMode
-                  ? 'bg-[#121212] border-[#2E2E2E]'
-                  : 'bg-white border-gray-200'
-              }`}>
+              <div className="absolute right-0 top-full mt-2 w-80 rounded-xl border overflow-hidden z-50 bg-white border-[#E8E2DB]"
+                style={{ boxShadow: '0 8px 32px rgba(44,36,23,0.06)' }}
+              >
                 {/* Header */}
-                <div className={`px-4 py-3 border-b flex items-center justify-between ${
-                  darkMode ? 'border-[#2E2E2E] bg-[#0A0A0A]' : 'border-gray-100 bg-gray-50'
-                }`}>
+                <div className="px-4 py-3 border-b flex items-center justify-between border-[#E8E2DB] bg-[#FBF9F7]">
                   <div className="flex items-center gap-2">
-                    <Sparkles size={14} className="text-[#D7B797]" />
-                    <h3 className={`text-sm font-semibold font-['Montserrat'] ${
-                      darkMode ? 'text-[#F2F2F2]' : 'text-gray-900'
-                    }`}>
+                    <Sparkles size={14} className="text-[#C4975A]" />
+                    <h3 className="text-sm font-semibold font-['Montserrat'] text-[#2C2417]">
                       {t('header.budgetAlerts')}
                     </h3>
                   </div>
                   {budgetAlerts.length > 0 && (
                     <span className={`text-xs font-['JetBrains_Mono'] px-2 py-0.5 rounded-full ${
                       hasCritical
-                        ? darkMode ? 'bg-[rgba(248,81,73,0.15)] text-[#FF7B72]' : 'bg-red-100 text-red-600'
-                        : darkMode ? 'bg-[rgba(215,183,151,0.15)] text-[#D7B797]' : 'bg-amber-100 text-amber-600'
+                        ? 'bg-red-100 text-[#DC3545]'
+                        : 'bg-amber-100 text-[#D97706]'
                     }`}>
                       {budgetAlerts.length} {budgetAlerts.length !== 1 ? t('header.alerts') : t('header.alert')}
                     </span>
@@ -579,43 +515,33 @@ const AppHeader = ({
                 {/* Alert List */}
                 <div className="max-h-80 overflow-y-auto">
                   {budgetAlerts.length === 0 ? (
-                    <div className={`px-4 py-8 text-center text-sm ${darkMode ? 'text-[#666666]' : 'text-gray-400'}`}>
+                    <div className="px-4 py-8 text-center text-sm text-[#8C8178]">
                       {t('header.noAlerts')}
                     </div>
                   ) : (
                     budgetAlerts.slice(0, 8).map((alert, idx) => (
                       <div
                         key={alert.id}
-                        className={`px-4 py-3 flex gap-3 cursor-pointer transition-all duration-200 border-l-2 ${
-                          darkMode
-                            ? `hover:bg-[rgba(160,120,75,0.08)] border-transparent hover:border-[#D7B797] ${getAlertBg(alert.severity, darkMode)}`
-                            : `hover:bg-[rgba(215,183,151,0.08)] border-transparent hover:border-[#D7B797] ${getAlertBg(alert.severity, darkMode)}`
-                        } ${idx !== Math.min(budgetAlerts.length, 8) - 1 ? (darkMode ? 'border-b border-b-[#1A1A1A]' : 'border-b border-b-gray-100') : ''}`}
+                        className={`px-4 py-3 flex gap-3 cursor-pointer transition-all duration-200 border-l-2 hover:bg-[rgba(196,151,90,0.08)] border-transparent hover:border-[#C4975A] ${getAlertBg(alert.severity)} ${idx !== Math.min(budgetAlerts.length, 8) - 1 ? 'border-b border-b-[#F0EBE5]' : ''}`}
                       >
                         <div className={`mt-0.5 p-1.5 rounded-lg ${
                           alert.severity === 'critical'
-                            ? 'bg-[rgba(248,81,73,0.15)]'
+                            ? 'bg-[rgba(220,53,69,0.10)]'
                             : alert.severity === 'warning'
-                              ? 'bg-[rgba(227,179,65,0.15)]'
-                              : 'bg-[rgba(42,158,106,0.15)]'
+                              ? 'bg-[rgba(217,119,6,0.10)]'
+                              : 'bg-[rgba(27,107,69,0.10)]'
                         }`}>
                           {getAlertIcon(alert.severity)}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <div className={`text-sm font-medium truncate ${
-                            darkMode ? 'text-[#F2F2F2]' : 'text-gray-900'
-                          }`}>
+                          <div className="text-sm font-medium truncate text-[#2C2417]">
                             {alert.title}
                           </div>
-                          <div className={`text-xs mt-0.5 line-clamp-2 ${
-                            darkMode ? 'text-[#999999]' : 'text-gray-700'
-                          }`}>
+                          <div className="text-xs mt-0.5 line-clamp-2 text-[#6B5D4F]">
                             {alert.message}
                           </div>
                           {alert.budget && (
-                            <div className={`text-[10px] font-['JetBrains_Mono'] mt-1.5 ${
-                              darkMode ? 'text-[#666666]' : 'text-gray-600'
-                            }`}>
+                            <div className="text-[10px] font-['JetBrains_Mono'] mt-1.5 text-[#8C8178]">
                               {alert.budget.groupBrand?.name} — {alert.budget.budgetCode}
                             </div>
                           )}
@@ -626,10 +552,8 @@ const AppHeader = ({
                 </div>
 
                 {/* Footer */}
-                <div className={`px-4 py-2.5 border-t ${
-                  darkMode ? 'border-[#2E2E2E] bg-[#0A0A0A]' : 'border-gray-100 bg-gray-50'
-                }`}>
-                  <button className="w-full text-center text-xs font-semibold font-['Montserrat'] text-[#D7B797] hover:text-[#B89970] transition-colors py-1">
+                <div className="px-4 py-2.5 border-t border-[#E8E2DB] bg-[#FBF9F7]">
+                  <button className="w-full text-center text-xs font-semibold font-['Montserrat'] text-[#C4975A] hover:text-[#A67B3D] transition-colors py-1">
                     {t('header.viewAllAlerts')}
                   </button>
                 </div>
@@ -641,27 +565,21 @@ const AppHeader = ({
           {isInPlanningWorkflow && currentScreen !== 'tickets' && currentScreen !== 'ticket-detail' && (
           <>
             <div className="w-px h-4 mx-1" style={{
-              background: darkMode
-                ? 'linear-gradient(180deg, transparent 0%, rgba(215,183,151,0.15) 50%, transparent 100%)'
-                : 'linear-gradient(180deg, transparent 0%, rgba(215,183,151,0.25) 50%, transparent 100%)',
+              background: 'linear-gradient(180deg, transparent 0%, rgba(196,151,90,0.25) 50%, transparent 100%)',
             }} />
             <div className="flex items-center gap-2 shrink-0">
               <button
                 onClick={() => window.print()}
-                className={`no-print px-1.5 py-1 rounded-lg transition-colors ${
-                  darkMode
-                    ? 'text-[#999] hover:bg-[rgba(215,183,151,0.08)] hover:text-[#D7B797]'
-                    : 'text-[#666] hover:bg-[rgba(160,120,75,0.12)] hover:text-[#6B4D30]'
-                }`}
+                className="no-print px-1.5 py-1 rounded-lg transition-colors text-[#8C8178] hover:bg-[rgba(196,151,90,0.12)] hover:text-[#7D5A28]"
                 title={t('common.print')}
               >
                 <Printer size={14} />
               </button>
               <div className="relative" ref={saveButtonRef}>
-                <div className="inline-flex items-stretch rounded-lg border border-[rgba(215,183,151,0.3)] overflow-hidden">
+                <div className="inline-flex items-stretch rounded-lg border border-[rgba(196,151,90,0.3)] overflow-hidden">
                   <button
                     onClick={() => console.log('Save')}
-                    className="flex items-center px-2 py-1 transition-colors bg-[#D7B797] text-[#0A0A0A] hover:bg-[#C4A684]"
+                    className="flex items-center px-2 py-1 transition-colors bg-[#C4975A] text-white hover:bg-[#A67B3D]"
                     title={t('header.save')}
                   >
                     <Save size={14} />
@@ -674,7 +592,7 @@ const AppHeader = ({
                       }
                       setOpenSaveMenu(!openSaveMenu);
                     }}
-                    className="flex items-center px-1 py-1 border-l border-[rgba(26,26,26,0.2)] transition-colors bg-[#D7B797] text-[#0A0A0A] hover:bg-[#C4A684]"
+                    className="flex items-center px-1 py-1 border-l border-[rgba(255,255,255,0.2)] transition-colors bg-[#C4975A] text-white hover:bg-[#A67B3D]"
                   >
                     <ChevronDown size={12} className={`transition-transform ${openSaveMenu ? 'rotate-180' : ''}`} />
                   </button>
@@ -689,10 +607,8 @@ const AppHeader = ({
       {/* KPI Tracking Bar - Only show for Planning workflow, hidden on mobile */}
       {!isMobile && currentScreen !== 'budget-management' && isInPlanningWorkflow && (
         <div className="px-4 py-1.5" style={{
-          borderBottom: `1px solid ${darkMode ? '#1A1A1A' : '#E5E7EB'}`,
-          background: darkMode
-            ? 'linear-gradient(90deg, #0A0A0A 0%, rgba(215,183,151,0.02) 50%, #0A0A0A 100%)'
-            : 'linear-gradient(90deg, #FAFAFA 0%, #ffffff 50%, #FAFAFA 100%)',
+          borderBottom: '1px solid #E8E2DB',
+          background: 'linear-gradient(90deg, #FAF8F5 0%, #FFFFFF 50%, #FAF8F5 100%)',
         }}>
           <div className="flex items-center gap-3">
             {/* Step Progress */}
@@ -707,10 +623,10 @@ const AppHeader = ({
                 return (
                   <React.Fragment key={step.id}>
                     {index > 0 && (
-                      <div className={`w-4 h-[1.5px] rounded-full transition-all duration-300`} style={{
+                      <div className="w-4 h-[1.5px] rounded-full transition-all duration-300" style={{
                         background: isCompleted
-                          ? 'linear-gradient(90deg, #127749, #2A9E6A)'
-                          : darkMode ? '#1A1A1A' : '#E5E7EB',
+                          ? 'linear-gradient(90deg, #1B6B45, #1B6B45)'
+                          : '#E8E2DB',
                       }} />
                     )}
                     <button
@@ -718,39 +634,39 @@ const AppHeader = ({
                       className="flex items-center gap-1.5 px-2 py-1 rounded-md transition-all duration-200"
                       style={{
                         background: isCurrent
-                          ? 'linear-gradient(135deg, rgba(215,183,151,0.08) 0%, rgba(215,183,151,0.16) 100%)'
+                          ? 'linear-gradient(135deg, rgba(196,151,90,0.08) 0%, rgba(196,151,90,0.16) 100%)'
                           : isCompleted
-                            ? 'linear-gradient(135deg, rgba(18,119,73,0.06) 0%, rgba(18,119,73,0.12) 100%)'
+                            ? 'linear-gradient(135deg, rgba(27,107,69,0.06) 0%, rgba(27,107,69,0.12) 100%)'
                             : 'transparent',
                         border: `1px solid ${
-                          isCurrent ? 'rgba(215,183,151,0.2)' : isCompleted ? 'rgba(18,119,73,0.2)' : 'transparent'
+                          isCurrent ? 'rgba(196,151,90,0.2)' : isCompleted ? 'rgba(27,107,69,0.2)' : 'transparent'
                         }`,
                       }}
                     >
                       <div className={`p-0.5 rounded ${
-                        isCurrent ? 'bg-[#D7B797]' : isCompleted ? 'bg-[#127749]' : darkMode ? 'bg-[#1A1A1A]' : 'bg-gray-200'
+                        isCurrent ? 'bg-[#C4975A]' : isCompleted ? 'bg-[#1B6B45]' : 'bg-[#E8E2DB]'
                       }`}>
                         {isCompleted ? (
                           <CheckCircle size={10} className="text-white" strokeWidth={2.5} />
                         ) : (
-                          <Icon size={10} className={isCurrent ? 'text-[#0A0A0A]' : darkMode ? 'text-[#555555]' : 'text-gray-600'} strokeWidth={2.5} />
+                          <Icon size={10} className={isCurrent ? 'text-white' : 'text-[#8C8178]'} strokeWidth={2.5} />
                         )}
                       </div>
                       <div className="text-left">
                         <div className={`text-[11px] font-semibold font-['Montserrat'] leading-tight ${
-                          isCurrent ? 'text-[#D7B797]' : isCompleted ? 'text-[#2A9E6A]' : darkMode ? 'text-[#888888]' : 'text-gray-600'
+                          isCurrent ? 'text-[#C4975A]' : isCompleted ? 'text-[#1B6B45]' : 'text-[#8C8178]'
                         }`}>
                           {config.shortLabel}
                         </div>
                         <div className="flex items-center gap-0.5">
                           {kpi.status === 'completed' ? (
-                            <CheckCircle size={7} className="text-[#2A9E6A]" />
+                            <CheckCircle size={7} className="text-[#1B6B45]" />
                           ) : kpi.status === 'in-progress' ? (
-                            <Clock size={7} className="text-[#E3B341]" />
+                            <Clock size={7} className="text-[#D97706]" />
                           ) : (
-                            <Target size={7} className={darkMode ? 'text-[#444444]' : 'text-gray-400'} />
+                            <Target size={7} className="text-[#E8E2DB]" />
                           )}
-                          <span className={`text-[8px] font-['JetBrains_Mono'] ${darkMode ? 'text-[#555555]' : 'text-gray-500'}`}>
+                          <span className="text-[8px] font-['JetBrains_Mono'] text-[#8C8178]">
                             {kpi.value} {config.kpiLabel}
                           </span>
                         </div>
@@ -767,13 +683,12 @@ const AppHeader = ({
       {/* Save Dropdown Menu - Portal to body */}
       {openSaveMenu && createPortal(
         <div
-          className={`fixed w-56 border rounded-xl shadow-2xl overflow-hidden ${
-            darkMode ? 'bg-[#1A1A1A] border-[#2E2E2E]' : 'bg-white border-[#C4B5A5]'
-          }`}
+          className="fixed w-56 border rounded-xl overflow-hidden bg-white border-[#E8E2DB]"
           style={{
             top: saveMenuPosition.top,
             right: saveMenuPosition.right,
-            zIndex: 99999
+            zIndex: 99999,
+            boxShadow: '0 8px 32px rgba(44,36,23,0.06)',
           }}
         >
           <button
@@ -781,11 +696,7 @@ const AppHeader = ({
               console.log('Save');
               setOpenSaveMenu(false);
             }}
-            className={`w-full px-4 py-3 flex items-center gap-3 text-left text-sm font-medium transition-colors ${
-              darkMode
-                ? 'hover:bg-[rgba(215,183,151,0.08)] text-[#F2F2F2]'
-                : 'hover:bg-[rgba(215,183,151,0.15)] text-[#0A0A0A]'
-            }`}
+            className="w-full px-4 py-3 flex items-center gap-3 text-left text-sm font-medium transition-colors hover:bg-[rgba(196,151,90,0.08)] text-[#2C2417]"
           >
             <Save size={14} className="shrink-0" />
             {t('header.save')}
@@ -795,11 +706,7 @@ const AppHeader = ({
               console.log('Save As New Version');
               setOpenSaveMenu(false);
             }}
-            className={`w-full px-4 py-3 flex items-center gap-3 text-left text-sm font-medium border-t transition-colors ${
-              darkMode
-                ? 'border-[#2E2E2E] hover:bg-[rgba(215,183,151,0.08)] text-[#F2F2F2]'
-                : 'border-[#C4B5A5] hover:bg-[rgba(215,183,151,0.15)] text-[#0A0A0A]'
-            }`}
+            className="w-full px-4 py-3 flex items-center gap-3 text-left text-sm font-medium border-t transition-colors border-[#E8E2DB] hover:bg-[rgba(196,151,90,0.08)] text-[#2C2417]"
           >
             <Layers size={14} className="shrink-0" />
             {t('header.saveAsNewVersion')}

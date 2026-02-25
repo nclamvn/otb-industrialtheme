@@ -18,17 +18,17 @@ import { ExpandableStatCard } from '../components/Common';
    STATUS CONFIG
 ═══════════════════════════════════════════════ */
 const ORDER_STATUS = {
-  PENDING: { color: '#D29922', bg: 'rgba(210,153,34,0.12)', label: 'Pending' },
-  CONFIRMED: { color: '#2A9E6A', bg: 'rgba(42,158,106,0.12)', label: 'Confirmed' },
-  SHIPPED: { color: '#58A6FF', bg: 'rgba(88,166,255,0.12)', label: 'Shipped' },
-  CANCELLED: { color: '#F85149', bg: 'rgba(248,81,73,0.12)', label: 'Cancelled' },
+  PENDING: { color: '#D97706', bg: 'rgba(217,119,6,0.12)', label: 'Pending' },
+  CONFIRMED: { color: '#1B6B45', bg: 'rgba(27,107,69,0.12)', label: 'Confirmed' },
+  SHIPPED: { color: '#2563EB', bg: 'rgba(37,99,235,0.12)', label: 'Shipped' },
+  CANCELLED: { color: '#DC3545', bg: 'rgba(220,53,69,0.12)', label: 'Cancelled' },
   PARTIAL: { color: '#A371F7', bg: 'rgba(163,113,247,0.12)', label: 'Partial' },
 };
 
 /* ═══════════════════════════════════════════════
    MAIN SCREEN
 ═══════════════════════════════════════════════ */
-const OrderConfirmationScreen = ({ darkMode }) => {
+const OrderConfirmationScreen = () => {
   const { user } = useAuth();
   const { t } = useLanguage();
   const { isMobile } = useIsMobile();
@@ -136,38 +136,36 @@ const OrderConfirmationScreen = ({ darkMode }) => {
       total, pending, confirmed, shipped, cancelled, totalValue, confirmedValue, pendingValue,
       confirmedPct: total > 0 ? Math.round((confirmed / total) * 100) : 0,
       statusBreakdown: [
-        { label: t('orderConfirm.statusPending'), value: pending, color: '#D29922' },
-        { label: t('orderConfirm.statusConfirmed'), value: confirmed, color: '#2A9E6A' },
-        { label: t('orderConfirm.statusShipped'), value: shipped, color: '#58A6FF' },
-        { label: t('orderConfirm.statusCancelled'), value: cancelled, color: '#F85149' },
+        { label: t('orderConfirm.statusPending'), value: pending, color: '#D97706' },
+        { label: t('orderConfirm.statusConfirmed'), value: confirmed, color: '#1B6B45' },
+        { label: t('orderConfirm.statusShipped'), value: shipped, color: '#2563EB' },
+        { label: t('orderConfirm.statusCancelled'), value: cancelled, color: '#DC3545' },
       ].filter(b => b.value > 0),
       valueBreakdown: [
-        { label: t('orderConfirm.statusPending'), value: pendingValue, displayValue: formatCurrency(pendingValue), color: '#D29922' },
-        { label: t('orderConfirm.statusConfirmed'), value: confirmedValue, displayValue: formatCurrency(confirmedValue), color: '#2A9E6A' },
+        { label: t('orderConfirm.statusPending'), value: pendingValue, displayValue: formatCurrency(pendingValue), color: '#D97706' },
+        { label: t('orderConfirm.statusConfirmed'), value: confirmedValue, displayValue: formatCurrency(confirmedValue), color: '#1B6B45' },
       ].filter(b => b.value > 0),
     };
   }, [orders, t]);
 
-  const bg = darkMode ? 'bg-[#0A0A0A]' : 'bg-gray-50';
-  const cardBg = darkMode ? 'bg-[#121212]' : 'bg-white';
-  const border = darkMode ? 'border-[#2E2E2E]' : 'border-gray-300';
-  const textPrimary = darkMode ? 'text-[#F2F2F2]' : 'text-gray-900';
-  const textSecondary = darkMode ? 'text-[#999999]' : 'text-gray-700';
-  const textMuted = darkMode ? 'text-[#666666]' : 'text-gray-600';
+  const bg = 'bg-[#FAF8F5]';
+  const cardBg = 'bg-[#FFFFFF]';
+  const border = 'border-[#E8E2DB]';
+  const textPrimary = 'text-[#2C2417]';
+  const textSecondary = 'text-[#6B5D4F]';
+  const textMuted = 'text-[#8C8178]';
 
   return (
     <div className={`min-h-screen ${bg} p-4`}>
       {/* Compact Header + Filters */}
       <div className={`border ${border} rounded-xl px-3 py-2 mb-3`} style={{
-        background: darkMode
-          ? 'linear-gradient(135deg, #121212 0%, rgba(215,183,151,0.03) 40%, rgba(215,183,151,0.10) 100%)'
-          : 'linear-gradient(135deg, #ffffff 0%, rgba(215,183,151,0.04) 35%, rgba(215,183,151,0.12) 100%)',
-        boxShadow: `inset 0 -1px 0 ${darkMode ? 'rgba(215,183,151,0.08)' : 'rgba(215,183,151,0.05)'}`,
+        background: 'linear-gradient(135deg, #FFFFFF 0%, rgba(196,151,90,0.04) 35%, rgba(196,151,90,0.12) 100%)',
+        boxShadow: 'inset 0 -1px 0 rgba(196,151,90,0.05)',
       }}>
         <div className="flex flex-wrap items-center gap-3">
           {/* Icon + Title */}
-          <div className={`w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 ${darkMode ? 'bg-[rgba(215,183,151,0.1)]' : 'bg-[rgba(215,183,151,0.15)]'}`}>
-            <ShoppingCart size={14} className={darkMode ? 'text-[#D7B797]' : 'text-[#6B4D30]'} />
+          <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 bg-[rgba(196,151,90,0.15)]">
+            <ShoppingCart size={14} className="text-[#A67B3D]" />
           </div>
           <div className="flex-shrink-0">
             <h1 className={`text-sm font-semibold font-['Montserrat'] ${textPrimary} leading-tight`}>
@@ -180,7 +178,7 @@ const OrderConfirmationScreen = ({ darkMode }) => {
 
           {/* Inline Filters */}
           <div className="flex flex-wrap items-center gap-2 ml-auto">
-            <div className={`flex items-center gap-1.5 px-2 py-1 rounded-lg border ${border} ${darkMode ? 'bg-[#1A1A1A]' : 'bg-gray-50'} w-48`}>
+            <div className={`flex items-center gap-1.5 px-2 py-1 rounded-lg border ${border} bg-[#FBF9F7] w-48`}>
               <Search size={12} className={textMuted} />
               <input
                 type="text"
@@ -200,7 +198,7 @@ const OrderConfirmationScreen = ({ darkMode }) => {
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className={`appearance-none px-2 py-1 pr-6 rounded-lg border ${border} ${darkMode ? 'bg-[#1A1A1A]' : 'bg-gray-50'} text-xs font-['Montserrat'] ${textPrimary} outline-none cursor-pointer`}
+                className={`appearance-none px-2 py-1 pr-6 rounded-lg border ${border} bg-[#FBF9F7] text-xs font-['Montserrat'] ${textPrimary} outline-none cursor-pointer`}
               >
                 <option value="all">{t('orderConfirm.allStatuses')}</option>
                 <option value="PENDING">{t('orderConfirm.statusPending')}</option>
@@ -213,7 +211,7 @@ const OrderConfirmationScreen = ({ darkMode }) => {
 
             <button
               onClick={fetchOrders}
-              className={`px-2.5 py-1 rounded-lg border ${border} text-xs font-medium font-['Montserrat'] transition-all ${darkMode ? 'text-[#D7B797] hover:bg-[rgba(215,183,151,0.08)]' : 'text-[#6B4D30] hover:bg-[rgba(215,183,151,0.1)]'}`}
+              className={`px-2.5 py-1 rounded-lg border ${border} text-xs font-medium font-['Montserrat'] transition-all text-[#A67B3D] hover:bg-[rgba(196,151,90,0.1)]`}
             >
               {t('common.refresh')}
             </button>
@@ -227,7 +225,6 @@ const OrderConfirmationScreen = ({ darkMode }) => {
           title={t('orderConfirm.totalOrders')}
           value={stats.total}
           sub={t('orderConfirm.allPurchaseOrders')}
-          darkMode={darkMode}
           icon={ShoppingCart}
           accent="gold"
           breakdown={stats.statusBreakdown}
@@ -237,7 +234,6 @@ const OrderConfirmationScreen = ({ darkMode }) => {
           title={t('orderConfirm.pendingConfirm')}
           value={stats.pending}
           sub={t('orderConfirm.awaitingConfirmation')}
-          darkMode={darkMode}
           icon={Clock}
           accent="amber"
           trendLabel={stats.total > 0 ? `${Math.round((stats.pending / stats.total) * 100)}%` : '0%'}
@@ -247,20 +243,18 @@ const OrderConfirmationScreen = ({ darkMode }) => {
           title={t('orderConfirm.confirmed')}
           value={stats.confirmed}
           sub={t('orderConfirm.ordersConfirmed')}
-          darkMode={darkMode}
           icon={CheckCircle}
           accent="emerald"
           progress={stats.confirmedPct}
           progressLabel={t('orderConfirm.statusConfirmed')}
           badges={[
-            { label: t('orderConfirm.statusShipped'), value: stats.shipped, color: '#58A6FF' },
+            { label: t('orderConfirm.statusShipped'), value: stats.shipped, color: '#2563EB' },
           ].filter(b => b.value > 0)}
         />
         <ExpandableStatCard
           title={t('orderConfirm.totalValue')}
           value={formatCurrency(stats.totalValue)}
           sub={t('orderConfirm.allOrdersValue')}
-          darkMode={darkMode}
           icon={DollarSign}
           accent="blue"
           breakdown={stats.valueBreakdown}
@@ -270,20 +264,18 @@ const OrderConfirmationScreen = ({ darkMode }) => {
 
       {/* Table */}
       <div className={`border ${border} rounded-xl overflow-hidden`} style={{
-        background: darkMode
-          ? 'linear-gradient(135deg, #121212 0%, rgba(215,183,151,0.02) 40%, rgba(215,183,151,0.06) 100%)'
-          : 'linear-gradient(135deg, #ffffff 0%, rgba(215,183,151,0.03) 35%, rgba(215,183,151,0.08) 100%)',
+        background: 'linear-gradient(135deg, #FFFFFF 0%, rgba(196,151,90,0.03) 35%, rgba(196,151,90,0.08) 100%)',
       }}>
         {loading ? (
           <div className="flex flex-col items-center justify-center py-20">
-            <Loader2 size={32} className={`animate-spin ${darkMode ? 'text-[#D7B797]' : 'text-[#6B4D30]'}`} />
+            <Loader2 size={32} className="animate-spin text-[#A67B3D]" />
             <p className={`text-sm mt-3 ${textSecondary}`}>{t('orderConfirm.loadingOrders')}</p>
           </div>
         ) : error ? (
           <div className="flex flex-col items-center justify-center py-20">
-            <AlertTriangle size={32} className="text-[#F85149]" />
+            <AlertTriangle size={32} className="text-[#DC3545]" />
             <p className={`text-sm mt-3 ${textSecondary}`}>{error}</p>
-            <button onClick={fetchOrders} className="mt-3 px-4 py-2 rounded-xl bg-[#D7B797] text-black text-sm font-medium font-['Montserrat']">
+            <button onClick={fetchOrders} className="mt-3 px-4 py-2 rounded-xl bg-[#C4975A] text-white text-sm font-medium font-['Montserrat']">
               {t('common.tryAgain')}
             </button>
           </div>
@@ -297,7 +289,7 @@ const OrderConfirmationScreen = ({ darkMode }) => {
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className={`${darkMode ? 'bg-[#1A1A1A]' : 'bg-gray-50'} border-b ${border}`}>
+                <tr className={`bg-[#FBF9F7] border-b ${border}`}>
                   {[t('orderConfirm.colPO'), t('orderConfirm.colBrand'), t('orderConfirm.colSeason'), t('orderConfirm.colSKUs'), t('orderConfirm.colValue'), t('orderConfirm.colStatus'), t('orderConfirm.colDate'), t('common.actions')].map((h) => (
                     <th key={h} className={`px-3 py-2 text-left text-[10px] font-semibold uppercase tracking-wider font-['Montserrat'] ${textMuted}`}>
                       {h}
@@ -309,7 +301,7 @@ const OrderConfirmationScreen = ({ darkMode }) => {
                 {filtered.map((order, idx) => {
                   const sc = ORDER_STATUS[order.status] || ORDER_STATUS.PENDING;
                   return (
-                    <tr key={order.id || idx} className={`border-b ${border} transition-colors ${darkMode ? 'hover:bg-[#1A1A1A]' : 'hover:bg-gray-50'}`}>
+                    <tr key={order.id || idx} className={`border-b ${border} transition-colors hover:bg-[#FBF9F7]`}>
                       <td className="px-3 py-1.5">
                         <span className={`text-sm font-semibold font-['JetBrains_Mono'] ${textPrimary}`}>{order.poNumber}</span>
                       </td>
@@ -344,14 +336,14 @@ const OrderConfirmationScreen = ({ darkMode }) => {
                           <div className="flex items-center gap-2">
                             <button
                               onClick={() => setConfirmModal({ order, action: 'confirm' })}
-                              className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold font-['Montserrat'] transition-all bg-[rgba(42,158,106,0.12)] text-[#2A9E6A] hover:bg-[rgba(42,158,106,0.2)]"
+                              className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold font-['Montserrat'] transition-all bg-[rgba(27,107,69,0.12)] text-[#1B6B45] hover:bg-[rgba(27,107,69,0.2)]"
                             >
                               <CheckCircle size={13} />
                               {t('common.confirm')}
                             </button>
                             <button
                               onClick={() => setConfirmModal({ order, action: 'cancel' })}
-                              className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold font-['Montserrat'] transition-all bg-[rgba(248,81,73,0.1)] text-[#F85149] hover:bg-[rgba(248,81,73,0.18)]"
+                              className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold font-['Montserrat'] transition-all bg-[rgba(220,53,69,0.1)] text-[#DC3545] hover:bg-[rgba(220,53,69,0.18)]"
                             >
                               <XCircle size={13} />
                               {t('common.cancel')}
@@ -383,13 +375,13 @@ const OrderConfirmationScreen = ({ darkMode }) => {
                 <h3 className={`text-lg font-bold font-['Montserrat'] ${textPrimary}`}>
                   {confirmModal.action === 'confirm' ? t('orderConfirm.confirmOrder') : t('orderConfirm.cancelOrder')}
                 </h3>
-                <button onClick={() => setConfirmModal(null)} className={`p-1.5 rounded-lg ${darkMode ? 'hover:bg-[#1A1A1A]' : 'hover:bg-gray-100'}`}>
+                <button onClick={() => setConfirmModal(null)} className="p-1.5 rounded-lg hover:bg-[#F0EBE5]">
                   <X size={18} className={textMuted} />
                 </button>
               </div>
             </div>
             <div className="p-5">
-              <div className={`rounded-xl border ${border} p-4 ${darkMode ? 'bg-[#1A1A1A]' : 'bg-gray-50'}`}>
+              <div className={`rounded-xl border ${border} p-4 bg-[#FBF9F7]`}>
                 <div className="space-y-2">
                   <div className="flex justify-between">
                     <span className={`text-xs ${textMuted}`}>{t('orderConfirm.colPO')}</span>
@@ -406,7 +398,7 @@ const OrderConfirmationScreen = ({ darkMode }) => {
                 </div>
               </div>
               {confirmModal.action === 'cancel' && (
-                <p className={`text-sm mt-4 ${darkMode ? 'text-[#FF7B72]' : 'text-red-600'}`}>
+                <p className="text-sm mt-4 text-[#DC3545]">
                   {t('orderConfirm.cancelWarning')}
                 </p>
               )}
@@ -414,7 +406,7 @@ const OrderConfirmationScreen = ({ darkMode }) => {
             <div className={`p-5 border-t ${border} flex justify-end gap-3`}>
               <button
                 onClick={() => setConfirmModal(null)}
-                className={`px-4 py-2 rounded-xl border ${border} text-sm font-medium font-['Montserrat'] ${textSecondary} transition-all ${darkMode ? 'hover:bg-[#1A1A1A]' : 'hover:bg-gray-100'}`}
+                className={`px-4 py-2 rounded-xl border ${border} text-sm font-medium font-['Montserrat'] ${textSecondary} transition-all hover:bg-[#F0EBE5]`}
               >
                 {t('common.back')}
               </button>
@@ -423,8 +415,8 @@ const OrderConfirmationScreen = ({ darkMode }) => {
                 disabled={processing}
                 className={`px-5 py-2 rounded-xl text-sm font-semibold font-['Montserrat'] transition-all disabled:opacity-50 ${
                   confirmModal.action === 'confirm'
-                    ? 'bg-[#2A9E6A] text-white hover:bg-[#238a5a]'
-                    : 'bg-[#F85149] text-white hover:bg-[#e04440]'
+                    ? 'bg-[#1B6B45] text-white hover:bg-[#155a39]'
+                    : 'bg-[#DC3545] text-white hover:bg-[#c82333]'
                 }`}
               >
                 {processing ? (

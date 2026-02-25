@@ -80,7 +80,7 @@ const EditableCell = React.memo(({ cellKey, value, isEditing, editValue, onStart
           onChange={(e) => onChangeValue(e.target.value)}
           onBlur={() => onSaveEdit(cellKey)}
           onKeyDown={(e) => onKeyDown(e, cellKey)}
-          className="w-20 px-2 py-1.5 text-center border-2 border-[#D7B797] rounded-lg focus:outline-none focus:ring-2 focus:ring-[rgba(215,183,151,0.5)] bg-[#121212] text-[#F2F2F2] font-['JetBrains_Mono'] transform scale-105 transition-transform"
+          className="w-20 px-2 py-1.5 text-center border-2 border-[#C4975A] rounded-lg focus:outline-none focus:ring-2 focus:ring-[rgba(196,151,90,0.5)] bg-[#FFFFFF] text-[#2C2417] font-['JetBrains_Mono'] transform scale-105 transition-transform"
           autoFocus
         />
       </div>
@@ -90,8 +90,8 @@ const EditableCell = React.memo(({ cellKey, value, isEditing, editValue, onStart
   if (readOnly) {
     return (
       <div className="flex items-center justify-center">
-        <div className="flex items-center gap-1.5 px-3 py-1.5 bg-[#1A1A1A] border border-[#2E2E2E] rounded-lg min-w-[70px] justify-center">
-          <span className="text-[#999999] font-['JetBrains_Mono']">{typeof value === 'number' ? value.toFixed(0) : value}%</span>
+        <div className="flex items-center gap-1.5 px-3 py-1.5 bg-[#FBF9F7] border border-[#E8E2DB] rounded-lg min-w-[70px] justify-center">
+          <span className="text-[#6B5D4F] font-['JetBrains_Mono']">{typeof value === 'number' ? value.toFixed(0) : value}%</span>
         </div>
       </div>
     );
@@ -103,9 +103,9 @@ const EditableCell = React.memo(({ cellKey, value, isEditing, editValue, onStart
       className="group flex items-center justify-center gap-1 cursor-pointer"
       title="Click to edit"
     >
-      <div className="flex items-center gap-1.5 px-3 py-1.5 bg-[rgba(215,183,151,0.08)] border border-[rgba(215,183,151,0.25)] rounded-lg hover:bg-[rgba(215,183,151,0.15)] hover:border-[rgba(215,183,151,0.4)] hover:scale-105 transition-all min-w-[70px] justify-center">
-        <span className="text-[#F2F2F2] font-['JetBrains_Mono']">{typeof value === 'number' ? value.toFixed(0) : value}%</span>
-        <Pencil size={12} className="text-[#D7B797] opacity-0 group-hover:opacity-100 transition-opacity" />
+      <div className="flex items-center gap-1.5 px-3 py-1.5 bg-[rgba(196,151,90,0.08)] border border-[rgba(196,151,90,0.25)] rounded-lg hover:bg-[rgba(196,151,90,0.15)] hover:border-[rgba(196,151,90,0.4)] hover:scale-105 transition-all min-w-[70px] justify-center">
+        <span className="text-[#2C2417] font-['JetBrains_Mono']">{typeof value === 'number' ? value.toFixed(0) : value}%</span>
+        <Pencil size={12} className="text-[#C4975A] opacity-0 group-hover:opacity-100 transition-opacity" />
       </div>
     </div>
   );
@@ -357,12 +357,12 @@ const PlanningDetailModal = ({
     { id: 'seasonal', nameKey: 'planningDetail.seasonal' }
   ];
 
-  // Common table header style - DAFC Dark Theme
-  const headerClass = "bg-[#1A1A1A] text-[#F2F2F2]";
+  // Common table header style - Light Theme
+  const headerClass = "bg-[#FBF9F7] text-[#2C2417]";
   const headerCellClass = "px-4 py-3 text-center text-xs font-semibold uppercase tracking-wide font-['Montserrat']";
-  const groupRowClass = "bg-[rgba(215,183,151,0.08)] border-l-4 border-[#D7B797]";
-  const subGroupRowClass = "bg-[#121212] border-l-4 border-[#2E2E2E]";
-  const sumRowClass = "bg-[#127749] text-white font-semibold";
+  const groupRowClass = "bg-[rgba(196,151,90,0.08)] border-l-4 border-[#C4975A]";
+  const subGroupRowClass = "bg-[#FFFFFF] border-l-4 border-[#E8E2DB]";
+  const sumRowClass = "bg-[#1B6B45] text-white font-semibold";
 
   // Render Collection Tab
   const renderCollectionTab = () => {
@@ -409,7 +409,7 @@ const PlanningDetailModal = ({
               <th className={headerCellClass}>{t('planningDetail.pctSales')}</th>
               <th className={headerCellClass}>{t('planningDetail.pctST')}</th>
               <th className={headerCellClass}>{t('planningDetail.moc')}</th>
-              <th className={`${headerCellClass} bg-[rgba(215,183,151,0.15)]`}>{t('planningDetail.pctBuyProposed')}</th>
+              <th className={`${headerCellClass} bg-[rgba(196,151,90,0.15)]`}>{t('planningDetail.pctBuyProposed')}</th>
               <th className={headerCellClass}>{t('planningDetail.otbProposed')}</th>
               <th className={headerCellClass}>{t('planningDetail.pctVarVsLastSeason')}</th>
             </tr>
@@ -421,8 +421,8 @@ const PlanningDetailModal = ({
                 <tr className={groupRowClass}>
                   <td className="px-4 py-3" colSpan={8}>
                     <div className="flex items-center gap-2">
-                      <span className="font-bold text-[#D7B797] font-['Montserrat']">{t(colData.section.nameKey)}</span>
-                      <Info size={14} className="text-[#666666]" />
+                      <span className="font-bold text-[#C4975A] font-['Montserrat']">{t(colData.section.nameKey)}</span>
+                      <Info size={14} className="text-[#8C8178]" />
                     </div>
                   </td>
                 </tr>
@@ -435,16 +435,16 @@ const PlanningDetailModal = ({
                   return (
                     <tr
                       key={cellKey}
-                      className="border-b border-[#2E2E2E] hover:bg-[rgba(215,183,151,0.08)] transition-colors"
+                      className="border-b border-[#E8E2DB] hover:bg-[rgba(196,151,90,0.08)] transition-colors"
                     >
                       <td className="px-4 py-3 pl-8">
-                        <span className="text-[#999999]">{storeRow.store.name}</span>
+                        <span className="text-[#6B5D4F]">{storeRow.store.name}</span>
                       </td>
-                      <td className="px-4 py-3 text-center text-[#999999] font-['JetBrains_Mono']">{storeRow.buyPct.toFixed(1)}%</td>
-                      <td className="px-4 py-3 text-center text-[#999999] font-['JetBrains_Mono']">{storeRow.salesPct.toFixed(0)}%</td>
-                      <td className="px-4 py-3 text-center text-[#999999] font-['JetBrains_Mono']">{storeRow.stPct.toFixed(0)}%</td>
-                      <td className="px-4 py-3 text-center text-[#999999] font-['JetBrains_Mono']">{storeRow.moc.toFixed(1)}</td>
-                      <td className={`px-4 py-3 ${isReadOnly ? 'bg-[#1A1A1A]' : 'bg-[rgba(215,183,151,0.08)]'}`}>
+                      <td className="px-4 py-3 text-center text-[#6B5D4F] font-['JetBrains_Mono']">{storeRow.buyPct.toFixed(1)}%</td>
+                      <td className="px-4 py-3 text-center text-[#6B5D4F] font-['JetBrains_Mono']">{storeRow.salesPct.toFixed(0)}%</td>
+                      <td className="px-4 py-3 text-center text-[#6B5D4F] font-['JetBrains_Mono']">{storeRow.stPct.toFixed(0)}%</td>
+                      <td className="px-4 py-3 text-center text-[#6B5D4F] font-['JetBrains_Mono']">{storeRow.moc.toFixed(1)}</td>
+                      <td className={`px-4 py-3 ${isReadOnly ? 'bg-[#FBF9F7]' : 'bg-[rgba(196,151,90,0.08)]'}`}>
                         <EditableCell
                           cellKey={cellKey}
                           value={storeRow.userBuyPct}
@@ -457,9 +457,9 @@ const PlanningDetailModal = ({
                           readOnly={isReadOnly}
                         />
                       </td>
-                      <td className="px-4 py-3 text-center font-medium text-[#F2F2F2] font-['JetBrains_Mono']">{formatCurrency(storeRow.otbValue)}</td>
+                      <td className="px-4 py-3 text-center font-medium text-[#2C2417] font-['JetBrains_Mono']">{formatCurrency(storeRow.otbValue)}</td>
                       <td className={`px-4 py-3 text-center font-medium font-['JetBrains_Mono'] ${
-                        storeRow.variance < 0 ? 'text-[#F85149]' : storeRow.variance > 0 ? 'text-[#2A9E6A]' : 'text-[#999999]'
+                        storeRow.variance < 0 ? 'text-[#DC3545]' : storeRow.variance > 0 ? 'text-[#1B6B45]' : 'text-[#6B5D4F]'
                       }`}>
                         {storeRow.variance > 0 ? '+' : ''}{storeRow.variance.toFixed(0)}%
                       </td>
@@ -518,7 +518,7 @@ const PlanningDetailModal = ({
               <th className={headerCellClass}>{t('planningDetail.pctBuy')}</th>
               <th className={headerCellClass}>{t('planningDetail.pctSales')}</th>
               <th className={headerCellClass}>{t('planningDetail.pctST')}</th>
-              <th className={`${headerCellClass} bg-[rgba(215,183,151,0.15)]`}>{t('planningDetail.pctBuyProposed')}</th>
+              <th className={`${headerCellClass} bg-[rgba(196,151,90,0.15)]`}>{t('planningDetail.pctBuyProposed')}</th>
               <th className={headerCellClass}>{t('planningDetail.otbProposed')}</th>
               <th className={headerCellClass}>{t('planningDetail.pctVarVsLastSeason')}</th>
             </tr>
@@ -530,8 +530,8 @@ const PlanningDetailModal = ({
                 <tr className={groupRowClass}>
                   <td className="px-4 py-3" colSpan={7}>
                     <div className="flex items-center gap-2">
-                      <span className="font-bold text-[#D7B797] font-['Montserrat']">{genData.gender.name}</span>
-                      <Info size={14} className="text-[#666666]" />
+                      <span className="font-bold text-[#C4975A] font-['Montserrat']">{genData.gender.name}</span>
+                      <Info size={14} className="text-[#8C8178]" />
                     </div>
                   </td>
                 </tr>
@@ -544,15 +544,15 @@ const PlanningDetailModal = ({
                   return (
                     <tr
                       key={cellKey}
-                      className="border-b border-[#2E2E2E] hover:bg-[rgba(215,183,151,0.08)] transition-colors"
+                      className="border-b border-[#E8E2DB] hover:bg-[rgba(196,151,90,0.08)] transition-colors"
                     >
                       <td className="px-4 py-3 pl-8">
-                        <span className="text-[#999999]">{storeRow.store.name}</span>
+                        <span className="text-[#6B5D4F]">{storeRow.store.name}</span>
                       </td>
-                      <td className="px-4 py-3 text-center text-[#999999] font-['JetBrains_Mono']">{storeRow.buyPct.toFixed(1)}%</td>
-                      <td className="px-4 py-3 text-center text-[#999999] font-['JetBrains_Mono']">{storeRow.salesPct.toFixed(0)}%</td>
-                      <td className="px-4 py-3 text-center text-[#999999] font-['JetBrains_Mono']">{storeRow.stPct.toFixed(0)}%</td>
-                      <td className={`px-4 py-3 ${isReadOnly ? 'bg-[#1A1A1A]' : 'bg-[rgba(215,183,151,0.08)]'}`}>
+                      <td className="px-4 py-3 text-center text-[#6B5D4F] font-['JetBrains_Mono']">{storeRow.buyPct.toFixed(1)}%</td>
+                      <td className="px-4 py-3 text-center text-[#6B5D4F] font-['JetBrains_Mono']">{storeRow.salesPct.toFixed(0)}%</td>
+                      <td className="px-4 py-3 text-center text-[#6B5D4F] font-['JetBrains_Mono']">{storeRow.stPct.toFixed(0)}%</td>
+                      <td className={`px-4 py-3 ${isReadOnly ? 'bg-[#FBF9F7]' : 'bg-[rgba(196,151,90,0.08)]'}`}>
                         <EditableCell
                           cellKey={cellKey}
                           value={storeRow.userBuyPct}
@@ -565,9 +565,9 @@ const PlanningDetailModal = ({
                           readOnly={isReadOnly}
                         />
                       </td>
-                      <td className="px-4 py-3 text-center font-medium text-[#F2F2F2] font-['JetBrains_Mono']">{formatCurrency(storeRow.otbValue)}</td>
+                      <td className="px-4 py-3 text-center font-medium text-[#2C2417] font-['JetBrains_Mono']">{formatCurrency(storeRow.otbValue)}</td>
                       <td className={`px-4 py-3 text-center font-medium font-['JetBrains_Mono'] ${
-                        storeRow.variance < 0 ? 'text-[#F85149]' : storeRow.variance > 0 ? 'text-[#2A9E6A]' : 'text-[#999999]'
+                        storeRow.variance < 0 ? 'text-[#DC3545]' : storeRow.variance > 0 ? 'text-[#1B6B45]' : 'text-[#6B5D4F]'
                       }`}>
                         {storeRow.variance > 0 ? '+' : ''}{storeRow.variance.toFixed(0)}%
                       </td>
@@ -593,7 +593,7 @@ const PlanningDetailModal = ({
     );
   };
 
-  // Render Category Tab with Gender → Cat → Sub_Cat structure
+  // Render Category Tab with Gender -> Cat -> Sub_Cat structure
   const renderCategoryTab = () => {
     // Calculate totals for each gender
     const calculateGenderTotals = (genderGroup) => {
@@ -651,18 +651,18 @@ const PlanningDetailModal = ({
       })).filter(cat => cat.subCategories.length > 0)
     })).filter(genderGroup => genderGroup.categories.length > 0);
 
-    // Color classes for Gender and Category cells - DAFC Theme
+    // Color classes for Gender and Category cells - Light Theme
     const genderColors = {
-      female: 'bg-[rgba(215,183,151,0.12)] text-[#D7B797]',
-      male: 'bg-[rgba(215,183,151,0.08)] text-[#D7B797]'
+      female: 'bg-[rgba(196,151,90,0.12)] text-[#C4975A]',
+      male: 'bg-[rgba(196,151,90,0.08)] text-[#C4975A]'
     };
 
     const categoryColors = [
-      'bg-[#1A1A1A] text-[#D7B797]',
-      'bg-[#121212] text-[#D7B797]',
-      'bg-[rgba(215,183,151,0.05)] text-[#D7B797]',
-      'bg-[#1A1A1A] text-[#D7B797]',
-      'bg-[#121212] text-[#D7B797]'
+      'bg-[#FBF9F7] text-[#C4975A]',
+      'bg-[#FFFFFF] text-[#C4975A]',
+      'bg-[rgba(196,151,90,0.05)] text-[#C4975A]',
+      'bg-[#FBF9F7] text-[#C4975A]',
+      'bg-[#FFFFFF] text-[#C4975A]'
     ];
 
     // Get selected filter labels for display
@@ -674,9 +674,9 @@ const PlanningDetailModal = ({
     return (
       <div>
         {/* Filter Section */}
-        <div className="px-6 py-4 bg-[#121212] border-b border-[#2E2E2E]">
+        <div className="px-6 py-4 bg-[#FBF9F7] border-b border-[#E8E2DB]">
           <div className="flex items-center gap-6">
-            <div className="flex items-center gap-2 text-[#999999]">
+            <div className="flex items-center gap-2 text-[#6B5D4F]">
               <Filter size={16} />
               <span className="font-medium text-sm font-['Montserrat']">{t('planningDetail.filters')}</span>
             </div>
@@ -690,26 +690,26 @@ const PlanningDetailModal = ({
                   setIsCategoryDropdownOpen(false);
                   setIsSubCategoryDropdownOpen(false);
                 }}
-                className="flex items-center gap-2 px-4 py-2 bg-[#0A0A0A] border-2 border-[#2E2E2E] rounded-lg hover:border-[rgba(215,183,151,0.25)] hover:bg-[rgba(215,183,151,0.08)] transition-all min-w-[150px]"
+                className="flex items-center gap-2 px-4 py-2 bg-[#FFFFFF] border-2 border-[#E8E2DB] rounded-lg hover:border-[rgba(196,151,90,0.25)] hover:bg-[rgba(196,151,90,0.08)] transition-all min-w-[150px]"
               >
-                <Users size={14} className="text-[#D7B797]" />
-                <span className="text-sm font-medium text-[#F2F2F2] flex-1 text-left truncate">
+                <Users size={14} className="text-[#C4975A]" />
+                <span className="text-sm font-medium text-[#2C2417] flex-1 text-left truncate">
                   {getSelectedLabel(filterOptions.genders, genderFilter)}
                 </span>
-                <ChevronDown size={16} className={`text-[#666666] transition-transform ${isGenderDropdownOpen ? 'rotate-180' : ''}`} />
+                <ChevronDown size={16} className={`text-[#8C8178] transition-transform ${isGenderDropdownOpen ? 'rotate-180' : ''}`} />
               </button>
               {isGenderDropdownOpen && (
-                <div className="absolute top-full left-0 mt-1 w-full bg-[#121212] border-2 border-[#2E2E2E] rounded-lg shadow-lg z-50 overflow-hidden">
+                <div className="absolute top-full left-0 mt-1 w-full bg-[#FFFFFF] border-2 border-[#E8E2DB] rounded-lg shadow-[0_4px_12px_rgba(44,36,23,0.06)] z-50 overflow-hidden">
                   {filterOptions.genders.map(option => (
                     <div
                       key={option.id}
                       onClick={() => handleGenderFilterChange(option.id)}
-                      className="px-4 py-2.5 flex items-center gap-2 hover:bg-[rgba(215,183,151,0.08)] cursor-pointer transition-colors"
+                      className="px-4 py-2.5 flex items-center gap-2 hover:bg-[rgba(196,151,90,0.08)] cursor-pointer transition-colors"
                     >
-                      <span className={`text-sm ${genderFilter === option.id ? 'text-[#D7B797] font-semibold' : 'text-[#F2F2F2]'}`}>
+                      <span className={`text-sm ${genderFilter === option.id ? 'text-[#C4975A] font-semibold' : 'text-[#2C2417]'}`}>
                         {option.name}
                       </span>
-                      {genderFilter === option.id && <Check size={14} className="text-[#D7B797] ml-auto" />}
+                      {genderFilter === option.id && <Check size={14} className="text-[#C4975A] ml-auto" />}
                     </div>
                   ))}
                 </div>
@@ -725,26 +725,26 @@ const PlanningDetailModal = ({
                   setIsGenderDropdownOpen(false);
                   setIsSubCategoryDropdownOpen(false);
                 }}
-                className="flex items-center gap-2 px-4 py-2 bg-[#0A0A0A] border-2 border-[#2E2E2E] rounded-lg hover:border-[rgba(215,183,151,0.25)] hover:bg-[rgba(215,183,151,0.08)] transition-all min-w-[180px]"
+                className="flex items-center gap-2 px-4 py-2 bg-[#FFFFFF] border-2 border-[#E8E2DB] rounded-lg hover:border-[rgba(196,151,90,0.25)] hover:bg-[rgba(196,151,90,0.08)] transition-all min-w-[180px]"
               >
-                <Tag size={14} className="text-[#D7B797]" />
-                <span className="text-sm font-medium text-[#F2F2F2] flex-1 text-left truncate">
+                <Tag size={14} className="text-[#C4975A]" />
+                <span className="text-sm font-medium text-[#2C2417] flex-1 text-left truncate">
                   {getSelectedLabel(filterOptions.categories, categoryFilter)}
                 </span>
-                <ChevronDown size={16} className={`text-[#666666] transition-transform ${isCategoryDropdownOpen ? 'rotate-180' : ''}`} />
+                <ChevronDown size={16} className={`text-[#8C8178] transition-transform ${isCategoryDropdownOpen ? 'rotate-180' : ''}`} />
               </button>
               {isCategoryDropdownOpen && (
-                <div className="absolute top-full left-0 mt-1 w-full bg-[#121212] border-2 border-[#2E2E2E] rounded-lg shadow-lg z-50 overflow-hidden max-h-[300px] overflow-y-auto">
+                <div className="absolute top-full left-0 mt-1 w-full bg-[#FFFFFF] border-2 border-[#E8E2DB] rounded-lg shadow-[0_4px_12px_rgba(44,36,23,0.06)] z-50 overflow-hidden max-h-[300px] overflow-y-auto">
                   {filteredCategoryOptions.map(option => (
                     <div
                       key={option.id}
                       onClick={() => handleCategoryFilterChange(option.id)}
-                      className="px-4 py-2.5 flex items-center gap-2 hover:bg-[rgba(215,183,151,0.08)] cursor-pointer transition-colors"
+                      className="px-4 py-2.5 flex items-center gap-2 hover:bg-[rgba(196,151,90,0.08)] cursor-pointer transition-colors"
                     >
-                      <span className={`text-sm ${categoryFilter === option.id ? 'text-[#D7B797] font-semibold' : 'text-[#F2F2F2]'}`}>
+                      <span className={`text-sm ${categoryFilter === option.id ? 'text-[#C4975A] font-semibold' : 'text-[#2C2417]'}`}>
                         {option.name}
                       </span>
-                      {categoryFilter === option.id && <Check size={14} className="text-[#D7B797] ml-auto" />}
+                      {categoryFilter === option.id && <Check size={14} className="text-[#C4975A] ml-auto" />}
                     </div>
                   ))}
                 </div>
@@ -760,26 +760,26 @@ const PlanningDetailModal = ({
                   setIsGenderDropdownOpen(false);
                   setIsCategoryDropdownOpen(false);
                 }}
-                className="flex items-center gap-2 px-4 py-2 bg-[#0A0A0A] border-2 border-[#2E2E2E] rounded-lg hover:border-[rgba(215,183,151,0.25)] hover:bg-[rgba(215,183,151,0.08)] transition-all min-w-[180px]"
+                className="flex items-center gap-2 px-4 py-2 bg-[#FFFFFF] border-2 border-[#E8E2DB] rounded-lg hover:border-[rgba(196,151,90,0.25)] hover:bg-[rgba(196,151,90,0.08)] transition-all min-w-[180px]"
               >
-                <Layers size={14} className="text-[#2A9E6A]" />
-                <span className="text-sm font-medium text-[#F2F2F2] flex-1 text-left truncate">
+                <Layers size={14} className="text-[#1B6B45]" />
+                <span className="text-sm font-medium text-[#2C2417] flex-1 text-left truncate">
                   {getSelectedLabel(filterOptions.subCategories, subCategoryFilter)}
                 </span>
-                <ChevronDown size={16} className={`text-[#666666] transition-transform ${isSubCategoryDropdownOpen ? 'rotate-180' : ''}`} />
+                <ChevronDown size={16} className={`text-[#8C8178] transition-transform ${isSubCategoryDropdownOpen ? 'rotate-180' : ''}`} />
               </button>
               {isSubCategoryDropdownOpen && (
-                <div className="absolute top-full left-0 mt-1 w-full bg-[#121212] border-2 border-[#2E2E2E] rounded-lg shadow-lg z-50 overflow-hidden max-h-[300px] overflow-y-auto">
+                <div className="absolute top-full left-0 mt-1 w-full bg-[#FFFFFF] border-2 border-[#E8E2DB] rounded-lg shadow-[0_4px_12px_rgba(44,36,23,0.06)] z-50 overflow-hidden max-h-[300px] overflow-y-auto">
                   {filteredSubCategoryOptions.map(option => (
                     <div
                       key={option.id}
                       onClick={() => handleSubCategoryFilterChange(option.id)}
-                      className="px-4 py-2.5 flex items-center gap-2 hover:bg-[rgba(215,183,151,0.08)] cursor-pointer transition-colors"
+                      className="px-4 py-2.5 flex items-center gap-2 hover:bg-[rgba(196,151,90,0.08)] cursor-pointer transition-colors"
                     >
-                      <span className={`text-sm ${subCategoryFilter === option.id ? 'text-[#2A9E6A] font-semibold' : 'text-[#F2F2F2]'}`}>
+                      <span className={`text-sm ${subCategoryFilter === option.id ? 'text-[#1B6B45] font-semibold' : 'text-[#2C2417]'}`}>
                         {option.name}
                       </span>
-                      {subCategoryFilter === option.id && <Check size={14} className="text-[#2A9E6A] ml-auto" />}
+                      {subCategoryFilter === option.id && <Check size={14} className="text-[#1B6B45] ml-auto" />}
                     </div>
                   ))}
                 </div>
@@ -794,7 +794,7 @@ const PlanningDetailModal = ({
                   setCategoryFilter('all');
                   setSubCategoryFilter('all');
                 }}
-                className="flex items-center gap-2 px-4 py-2 bg-[#F85149] text-white rounded-lg hover:bg-[#FF7B72] transition-all shadow-md hover:shadow-lg text-sm font-medium"
+                className="flex items-center gap-2 px-4 py-2 bg-[#DC3545] text-white rounded-lg hover:bg-[#DC3545]/90 transition-all shadow-md hover:shadow-lg text-sm font-medium"
               >
                 <X size={14} />
                 {t('common.clearAll')}
@@ -814,7 +814,7 @@ const PlanningDetailModal = ({
                 <th className={headerCellClass}>{t('planningDetail.pctBuySP25')}</th>
                 <th className={headerCellClass}>{t('planningDetail.pctSalesSP25')}</th>
                 <th className={headerCellClass}>{t('planningDetail.pctSTSP25')}</th>
-                <th className={`${headerCellClass} bg-[rgba(215,183,151,0.15)]`}>{t('planningDetail.pctBuyProposed')}</th>
+                <th className={`${headerCellClass} bg-[rgba(196,151,90,0.15)]`}>{t('planningDetail.pctBuyProposed')}</th>
                 <th className={headerCellClass}>{t('planningDetail.dollarOtbProposed')}</th>
                 <th className={headerCellClass}>{t('planningDetail.pctVar2025_2026')}</th>
                 <th className={headerCellClass}>{t('planningDetail.otbSubmitted')}</th>
@@ -824,7 +824,7 @@ const PlanningDetailModal = ({
             <tbody>
               {filteredData.map((genderGroup) => {
                 const genderTotals = calculateGenderTotals(genderGroup);
-                const genderColorClass = genderColors[genderGroup.gender.id] || 'bg-[#1A1A1A] text-[#F2F2F2]';
+                const genderColorClass = genderColors[genderGroup.gender.id] || 'bg-[#FBF9F7] text-[#2C2417]';
 
                 return (
                   <>
@@ -836,9 +836,9 @@ const PlanningDetailModal = ({
                       <td className="px-4 py-3 text-center font-['JetBrains_Mono']">{genderTotals.buyPct}%</td>
                       <td className="px-4 py-3 text-center font-['JetBrains_Mono']">{genderTotals.salesPct}%</td>
                       <td className="px-4 py-3 text-center font-['JetBrains_Mono']">{genderTotals.stPct}%</td>
-                      <td className="px-4 py-3 text-center bg-[rgba(42,158,106,0.3)] font-['JetBrains_Mono']">{genderTotals.buyProposed}%</td>
+                      <td className="px-4 py-3 text-center bg-[rgba(27,107,69,0.3)] font-['JetBrains_Mono']">{genderTotals.buyProposed}%</td>
                       <td className="px-4 py-3 text-center font-['JetBrains_Mono']">{genderTotals.otbProposed.toLocaleString()}</td>
-                      <td className={`px-4 py-3 text-center font-['JetBrains_Mono'] ${genderTotals.varPct < 0 ? 'text-[#FF7B72]' : ''}`}>{genderTotals.varPct}%</td>
+                      <td className={`px-4 py-3 text-center font-['JetBrains_Mono'] ${genderTotals.varPct < 0 ? 'text-[#DC3545]' : ''}`}>{genderTotals.varPct}%</td>
                       <td className="px-4 py-3 text-center font-['JetBrains_Mono']">{genderTotals.otbSubmitted.toLocaleString()}</td>
                       <td className="px-4 py-3 text-center font-['JetBrains_Mono']">{genderTotals.buyActual}%</td>
                     </tr>
@@ -857,11 +857,11 @@ const PlanningDetailModal = ({
                             const isEditing = editingCell === cellKey;
 
                             return (
-                              <tr key={cellKey} className="border-b border-[#2E2E2E] hover:bg-[rgba(215,183,151,0.05)] transition-colors">
+                              <tr key={cellKey} className="border-b border-[#E8E2DB] hover:bg-[rgba(196,151,90,0.05)] transition-colors">
                                 {/* Gender column - only show on first row of first category */}
                                 {catIdx === 0 && subIdx === 0 ? (
                                   <td
-                                    className={`px-4 py-2.5 font-semibold border-r border-[#2E2E2E] ${genderColorClass}`}
+                                    className={`px-4 py-2.5 font-semibold border-r border-[#E8E2DB] ${genderColorClass}`}
                                     rowSpan={genderGroup.categories.reduce((sum, c) => sum + c.subCategories.length + 1, 0)}
                                   >
                                     <div className="flex items-center gap-2">
@@ -874,7 +874,7 @@ const PlanningDetailModal = ({
                                 {/* Category column - only show on first subcat row */}
                                 {subIdx === 0 ? (
                                   <td
-                                    className={`px-4 py-2.5 font-medium border-r border-[#2E2E2E] ${categoryColorClass}`}
+                                    className={`px-4 py-2.5 font-medium border-r border-[#E8E2DB] ${categoryColorClass}`}
                                     rowSpan={cat.subCategories.length + 1}
                                   >
                                     <div className="flex items-center gap-2">
@@ -884,11 +884,11 @@ const PlanningDetailModal = ({
                                   </td>
                                 ) : null}
 
-                                <td className="px-4 py-2.5 text-[#999999]">{subCat.name}</td>
-                                <td className="px-4 py-2.5 text-center text-[#999999] font-['JetBrains_Mono']">{rowData.buyPct || 0}%</td>
-                                <td className="px-4 py-2.5 text-center text-[#999999] font-['JetBrains_Mono']">{rowData.salesPct || 0}%</td>
-                                <td className="px-4 py-2.5 text-center text-[#999999] font-['JetBrains_Mono']">{rowData.stPct || 0}%</td>
-                                <td className={`px-4 py-2.5 ${isReadOnly ? 'bg-[#1A1A1A]' : 'bg-[rgba(215,183,151,0.08)]'}`}>
+                                <td className="px-4 py-2.5 text-[#6B5D4F]">{subCat.name}</td>
+                                <td className="px-4 py-2.5 text-center text-[#6B5D4F] font-['JetBrains_Mono']">{rowData.buyPct || 0}%</td>
+                                <td className="px-4 py-2.5 text-center text-[#6B5D4F] font-['JetBrains_Mono']">{rowData.salesPct || 0}%</td>
+                                <td className="px-4 py-2.5 text-center text-[#6B5D4F] font-['JetBrains_Mono']">{rowData.stPct || 0}%</td>
+                                <td className={`px-4 py-2.5 ${isReadOnly ? 'bg-[#FBF9F7]' : 'bg-[rgba(196,151,90,0.08)]'}`}>
                                   <EditableCell
                                     cellKey={cellKey}
                                     value={rowData.buyProposed || 0}
@@ -901,29 +901,29 @@ const PlanningDetailModal = ({
                                     readOnly={isReadOnly}
                                   />
                                 </td>
-                                <td className="px-4 py-2.5 text-center text-[#F2F2F2] font-['JetBrains_Mono']">{(rowData.otbProposed || 0).toLocaleString()}</td>
-                                <td className={`px-4 py-2.5 text-center font-['JetBrains_Mono'] ${(rowData.varPct || 0) < 0 ? 'text-[#F85149]' : 'text-[#999999]'}`}>
+                                <td className="px-4 py-2.5 text-center text-[#2C2417] font-['JetBrains_Mono']">{(rowData.otbProposed || 0).toLocaleString()}</td>
+                                <td className={`px-4 py-2.5 text-center font-['JetBrains_Mono'] ${(rowData.varPct || 0) < 0 ? 'text-[#DC3545]' : 'text-[#6B5D4F]'}`}>
                                   {rowData.varPct || 0}%
                                 </td>
-                                <td className="px-4 py-2.5 text-center text-[#999999] font-['JetBrains_Mono']">{(rowData.otbSubmitted || 0).toLocaleString()}</td>
-                                <td className="px-4 py-2.5 text-center text-[#999999] font-['JetBrains_Mono']">{rowData.buyActual || 0}%</td>
+                                <td className="px-4 py-2.5 text-center text-[#6B5D4F] font-['JetBrains_Mono']">{(rowData.otbSubmitted || 0).toLocaleString()}</td>
+                                <td className="px-4 py-2.5 text-center text-[#6B5D4F] font-['JetBrains_Mono']">{rowData.buyActual || 0}%</td>
                               </tr>
                             );
                           })}
 
                           {/* Category Subtotal Row */}
-                          <tr key={`subtotal-${genderGroup.gender.id}-${cat.id}`} className="bg-[rgba(42,158,106,0.15)] border-l-4 border-[#2A9E6A] font-medium">
-                            <td className="px-4 py-2.5 text-[#2A9E6A] italic text-right pr-6">{t('planningDetail.subtotal')}</td>
-                            <td className="px-4 py-2.5 text-center text-[#2A9E6A] font-['JetBrains_Mono']">{catTotals.buyPct}%</td>
-                            <td className="px-4 py-2.5 text-center text-[#2A9E6A] font-['JetBrains_Mono']">{catTotals.salesPct}%</td>
-                            <td className="px-4 py-2.5 text-center text-[#2A9E6A] font-['JetBrains_Mono']">{catTotals.stPct}%</td>
-                            <td className="px-4 py-2.5 text-center text-[#2A9E6A] bg-[rgba(42,158,106,0.2)] font-['JetBrains_Mono']">{catTotals.buyProposed}%</td>
-                            <td className="px-4 py-2.5 text-center text-[#2A9E6A] font-['JetBrains_Mono']">{catTotals.otbProposed.toLocaleString()}</td>
-                            <td className={`px-4 py-2.5 text-center font-['JetBrains_Mono'] ${catTotals.varPct < 0 ? 'text-[#F85149]' : 'text-[#2A9E6A]'}`}>
+                          <tr key={`subtotal-${genderGroup.gender.id}-${cat.id}`} className="bg-[rgba(27,107,69,0.10)] border-l-4 border-[#1B6B45] font-medium">
+                            <td className="px-4 py-2.5 text-[#1B6B45] italic text-right pr-6">{t('planningDetail.subtotal')}</td>
+                            <td className="px-4 py-2.5 text-center text-[#1B6B45] font-['JetBrains_Mono']">{catTotals.buyPct}%</td>
+                            <td className="px-4 py-2.5 text-center text-[#1B6B45] font-['JetBrains_Mono']">{catTotals.salesPct}%</td>
+                            <td className="px-4 py-2.5 text-center text-[#1B6B45] font-['JetBrains_Mono']">{catTotals.stPct}%</td>
+                            <td className="px-4 py-2.5 text-center text-[#1B6B45] bg-[rgba(27,107,69,0.15)] font-['JetBrains_Mono']">{catTotals.buyProposed}%</td>
+                            <td className="px-4 py-2.5 text-center text-[#1B6B45] font-['JetBrains_Mono']">{catTotals.otbProposed.toLocaleString()}</td>
+                            <td className={`px-4 py-2.5 text-center font-['JetBrains_Mono'] ${catTotals.varPct < 0 ? 'text-[#DC3545]' : 'text-[#1B6B45]'}`}>
                               {catTotals.varPct}%
                             </td>
-                            <td className="px-4 py-2.5 text-center text-[#2A9E6A] font-['JetBrains_Mono']">{catTotals.otbSubmitted.toLocaleString()}</td>
-                            <td className="px-4 py-2.5 text-center text-[#2A9E6A] font-['JetBrains_Mono']">{catTotals.buyActual}%</td>
+                            <td className="px-4 py-2.5 text-center text-[#1B6B45] font-['JetBrains_Mono']">{catTotals.otbSubmitted.toLocaleString()}</td>
+                            <td className="px-4 py-2.5 text-center text-[#1B6B45] font-['JetBrains_Mono']">{catTotals.buyActual}%</td>
                           </tr>
                         </>
                       );
@@ -942,22 +942,22 @@ const PlanningDetailModal = ({
 
   return (
     <div
-      className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-[100] animate-in fade-in duration-300"
+      className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-[100] animate-in fade-in duration-300"
       style={{ pointerEvents: 'auto' }}
     >
       <div
-        className="bg-[#0A0A0A] rounded-2xl shadow-2xl w-full max-w-7xl max-h-[90vh] flex flex-col transform animate-in zoom-in-95 duration-300 border border-[#2E2E2E]"
+        className="bg-[#FAF8F5] rounded-2xl shadow-[0_8px_32px_rgba(44,36,23,0.06)] w-full max-w-7xl max-h-[90vh] flex flex-col transform animate-in zoom-in-95 duration-300 border border-[#E8E2DB]"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="bg-[#D7B797] px-8 py-5 flex items-center justify-between relative overflow-hidden rounded-t-2xl">
+        <div className="bg-[#C4975A] px-8 py-5 flex items-center justify-between relative overflow-hidden rounded-t-2xl">
           <div className="relative z-10 flex items-center gap-6">
             <div>
-              <h2 className="text-xl font-bold text-[#0A0A0A] flex items-center gap-3 font-['Montserrat']">
+              <h2 className="text-xl font-bold text-[#FFFFFF] flex items-center gap-3 font-['Montserrat']">
                 <TrendingUp size={22} />
                 {t('planningDetail.title')}
               </h2>
-              <p className="text-[#0A0A0A]/70 text-sm mt-1">
+              <p className="text-[#FFFFFF]/70 text-sm mt-1">
                 {selectedBudgetDetail.budget?.groupBrandName} - {selectedBudgetDetail.budget?.seasonGroupId} {selectedBudgetDetail.budget?.seasonName}
               </p>
             </div>
@@ -969,8 +969,8 @@ const PlanningDetailModal = ({
                 onClick={() => setIsVersionDropdownOpen(!isVersionDropdownOpen)}
                 className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium text-sm transition-all duration-300 transform hover:scale-105 ${
                   selectedVersion === 'draft'
-                    ? 'bg-[#E3B341] text-[#0A0A0A] hover:bg-[#E3B341]/90 shadow-lg'
-                    : 'bg-[#127749] text-white hover:bg-[#2A9E6A] shadow-lg'
+                    ? 'bg-[#D97706] text-white hover:bg-[#D97706]/90 shadow-lg'
+                    : 'bg-[#1B6B45] text-white hover:bg-[#1B6B45]/90 shadow-lg'
                 }`}
               >
                 {selectedVersion === 'draft' ? (
@@ -988,7 +988,7 @@ const PlanningDetailModal = ({
               </button>
 
               {isVersionDropdownOpen && (
-                <div className="absolute top-full left-0 mt-2 w-72 bg-[#121212] border-2 border-[#2E2E2E] rounded-xl shadow-2xl z-[9999] overflow-hidden animate-in slide-in-from-top-2 fade-in duration-200">
+                <div className="absolute top-full left-0 mt-2 w-72 bg-[#FFFFFF] border-2 border-[#E8E2DB] rounded-xl shadow-[0_8px_24px_rgba(44,36,23,0.06)] z-[9999] overflow-hidden animate-in slide-in-from-top-2 fade-in duration-200">
                   {/* Draft Option */}
                   <div
                     onClick={() => {
@@ -997,26 +997,26 @@ const PlanningDetailModal = ({
                     }}
                     className={`px-4 py-3 flex items-center gap-3 cursor-pointer transition-all duration-200 hover:pl-6 ${
                       selectedVersion === 'draft'
-                        ? 'bg-[rgba(227,179,65,0.15)] border-l-4 border-[#E3B341]'
-                        : 'hover:bg-[rgba(215,183,151,0.08)]'
+                        ? 'bg-[rgba(217,119,6,0.10)] border-l-4 border-[#D97706]'
+                        : 'hover:bg-[rgba(196,151,90,0.08)]'
                     }`}
                   >
-                    <div className={`p-1.5 rounded-lg ${selectedVersion === 'draft' ? 'bg-[rgba(227,179,65,0.2)]' : 'bg-[#1A1A1A]'}`}>
-                      <Sparkles size={16} className={selectedVersion === 'draft' ? 'text-[#E3B341]' : 'text-[#666666]'} />
+                    <div className={`p-1.5 rounded-lg ${selectedVersion === 'draft' ? 'bg-[rgba(217,119,6,0.15)]' : 'bg-[#FBF9F7]'}`}>
+                      <Sparkles size={16} className={selectedVersion === 'draft' ? 'text-[#D97706]' : 'text-[#8C8178]'} />
                     </div>
                     <div className="flex-1">
-                      <div className={`font-semibold ${selectedVersion === 'draft' ? 'text-[#E3B341]' : 'text-[#F2F2F2]'}`}>
+                      <div className={`font-semibold ${selectedVersion === 'draft' ? 'text-[#D97706]' : 'text-[#2C2417]'}`}>
                         {t('planningDetail.draftCurrent')}
                       </div>
-                      <div className="text-xs text-[#666666]">{t('planningDetail.editableVersion')}</div>
+                      <div className="text-xs text-[#8C8178]">{t('planningDetail.editableVersion')}</div>
                     </div>
-                    {selectedVersion === 'draft' && <Check size={18} className="text-[#E3B341]" />}
+                    {selectedVersion === 'draft' && <Check size={18} className="text-[#D97706]" />}
                   </div>
 
                   {/* Divider */}
                   {versions.length > 0 && (
-                    <div className="px-4 py-2 bg-[#1A1A1A] border-y border-[#2E2E2E]">
-                      <span className="text-xs font-semibold text-[#666666] uppercase tracking-wide flex items-center gap-2">
+                    <div className="px-4 py-2 bg-[#FBF9F7] border-y border-[#E8E2DB]">
+                      <span className="text-xs font-semibold text-[#8C8178] uppercase tracking-wide flex items-center gap-2">
                         <History size={12} />
                         {t('planningDetail.approvedVersions')} ({versions.length})
                       </span>
@@ -1026,7 +1026,7 @@ const PlanningDetailModal = ({
                   {/* Version List */}
                   <div className="max-h-[200px] overflow-y-auto">
                     {versions.length === 0 ? (
-                      <div className="px-4 py-6 text-center text-[#666666] text-sm">
+                      <div className="px-4 py-6 text-center text-[#8C8178] text-sm">
                         <Clock size={24} className="mx-auto mb-2 opacity-50" />
                         {t('planningDetail.noApprovedVersions')}
                       </div>
@@ -1040,24 +1040,24 @@ const PlanningDetailModal = ({
                           }}
                           className={`px-4 py-3 flex items-center gap-3 cursor-pointer transition-all duration-200 hover:pl-6 animate-in fade-in slide-in-from-right ${
                             selectedVersion === version.id
-                              ? 'bg-[rgba(42,158,106,0.15)] border-l-4 border-[#2A9E6A]'
-                              : 'hover:bg-[rgba(215,183,151,0.08)]'
+                              ? 'bg-[rgba(27,107,69,0.10)] border-l-4 border-[#1B6B45]'
+                              : 'hover:bg-[rgba(196,151,90,0.08)]'
                           }`}
                           style={{ animationDelay: `${idx * 50}ms`, animationFillMode: 'backwards' }}
                         >
-                          <div className={`p-1.5 rounded-lg ${selectedVersion === version.id ? 'bg-[rgba(42,158,106,0.2)]' : 'bg-[#1A1A1A]'}`}>
-                            <CheckCircle2 size={16} className={selectedVersion === version.id ? 'text-[#2A9E6A]' : 'text-[#666666]'} />
+                          <div className={`p-1.5 rounded-lg ${selectedVersion === version.id ? 'bg-[rgba(27,107,69,0.15)]' : 'bg-[#FBF9F7]'}`}>
+                            <CheckCircle2 size={16} className={selectedVersion === version.id ? 'text-[#1B6B45]' : 'text-[#8C8178]'} />
                           </div>
                           <div className="flex-1">
-                            <div className={`font-semibold ${selectedVersion === version.id ? 'text-[#2A9E6A]' : 'text-[#F2F2F2]'}`}>
+                            <div className={`font-semibold ${selectedVersion === version.id ? 'text-[#1B6B45]' : 'text-[#2C2417]'}`}>
                               Version {version.versionNumber}
                             </div>
-                            <div className="text-xs text-[#666666] flex items-center gap-1">
+                            <div className="text-xs text-[#8C8178] flex items-center gap-1">
                               <Clock size={10} />
                               {formatDate(version.createdAt)}
                             </div>
                           </div>
-                          {selectedVersion === version.id && <Check size={18} className="text-[#2A9E6A]" />}
+                          {selectedVersion === version.id && <Check size={18} className="text-[#1B6B45]" />}
                         </div>
                       ))
                     )}
@@ -1069,7 +1069,7 @@ const PlanningDetailModal = ({
 
           <button
             onClick={onClose}
-            className="relative z-10 text-[#0A0A0A] hover:bg-[rgba(0,0,0,0.1)] rounded-xl p-2.5 transition-all duration-300 hover:rotate-90"
+            className="relative z-10 text-[#FFFFFF] hover:bg-[rgba(255,255,255,0.15)] rounded-xl p-2.5 transition-all duration-300 hover:rotate-90"
           >
             <X size={22} />
           </button>
@@ -1077,7 +1077,7 @@ const PlanningDetailModal = ({
 
         {/* Read-only indicator when viewing approved version */}
         {isReadOnly && (
-          <div className="px-6 py-3 bg-[#127749] text-white flex items-center justify-center gap-2 text-sm font-medium animate-in slide-in-from-top duration-300">
+          <div className="px-6 py-3 bg-[#1B6B45] text-white flex items-center justify-center gap-2 text-sm font-medium animate-in slide-in-from-top duration-300">
             <CheckCircle2 size={16} />
             <span>{t('planningDetail.viewingApprovedVersion', { version: versions.find(v => v.id === selectedVersion)?.versionNumber })}</span>
             <button
@@ -1090,7 +1090,7 @@ const PlanningDetailModal = ({
         )}
 
         {/* Tabs */}
-        <div className="border-b border-[#2E2E2E] px-6 bg-[#121212]">
+        <div className="border-b border-[#E8E2DB] px-6 bg-[#FBF9F7]">
           <div className="flex gap-1">
             {TABS.map(tab => {
               const Icon = tab.icon;
@@ -1101,8 +1101,8 @@ const PlanningDetailModal = ({
                   onClick={() => setActiveTab(tab.id)}
                   className={`px-5 py-3 font-medium text-sm flex items-center gap-2 border-b-2 transition-all duration-200 font-['Montserrat'] ${
                     isActive
-                      ? 'border-[#D7B797] text-[#D7B797] bg-[#0A0A0A] -mb-px rounded-t-lg'
-                      : 'border-transparent text-[#666666] hover:text-[#D7B797] hover:bg-[rgba(215,183,151,0.08)] rounded-t-lg'
+                      ? 'border-[#C4975A] text-[#C4975A] bg-[#FFFFFF] -mb-px rounded-t-lg'
+                      : 'border-transparent text-[#8C8178] hover:text-[#C4975A] hover:bg-[rgba(196,151,90,0.08)] rounded-t-lg'
                   }`}
                 >
                   <Icon size={16} />
@@ -1115,38 +1115,38 @@ const PlanningDetailModal = ({
 
         {/* Hint for editable cells */}
         {!isReadOnly && (
-          <div className="px-6 py-2 bg-[rgba(215,183,151,0.08)] border-b border-[#2E2E2E] flex items-center gap-2 text-sm text-[#D7B797] animate-in fade-in slide-in-from-top duration-300">
+          <div className="px-6 py-2 bg-[rgba(196,151,90,0.08)] border-b border-[#E8E2DB] flex items-center gap-2 text-sm text-[#C4975A] animate-in fade-in slide-in-from-top duration-300">
             <Pencil size={14} className="animate-bounce" style={{ animationDuration: '2s' }} />
             <span>{t('planningDetail.editHint')}</span>
           </div>
         )}
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto bg-[#0A0A0A]">
+        <div className="flex-1 overflow-y-auto bg-[#FFFFFF]">
           {activeTab === 'collection' && renderCollectionTab()}
           {activeTab === 'gender' && renderGenderTab()}
           {activeTab === 'category' && renderCategoryTab()}
         </div>
 
         {/* Footer */}
-        <div className="border-t border-[#2E2E2E] px-6 py-4 flex items-center justify-between bg-[#121212] rounded-b-2xl">
+        <div className="border-t border-[#E8E2DB] px-6 py-4 flex items-center justify-between bg-[#FBF9F7] rounded-b-2xl">
           <div className="flex items-center gap-6">
             <div className="text-sm">
-              <span className="text-[#666666]">{t('planningDetail.totalBudget')}</span>
-              <span className="ml-2 font-bold text-[#D7B797] font-['JetBrains_Mono']">
+              <span className="text-[#8C8178]">{t('planningDetail.totalBudget')}</span>
+              <span className="ml-2 font-bold text-[#C4975A] font-['JetBrains_Mono']">
                 {formatCurrency(selectedBudgetDetail.budget?.totalBudget || 0)}
               </span>
             </div>
             <div className="text-sm">
-              <span className="text-[#666666]">{t('planningDetail.allocated')}</span>
-              <span className="ml-2 font-bold text-[#2A9E6A] font-['JetBrains_Mono']">
+              <span className="text-[#8C8178]">{t('planningDetail.allocated')}</span>
+              <span className="ml-2 font-bold text-[#1B6B45] font-['JetBrains_Mono']">
                 {formatCurrency(grandTotals.otbValue)}
               </span>
             </div>
             {versions.length > 0 && (
               <div className="text-sm animate-in fade-in slide-in-from-left duration-300">
-                <span className="text-[#666666]">{t('planningDetail.versions')}</span>
-                <span className="ml-2 font-bold text-[#D7B797] font-['JetBrains_Mono']">
+                <span className="text-[#8C8178]">{t('planningDetail.versions')}</span>
+                <span className="ml-2 font-bold text-[#C4975A] font-['JetBrains_Mono']">
                   {versions.length} {t('planningDetail.approved')}
                 </span>
               </div>
@@ -1155,7 +1155,7 @@ const PlanningDetailModal = ({
           <div className="flex items-center gap-3">
             <button
               onClick={onClose}
-              className="px-5 py-2.5 border border-[#2E2E2E] rounded-lg font-medium text-[#999999] hover:bg-[rgba(215,183,151,0.08)] hover:border-[rgba(215,183,151,0.25)] hover:text-[#D7B797] transition-all duration-200 transform hover:scale-105 active:scale-95"
+              className="px-5 py-2.5 border border-[#E8E2DB] rounded-lg font-medium text-[#6B5D4F] hover:bg-[rgba(196,151,90,0.08)] hover:border-[rgba(196,151,90,0.25)] hover:text-[#C4975A] transition-all duration-200 transform hover:scale-105 active:scale-95"
             >
               {t('common.cancel')}
             </button>
@@ -1167,8 +1167,8 @@ const PlanningDetailModal = ({
                 disabled={approveAnimation}
                 className={`px-5 py-2.5 rounded-lg font-medium transition-all duration-300 flex items-center gap-2 transform hover:scale-105 active:scale-95 relative overflow-hidden ${
                   approveAnimation
-                    ? 'bg-[#2A9E6A] text-white shadow-lg'
-                    : 'bg-[#127749] text-white hover:bg-[#2A9E6A] shadow-lg'
+                    ? 'bg-[#1B6B45] text-white shadow-lg'
+                    : 'bg-[#1B6B45] text-white hover:bg-[#1B6B45]/90 shadow-lg'
                 }`}
               >
                 {approveAnimation ? (
@@ -1190,8 +1190,8 @@ const PlanningDetailModal = ({
               disabled={isReadOnly}
               className={`px-5 py-2.5 rounded-lg font-medium transition-all duration-200 flex items-center gap-2 shadow-lg transform hover:scale-105 active:scale-95 relative overflow-hidden ${
                 isReadOnly
-                  ? 'bg-[#2E2E2E] text-[#666666] cursor-not-allowed shadow-none'
-                  : 'bg-[#D7B797] text-[#0A0A0A] hover:bg-[#D7B797]/90'
+                  ? 'bg-[#E8E2DB] text-[#8C8178] cursor-not-allowed shadow-none'
+                  : 'bg-[#C4975A] text-[#FFFFFF] hover:bg-[#C4975A]/90'
               }`}
             >
               <Save size={16} />
@@ -1203,12 +1203,12 @@ const PlanningDetailModal = ({
         {/* Approve Success Overlay Animation */}
         {approveAnimation && (
           <div className="absolute inset-0 flex items-center justify-center z-50 pointer-events-none">
-            <div className="animate-in zoom-in duration-300 bg-[#127749] text-white px-8 py-6 rounded-2xl shadow-2xl flex flex-col items-center gap-3 border border-[#2A9E6A]">
+            <div className="animate-in zoom-in duration-300 bg-[#1B6B45] text-white px-8 py-6 rounded-2xl shadow-2xl flex flex-col items-center gap-3 border border-[#1B6B45]">
               <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center animate-bounce">
                 <CheckCircle2 size={40} />
               </div>
               <div className="text-xl font-bold font-['Montserrat']">{t('planningDetail.versionApproved', { version: versions.length })}</div>
-              <div className="text-[#2A9E6A]/80 text-sm">{t('planningDetail.planningDataSaved')}</div>
+              <div className="text-white/70 text-sm">{t('planningDetail.planningDataSaved')}</div>
             </div>
           </div>
         )}

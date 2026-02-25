@@ -28,7 +28,7 @@ const MORE_ITEMS = [
   { id: 'settings', icon: Settings, labelKey: 'userMenu.settings' },
 ];
 
-export default function MobileBottomNav({ currentScreen, darkMode }) {
+export default function MobileBottomNav({ currentScreen }) {
   const router = useRouter();
   const { t } = useLanguage();
   const [showMore, setShowMore] = useState(false);
@@ -55,33 +55,25 @@ export default function MobileBottomNav({ currentScreen, darkMode }) {
         {showMore && (
           <>
             <motion.div
-              className="fixed inset-0 z-[90] bg-black/50"
+              className="fixed inset-0 z-[90] bg-black/30"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setShowMore(false)}
             />
             <motion.div
-              className={`fixed bottom-[68px] left-3 right-3 z-[91] rounded-2xl border overflow-hidden ${
-                darkMode ? 'bg-surface-secondary border-border' : 'bg-white border-gray-200'
-              }`}
+              className="fixed bottom-[68px] left-3 right-3 z-[91] rounded-2xl border bg-white border-[#E8E2DB] overflow-hidden"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 20 }}
               transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-              style={{ boxShadow: '0 -8px 30px rgba(0,0,0,0.3)' }}
+              style={{ boxShadow: '0 -8px 30px rgba(44,36,23,0.12)' }}
             >
-              <div className={`px-4 py-3 border-b flex items-center justify-between ${
-                darkMode ? 'border-border' : 'border-gray-100'
-              }`}>
-                <span className={`text-sm font-semibold font-['Montserrat'] ${
-                  darkMode ? 'text-content' : 'text-gray-900'
-                }`}>
+              <div className="px-4 py-3 border-b border-[#E8E2DB] flex items-center justify-between">
+                <span className="text-sm font-semibold font-['Montserrat'] text-[#2C2417]">
                   More
                 </span>
-                <button onClick={() => setShowMore(false)} className={`p-1 rounded-lg ${
-                  darkMode ? 'text-content-muted hover:bg-surface-elevated' : 'text-gray-500 hover:bg-gray-100'
-                }`}>
+                <button onClick={() => setShowMore(false)} className="p-1 rounded-lg text-[#8C8178] hover:bg-[#FBF9F7]">
                   <X size={18} />
                 </button>
               </div>
@@ -95,26 +87,17 @@ export default function MobileBottomNav({ currentScreen, darkMode }) {
                       onClick={() => navigateTo(item.id)}
                       className={`flex flex-col items-center gap-1.5 py-3 px-2 rounded-xl transition-colors ${
                         active
-                          ? darkMode
-                            ? 'bg-[rgba(215,183,151,0.12)]'
-                            : 'bg-[rgba(215,183,151,0.15)]'
-                          : darkMode
-                            ? 'active:bg-surface-elevated'
-                            : 'active:bg-gray-100'
+                          ? 'bg-[rgba(196,151,90,0.12)]'
+                          : 'active:bg-[#FBF9F7]'
                       }`}
                     >
                       <Icon
                         size={20}
                         strokeWidth={active ? 2.5 : 2}
-                        className={active
-                          ? 'text-dafc-gold'
-                          : darkMode ? 'text-content-secondary' : 'text-gray-500'
-                        }
+                        className={active ? 'text-[#C4975A]' : 'text-[#8C8178]'}
                       />
                       <span className={`text-[10px] font-medium font-['Montserrat'] text-center leading-tight ${
-                        active
-                          ? 'text-dafc-gold'
-                          : darkMode ? 'text-content-secondary' : 'text-gray-600'
+                        active ? 'text-[#C4975A]' : 'text-[#6B5D4F]'
                       }`}>
                         {t(item.labelKey, item.labelKey.split('.').pop())}
                       </span>
@@ -129,13 +112,9 @@ export default function MobileBottomNav({ currentScreen, darkMode }) {
 
       {/* Bottom Nav Bar */}
       <div
-        className={`fixed bottom-0 left-0 right-0 z-[80] border-t md:hidden ${
-          darkMode ? 'border-border' : 'border-gray-200'
-        }`}
+        className="fixed bottom-0 left-0 right-0 z-[80] border-t border-[#E8E2DB] md:hidden"
         style={{
-          background: darkMode
-            ? 'linear-gradient(180deg, #0A0A0A 0%, #080808 100%)'
-            : 'linear-gradient(180deg, #ffffff 0%, #fdfbf9 100%)',
+          background: 'linear-gradient(180deg, #FFFFFF 0%, #FDFBF9 100%)',
           paddingBottom: 'env(safe-area-inset-bottom)',
         }}
       >
@@ -150,27 +129,18 @@ export default function MobileBottomNav({ currentScreen, darkMode }) {
                 className="flex flex-col items-center justify-center gap-0.5 flex-1 h-full transition-colors"
               >
                 <div className={`p-1 rounded-lg transition-colors ${
-                  active
-                    ? darkMode
-                      ? 'bg-[rgba(215,183,151,0.15)]'
-                      : 'bg-[rgba(215,183,151,0.2)]'
-                    : ''
+                  active ? 'bg-[rgba(196,151,90,0.15)]' : ''
                 }`}>
                   <Icon
                     size={20}
                     strokeWidth={active ? 2.5 : 2}
                     className={`transition-colors ${
-                      active
-                        ? 'text-dafc-gold'
-                        : darkMode ? 'text-content-muted' : 'text-gray-400'
+                      active ? 'text-[#C4975A]' : 'text-[#8C8178]'
                     }`}
-                    style={active && darkMode ? { filter: 'drop-shadow(0 0 4px rgba(215,183,151,0.4))' } : undefined}
                   />
                 </div>
                 <span className={`text-[10px] font-medium font-['Montserrat'] ${
-                  active
-                    ? 'text-dafc-gold'
-                    : darkMode ? 'text-content-muted' : 'text-gray-400'
+                  active ? 'text-[#C4975A]' : 'text-[#8C8178]'
                 }`}>
                   {tab.shortLabel}
                 </span>
@@ -184,26 +154,18 @@ export default function MobileBottomNav({ currentScreen, darkMode }) {
             className="flex flex-col items-center justify-center gap-0.5 flex-1 h-full transition-colors"
           >
             <div className={`p-1 rounded-lg transition-colors ${
-              showMore || isMoreActive
-                ? darkMode
-                  ? 'bg-[rgba(215,183,151,0.15)]'
-                  : 'bg-[rgba(215,183,151,0.2)]'
-                : ''
+              showMore || isMoreActive ? 'bg-[rgba(196,151,90,0.15)]' : ''
             }`}>
               <MoreHorizontal
                 size={20}
                 strokeWidth={showMore || isMoreActive ? 2.5 : 2}
                 className={`transition-colors ${
-                  showMore || isMoreActive
-                    ? 'text-dafc-gold'
-                    : darkMode ? 'text-content-muted' : 'text-gray-400'
+                  showMore || isMoreActive ? 'text-[#C4975A]' : 'text-[#8C8178]'
                 }`}
               />
             </div>
             <span className={`text-[10px] font-medium font-['Montserrat'] ${
-              showMore || isMoreActive
-                ? 'text-dafc-gold'
-                : darkMode ? 'text-content-muted' : 'text-gray-400'
+              showMore || isMoreActive ? 'text-[#C4975A]' : 'text-[#8C8178]'
             }`}>
               More
             </span>

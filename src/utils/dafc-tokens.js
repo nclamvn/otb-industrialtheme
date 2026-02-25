@@ -1,22 +1,23 @@
 /**
  * DAFC Design Tokens
- * Industrial Precision UI Design System
+ * Warm Golden Light Theme Design System
  *
- * Framework: Industrial Precision UI
- * Brand: DAFC (Champagne Gold + Forest Green)
- * Philosophy: Flat Design, High Contrast, Data-First
+ * Framework: Minimalist Premium UI
+ * Brand: DAFC (Warm Golden Copper + Forest Green)
+ * Philosophy: Light-only, Semi-compact, Data-First
  */
 
 // ===== BRAND COLORS =====
 export const DAFC_BRAND = {
   gold: {
-    DEFAULT: '#D7B797',
-    light: '#E8D4C0',
-    dark: '#B89970',
-    darker: '#8A6340',
+    DEFAULT: '#C4975A',
+    light: '#D4B082',
+    lighter: '#EDE0D0',
+    dark: '#A67B3D',
+    darker: '#7D5A28',
   },
   green: {
-    DEFAULT: '#127749',
+    DEFAULT: '#1B6B45',
     light: '#2A9E6A',
     dark: '#095431',
   },
@@ -24,91 +25,91 @@ export const DAFC_BRAND = {
 
 // ===== SURFACE COLORS =====
 export const SURFACE = {
-  DEFAULT: '#121212',
-  secondary: '#1A1A1A',
-  elevated: '#242424',
-  overlay: 'rgba(36, 36, 36, 0.5)',
-  canvas: '#000000',
+  DEFAULT: '#FFFFFF',
+  secondary: '#FBF9F7',
+  elevated: '#FFFFFF',
+  overlay: 'rgba(44, 36, 23, 0.4)',
+  canvas: '#FAF8F5',
 };
 
 // ===== CONTENT/TEXT COLORS =====
 export const CONTENT = {
-  DEFAULT: '#F2F2F2',
-  secondary: '#999999',
-  muted: '#666666',
-  inverse: '#000000',
+  DEFAULT: '#2C2417',
+  secondary: '#6B5D4F',
+  muted: '#8C8178',
+  inverse: '#FFFFFF',
 };
 
 // ===== BORDER COLORS =====
 export const BORDER = {
-  DEFAULT: '#2E2E2E',
-  muted: '#1A1A1A',
-  emphasis: '#3D3D3D',
+  DEFAULT: '#E8E2DB',
+  muted: '#F0EBE5',
+  emphasis: '#D4CBBC',
 };
 
 // ===== STATUS COLORS =====
 export const STATUS = {
   critical: {
-    DEFAULT: '#F85149',
-    muted: 'rgba(248, 81, 73, 0.15)',
-    text: '#FF7B72',
+    DEFAULT: '#DC3545',
+    muted: 'rgba(220, 53, 69, 0.1)',
+    text: '#DC3545',
   },
   warning: {
-    DEFAULT: '#D29922',
-    muted: 'rgba(210, 153, 34, 0.15)',
-    text: '#E3B341',
+    DEFAULT: '#D97706',
+    muted: 'rgba(217, 119, 6, 0.1)',
+    text: '#D97706',
   },
   success: {
-    DEFAULT: '#127749',
-    muted: 'rgba(18, 119, 73, 0.15)',
-    text: '#2A9E6A',
+    DEFAULT: '#1B6B45',
+    muted: 'rgba(27, 107, 69, 0.1)',
+    text: '#1B6B45',
   },
   info: {
-    DEFAULT: '#58A6FF',
-    muted: 'rgba(88, 166, 255, 0.15)',
-    text: '#79C0FF',
+    DEFAULT: '#2563EB',
+    muted: 'rgba(37, 99, 235, 0.1)',
+    text: '#2563EB',
   },
   neutral: {
-    DEFAULT: '#8B949E',
-    muted: 'rgba(139, 148, 158, 0.15)',
+    DEFAULT: '#8C8178',
+    muted: 'rgba(140, 129, 120, 0.1)',
   },
 };
 
 // ===== DATA VISUALIZATION COLORS =====
 export const DATA = {
-  positive: '#127749',
-  negative: '#F85149',
-  neutral: '#8B949E',
+  positive: '#1B6B45',
+  negative: '#DC3545',
+  neutral: '#8C8178',
 };
 
 // ===== CHART COLORS =====
 export const CHART_COLORS = {
-  1: '#D7B797', // DAFC Gold
-  2: '#2A9E6A', // DAFC Green Light
-  3: '#D29922', // Amber
-  4: '#A371F7', // Purple
-  5: '#F85149', // Red
-  6: '#8B949E', // Gray
-  7: '#58A6FF', // Blue
-  8: '#48CAE4', // Teal
+  1: '#C4975A', // DAFC Gold
+  2: '#1B6B45', // DAFC Green
+  3: '#D97706', // Amber
+  4: '#7C3AED', // Purple
+  5: '#DC3545', // Red
+  6: '#8C8178', // Gray
+  7: '#2563EB', // Blue
+  8: '#0891B2', // Teal
 };
 
 export const CHART_SERIES = [
-  '#D7B797', // Champagne Gold
-  '#2A9E6A', // Forest Green Light
-  '#58A6FF', // Blue
-  '#D29922', // Amber
-  '#A371F7', // Purple
-  '#48CAE4', // Teal
+  '#C4975A', // Golden Copper
+  '#1B6B45', // Forest Green
+  '#2563EB', // Blue
+  '#D97706', // Amber
+  '#7C3AED', // Purple
+  '#0891B2', // Teal
   '#EC4899', // Pink
   '#84CC16', // Lime
 ];
 
 // ===== AI COLORS =====
 export const AI = {
-  DEFAULT: '#A371F7',
-  muted: 'rgba(163, 113, 247, 0.15)',
-  text: '#D2A8FF',
+  DEFAULT: '#7C3AED',
+  muted: 'rgba(124, 58, 237, 0.1)',
+  text: '#7C3AED',
 };
 
 // ===== HIERARCHY COLORS (Tree Structure) =====
@@ -169,19 +170,19 @@ export const STATUS_COLORS = {
 // ===== CHART THEME =====
 export const chartTheme = {
   colors: {
-    primary: '#D7B797',
-    secondary: '#2A9E6A',
-    tertiary: '#58A6FF',
-    quaternary: '#D29922',
-    quinary: '#A371F7',
-    senary: '#48CAE4',
-    positive: '#127749',
-    negative: '#F85149',
-    neutral: '#8B949E',
-    grid: '#2E2E2E',
-    axis: '#999999',
-    tooltipBg: '#121212',
-    tooltipBorder: '#2E2E2E',
+    primary: '#C4975A',
+    secondary: '#1B6B45',
+    tertiary: '#2563EB',
+    quaternary: '#D97706',
+    quinary: '#7C3AED',
+    senary: '#0891B2',
+    positive: '#1B6B45',
+    negative: '#DC3545',
+    neutral: '#8C8178',
+    grid: '#E8E2DB',
+    axis: '#6B5D4F',
+    tooltipBg: '#FFFFFF',
+    tooltipBorder: '#E8E2DB',
   },
 
   series: CHART_SERIES,
@@ -193,26 +194,26 @@ export const chartTheme = {
   },
 
   grid: {
-    stroke: '#2E2E2E',
+    stroke: '#E8E2DB',
     strokeDasharray: '3 3',
     strokeWidth: 1,
-    opacity: 0.4,
+    opacity: 0.6,
   },
 
   axis: {
-    stroke: '#2E2E2E',
+    stroke: '#E8E2DB',
     fontSize: 10,
     tickSize: 4,
     tick: {
-      fill: '#999999',
+      fill: '#6B5D4F',
       fontSize: 10,
       fontFamily: "'JetBrains Mono', monospace",
     },
   },
 
   tooltip: {
-    backgroundColor: '#121212',
-    borderColor: '#2E2E2E',
+    backgroundColor: '#FFFFFF',
+    borderColor: '#E8E2DB',
     borderRadius: 6,
     padding: 12,
     fontSize: 11,
@@ -231,16 +232,16 @@ export const chartTheme = {
 export const rechartsConfig = {
   cartesianGrid: {
     strokeDasharray: '3 3',
-    stroke: '#2E2E2E',
-    strokeOpacity: 0.4,
+    stroke: '#E8E2DB',
+    strokeOpacity: 0.6,
     vertical: false,
   },
 
   xAxis: {
-    axisLine: { stroke: '#2E2E2E' },
-    tickLine: { stroke: '#2E2E2E' },
+    axisLine: { stroke: '#E8E2DB' },
+    tickLine: { stroke: '#E8E2DB' },
     tick: {
-      fill: '#999999',
+      fill: '#6B5D4F',
       fontSize: 10,
       fontFamily: "'JetBrains Mono', monospace",
     },
@@ -250,19 +251,20 @@ export const rechartsConfig = {
     axisLine: false,
     tickLine: false,
     tick: {
-      fill: '#999999',
+      fill: '#6B5D4F',
       fontSize: 10,
       fontFamily: "'JetBrains Mono', monospace",
     },
   },
 
   tooltipContentStyle: {
-    backgroundColor: '#121212',
-    border: '1px solid #2E2E2E',
+    backgroundColor: '#FFFFFF',
+    border: '1px solid #E8E2DB',
     borderRadius: '6px',
     padding: '12px',
     fontSize: '11px',
     fontFamily: "'JetBrains Mono', monospace",
+    boxShadow: '0 4px 12px rgba(44,36,23,0.12)',
   },
 };
 
@@ -296,17 +298,17 @@ export const chartFormatters = {
 // ===== COMPLETE TOKEN OBJECT =====
 export const DAFC = {
   colors: {
-    gold: '#D7B797',
-    goldDark: '#B89970',
-    goldLight: '#E8D4C0',
-    goldDarker: '#8A6340',
-    green: '#127749',
+    gold: '#C4975A',
+    goldDark: '#A67B3D',
+    goldLight: '#D4B082',
+    goldLighter: '#EDE0D0',
+    goldDarker: '#7D5A28',
+    green: '#1B6B45',
     greenLight: '#2A9E6A',
     greenDark: '#095431',
-    black: '#000000',
-    charcoal: '#1a1a1a',
-    slate: '#2a2a2a',
-    cream: '#FAFAFA',
+    canvas: '#FAF8F5',
+    surface: '#FFFFFF',
+    surfaceSecondary: '#FBF9F7',
     white: '#FFFFFF',
     status: STATUS,
   },
@@ -322,9 +324,9 @@ export const DAFC = {
     input: '8px',
   },
   shadows: {
-    glow: '0 0 20px rgba(215, 183, 151, 0.3)',
-    card: '0 4px 24px rgba(0, 0, 0, 0.12)',
-    elevated: '0 8px 32px rgba(0, 0, 0, 0.24)',
+    glow: '0 0 20px rgba(196, 151, 90, 0.15)',
+    card: '0 2px 8px rgba(44,36,23,0.06)',
+    elevated: '0 8px 24px rgba(44,36,23,0.10)',
   },
   media: {
     heroSize: { width: 1200, height: 1600 },
@@ -332,7 +334,7 @@ export const DAFC = {
     thumbSize: { width: 400, height: 400 },
     miniSize: { width: 64, height: 64 },
     aspectRatio: '3/4',
-    background: '#FAFAFA',
+    background: '#FAF8F5',
     format: 'webp',
   },
 };

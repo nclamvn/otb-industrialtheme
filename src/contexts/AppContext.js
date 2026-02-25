@@ -4,21 +4,9 @@ import React, { createContext, useContext, useState, useCallback } from 'react';
 const AppContext = createContext(null);
 
 export const AppProvider = ({ children }) => {
-  // Dark mode state
-  const [darkMode, setDarkModeState] = useState(true);
-
-  const setDarkMode = useCallback((value) => {
-    setDarkModeState(value);
-    if (typeof document !== 'undefined') {
-      if (value) {
-        document.documentElement.classList.add('dark');
-        document.documentElement.classList.remove('light');
-      } else {
-        document.documentElement.classList.add('light');
-        document.documentElement.classList.remove('dark');
-      }
-    }
-  }, []);
+  // Dark mode removed — light theme only
+  const [darkMode] = useState(false);
+  const setDarkMode = useCallback(() => {}, []);
 
   // Shared filter state between Budget Management and Planning screens
   const [sharedYear, setSharedYear] = useState(2025);

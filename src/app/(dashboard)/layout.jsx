@@ -32,7 +32,7 @@ export default function DashboardLayout({ children }) {
 
   return (
     <AuthGuard>
-      <div className={`min-h-screen ${darkMode ? 'dark bg-canvas' : 'light bg-[hsl(40,25%,96%)]'} flex transition-colors duration-normal`}>
+      <div className="min-h-screen bg-[#FAF8F5] flex transition-colors duration-normal">
         {/* Desktop Sidebar - hidden on mobile */}
         <div className="hidden md:block">
           <Sidebar
@@ -44,7 +44,7 @@ export default function DashboardLayout({ children }) {
           />
         </div>
 
-        <div className={`flex-1 flex flex-col overflow-hidden ${darkMode ? 'text-content' : 'text-content-inverse'}`}>
+        <div className="flex-1 flex flex-col overflow-hidden text-[#2C2417]">
           <AppHeader
             currentScreen={currentScreen}
             darkMode={darkMode}

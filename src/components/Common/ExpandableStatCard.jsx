@@ -4,43 +4,24 @@ import React, { useState } from 'react';
 import { ArrowUpRight, ChevronDown, TrendingUp, TrendingDown } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 
-const BAR_COLORS = ['#D7B797', '#2A9E6A', '#58A6FF', '#F87171', '#F59E0B', '#14B8A6', '#A78BFA'];
-
-/**
- * ExpandableStatCard - Reusable stat card with click-to-expand breakdown panel
- *
- * @param {string} title - Card label
- * @param {string|number} value - Main display value
- * @param {string} sub - Subtitle text
- * @param {boolean} darkMode
- * @param {Component} icon - lucide-react icon component
- * @param {string} accent - Color accent key
- * @param {number} trend - Trend percentage (positive = up, negative = down)
- * @param {string} trendLabel - Display text for trend (e.g. "+12.5%")
- * @param {number} progress - Progress bar value 0-100
- * @param {string} progressLabel - Label for progress bar
- * @param {Array} breakdown - Array of { label, value, pct?, color? } items
- * @param {Array} badges - Array of { label, value, color } badge items
- * @param {string} expandTitle - Title for expanded section
- */
+const BAR_COLORS = ['#C4975A', '#1B6B45', '#2563EB', '#DC3545', '#D97706', '#0891B2', '#7C3AED'];
 
 const ACCENTS = {
-  gold:    { color: '#D7B797', darkGrad: 'rgba(215,183,151,0.18)', darkMid: 'rgba(215,183,151,0.06)', lightGrad: 'rgba(160,120,70,0.38)', lightMid: 'rgba(180,140,95,0.16)', iconDark: 'rgba(215,183,151,0.12)', iconLight: 'rgba(140,100,55,0.26)', glowDark: 'rgba(215,183,151,0.15)', glowLight: 'rgba(160,120,70,0.20)' },
-  emerald: { color: '#2A9E6A', darkGrad: 'rgba(42,158,106,0.18)',  darkMid: 'rgba(42,158,106,0.05)', lightGrad: 'rgba(15,100,55,0.35)',  lightMid: 'rgba(20,120,65,0.14)',  iconDark: 'rgba(42,158,106,0.12)', iconLight: 'rgba(15,100,55,0.24)', glowDark: 'rgba(42,158,106,0.15)', glowLight: 'rgba(15,100,55,0.18)' },
-  blue:    { color: '#58A6FF', darkGrad: 'rgba(88,166,255,0.16)',   darkMid: 'rgba(88,166,255,0.04)', lightGrad: 'rgba(40,100,200,0.32)', lightMid: 'rgba(50,120,220,0.14)', iconDark: 'rgba(88,166,255,0.12)', iconLight: 'rgba(40,100,200,0.24)', glowDark: 'rgba(88,166,255,0.12)', glowLight: 'rgba(40,100,200,0.18)' },
-  rose:    { color: '#F87171', darkGrad: 'rgba(248,113,113,0.16)', darkMid: 'rgba(248,113,113,0.04)', lightGrad: 'rgba(200,55,55,0.32)',  lightMid: 'rgba(220,70,70,0.14)',  iconDark: 'rgba(248,113,113,0.12)', iconLight: 'rgba(180,45,45,0.24)', glowDark: 'rgba(248,113,113,0.12)', glowLight: 'rgba(200,55,55,0.18)' },
-  amber:   { color: '#D29922', darkGrad: 'rgba(210,153,34,0.16)',   darkMid: 'rgba(210,153,34,0.04)', lightGrad: 'rgba(180,100,5,0.35)', lightMid: 'rgba(200,120,10,0.14)', iconDark: 'rgba(210,153,34,0.12)', iconLight: 'rgba(160,90,5,0.24)', glowDark: 'rgba(210,153,34,0.12)', glowLight: 'rgba(180,100,5,0.18)' },
-  teal:    { color: '#14B8A6', darkGrad: 'rgba(20,184,166,0.16)',   darkMid: 'rgba(20,184,166,0.04)', lightGrad: 'rgba(10,120,110,0.32)', lightMid: 'rgba(15,140,130,0.14)', iconDark: 'rgba(20,184,166,0.12)', iconLight: 'rgba(10,120,110,0.24)', glowDark: 'rgba(20,184,166,0.12)', glowLight: 'rgba(10,120,110,0.18)' },
-  violet:  { color: '#A78BFA', darkGrad: 'rgba(167,139,250,0.16)', darkMid: 'rgba(167,139,250,0.04)', lightGrad: 'rgba(100,70,200,0.32)', lightMid: 'rgba(120,90,220,0.14)', iconDark: 'rgba(167,139,250,0.12)', iconLight: 'rgba(80,55,180,0.24)', glowDark: 'rgba(167,139,250,0.12)', glowLight: 'rgba(100,70,200,0.18)' },
-  indigo:  { color: '#818CF8', darkGrad: 'rgba(129,140,248,0.16)', darkMid: 'rgba(129,140,248,0.04)', lightGrad: 'rgba(60,70,200,0.32)',  lightMid: 'rgba(80,90,220,0.14)', iconDark: 'rgba(129,140,248,0.12)', iconLight: 'rgba(60,70,200,0.24)', glowDark: 'rgba(129,140,248,0.12)', glowLight: 'rgba(60,70,200,0.18)' },
-  red:     { color: '#F85149', darkGrad: 'rgba(248,81,73,0.16)',   darkMid: 'rgba(248,81,73,0.04)', lightGrad: 'rgba(200,40,40,0.32)',  lightMid: 'rgba(220,55,55,0.14)',  iconDark: 'rgba(248,81,73,0.12)', iconLight: 'rgba(180,35,35,0.24)', glowDark: 'rgba(248,81,73,0.12)', glowLight: 'rgba(200,40,40,0.18)' },
+  gold:    { color: '#C4975A', grad: 'rgba(196,151,90,0.30)', mid: 'rgba(196,151,90,0.12)', icon: 'rgba(196,151,90,0.18)', glow: 'rgba(196,151,90,0.15)' },
+  emerald: { color: '#1B6B45', grad: 'rgba(27,107,69,0.28)', mid: 'rgba(27,107,69,0.10)', icon: 'rgba(27,107,69,0.16)', glow: 'rgba(27,107,69,0.12)' },
+  blue:    { color: '#2563EB', grad: 'rgba(37,99,235,0.25)', mid: 'rgba(37,99,235,0.10)', icon: 'rgba(37,99,235,0.16)', glow: 'rgba(37,99,235,0.12)' },
+  rose:    { color: '#DC3545', grad: 'rgba(220,53,69,0.25)',  mid: 'rgba(220,53,69,0.10)',  icon: 'rgba(220,53,69,0.16)', glow: 'rgba(220,53,69,0.12)' },
+  amber:   { color: '#D97706', grad: 'rgba(217,119,6,0.28)',  mid: 'rgba(217,119,6,0.10)',  icon: 'rgba(217,119,6,0.16)', glow: 'rgba(217,119,6,0.12)' },
+  teal:    { color: '#0891B2', grad: 'rgba(8,145,178,0.25)',   mid: 'rgba(8,145,178,0.10)',  icon: 'rgba(8,145,178,0.16)', glow: 'rgba(8,145,178,0.12)' },
+  violet:  { color: '#7C3AED', grad: 'rgba(124,58,237,0.25)', mid: 'rgba(124,58,237,0.10)', icon: 'rgba(124,58,237,0.16)', glow: 'rgba(124,58,237,0.12)' },
+  indigo:  { color: '#4F46E5', grad: 'rgba(79,70,229,0.25)',  mid: 'rgba(79,70,229,0.10)',  icon: 'rgba(79,70,229,0.16)', glow: 'rgba(79,70,229,0.12)' },
+  red:     { color: '#DC3545', grad: 'rgba(220,53,69,0.25)',   mid: 'rgba(220,53,69,0.10)',  icon: 'rgba(220,53,69,0.16)', glow: 'rgba(220,53,69,0.12)' },
 };
 
 const ExpandableStatCard = ({
   title,
   value,
   sub,
-  darkMode,
   icon: Icon,
   accent = 'blue',
   trend,
@@ -54,30 +35,21 @@ const ExpandableStatCard = ({
   const [expanded, setExpanded] = useState(false);
   const { t } = useLanguage();
   const a = ACCENTS[accent] || ACCENTS.blue;
-  const borderColor = darkMode ? 'border-[#2E2E2E]' : 'border-gray-300';
-  const textMuted = darkMode ? 'text-[#666666]' : 'text-gray-600';
-  const textPrimary = darkMode ? 'text-[#F2F2F2]' : 'text-gray-900';
-  const textSecondary = darkMode ? 'text-[#999999]' : 'text-gray-700';
   const hasExpandContent = breakdown?.length > 0 || badges?.length > 0 || progress != null;
 
   return (
     <div
-      className={`relative overflow-hidden border ${borderColor} rounded-xl transition-all duration-300 ${
+      className={`relative overflow-hidden border border-[#E8E2DB] rounded-xl transition-all duration-300 ${
         expanded ? 'shadow-lg' : 'hover:shadow-md'
       } group`}
       style={{
-        background: darkMode
-          ? `linear-gradient(135deg, #121212 0%, ${a.darkMid} 40%, ${a.darkGrad} 100%)`
-          : `linear-gradient(135deg, #ffffff 0%, ${a.lightMid} 35%, ${a.lightGrad} 100%)`,
-        boxShadow: `inset 0 -1px 0 ${darkMode ? a.glowDark : a.glowLight}`,
+        background: `linear-gradient(135deg, #ffffff 0%, ${a.mid} 35%, ${a.grad} 100%)`,
+        boxShadow: `inset 0 -1px 0 ${a.glow}`,
       }}
     >
       {/* Watermark Icon */}
       {Icon && (
-        <div
-          className="absolute -bottom-1 -right-1 transition-all duration-300 group-hover:scale-110 group-hover:opacity-[0.12] pointer-events-none"
-          style={{ opacity: darkMode ? 0.04 : 0.12 }}
-        >
+        <div className="absolute -bottom-1 -right-1 transition-all duration-300 group-hover:scale-110 group-hover:opacity-[0.15] pointer-events-none opacity-[0.10]">
           <Icon size={48} color={a.color} strokeWidth={1} />
         </div>
       )}
@@ -90,15 +62,15 @@ const ExpandableStatCard = ({
         <div className="flex items-center justify-between gap-2">
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-1.5">
-              <p className={`text-[10px] font-medium uppercase tracking-wider ${textMuted} font-['Montserrat']`}>{title}</p>
+              <p className="text-[10px] font-medium uppercase tracking-wider text-[#6B5D4F] font-['Montserrat']">{title}</p>
               {hasExpandContent && (
                 <ChevronDown
                   size={10}
-                  className={`transition-transform duration-300 ${textMuted} ${expanded ? 'rotate-180' : ''}`}
+                  className={`transition-transform duration-300 text-[#6B5D4F] ${expanded ? 'rotate-180' : ''}`}
                 />
               )}
             </div>
-            <div className={`mt-0.5 text-lg font-bold font-['JetBrains_Mono'] tabular-nums leading-tight ${textPrimary}`}>
+            <div className="mt-0.5 text-lg font-bold font-['JetBrains_Mono'] tabular-nums leading-tight text-[#2C2417]">
               {value}
             </div>
 
@@ -107,15 +79,15 @@ const ExpandableStatCard = ({
               {trendLabel && (
                 <span className={`inline-flex items-center gap-0.5 px-1.5 py-0.5 text-[9px] font-semibold font-['JetBrains_Mono'] rounded ${
                   trend > 0
-                    ? 'bg-[rgba(18,119,73,0.15)] text-[#2A9E6A]'
+                    ? 'bg-[rgba(27,107,69,0.12)] text-[#1B6B45]'
                     : trend < 0
-                      ? 'bg-[rgba(248,81,73,0.15)] text-[#FF7B72]'
-                      : `bg-[rgba(102,102,102,0.15)] ${textMuted}`
+                      ? 'bg-[rgba(220,53,69,0.10)] text-[#DC3545]'
+                      : 'bg-[rgba(140,129,120,0.12)] text-[#8C8178]'
                 }`}>
                   {trend > 0 ? '▲' : trend < 0 ? '▼' : '—'} {trendLabel}
                 </span>
               )}
-              {sub && <p className={`text-[10px] ${textMuted}`}>{sub}</p>}
+              {sub && <p className="text-[10px] text-[#6B5D4F]">{sub}</p>}
             </div>
 
             {/* Progress bar (always visible when provided) */}
@@ -123,13 +95,13 @@ const ExpandableStatCard = ({
               <div className="mt-1.5">
                 <div className="flex items-center justify-between mb-0.5">
                   {progressLabel && (
-                    <span className={`text-[9px] font-medium ${textMuted} font-['Montserrat']`}>{progressLabel}</span>
+                    <span className="text-[9px] font-medium text-[#6B5D4F] font-['Montserrat']">{progressLabel}</span>
                   )}
-                  <span className={`text-[9px] font-semibold font-['JetBrains_Mono'] ${textSecondary}`}>
+                  <span className="text-[9px] font-semibold font-['JetBrains_Mono'] text-[#6B5D4F]">
                     {Math.round(progress)}%
                   </span>
                 </div>
-                <div className={`h-1 rounded-full overflow-hidden ${darkMode ? 'bg-[#1E1E1E]' : 'bg-gray-200'}`}>
+                <div className="h-1 rounded-full overflow-hidden bg-[#E8E2DB]">
                   <div
                     className="h-full rounded-full transition-all duration-700"
                     style={{
@@ -146,7 +118,7 @@ const ExpandableStatCard = ({
           {Icon && (
             <div
               className="w-7 h-7 rounded-lg flex items-center justify-center backdrop-blur-sm shrink-0"
-              style={{ backgroundColor: darkMode ? a.iconDark : a.iconLight }}
+              style={{ backgroundColor: a.icon }}
             >
               <Icon size={14} color={a.color} />
             </div>
@@ -167,10 +139,10 @@ const ExpandableStatCard = ({
           expanded ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'
         }`}
       >
-        <div className={`px-3 pb-2.5 border-t ${borderColor}`}>
+        <div className="px-3 pb-2.5 border-t border-[#E8E2DB]">
           {/* Expand title */}
           {expandTitle && (
-            <p className={`text-[9px] font-semibold uppercase tracking-wider mt-2 mb-1.5 ${textMuted} font-['Montserrat']`}>
+            <p className="text-[9px] font-semibold uppercase tracking-wider mt-2 mb-1.5 text-[#6B5D4F] font-['Montserrat']">
               {expandTitle}
             </p>
           )}
@@ -183,8 +155,8 @@ const ExpandableStatCard = ({
                   key={i}
                   className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[9px] font-semibold font-['JetBrains_Mono']"
                   style={{
-                    backgroundColor: `${badge.color || a.color}${darkMode ? '15' : '25'}`,
-                    color: !darkMode && (badge.color || a.color) === '#D7B797' ? '#6B4D30' : (badge.color || a.color),
+                    backgroundColor: `${badge.color || a.color}18`,
+                    color: badge.color || a.color,
                   }}
                 >
                   <span className="w-1 h-1 rounded-full" style={{ backgroundColor: badge.color || a.color }} />
@@ -203,14 +175,14 @@ const ExpandableStatCard = ({
                 return (
                   <div key={i}>
                     <div className="flex items-center justify-between">
-                      <span className={`text-[10px] font-medium ${textPrimary} font-['Montserrat'] truncate max-w-[60%]`}>
+                      <span className="text-[10px] font-medium text-[#2C2417] font-['Montserrat'] truncate max-w-[60%]">
                         {item.label}
                       </span>
-                      <span className={`text-[9px] font-['JetBrains_Mono'] tabular-nums ${textSecondary}`}>
+                      <span className="text-[9px] font-['JetBrains_Mono'] tabular-nums text-[#6B5D4F]">
                         {item.displayValue || item.value}
                       </span>
                     </div>
-                    <div className={`h-0.5 rounded-full overflow-hidden mt-0.5 ${darkMode ? 'bg-[#1E1E1E]' : 'bg-gray-200'}`}>
+                    <div className="h-0.5 rounded-full overflow-hidden mt-0.5 bg-[#E8E2DB]">
                       <div
                         className="h-full rounded-full transition-all duration-700"
                         style={{

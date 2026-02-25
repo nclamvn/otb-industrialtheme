@@ -16,8 +16,8 @@ export default function AuthGuard({ children }) {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">
-        <LoadingSpinner darkMode={true} size="lg" message="Checking authentication..." />
+      <div className="min-h-screen bg-[#FAF8F5] flex items-center justify-center">
+        <LoadingSpinner size="lg" message="Checking authentication..." />
       </div>
     );
   }

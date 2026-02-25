@@ -28,12 +28,12 @@ const SEASONS = [
 
 // DAFC Design System card backgrounds - warm gold tints
 const CARD_BG_CLASSES = [
-  { light: 'bg-[rgba(160,120,75,0.12)] border-[rgba(215,183,151,0.3)]', dark: 'bg-[rgba(215,183,151,0.08)] border-[rgba(215,183,151,0.2)]' },
-  { light: 'bg-[rgba(160,120,75,0.18)] border-[rgba(215,183,151,0.35)]', dark: 'bg-[rgba(215,183,151,0.1)] border-[rgba(215,183,151,0.25)]' },
-  { light: 'bg-[rgba(18,119,73,0.08)] border-[rgba(18,119,73,0.2)]', dark: 'bg-[rgba(42,158,106,0.1)] border-[rgba(42,158,106,0.25)]' },
-  { light: 'bg-[rgba(215,183,151,0.12)] border-[rgba(215,183,151,0.32)]', dark: 'bg-[rgba(215,183,151,0.06)] border-[rgba(215,183,151,0.18)]' },
-  { light: 'bg-[rgba(18,119,73,0.06)] border-[rgba(18,119,73,0.18)]', dark: 'bg-[rgba(42,158,106,0.08)] border-[rgba(42,158,106,0.2)]' },
-  { light: 'bg-[rgba(215,183,151,0.08)] border-[rgba(215,183,151,0.25)]', dark: 'bg-[rgba(215,183,151,0.05)] border-[rgba(215,183,151,0.15)]' }
+  'bg-[rgba(160,120,75,0.12)] border-[rgba(196,151,90,0.3)]',
+  'bg-[rgba(160,120,75,0.18)] border-[rgba(196,151,90,0.35)]',
+  'bg-[rgba(27,107,69,0.08)] border-[rgba(27,107,69,0.2)]',
+  'bg-[rgba(196,151,90,0.12)] border-[rgba(196,151,90,0.32)]',
+  'bg-[rgba(27,107,69,0.06)] border-[rgba(27,107,69,0.18)]',
+  'bg-[rgba(196,151,90,0.08)] border-[rgba(196,151,90,0.25)]'
 ];
 
 const SKU_VERSIONS = [
@@ -519,15 +519,14 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
   }, [filteredSkuBlocks]);
 
   const getCardBgClass = (index) => {
-    const style = CARD_BG_CLASSES[index % CARD_BG_CLASSES.length];
-    return darkMode ? style.dark : style.light;
+    return CARD_BG_CLASSES[index % CARD_BG_CLASSES.length];
   };
 
   return (
     <div className="space-y-5">
-      <div className={`rounded-2xl shadow-sm border p-3 md:p-5 ${darkMode ? 'bg-[#121212] border-[#2E2E2E]' : 'bg-white border-[rgba(215,183,151,0.3)]'}`}>
+      <div className="rounded-2xl shadow-[0_1px_4px_rgba(44,36,23,0.06)] border p-3 md:p-5 bg-white border-[rgba(196,151,90,0.3)]">
         <div className="flex items-center justify-between mb-4">
-          
+
 
         </div>
 
@@ -536,16 +535,12 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
           <div className="space-y-3">
             <button
               onClick={() => setShowMobileFilters(true)}
-              className={`w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl border text-sm font-semibold font-['Montserrat'] transition-colors ${
-                darkMode
-                  ? 'bg-[#1A1A1A] border-[#2E2E2E] text-[#D7B797] active:bg-[rgba(215,183,151,0.1)]'
-                  : 'bg-[rgba(160,120,75,0.08)] border-[rgba(215,183,151,0.2)] text-[#8A6340] active:bg-[rgba(160,120,75,0.15)]'
-              }`}
+              className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl border text-sm font-semibold font-['Montserrat'] transition-colors bg-[rgba(160,120,75,0.08)] border-[rgba(196,151,90,0.2)] text-[#7D5A28] active:bg-[rgba(160,120,75,0.15)]"
             >
               <SlidersHorizontal size={16} />
               <span>{t('skuProposal.filters')}</span>
               {(budgetFilter !== 'all' || seasonGroupFilter !== 'all' || seasonFilter !== 'all' || genderFilter !== 'all' || categoryFilter !== 'all' || subCategoryFilter !== 'all') && (
-                <span className="ml-1 w-5 h-5 rounded-full bg-dafc-gold text-[#0A0A0A] text-[10px] font-bold flex items-center justify-center">
+                <span className="ml-1 w-5 h-5 rounded-full bg-[#C4975A] text-white text-[10px] font-bold flex items-center justify-center">
                   {[budgetFilter, seasonGroupFilter, seasonFilter, genderFilter, categoryFilter, subCategoryFilter].filter(f => f !== 'all').length}
                 </span>
               )}
@@ -554,25 +549,25 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
             {(budgetFilter !== 'all' || genderFilter !== 'all' || categoryFilter !== 'all' || subCategoryFilter !== 'all') && (
               <div className="flex flex-wrap gap-2">
                 {budgetFilter !== 'all' && (
-                  <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium ${darkMode ? 'bg-[rgba(215,183,151,0.12)] text-[#D7B797]' : 'bg-[rgba(160,120,75,0.12)] text-[#8A6340]'}`}>
+                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-[rgba(160,120,75,0.12)] text-[#7D5A28]">
                     {budgetOptions.find(b => String(b.id) === String(budgetFilter))?.label || budgetFilter}
                     <button onClick={() => setBudgetFilter('all')} className="ml-0.5"><X size={12} /></button>
                   </span>
                 )}
                 {genderFilter !== 'all' && (
-                  <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium ${darkMode ? 'bg-[rgba(215,183,151,0.12)] text-[#D7B797]' : 'bg-[rgba(160,120,75,0.12)] text-[#8A6340]'}`}>
+                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-[rgba(160,120,75,0.12)] text-[#7D5A28]">
                     {genderFilter}
                     <button onClick={() => setGenderFilter('all')} className="ml-0.5"><X size={12} /></button>
                   </span>
                 )}
                 {categoryFilter !== 'all' && (
-                  <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium ${darkMode ? 'bg-[rgba(215,183,151,0.12)] text-[#D7B797]' : 'bg-[rgba(160,120,75,0.12)] text-[#8A6340]'}`}>
+                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-[rgba(160,120,75,0.12)] text-[#7D5A28]">
                     {categoryFilter}
                     <button onClick={() => setCategoryFilter('all')} className="ml-0.5"><X size={12} /></button>
                   </span>
                 )}
                 {subCategoryFilter !== 'all' && (
-                  <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium ${darkMode ? 'bg-[rgba(215,183,151,0.12)] text-[#D7B797]' : 'bg-[rgba(160,120,75,0.12)] text-[#8A6340]'}`}>
+                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-[rgba(160,120,75,0.12)] text-[#7D5A28]">
                     {subCategoryFilter}
                     <button onClick={() => setSubCategoryFilter('all')} className="ml-0.5"><X size={12} /></button>
                   </span>
@@ -582,18 +577,18 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
           </div>
         ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <div className={`rounded-xl border p-4 ${darkMode ? 'bg-[#1A1A1A] border-[#2E2E2E]' : 'bg-[rgba(160,120,75,0.08)] border-[rgba(215,183,151,0.2)]'}`}>
-            <div className={`flex items-center gap-2 mb-3 ${darkMode ? 'text-[#D7B797]' : 'text-[#8A6340]'}`}>
+          <div className="rounded-xl border p-4 bg-[rgba(160,120,75,0.08)] border-[rgba(196,151,90,0.2)]">
+            <div className="flex items-center gap-2 mb-3 text-[#7D5A28]">
               <Filter size={14} />
               <span className="text-sm font-semibold font-['Montserrat']">{t('skuProposal.filters')}</span>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <div>
-                <label className={`block text-xs font-medium mb-1.5 ${darkMode ? 'text-[#999999]' : 'text-[#666666]'}`}>{t('skuProposal.budget')}</label>
+                <label className="block text-xs font-medium mb-1.5 text-[#8C8178]">{t('skuProposal.budget')}</label>
                 <select
                   value={budgetFilter}
                   onChange={(e) => setBudgetFilter(e.target.value)}
-                  className={`w-full border rounded-lg pl-3 pr-8 py-2 text-sm focus:outline-none focus:ring-2 ${darkMode ? 'bg-[#121212] border-[#2E2E2E] text-[#F2F2F2] focus:ring-[rgba(215,183,151,0.3)] focus:border-[#D7B797]' : 'bg-white border-[rgba(215,183,151,0.3)] text-[#333333] focus:ring-[rgba(215,183,151,0.3)] focus:border-[#D7B797]'}`}
+                  className="w-full border rounded-lg pl-3 pr-8 py-2 text-sm focus:outline-none focus:ring-2 bg-white border-[rgba(196,151,90,0.3)] text-[#2C2417] focus:ring-[rgba(196,151,90,0.3)] focus:border-[#C4975A]"
                 >
                   {budgetOptions.map(opt => (
                     <option key={opt.id} value={opt.id}>{opt.label}</option>
@@ -601,11 +596,11 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
                 </select>
               </div>
               <div>
-                <label className={`block text-xs font-medium mb-1.5 ${darkMode ? 'text-[#999999]' : 'text-[#666666]'}`}>{t('skuProposal.seasonGroup')}</label>
+                <label className="block text-xs font-medium mb-1.5 text-[#8C8178]">{t('skuProposal.seasonGroup')}</label>
                 <select
                   value={seasonGroupFilter}
                   onChange={(e) => setSeasonGroupFilter(e.target.value)}
-                  className={`w-full border rounded-lg pl-3 pr-8 py-2 text-sm focus:outline-none focus:ring-2 ${darkMode ? 'bg-[#121212] border-[#2E2E2E] text-[#F2F2F2] focus:ring-[rgba(215,183,151,0.3)] focus:border-[#D7B797]' : 'bg-white border-[rgba(215,183,151,0.3)] text-[#333333] focus:ring-[rgba(215,183,151,0.3)] focus:border-[#D7B797]'}`}
+                  className="w-full border rounded-lg pl-3 pr-8 py-2 text-sm focus:outline-none focus:ring-2 bg-white border-[rgba(196,151,90,0.3)] text-[#2C2417] focus:ring-[rgba(196,151,90,0.3)] focus:border-[#C4975A]"
                 >
                   {SEASON_GROUPS.map(opt => (
                     <option key={opt.id} value={opt.id}>{opt.label}</option>
@@ -613,11 +608,11 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
                 </select>
               </div>
               <div>
-                <label className={`block text-xs font-medium mb-1.5 ${darkMode ? 'text-[#999999]' : 'text-[#666666]'}`}>{t('skuProposal.season')}</label>
+                <label className="block text-xs font-medium mb-1.5 text-[#8C8178]">{t('skuProposal.season')}</label>
                 <select
                   value={seasonFilter}
                   onChange={(e) => setSeasonFilter(e.target.value)}
-                  className={`w-full border rounded-lg pl-3 pr-8 py-2 text-sm focus:outline-none focus:ring-2 ${darkMode ? 'bg-[#121212] border-[#2E2E2E] text-[#F2F2F2] focus:ring-[rgba(215,183,151,0.3)] focus:border-[#D7B797]' : 'bg-white border-[rgba(215,183,151,0.3)] text-[#333333] focus:ring-[rgba(215,183,151,0.3)] focus:border-[#D7B797]'}`}
+                  className="w-full border rounded-lg pl-3 pr-8 py-2 text-sm focus:outline-none focus:ring-2 bg-white border-[rgba(196,151,90,0.3)] text-[#2C2417] focus:ring-[rgba(196,151,90,0.3)] focus:border-[#C4975A]"
                 >
                   {SEASONS.map(opt => (
                     <option key={opt.id} value={opt.id}>{opt.label}</option>
@@ -627,18 +622,18 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
             </div>
           </div>
 
-          <div className={`rounded-xl border p-4 ${darkMode ? 'bg-[#1A1A1A] border-[#2E2E2E]' : 'bg-white border-[rgba(215,183,151,0.2)]'}`}>
-            <div className={`flex items-center gap-2 mb-3 ${darkMode ? 'text-[#D7B797]' : 'text-[#8A6340]'}`}>
+          <div className="rounded-xl border p-4 bg-white border-[rgba(196,151,90,0.2)]">
+            <div className="flex items-center gap-2 mb-3 text-[#7D5A28]">
               <Filter size={14} />
               <span className="text-sm font-semibold font-['Montserrat']">{t('common.filters')}</span>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <div>
-                <label className={`block text-xs font-medium mb-1.5 ${darkMode ? 'text-[#999999]' : 'text-[#666666]'}`}>{t('skuProposal.gender')}</label>
+                <label className="block text-xs font-medium mb-1.5 text-[#8C8178]">{t('skuProposal.gender')}</label>
                 <select
                   value={genderFilter}
                   onChange={(e) => setGenderFilter(e.target.value)}
-                  className={`w-full border rounded-lg pl-3 pr-8 py-2 text-sm focus:outline-none focus:ring-2 ${darkMode ? 'bg-[#121212] border-[#2E2E2E] text-[#F2F2F2] focus:ring-[rgba(215,183,151,0.3)] focus:border-[#D7B797]' : 'bg-white border-[rgba(215,183,151,0.3)] text-[#333333] focus:ring-[rgba(215,183,151,0.3)] focus:border-[#D7B797]'}`}
+                  className="w-full border rounded-lg pl-3 pr-8 py-2 text-sm focus:outline-none focus:ring-2 bg-white border-[rgba(196,151,90,0.3)] text-[#2C2417] focus:ring-[rgba(196,151,90,0.3)] focus:border-[#C4975A]"
                 >
                   {genderOptions.map(g => (
                     <option key={g} value={g}>{g === 'all' ? 'All' : g}</option>
@@ -646,11 +641,11 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
                 </select>
               </div>
               <div>
-                <label className={`block text-xs font-medium mb-1.5 ${darkMode ? 'text-[#999999]' : 'text-[#666666]'}`}>{t('skuProposal.category')}</label>
+                <label className="block text-xs font-medium mb-1.5 text-[#8C8178]">{t('skuProposal.category')}</label>
                 <select
                   value={categoryFilter}
                   onChange={(e) => setCategoryFilter(e.target.value)}
-                  className={`w-full border rounded-lg pl-3 pr-8 py-2 text-sm focus:outline-none focus:ring-2 ${darkMode ? 'bg-[#121212] border-[#2E2E2E] text-[#F2F2F2] focus:ring-[rgba(215,183,151,0.3)] focus:border-[#D7B797]' : 'bg-white border-[rgba(215,183,151,0.3)] text-[#333333] focus:ring-[rgba(215,183,151,0.3)] focus:border-[#D7B797]'}`}
+                  className="w-full border rounded-lg pl-3 pr-8 py-2 text-sm focus:outline-none focus:ring-2 bg-white border-[rgba(196,151,90,0.3)] text-[#2C2417] focus:ring-[rgba(196,151,90,0.3)] focus:border-[#C4975A]"
                 >
                   {categoryOptions.map(c => (
                     <option key={c} value={c}>{c === 'all' ? 'All' : c}</option>
@@ -658,11 +653,11 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
                 </select>
               </div>
               <div>
-                <label className={`block text-xs font-medium mb-1.5 ${darkMode ? 'text-[#999999]' : 'text-[#666666]'}`}>{t('skuProposal.subCategory')}</label>
+                <label className="block text-xs font-medium mb-1.5 text-[#8C8178]">{t('skuProposal.subCategory')}</label>
                 <select
                   value={subCategoryFilter}
                   onChange={(e) => setSubCategoryFilter(e.target.value)}
-                  className={`w-full border rounded-lg pl-3 pr-8 py-2 text-sm focus:outline-none focus:ring-2 ${darkMode ? 'bg-[#121212] border-[#2E2E2E] text-[#F2F2F2] focus:ring-[rgba(215,183,151,0.3)] focus:border-[#D7B797]' : 'bg-white border-[rgba(215,183,151,0.3)] text-[#333333] focus:ring-[rgba(215,183,151,0.3)] focus:border-[#D7B797]'}`}
+                  className="w-full border rounded-lg pl-3 pr-8 py-2 text-sm focus:outline-none focus:ring-2 bg-white border-[rgba(196,151,90,0.3)] text-[#2C2417] focus:ring-[rgba(196,151,90,0.3)] focus:border-[#C4975A]"
                 >
                   {subCategoryOptions.map(s => (
                     <option key={s} value={s}>{s === 'all' ? 'All' : s}</option>
@@ -717,37 +712,33 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
         )}
 
         {/* Versions Section */}
-        <div className={`mt-4 rounded-xl border p-4 ${darkMode ? 'bg-[#1A1A1A] border-[#2E2E2E]' : 'bg-[rgba(160,120,75,0.08)] border-[rgba(215,183,151,0.2)]'}`}>
-          <div className={`flex items-center gap-2 mb-3 ${darkMode ? 'text-[#D7B797]' : 'text-[#8A6340]'}`}>
+        <div className="mt-4 rounded-xl border p-4 bg-[rgba(160,120,75,0.08)] border-[rgba(196,151,90,0.2)]">
+          <div className="flex items-center gap-2 mb-3 text-[#7D5A28]">
             <Package size={14} />
             <span className="text-sm font-semibold font-['Montserrat']">{t('skuProposal.version')}</span>
           </div>
           <div className="flex flex-col md:flex-row md:flex-wrap md:items-center gap-4 md:gap-6">
             {/* SKU Version Dropdown */}
             <div className="flex items-center gap-3">
-              <span className={`text-sm font-medium whitespace-nowrap ${darkMode ? 'text-[#999999]' : 'text-[#666666]'}`}>{t('skuProposal.version')}</span>
+              <span className="text-sm font-medium whitespace-nowrap text-[#8C8178]">{t('skuProposal.version')}</span>
               <div className="relative" ref={skuVersionDropdownRef}>
                 <button
                   type="button"
                   onClick={() => setIsSkuVersionOpen(!isSkuVersionOpen)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all border ${
-                    darkMode
-                      ? 'bg-[rgba(215,183,151,0.1)] border-[rgba(215,183,151,0.3)] text-[#F2F2F2] hover:bg-[rgba(215,183,151,0.15)]'
-                      : 'bg-[rgba(160,120,75,0.12)] border-[rgba(215,183,151,0.4)] text-[#333333] hover:bg-[rgba(160,120,75,0.18)]'
-                  }`}
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all border bg-[rgba(160,120,75,0.12)] border-[rgba(196,151,90,0.4)] text-[#2C2417] hover:bg-[rgba(160,120,75,0.18)]"
                 >
-                  {selectedSkuVersion?.isFinal && <Star size={14} className="text-[#D7B797] fill-[#D7B797]" />}
+                  {selectedSkuVersion?.isFinal && <Star size={14} className="text-[#C4975A] fill-[#C4975A]" />}
                   <span>{selectedSkuVersion?.name || t('common.version')}</span>
                   {selectedSkuVersion?.isFinal && (
-                    <span className={`px-1.5 py-0.5 text-[10px] font-bold rounded ${darkMode ? 'bg-[#D7B797] text-[#0A0A0A]' : 'bg-[#D7B797] text-white'}`}>FINAL</span>
+                    <span className="px-1.5 py-0.5 text-[10px] font-bold rounded bg-[#C4975A] text-white">FINAL</span>
                   )}
                   <ChevronDown size={14} className={`transition-transform ${isSkuVersionOpen ? 'rotate-180' : ''}`} />
                 </button>
 
                 {isSkuVersionOpen && (
-                  <div className={`absolute top-full left-0 mt-1 w-72 rounded-xl shadow-xl border z-50 overflow-hidden ${darkMode ? 'bg-[#1A1A1A] border-[#2E2E2E]' : 'bg-white border-[rgba(215,183,151,0.3)]'}`}>
-                    <div className={`px-3 py-2 border-b ${darkMode ? 'bg-[#121212] border-[#2E2E2E]' : 'bg-[rgba(160,120,75,0.08)] border-[rgba(215,183,151,0.2)]'}`}>
-                      <span className={`text-xs font-semibold uppercase tracking-wide font-['Montserrat'] ${darkMode ? 'text-[#666666]' : 'text-[#999999]'}`}>{t('common.version')}</span>
+                  <div className="absolute top-full left-0 mt-1 w-72 rounded-xl shadow-[0_4px_24px_rgba(44,36,23,0.12)] border z-50 overflow-hidden bg-white border-[rgba(196,151,90,0.3)]">
+                    <div className="px-3 py-2 border-b bg-[rgba(160,120,75,0.08)] border-[rgba(196,151,90,0.2)]">
+                      <span className="text-xs font-semibold uppercase tracking-wide font-['Montserrat'] text-[#8C8178]">{t('common.version')}</span>
                     </div>
                     {skuVersions.map(version => (
                       <button
@@ -756,23 +747,23 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
                         onClick={() => { setSkuVersion(version.id); setIsSkuVersionOpen(false); }}
                         className={`w-full px-3 py-3 flex items-center justify-between transition-colors ${
                           version.id === skuVersion
-                            ? darkMode ? 'bg-[rgba(215,183,151,0.1)]' : 'bg-[rgba(160,120,75,0.12)]'
-                            : darkMode ? 'hover:bg-[rgba(215,183,151,0.05)]' : 'hover:bg-[rgba(160,120,75,0.08)]'
+                            ? 'bg-[rgba(160,120,75,0.12)]'
+                            : 'hover:bg-[rgba(160,120,75,0.08)]'
                         }`}
                       >
                         <div className="flex items-center gap-2">
                           {version.isFinal
-                            ? <Star size={14} className="text-[#D7B797] fill-[#D7B797]" />
-                            : <Layers size={14} className={darkMode ? 'text-[#666666]' : 'text-[#999999]'} />
+                            ? <Star size={14} className="text-[#C4975A] fill-[#C4975A]" />
+                            : <Layers size={14} className="text-[#8C8178]" />
                           }
                           <div className="text-left">
                             <div className="flex items-center gap-2">
-                              <span className={`text-sm font-medium ${darkMode ? 'text-[#F2F2F2]' : 'text-[#333333]'}`}>{version.name}</span>
+                              <span className="text-sm font-medium text-[#2C2417]">{version.name}</span>
                               {version.isFinal && (
-                                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-[rgba(42,158,106,0.15)] text-[#2A9E6A]">FINAL</span>
+                                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-[rgba(27,107,69,0.15)] text-[#1B6B45]">FINAL</span>
                               )}
                             </div>
-                            <span className={`text-xs ${darkMode ? 'text-[#666666]' : 'text-[#999999]'}`}>Created: {version.createdAt}</span>
+                            <span className="text-xs text-[#8C8178]">Created: {version.createdAt}</span>
                           </div>
                         </div>
                         <div className="flex items-center gap-2">
@@ -782,12 +773,12 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
                               tabIndex={0}
                               onClick={(e) => handleSetFinalVersion(version.id, e)}
                               onKeyDown={(e) => { if (e.key === 'Enter') handleSetFinalVersion(version.id, e); }}
-                              className={`text-xs px-2 py-1 rounded transition-colors cursor-pointer ${darkMode ? 'text-[#D7B797] hover:bg-[rgba(215,183,151,0.1)]' : 'text-[#8A6340] hover:bg-[rgba(160,120,75,0.12)]'}`}
+                              className="text-xs px-2 py-1 rounded transition-colors cursor-pointer text-[#7D5A28] hover:bg-[rgba(160,120,75,0.12)]"
                             >
                               {t('planning.latestVersion')}
                             </span>
                           )}
-                          {version.id === skuVersion && <Check size={16} className="text-[#2A9E6A]" />}
+                          {version.id === skuVersion && <Check size={16} className="text-[#1B6B45]" />}
                         </div>
                       </button>
                     ))}
@@ -797,33 +788,29 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
             </div>
 
             {/* Divider */}
-            <div className={`h-8 w-px hidden sm:block ${darkMode ? 'bg-[#2E2E2E]' : 'bg-[rgba(215,183,151,0.3)]'}`} />
+            <div className="h-8 w-px hidden sm:block bg-[rgba(196,151,90,0.3)]" />
 
             {/* Sizing Choice Dropdown */}
             <div className="flex items-center gap-3">
-              <span className={`text-sm font-medium ${darkMode ? 'text-[#999999]' : 'text-[#666666]'}`}>{t('skuProposal.sizingChoice')}</span>
+              <span className="text-sm font-medium text-[#8C8178]">{t('skuProposal.sizingChoice')}</span>
               <div className="relative" ref={sizingVersionDropdownRef}>
                 <button
                   type="button"
                   onClick={() => setIsSizingVersionOpen(!isSizingVersionOpen)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all border ${
-                    darkMode
-                      ? 'bg-[rgba(215,183,151,0.1)] border-[rgba(215,183,151,0.3)] text-[#F2F2F2] hover:bg-[rgba(215,183,151,0.15)]'
-                      : 'bg-[rgba(160,120,75,0.12)] border-[rgba(215,183,151,0.4)] text-[#333333] hover:bg-[rgba(160,120,75,0.18)]'
-                  }`}
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all border bg-[rgba(160,120,75,0.12)] border-[rgba(196,151,90,0.4)] text-[#2C2417] hover:bg-[rgba(160,120,75,0.18)]"
                 >
-                  {selectedSizingChoice?.isFinal && <Star size={14} className="text-[#D7B797] fill-[#D7B797]" />}
+                  {selectedSizingChoice?.isFinal && <Star size={14} className="text-[#C4975A] fill-[#C4975A]" />}
                   <span>{selectedSizingChoice?.name || t('skuProposal.sizing')}</span>
                   {selectedSizingChoice?.isFinal && (
-                    <span className={`px-1.5 py-0.5 text-[10px] font-bold rounded ${darkMode ? 'bg-[#D7B797] text-[#0A0A0A]' : 'bg-[#D7B797] text-white'}`}>FINAL</span>
+                    <span className="px-1.5 py-0.5 text-[10px] font-bold rounded bg-[#C4975A] text-white">FINAL</span>
                   )}
                   <ChevronDown size={14} className={`transition-transform ${isSizingVersionOpen ? 'rotate-180' : ''}`} />
                 </button>
 
                 {isSizingVersionOpen && (
-                  <div className={`absolute top-full left-0 mt-1 w-64 rounded-xl shadow-xl border z-50 overflow-hidden ${darkMode ? 'bg-[#1A1A1A] border-[#2E2E2E]' : 'bg-white border-[rgba(215,183,151,0.3)]'}`}>
-                    <div className={`px-3 py-2 border-b ${darkMode ? 'bg-[#121212] border-[#2E2E2E]' : 'bg-[rgba(160,120,75,0.08)] border-[rgba(215,183,151,0.2)]'}`}>
-                      <span className={`text-xs font-semibold uppercase tracking-wide font-['Montserrat'] ${darkMode ? 'text-[#666666]' : 'text-[#999999]'}`}>{t('skuProposal.sizing')}</span>
+                  <div className="absolute top-full left-0 mt-1 w-64 rounded-xl shadow-[0_4px_24px_rgba(44,36,23,0.12)] border z-50 overflow-hidden bg-white border-[rgba(196,151,90,0.3)]">
+                    <div className="px-3 py-2 border-b bg-[rgba(160,120,75,0.08)] border-[rgba(196,151,90,0.2)]">
+                      <span className="text-xs font-semibold uppercase tracking-wide font-['Montserrat'] text-[#8C8178]">{t('skuProposal.sizing')}</span>
                     </div>
                     {sizingChoices.map(choice => (
                       <button
@@ -832,19 +819,19 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
                         onClick={() => { setSizingVersion(choice.id); setIsSizingVersionOpen(false); }}
                         className={`w-full px-3 py-3 flex items-center justify-between transition-colors ${
                           choice.id === sizingVersion
-                            ? darkMode ? 'bg-[rgba(215,183,151,0.1)]' : 'bg-[rgba(160,120,75,0.12)]'
-                            : darkMode ? 'hover:bg-[rgba(215,183,151,0.05)]' : 'hover:bg-[rgba(160,120,75,0.08)]'
+                            ? 'bg-[rgba(160,120,75,0.12)]'
+                            : 'hover:bg-[rgba(160,120,75,0.08)]'
                         }`}
                       >
                         <div className="flex items-center gap-2">
                           {choice.isFinal
-                            ? <Star size={14} className="text-[#D7B797] fill-[#D7B797]" />
-                            : <Layers size={14} className={darkMode ? 'text-[#666666]' : 'text-[#999999]'} />
+                            ? <Star size={14} className="text-[#C4975A] fill-[#C4975A]" />
+                            : <Layers size={14} className="text-[#8C8178]" />
                           }
                           <div className="flex items-center gap-2">
-                            <span className={`text-sm font-medium ${darkMode ? 'text-[#F2F2F2]' : 'text-[#333333]'}`}>{choice.name}</span>
+                            <span className="text-sm font-medium text-[#2C2417]">{choice.name}</span>
                             {choice.isFinal && (
-                              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-[rgba(42,158,106,0.15)] text-[#2A9E6A]">FINAL</span>
+                              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-[rgba(27,107,69,0.15)] text-[#1B6B45]">FINAL</span>
                             )}
                           </div>
                         </div>
@@ -855,12 +842,12 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
                               tabIndex={0}
                               onClick={(e) => handleSetFinalSizing(choice.id, e)}
                               onKeyDown={(e) => { if (e.key === 'Enter') handleSetFinalSizing(choice.id, e); }}
-                              className={`text-xs px-2 py-1 rounded transition-colors cursor-pointer ${darkMode ? 'text-[#D7B797] hover:bg-[rgba(215,183,151,0.1)]' : 'text-[#8A6340] hover:bg-[rgba(160,120,75,0.12)]'}`}
+                              className="text-xs px-2 py-1 rounded transition-colors cursor-pointer text-[#7D5A28] hover:bg-[rgba(160,120,75,0.12)]"
                             >
                               {t('planning.latestVersion')}
                             </span>
                           )}
-                          {choice.id === sizingVersion && <Check size={16} className="text-[#2A9E6A]" />}
+                          {choice.id === sizingVersion && <Check size={16} className="text-[#1B6B45]" />}
                         </div>
                       </button>
                     ))}
@@ -873,17 +860,17 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
 
         {/* View Mode Toggle */}
         <div className="flex flex-wrap items-center gap-3 justify-between mt-4">
-          <div className={`text-xs ${darkMode ? 'text-[#999999]' : 'text-[#666666]'}`}>
+          <div className="text-xs text-[#8C8178]">
             {canShowCardView ? `${filteredSkuItems.length} SKUs found${!isMobile ? '. Card view available.' : '.'}` : 'No SKU data. Add SKUs to enable card view.'}
           </div>
-          <div className={`hidden md:flex items-center gap-1 rounded-lg p-1 ${darkMode ? 'bg-[#1A1A1A]' : 'bg-[rgba(160,120,75,0.12)]'}`}>
+          <div className="hidden md:flex items-center gap-1 rounded-lg p-1 bg-[rgba(160,120,75,0.12)]">
             <button
               type="button"
               onClick={() => setViewMode('table')}
               className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                 viewMode === 'table'
-                  ? darkMode ? 'bg-[rgba(215,183,151,0.15)] text-[#D7B797] shadow-sm' : 'bg-white text-[#8A6340] shadow-sm'
-                  : darkMode ? 'text-[#999999] hover:text-[#D7B797]' : 'text-[#666666] hover:text-[#8A6340]'
+                  ? 'bg-white text-[#7D5A28] shadow-sm'
+                  : 'text-[#8C8178] hover:text-[#7D5A28]'
               }`}
             >
               Table
@@ -895,8 +882,8 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
               title={!canShowCardView ? 'Add SKUs to enable card view' : 'View SKUs as cards'}
               className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                 viewMode === 'card'
-                  ? darkMode ? 'bg-[rgba(215,183,151,0.15)] text-[#D7B797] shadow-sm' : 'bg-white text-[#8A6340] shadow-sm'
-                  : darkMode ? 'text-[#999999] hover:text-[#D7B797]' : 'text-[#666666] hover:text-[#8A6340]'
+                  ? 'bg-white text-[#7D5A28] shadow-sm'
+                  : 'text-[#8C8178] hover:text-[#7D5A28]'
               } ${!canShowCardView ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
               Card
@@ -970,10 +957,10 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
       )}
 
       {filteredSkuBlocks.length === 0 ? (
-        <div className={`rounded-xl border p-10 text-center ${darkMode ? 'bg-[#121212] border-[#2E2E2E]' : 'bg-white border-[rgba(215,183,151,0.2)]'}`}>
-          <Package size={36} className={`mx-auto mb-3 ${darkMode ? 'text-[#666666]' : 'text-[rgba(215,183,151,0.5)]'}`} />
-          <p className={`font-medium font-['Montserrat'] ${darkMode ? 'text-[#F2F2F2]' : 'text-[#333333]'}`}>{t('skuProposal.noSkuData')}</p>
-          <p className={`text-sm mt-1 ${darkMode ? 'text-[#999999]' : 'text-[#666666]'}`}>Try adjusting the filters above</p>
+        <div className="rounded-xl border p-10 text-center bg-white border-[rgba(196,151,90,0.2)]">
+          <Package size={36} className="mx-auto mb-3 text-[rgba(196,151,90,0.5)]" />
+          <p className="font-medium font-['Montserrat'] text-[#2C2417]">{t('skuProposal.noSkuData')}</p>
+          <p className="text-sm mt-1 text-[#8C8178]">Try adjusting the filters above</p>
         </div>
       ) : viewMode === 'card' ? (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
@@ -984,15 +971,15 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
               <div key={key} className={`rounded-2xl border p-4 ${getCardBgClass(cardIdx)}`}>
                 <div className="flex flex-wrap items-center gap-3 justify-between">
                   <div className="flex items-center gap-3">
-                    <div className={`w-12 h-12 rounded-xl border flex items-center justify-center ${darkMode ? 'bg-[#1A1A1A] border-[#2E2E2E]' : 'bg-[rgba(160,120,75,0.12)] border-[rgba(215,183,151,0.25)]'}`}>
-                      <ImageIcon size={18} className={darkMode ? 'text-[#666666]' : 'text-[#999999]'} />
+                    <div className="w-12 h-12 rounded-xl border flex items-center justify-center bg-[rgba(160,120,75,0.12)] border-[rgba(196,151,90,0.25)]">
+                      <ImageIcon size={18} className="text-[#8C8178]" />
                     </div>
                     <div>
-                      <div className={`text-sm font-semibold ${darkMode ? 'text-[#F2F2F2]' : 'text-[#333333]'}`}>
-                        <span className="font-['JetBrains_Mono']">{item.sku || 'New SKU'}</span> <span className={darkMode ? 'text-[#999999]' : 'text-[#666666]'}>•</span> {item.name || 'Select SKU'}
+                      <div className="text-sm font-semibold text-[#2C2417]">
+                        <span className="font-['JetBrains_Mono']">{item.sku || 'New SKU'}</span> <span className="text-[#8C8178]">&bull;</span> {item.name || 'Select SKU'}
                       </div>
-                      <div className={`text-xs ${darkMode ? 'text-[#999999]' : 'text-[#666666]'}`}>
-                        {block.gender} • {block.category} • {block.subCategory}
+                      <div className="text-xs text-[#8C8178]">
+                        {block.gender} &bull; {block.category} &bull; {block.subCategory}
                       </div>
                     </div>
                   </div>
@@ -1000,28 +987,28 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
                     <button
                       type="button"
                       onClick={() => setCardDetailsOpen(prev => ({ ...prev, [key]: !prev[key] }))}
-                      className={`px-2 md:px-3 py-1.5 text-[11px] md:text-xs font-semibold rounded-full border transition-colors ${darkMode ? 'border-[rgba(215,183,151,0.25)] text-[#D7B797] hover:bg-[rgba(215,183,151,0.1)]' : 'border-[rgba(215,183,151,0.4)] text-[#8A6340] hover:bg-[rgba(160,120,75,0.18)]'}`}
+                      className="px-2 md:px-3 py-1.5 text-[11px] md:text-xs font-semibold rounded-full border transition-colors border-[rgba(196,151,90,0.4)] text-[#7D5A28] hover:bg-[rgba(160,120,75,0.18)]"
                     >
                       {detailsOpen ? t('skuProposal.hideDetails') : t('skuProposal.showDetails')}
                     </button>
                     <button
                       type="button"
                       onClick={() => setCardStoreOrderOpen(prev => ({ ...prev, [key]: !prev[key] }))}
-                      className={`px-2 md:px-3 py-1.5 text-[11px] md:text-xs font-semibold rounded-full border transition-colors ${darkMode ? 'border-[rgba(215,183,151,0.25)] text-[#D7B797] hover:bg-[rgba(215,183,151,0.1)]' : 'border-[rgba(215,183,151,0.4)] text-[#8A6340] hover:bg-[rgba(160,120,75,0.18)]'}`}
+                      className="px-2 md:px-3 py-1.5 text-[11px] md:text-xs font-semibold rounded-full border transition-colors border-[rgba(196,151,90,0.4)] text-[#7D5A28] hover:bg-[rgba(160,120,75,0.18)]"
                     >
                       {cardStoreOrderOpen[key] ? t('skuProposal.hideStores') : t('skuProposal.storeOrder')}
                     </button>
                     <button
                       type="button"
                       onClick={() => setCardSizingOpen(prev => ({ ...prev, [key]: !prev[key] }))}
-                      className={`px-2 md:px-3 py-1.5 text-[11px] md:text-xs font-semibold rounded-full border transition-colors ${darkMode ? 'border-[rgba(215,183,151,0.25)] text-[#D7B797] hover:bg-[rgba(215,183,151,0.1)]' : 'border-[rgba(215,183,151,0.4)] text-[#8A6340] hover:bg-[rgba(160,120,75,0.18)]'}`}
+                      className="px-2 md:px-3 py-1.5 text-[11px] md:text-xs font-semibold rounded-full border transition-colors border-[rgba(196,151,90,0.4)] text-[#7D5A28] hover:bg-[rgba(160,120,75,0.18)]"
                     >
                       {sizingOpen ? t('skuProposal.hideSizing') : t('skuProposal.sizing')}
                     </button>
                     <button
                       type="button"
                       onClick={() => handleDeleteSkuRow(blockKey, idx)}
-                      className={`p-2 rounded-lg transition-colors ${darkMode ? 'text-[#999999] hover:text-[#F85149] hover:bg-[rgba(248,81,73,0.1)]' : 'text-[#666666] hover:text-[#F85149] hover:bg-[rgba(248,81,73,0.1)]'}`}
+                      className="p-2 rounded-lg transition-colors text-[#8C8178] hover:text-[#DC3545] hover:bg-[rgba(220,53,69,0.1)]"
                       title={t('proposal.deleteSku')}
                     >
                       <Trash2 size={16} />
@@ -1034,7 +1021,7 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
                     <select
                       value={item.sku}
                       onChange={(e) => handleSkuSelect(blockKey, idx, e.target.value)}
-                      className={`w-full px-3 py-2 rounded-lg border-2 text-sm focus:outline-none focus:ring-2 font-['JetBrains_Mono'] ${darkMode ? 'border-[#2A9E6A] bg-[#121212] text-[#F2F2F2] focus:ring-[rgba(42,158,106,0.3)]' : 'border-[#127749] bg-white text-[#333333] focus:ring-[rgba(18,119,73,0.3)]'}`}
+                      className="w-full px-3 py-2 rounded-lg border-2 text-sm focus:outline-none focus:ring-2 font-['JetBrains_Mono'] border-[#1B6B45] bg-white text-[#2C2417] focus:ring-[rgba(27,107,69,0.3)]"
                     >
                       <option value="">{t('proposal.selectSku')}</option>
                       {skuCatalog.map(sku => (
@@ -1047,75 +1034,67 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
                 )}
 
                 <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-3">
-                  <div className={`rounded-xl border p-3 ${darkMode ? 'bg-[#1A1A1A] border-[#2E2E2E]' : 'bg-[rgba(160,120,75,0.08)] border-[rgba(215,183,151,0.2)]'}`}>
-                    <p className={`text-xs ${darkMode ? 'text-[#999999]' : 'text-[#666666]'}`}>{t('skuProposal.rex')}</p>
+                  <div className="rounded-xl border p-3 bg-[rgba(160,120,75,0.08)] border-[rgba(196,151,90,0.2)]">
+                    <p className="text-xs text-[#8C8178]">{t('skuProposal.rex')}</p>
                     <input
                       type="number"
                       value={item.rex}
                       onChange={(e) => handleNumberChange(blockKey, idx, 'rex', e.target.value)}
-                      className={`mt-1 w-full px-3 py-2 rounded-lg border text-sm font-['JetBrains_Mono'] focus:outline-none ${
-                        darkMode
-                          ? 'bg-[#121212] border-[rgba(215,183,151,0.3)] text-[#F2F2F2] placeholder-[#666666] focus:ring-2 focus:ring-[rgba(215,183,151,0.3)] focus:border-[#D7B797]'
-                          : 'bg-white border-[rgba(215,183,151,0.4)] text-[#333333] focus:ring-2 focus:ring-[rgba(215,183,151,0.3)] focus:border-[#D7B797]'
-                      }`}
+                      className="mt-1 w-full px-3 py-2 rounded-lg border text-sm font-['JetBrains_Mono'] focus:outline-none bg-white border-[rgba(196,151,90,0.4)] text-[#2C2417] focus:ring-2 focus:ring-[rgba(196,151,90,0.3)] focus:border-[#C4975A]"
                     />
                   </div>
-                  <div className={`rounded-xl border p-3 ${darkMode ? 'bg-[#1A1A1A] border-[#2E2E2E]' : 'bg-[rgba(160,120,75,0.08)] border-[rgba(215,183,151,0.2)]'}`}>
-                    <p className={`text-xs ${darkMode ? 'text-[#999999]' : 'text-[#666666]'}`}>{t('skuProposal.ttp')}</p>
+                  <div className="rounded-xl border p-3 bg-[rgba(160,120,75,0.08)] border-[rgba(196,151,90,0.2)]">
+                    <p className="text-xs text-[#8C8178]">{t('skuProposal.ttp')}</p>
                     <input
                       type="number"
                       value={item.ttp}
                       onChange={(e) => handleNumberChange(blockKey, idx, 'ttp', e.target.value)}
-                      className={`mt-1 w-full px-3 py-2 rounded-lg border text-sm font-['JetBrains_Mono'] focus:outline-none ${
-                        darkMode
-                          ? 'bg-[#121212] border-[rgba(215,183,151,0.3)] text-[#F2F2F2] placeholder-[#666666] focus:ring-2 focus:ring-[rgba(215,183,151,0.3)] focus:border-[#D7B797]'
-                          : 'bg-white border-[rgba(215,183,151,0.4)] text-[#333333] focus:ring-2 focus:ring-[rgba(215,183,151,0.3)] focus:border-[#D7B797]'
-                      }`}
+                      className="mt-1 w-full px-3 py-2 rounded-lg border text-sm font-['JetBrains_Mono'] focus:outline-none bg-white border-[rgba(196,151,90,0.4)] text-[#2C2417] focus:ring-2 focus:ring-[rgba(196,151,90,0.3)] focus:border-[#C4975A]"
                     />
                   </div>
-                  <div className={`rounded-xl border p-3 ${darkMode ? 'bg-[#1A1A1A] border-[#2E2E2E]' : 'bg-[rgba(160,120,75,0.08)] border-[rgba(215,183,151,0.2)]'}`}>
-                    <p className={`text-xs ${darkMode ? 'text-[#999999]' : 'text-[#666666]'}`}>{t('skuProposal.order')}</p>
-                    <div className={`mt-1 text-sm font-semibold font-['JetBrains_Mono'] ${darkMode ? 'text-[#F2F2F2]' : 'text-[#333333]'}`}>{item.order}</div>
+                  <div className="rounded-xl border p-3 bg-[rgba(160,120,75,0.08)] border-[rgba(196,151,90,0.2)]">
+                    <p className="text-xs text-[#8C8178]">{t('skuProposal.order')}</p>
+                    <div className="mt-1 text-sm font-semibold font-['JetBrains_Mono'] text-[#2C2417]">{item.order}</div>
                   </div>
-                  <div className={`rounded-xl border p-3 ${darkMode ? 'bg-[#1A1A1A] border-[#2E2E2E]' : 'bg-[rgba(160,120,75,0.08)] border-[rgba(215,183,151,0.2)]'}`}>
-                    <p className={`text-xs ${darkMode ? 'text-[#999999]' : 'text-[#666666]'}`}>{t('skuProposal.totalValue')}</p>
-                    <div className={`mt-1 text-sm font-semibold font-['JetBrains_Mono'] ${darkMode ? 'text-[#2A9E6A]' : 'text-[#127749]'}`}>{formatCurrency(item.ttlValue)}</div>
+                  <div className="rounded-xl border p-3 bg-[rgba(160,120,75,0.08)] border-[rgba(196,151,90,0.2)]">
+                    <p className="text-xs text-[#8C8178]">{t('skuProposal.totalValue')}</p>
+                    <div className="mt-1 text-sm font-semibold font-['JetBrains_Mono'] text-[#1B6B45]">{formatCurrency(item.ttlValue)}</div>
                   </div>
                 </div>
 
                 {detailsOpen && (
-                  <div className={`mt-4 rounded-xl border p-4 ${darkMode ? 'bg-[#1A1A1A] border-[#2E2E2E]' : 'bg-[rgba(160,120,75,0.08)] border-[rgba(215,183,151,0.2)]'}`}>
+                  <div className="mt-4 rounded-xl border p-4 bg-[rgba(160,120,75,0.08)] border-[rgba(196,151,90,0.2)]">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
                       <div>
-                        <span className={`text-xs ${darkMode ? 'text-[#999999]' : 'text-[#666666]'}`}>Product type</span>
-                        <div className={`font-medium ${darkMode ? 'text-[#F2F2F2]' : 'text-[#333333]'}`}>{item.productType}</div>
+                        <span className="text-xs text-[#8C8178]">Product type</span>
+                        <div className="font-medium text-[#2C2417]">{item.productType}</div>
                       </div>
                       <div>
-                        <span className={`text-xs ${darkMode ? 'text-[#999999]' : 'text-[#666666]'}`}>Theme</span>
-                        <div className={`font-medium ${darkMode ? 'text-[#F2F2F2]' : 'text-[#333333]'}`}>{item.theme}</div>
+                        <span className="text-xs text-[#8C8178]">Theme</span>
+                        <div className="font-medium text-[#2C2417]">{item.theme}</div>
                       </div>
                       <div>
-                        <span className={`text-xs ${darkMode ? 'text-[#999999]' : 'text-[#666666]'}`}>Color</span>
-                        <div className={`font-medium ${darkMode ? 'text-[#F2F2F2]' : 'text-[#333333]'}`}>{item.color}</div>
+                        <span className="text-xs text-[#8C8178]">Color</span>
+                        <div className="font-medium text-[#2C2417]">{item.color}</div>
                       </div>
                       <div>
-                        <span className={`text-xs ${darkMode ? 'text-[#999999]' : 'text-[#666666]'}`}>Composition</span>
-                        <div className={`font-medium ${darkMode ? 'text-[#F2F2F2]' : 'text-[#333333]'}`}>{item.composition}</div>
+                        <span className="text-xs text-[#8C8178]">Composition</span>
+                        <div className="font-medium text-[#2C2417]">{item.composition}</div>
                       </div>
                       <div>
-                        <span className={`text-xs ${darkMode ? 'text-[#999999]' : 'text-[#666666]'}`}>Unit cost</span>
-                        <div className={`font-medium font-['JetBrains_Mono'] ${darkMode ? 'text-[#F2F2F2]' : 'text-[#333333]'}`}>{formatCurrency(item.unitCost)}</div>
+                        <span className="text-xs text-[#8C8178]">Unit cost</span>
+                        <div className="font-medium font-['JetBrains_Mono'] text-[#2C2417]">{formatCurrency(item.unitCost)}</div>
                       </div>
                       <div>
-                        <span className={`text-xs ${darkMode ? 'text-[#999999]' : 'text-[#666666]'}`}>SRP</span>
-                        <div className={`font-medium font-['JetBrains_Mono'] ${darkMode ? 'text-[#2A9E6A]' : 'text-[#127749]'}`}>{formatCurrency(item.srp)}</div>
+                        <span className="text-xs text-[#8C8178]">SRP</span>
+                        <div className="font-medium font-['JetBrains_Mono'] text-[#1B6B45]">{formatCurrency(item.srp)}</div>
                       </div>
                       <div>
-                        <span className={`text-xs ${darkMode ? 'text-[#999999]' : 'text-[#666666]'}`}>Customer target</span>
+                        <span className="text-xs text-[#8C8178]">Customer target</span>
                         <select
                           value={item.customerTarget}
                           onChange={(e) => handleSelectChange(blockKey, idx, 'customerTarget', e.target.value)}
-                          className={`mt-1 w-full px-3 py-2 rounded-lg border text-sm focus:outline-none focus:ring-2 ${darkMode ? 'bg-[#121212] border-[#2E2E2E] text-[#F2F2F2] focus:ring-[rgba(215,183,151,0.3)] focus:border-[#D7B797]' : 'bg-white border-[rgba(215,183,151,0.3)] text-[#333333] focus:ring-[rgba(215,183,151,0.3)] focus:border-[#D7B797]'}`}
+                          className="mt-1 w-full px-3 py-2 rounded-lg border text-sm focus:outline-none focus:ring-2 bg-white border-[rgba(196,151,90,0.3)] text-[#2C2417] focus:ring-[rgba(196,151,90,0.3)] focus:border-[#C4975A]"
                         >
                           <option value="New">New</option>
                           <option value="Existing">Existing</option>
@@ -1126,38 +1105,38 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
                 )}
 
                 {cardStoreOrderOpen[key] && (
-                  <div className={`mt-4 rounded-xl border overflow-hidden ${darkMode ? 'bg-[#1A1A1A] border-[#2E2E2E]' : 'bg-white border-[rgba(215,183,151,0.2)]'}`}>
-                    <div className={`px-4 py-2 text-xs font-semibold font-['Montserrat'] ${darkMode ? 'text-[#D7B797] bg-[rgba(215,183,151,0.1)]' : 'text-[#8A6340] bg-[rgba(160,120,75,0.12)]'}`}>
+                  <div className="mt-4 rounded-xl border overflow-hidden bg-white border-[rgba(196,151,90,0.2)]">
+                    <div className="px-4 py-2 text-xs font-semibold font-['Montserrat'] text-[#7D5A28] bg-[rgba(160,120,75,0.12)]">
                       Store Order
                     </div>
                     <div className="overflow-x-auto">
                       <table className="w-full text-sm">
                         <thead>
-                          <tr className={darkMode ? 'bg-[#121212] text-[#999999]' : 'bg-[rgba(160,120,75,0.12)] text-[#666666]'}>
+                          <tr className="bg-[rgba(160,120,75,0.12)] text-[#8C8178]">
                             <th className="px-3 py-2 text-left">Store</th>
                             <th className="px-3 py-2 text-center font-['JetBrains_Mono']">ORDER</th>
                             <th className="px-3 py-2 text-right font-['JetBrains_Mono']">TTL VALUE</th>
                           </tr>
                         </thead>
                         <tbody>
-                          <tr className={`border-t ${darkMode ? 'border-[#2E2E2E]' : 'border-gray-200'}`}>
-                            <td className={`px-3 py-2 ${darkMode ? 'text-[#F2F2F2]' : 'text-gray-700'}`}>
-                              <span className="inline-flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-[#D7B797]" />REX</span>
+                          <tr className="border-t border-[#E8E2DB]">
+                            <td className="px-3 py-2 text-[#6B5D4F]">
+                              <span className="inline-flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-[#C4975A]" />REX</span>
                             </td>
-                            <td className={`px-3 py-2 text-center font-['JetBrains_Mono'] ${darkMode ? 'text-[#F2F2F2]' : 'text-gray-800'}`}>{item.rex || Math.floor((item.order || 0) / 2)}</td>
-                            <td className={`px-3 py-2 text-right font-['JetBrains_Mono'] ${darkMode ? 'text-[#F2F2F2]' : 'text-gray-800'}`}>{formatCurrency((item.rex || Math.floor((item.order || 0) / 2)) * (item.srp || 0))}</td>
+                            <td className="px-3 py-2 text-center font-['JetBrains_Mono'] text-[#2C2417]">{item.rex || Math.floor((item.order || 0) / 2)}</td>
+                            <td className="px-3 py-2 text-right font-['JetBrains_Mono'] text-[#2C2417]">{formatCurrency((item.rex || Math.floor((item.order || 0) / 2)) * (item.srp || 0))}</td>
                           </tr>
-                          <tr className={`border-t ${darkMode ? 'border-[#2E2E2E]' : 'border-gray-200'}`}>
-                            <td className={`px-3 py-2 ${darkMode ? 'text-[#F2F2F2]' : 'text-gray-700'}`}>
-                              <span className="inline-flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-[#127749]" />TTP</span>
+                          <tr className="border-t border-[#E8E2DB]">
+                            <td className="px-3 py-2 text-[#6B5D4F]">
+                              <span className="inline-flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-[#1B6B45]" />TTP</span>
                             </td>
-                            <td className={`px-3 py-2 text-center font-['JetBrains_Mono'] ${darkMode ? 'text-[#F2F2F2]' : 'text-gray-800'}`}>{item.ttp || Math.ceil((item.order || 0) / 2)}</td>
-                            <td className={`px-3 py-2 text-right font-['JetBrains_Mono'] ${darkMode ? 'text-[#F2F2F2]' : 'text-gray-800'}`}>{formatCurrency((item.ttp || Math.ceil((item.order || 0) / 2)) * (item.srp || 0))}</td>
+                            <td className="px-3 py-2 text-center font-['JetBrains_Mono'] text-[#2C2417]">{item.ttp || Math.ceil((item.order || 0) / 2)}</td>
+                            <td className="px-3 py-2 text-right font-['JetBrains_Mono'] text-[#2C2417]">{formatCurrency((item.ttp || Math.ceil((item.order || 0) / 2)) * (item.srp || 0))}</td>
                           </tr>
-                          <tr className={`border-t-2 ${darkMode ? 'border-[#D7B797]/30 bg-[rgba(215,183,151,0.05)]' : 'border-[#D7B797]/40 bg-[rgba(160,120,75,0.12)]'}`}>
-                            <td className={`px-3 py-2 font-semibold ${darkMode ? 'text-[#D7B797]' : 'text-[#8A6340]'}`}>{t('skuProposal.total')}</td>
-                            <td className={`px-3 py-2 text-center font-bold font-['JetBrains_Mono'] ${darkMode ? 'text-[#F2F2F2]' : 'text-gray-800'}`}>{item.order || 0}</td>
-                            <td className={`px-3 py-2 text-right font-bold font-['JetBrains_Mono'] ${darkMode ? 'text-[#F2F2F2]' : 'text-gray-800'}`}>{formatCurrency(item.ttlValue || (item.order || 0) * (item.srp || 0))}</td>
+                          <tr className="border-t-2 border-[#C4975A]/40 bg-[rgba(160,120,75,0.12)]">
+                            <td className="px-3 py-2 font-semibold text-[#7D5A28]">{t('skuProposal.total')}</td>
+                            <td className="px-3 py-2 text-center font-bold font-['JetBrains_Mono'] text-[#2C2417]">{item.order || 0}</td>
+                            <td className="px-3 py-2 text-right font-bold font-['JetBrains_Mono'] text-[#2C2417]">{formatCurrency(item.ttlValue || (item.order || 0) * (item.srp || 0))}</td>
                           </tr>
                         </tbody>
                       </table>
@@ -1166,14 +1145,14 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
                 )}
 
                 {sizingOpen && (
-                  <div className={`mt-4 rounded-xl border overflow-hidden ${darkMode ? 'bg-[#1A1A1A] border-[#2E2E2E]' : 'bg-white border-[rgba(215,183,151,0.2)]'}`}>
-                    <div className={`px-4 py-2 text-xs font-semibold font-['Montserrat'] ${darkMode ? 'text-[#D7B797] bg-[rgba(215,183,151,0.1)]' : 'text-[#8A6340] bg-[rgba(160,120,75,0.12)]'}`}>
+                  <div className="mt-4 rounded-xl border overflow-hidden bg-white border-[rgba(196,151,90,0.2)]">
+                    <div className="px-4 py-2 text-xs font-semibold font-['Montserrat'] text-[#7D5A28] bg-[rgba(160,120,75,0.12)]">
                       Sizing
                     </div>
                     <div className="overflow-x-auto">
                       <table className="w-full text-xs">
                         <thead>
-                          <tr className={darkMode ? 'bg-[rgba(215,183,151,0.08)] text-[#D7B797]' : 'bg-[rgba(160,120,75,0.12)] text-[#8A6340]'}>
+                          <tr className="bg-[rgba(160,120,75,0.12)] text-[#7D5A28]">
                             <th className="px-3 py-2 text-left font-['Montserrat']">{item.productType}</th>
                             <th className="px-3 py-2 text-center font-['JetBrains_Mono']">0002</th>
                             <th className="px-3 py-2 text-center font-['JetBrains_Mono']">0004</th>
@@ -1182,8 +1161,8 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
                             <th className="px-3 py-2 text-center font-['Montserrat']">Sum</th>
                           </tr>
                         </thead>
-                        <tbody className={darkMode ? 'text-[#F2F2F2]' : 'text-[#333333]'}>
-                          <tr className={darkMode ? 'border-t border-[#2E2E2E]' : 'border-t border-[rgba(215,183,151,0.2)]'}>
+                        <tbody className="text-[#2C2417]">
+                          <tr className="border-t border-[rgba(196,151,90,0.2)]">
                             <td className="px-3 py-2">% Sales mix</td>
                             <td className="px-3 py-2 text-center font-['JetBrains_Mono']">6%</td>
                             <td className="px-3 py-2 text-center font-['JetBrains_Mono']">33%</td>
@@ -1191,7 +1170,7 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
                             <td className="px-3 py-2 text-center font-['JetBrains_Mono']">28%</td>
                             <td className="px-3 py-2 text-center font-semibold font-['JetBrains_Mono']">100%</td>
                           </tr>
-                          <tr className={darkMode ? 'border-t border-[#2E2E2E]' : 'border-t border-[rgba(215,183,151,0.2)]'}>
+                          <tr className="border-t border-[rgba(196,151,90,0.2)]">
                             <td className="px-3 py-2">% ST</td>
                             <td className="px-3 py-2 text-center font-['JetBrains_Mono']">50%</td>
                             <td className="px-3 py-2 text-center font-['JetBrains_Mono']">43%</td>
@@ -1199,8 +1178,8 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
                             <td className="px-3 py-2 text-center font-['JetBrains_Mono']">63%</td>
                             <td className="px-3 py-2 text-center font-['JetBrains_Mono']">-</td>
                           </tr>
-                          <tr className={darkMode ? 'border-t border-[#2E2E2E] bg-[rgba(215,183,151,0.08)]' : 'border-t border-[rgba(215,183,151,0.2)] bg-[rgba(160,120,75,0.08)]'}>
-                            <td className={`px-3 py-2 font-semibold ${darkMode ? 'text-[#D7B797]' : 'text-[#8A6340]'}`}>Choice A</td>
+                          <tr className="border-t border-[rgba(196,151,90,0.2)] bg-[rgba(160,120,75,0.08)]">
+                            <td className="px-3 py-2 font-semibold text-[#7D5A28]">Choice A</td>
                             {['s0002', 's0004', 's0006', 's0008'].map(size => (
                               <td key={size} className="px-1 py-1 text-center">
                                 <input
@@ -1208,14 +1187,14 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
                                   min="0"
                                   value={getSizing(blockKey, idx).choiceA[size]}
                                   onChange={(e) => updateSizing(blockKey, idx, 'choiceA', size, e.target.value)}
-                                  className={`w-10 text-center font-['JetBrains_Mono'] text-xs rounded border py-1 focus:outline-none focus:ring-2 focus:ring-[rgba(215,183,151,0.4)] ${darkMode ? 'bg-[rgba(42,158,106,0.1)] border-[rgba(42,158,106,0.25)] text-[#D7B797]' : 'bg-emerald-50 border-emerald-200 text-[#8A6340]'}`}
+                                  className="w-10 text-center font-['JetBrains_Mono'] text-xs rounded border py-1 focus:outline-none focus:ring-2 focus:ring-[rgba(196,151,90,0.4)] bg-emerald-50 border-emerald-200 text-[#7D5A28]"
                                 />
                               </td>
                             ))}
-                            <td className={`px-3 py-2 text-center font-semibold font-['JetBrains_Mono'] ${darkMode ? 'text-[#D7B797]' : 'text-[#8A6340]'}`}>{calculateSum(getSizing(blockKey, idx).choiceA)}</td>
+                            <td className="px-3 py-2 text-center font-semibold font-['JetBrains_Mono'] text-[#7D5A28]">{calculateSum(getSizing(blockKey, idx).choiceA)}</td>
                           </tr>
-                          <tr className={darkMode ? 'border-t border-[#2E2E2E] bg-[rgba(42,158,106,0.08)]' : 'border-t border-[rgba(215,183,151,0.2)] bg-[rgba(18,119,73,0.03)]'}>
-                            <td className={`px-3 py-2 font-semibold ${darkMode ? 'text-[#2A9E6A]' : 'text-[#127749]'}`}>Choice B</td>
+                          <tr className="border-t border-[rgba(196,151,90,0.2)] bg-[rgba(27,107,69,0.03)]">
+                            <td className="px-3 py-2 font-semibold text-[#1B6B45]">Choice B</td>
                             {['s0002', 's0004', 's0006', 's0008'].map(size => (
                               <td key={size} className="px-1 py-1 text-center">
                                 <input
@@ -1223,14 +1202,14 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
                                   min="0"
                                   value={getSizing(blockKey, idx).choiceB[size]}
                                   onChange={(e) => updateSizing(blockKey, idx, 'choiceB', size, e.target.value)}
-                                  className={`w-10 text-center font-['JetBrains_Mono'] text-xs rounded border py-1 focus:outline-none focus:ring-2 focus:ring-[rgba(215,183,151,0.4)] ${darkMode ? 'bg-[rgba(42,158,106,0.1)] border-[rgba(42,158,106,0.25)] text-[#2A9E6A]' : 'bg-emerald-50 border-emerald-200 text-[#127749]'}`}
+                                  className="w-10 text-center font-['JetBrains_Mono'] text-xs rounded border py-1 focus:outline-none focus:ring-2 focus:ring-[rgba(196,151,90,0.4)] bg-emerald-50 border-emerald-200 text-[#1B6B45]"
                                 />
                               </td>
                             ))}
-                            <td className={`px-3 py-2 text-center font-semibold font-['JetBrains_Mono'] ${darkMode ? 'text-[#2A9E6A]' : 'text-[#127749]'}`}>{calculateSum(getSizing(blockKey, idx).choiceB)}</td>
+                            <td className="px-3 py-2 text-center font-semibold font-['JetBrains_Mono'] text-[#1B6B45]">{calculateSum(getSizing(blockKey, idx).choiceB)}</td>
                           </tr>
-                          <tr className={darkMode ? 'border-t border-[#2E2E2E] bg-[rgba(42,158,106,0.05)]' : 'border-t border-[rgba(215,183,151,0.2)] bg-[rgba(18,119,73,0.02)]'}>
-                            <td className={`px-3 py-2 font-semibold ${darkMode ? 'text-[#2A9E6A]' : 'text-[#127749]'}`}>Choice C</td>
+                          <tr className="border-t border-[rgba(196,151,90,0.2)] bg-[rgba(27,107,69,0.02)]">
+                            <td className="px-3 py-2 font-semibold text-[#1B6B45]">Choice C</td>
                             {['s0002', 's0004', 's0006', 's0008'].map(size => (
                               <td key={size} className="px-1 py-1 text-center">
                                 <input
@@ -1238,11 +1217,11 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
                                   min="0"
                                   value={getSizing(blockKey, idx).choiceC[size]}
                                   onChange={(e) => updateSizing(blockKey, idx, 'choiceC', size, e.target.value)}
-                                  className={`w-10 text-center font-['JetBrains_Mono'] text-xs rounded border py-1 focus:outline-none focus:ring-2 focus:ring-[rgba(215,183,151,0.4)] ${darkMode ? 'bg-[rgba(42,158,106,0.1)] border-[rgba(42,158,106,0.25)] text-[#2A9E6A]' : 'bg-emerald-50 border-emerald-200 text-[#127749]'}`}
+                                  className="w-10 text-center font-['JetBrains_Mono'] text-xs rounded border py-1 focus:outline-none focus:ring-2 focus:ring-[rgba(196,151,90,0.4)] bg-emerald-50 border-emerald-200 text-[#1B6B45]"
                                 />
                               </td>
                             ))}
-                            <td className={`px-3 py-2 text-center font-semibold font-['JetBrains_Mono'] ${darkMode ? 'text-[#2A9E6A]' : 'text-[#127749]'}`}>{calculateSum(getSizing(blockKey, idx).choiceC)}</td>
+                            <td className="px-3 py-2 text-center font-semibold font-['JetBrains_Mono'] text-[#1B6B45]">{calculateSum(getSizing(blockKey, idx).choiceC)}</td>
                           </tr>
                         </tbody>
                       </table>
@@ -1261,21 +1240,15 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
                 const blockKey = `${firstBlock.gender}_${firstBlock.category}_${firstBlock.subCategory}`;
                 handleAddSkuRow(blockKey);
               }}
-              className={`rounded-2xl border-2 border-dashed p-8 flex flex-col items-center justify-center gap-3 transition-all hover:scale-[1.02] ${
-                darkMode
-                  ? 'border-[rgba(215,183,151,0.3)] hover:border-[#D7B797] hover:bg-[rgba(215,183,151,0.05)]'
-                  : 'border-[rgba(215,183,151,0.4)] hover:border-[#8A6340] hover:bg-[rgba(215,183,151,0.08)]'
-              }`}
+              className="rounded-2xl border-2 border-dashed p-8 flex flex-col items-center justify-center gap-3 transition-all hover:scale-[1.02] border-[rgba(196,151,90,0.4)] hover:border-[#7D5A28] hover:bg-[rgba(196,151,90,0.08)]"
             >
-              <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
-                darkMode ? 'bg-[rgba(215,183,151,0.15)]' : 'bg-[rgba(215,183,151,0.2)]'
-              }`}>
-                <Plus size={24} className={darkMode ? 'text-[#D7B797]' : 'text-[#8A6340]'} />
+              <div className="w-12 h-12 rounded-full flex items-center justify-center bg-[rgba(196,151,90,0.2)]">
+                <Plus size={24} className="text-[#7D5A28]" />
               </div>
-              <span className={`text-sm font-semibold font-['Montserrat'] ${darkMode ? 'text-[#D7B797]' : 'text-[#8A6340]'}`}>
+              <span className="text-sm font-semibold font-['Montserrat'] text-[#7D5A28]">
                 Add New SKU
               </span>
-              <span className={`text-xs ${darkMode ? 'text-[#666666]' : 'text-[#999999]'}`}>
+              <span className="text-xs text-[#8C8178]">
                 Click to add a new SKU to {filteredSkuBlocks[0]?.subCategory}
               </span>
             </button>
@@ -1293,20 +1266,16 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
                 <button
                   type="button"
                   onClick={() => handleToggle(key)}
-                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl ${
-                    darkMode
-                      ? 'bg-[rgba(215,183,151,0.15)] border border-[rgba(215,183,151,0.25)]'
-                      : 'bg-[rgba(215,183,151,0.2)] border border-[rgba(215,183,151,0.3)]'
-                  }`}
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-[rgba(196,151,90,0.2)] border border-[rgba(196,151,90,0.3)]"
                 >
-                  <ChevronDown size={16} className={`transition-transform ${isCollapsed ? '-rotate-90' : ''} ${darkMode ? 'text-[#D7B797]' : 'text-[#8A6340]'}`} />
+                  <ChevronDown size={16} className={`transition-transform ${isCollapsed ? '-rotate-90' : ''} text-[#7D5A28]`} />
                   <div className="text-left flex-1 min-w-0">
-                    <div className={`font-semibold text-sm ${darkMode ? 'text-[#D7B797]' : 'text-[#8A6340]'}`}>{block.subCategory}</div>
-                    <div className={`text-xs ${darkMode ? 'text-[#999999]' : 'text-[#6B5B4D]'}`}>
+                    <div className="font-semibold text-sm text-[#7D5A28]">{block.subCategory}</div>
+                    <div className="text-xs text-[#6B5D4F]">
                       {block.gender} / {block.category} / {block.items.length} SKUs
                     </div>
                   </div>
-                  <div className={`text-xs text-right flex-shrink-0 ${darkMode ? 'text-[#999999]' : 'text-[#6B5B4D]'}`}>
+                  <div className="text-xs text-right flex-shrink-0 text-[#6B5D4F]">
                     {formatCurrency(block.items.reduce((sum, i) => sum + i.srp, 0))}
                   </div>
                 </button>
@@ -1326,7 +1295,7 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
                           { label: 'Order', value: String(item.order) },
                           { label: 'REX', value: String(item.rex) },
                           { label: 'TTP', value: String(item.ttp) },
-                          { label: 'TTL Value', value: formatCurrency(item.ttlValue), color: darkMode ? 'text-[#2A9E6A]' : 'text-[#127749]' },
+                          { label: 'TTL Value', value: formatCurrency(item.ttlValue), color: 'text-[#1B6B45]' },
                           { label: 'Unit Cost', value: formatCurrency(item.unitCost) },
                         ]}
                         actions={[
@@ -1339,7 +1308,7 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
                     <button
                       type="button"
                       onClick={() => handleAddSkuRow(key)}
-                      className={`w-full flex items-center justify-center gap-2 py-3 text-sm rounded-xl transition-colors border border-dashed ${darkMode ? 'text-[#999999] hover:text-[#D7B797] hover:bg-[rgba(215,183,151,0.08)] border-[#2E2E2E] hover:border-[rgba(215,183,151,0.5)]' : 'text-[#666666] hover:text-[#8A6340] hover:bg-[rgba(160,120,75,0.12)] border-[rgba(215,183,151,0.3)] hover:border-[rgba(215,183,151,0.5)]'}`}
+                      className="w-full flex items-center justify-center gap-2 py-3 text-sm rounded-xl transition-colors border border-dashed text-[#8C8178] hover:text-[#7D5A28] hover:bg-[rgba(160,120,75,0.12)] border-[rgba(196,151,90,0.3)] hover:border-[rgba(196,151,90,0.5)]"
                     >
                       <Plus size={16} />
                       <span>Add new SKU</span>
@@ -1356,24 +1325,20 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
             const key = `${block.gender}_${block.category}_${block.subCategory}`;
             const isCollapsed = collapsed[key];
             return (
-              <div key={key} className={`rounded-xl border overflow-hidden ${darkMode ? 'bg-[#121212] border-[#2E2E2E]' : 'bg-white border-[rgba(215,183,151,0.2)]'}`}>
+              <div key={key} className="rounded-xl border overflow-hidden bg-white border-[rgba(196,151,90,0.2)]">
                 <button
                   type="button"
                   onClick={() => handleToggle(key)}
-                  className={`w-full flex items-center gap-3 px-4 py-3 ${
-                    darkMode
-                      ? 'bg-[rgba(215,183,151,0.15)] border-b border-[rgba(215,183,151,0.25)]'
-                      : 'bg-[rgba(215,183,151,0.2)] border-b border-[rgba(215,183,151,0.3)]'
-                  }`}
+                  className="w-full flex items-center gap-3 px-4 py-3 bg-[rgba(196,151,90,0.2)] border-b border-[rgba(196,151,90,0.3)]"
                 >
-                  <ChevronDown size={16} className={`transition-transform ${isCollapsed ? '-rotate-90' : ''} ${darkMode ? 'text-[#D7B797]' : 'text-[#8A6340]'}`} />
+                  <ChevronDown size={16} className={`transition-transform ${isCollapsed ? '-rotate-90' : ''} text-[#7D5A28]`} />
                   <div className="text-left">
-                    <div className={`font-semibold ${darkMode ? 'text-[#D7B797]' : 'text-[#8A6340]'}`}>{block.subCategory}</div>
-                    <div className={`text-xs ${darkMode ? 'text-[#999999]' : 'text-[#6B5B4D]'}`}>
-                      {block.gender} • {block.category} • {block.items.length} SKUs
+                    <div className="font-semibold text-[#7D5A28]">{block.subCategory}</div>
+                    <div className="text-xs text-[#6B5D4F]">
+                      {block.gender} &bull; {block.category} &bull; {block.items.length} SKUs
                     </div>
                   </div>
-                  <div className={`ml-auto text-xs ${darkMode ? 'text-[#999999]' : 'text-[#6B5B4D]'}`}>
+                  <div className="ml-auto text-xs text-[#6B5D4F]">
                     Total SRP: {formatCurrency(block.items.reduce((sum, i) => sum + i.srp, 0))}
                   </div>
                 </button>
@@ -1382,21 +1347,21 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
                   <div className="overflow-x-auto">
                     <table className="w-full text-sm">
                       <thead>
-                        <tr className={darkMode ? 'bg-[rgba(215,183,151,0.08)] border-b border-[#2E2E2E]' : 'bg-[rgba(160,120,75,0.12)] border-b border-[rgba(215,183,151,0.2)]'}>
-                          <th className={`px-3 py-2 text-left text-xs font-semibold font-['Montserrat'] ${darkMode ? 'text-[#D7B797]' : 'text-[#8A6340]'}`}>Image</th>
-                          <th className={`px-3 py-2 text-left text-xs font-semibold font-['Montserrat'] ${darkMode ? 'text-[#D7B797]' : 'text-[#8A6340]'}`}>SKU</th>
-                          <th className={`px-3 py-2 text-left text-xs font-semibold font-['Montserrat'] ${darkMode ? 'text-[#D7B797]' : 'text-[#8A6340]'}`}>Name</th>
-                          <th className={`px-3 py-2 text-left text-xs font-semibold font-['Montserrat'] ${darkMode ? 'text-[#D7B797]' : 'text-[#8A6340]'}`}>Product type (L3)</th>
-                          <th className={`px-3 py-2 text-left text-xs font-semibold font-['Montserrat'] ${darkMode ? 'text-[#D7B797]' : 'text-[#8A6340]'}`}>Theme</th>
-                          <th className={`px-3 py-2 text-left text-xs font-semibold font-['Montserrat'] ${darkMode ? 'text-[#D7B797]' : 'text-[#8A6340]'}`}>Color</th>
-                          <th className={`px-3 py-2 text-left text-xs font-semibold font-['Montserrat'] ${darkMode ? 'text-[#D7B797]' : 'text-[#8A6340]'}`}>Composition</th>
-                          <th className={`px-3 py-2 text-right text-xs font-semibold font-['Montserrat'] ${darkMode ? 'text-[#D7B797]' : 'text-[#8A6340]'}`}>Unit cost</th>
-                          <th className={`px-3 py-2 text-right text-xs font-semibold font-['Montserrat'] ${darkMode ? 'text-[#D7B797]' : 'text-[#8A6340]'}`}>SRP</th>
-                          <th className={`px-3 py-2 text-center text-xs font-semibold font-['Montserrat'] ${darkMode ? 'text-[#D7B797]' : 'text-[#8A6340]'}`}>Order</th>
-                          <th className={`px-3 py-2 text-center text-xs font-semibold font-['Montserrat'] ${darkMode ? 'text-[#D7B797]' : 'text-[#8A6340]'}`}>Rex</th>
-                          <th className={`px-3 py-2 text-center text-xs font-semibold font-['Montserrat'] ${darkMode ? 'text-[#D7B797]' : 'text-[#8A6340]'}`}>TTP</th>
-                          <th className={`px-3 py-2 text-right text-xs font-semibold font-['Montserrat'] ${darkMode ? 'text-[#D7B797]' : 'text-[#8A6340]'}`}>TTL value</th>
-                          <th className={`px-3 py-2 text-center text-xs font-semibold font-['Montserrat'] ${darkMode ? 'text-[#D7B797]' : 'text-[#8A6340]'}`}>Customer target</th>
+                        <tr className="bg-[rgba(160,120,75,0.12)] border-b border-[rgba(196,151,90,0.2)]">
+                          <th className="px-3 py-2 text-left text-xs font-semibold font-['Montserrat'] text-[#7D5A28]">Image</th>
+                          <th className="px-3 py-2 text-left text-xs font-semibold font-['Montserrat'] text-[#7D5A28]">SKU</th>
+                          <th className="px-3 py-2 text-left text-xs font-semibold font-['Montserrat'] text-[#7D5A28]">Name</th>
+                          <th className="px-3 py-2 text-left text-xs font-semibold font-['Montserrat'] text-[#7D5A28]">Product type (L3)</th>
+                          <th className="px-3 py-2 text-left text-xs font-semibold font-['Montserrat'] text-[#7D5A28]">Theme</th>
+                          <th className="px-3 py-2 text-left text-xs font-semibold font-['Montserrat'] text-[#7D5A28]">Color</th>
+                          <th className="px-3 py-2 text-left text-xs font-semibold font-['Montserrat'] text-[#7D5A28]">Composition</th>
+                          <th className="px-3 py-2 text-right text-xs font-semibold font-['Montserrat'] text-[#7D5A28]">Unit cost</th>
+                          <th className="px-3 py-2 text-right text-xs font-semibold font-['Montserrat'] text-[#7D5A28]">SRP</th>
+                          <th className="px-3 py-2 text-center text-xs font-semibold font-['Montserrat'] text-[#7D5A28]">Order</th>
+                          <th className="px-3 py-2 text-center text-xs font-semibold font-['Montserrat'] text-[#7D5A28]">Rex</th>
+                          <th className="px-3 py-2 text-center text-xs font-semibold font-['Montserrat'] text-[#7D5A28]">TTP</th>
+                          <th className="px-3 py-2 text-right text-xs font-semibold font-['Montserrat'] text-[#7D5A28]">TTL value</th>
+                          <th className="px-3 py-2 text-center text-xs font-semibold font-['Montserrat'] text-[#7D5A28]">Customer target</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -1406,23 +1371,23 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
                           const isEditingRex = editingCell === rexKey;
                           const isEditingTtp = editingCell === ttpKey;
                           return (
-                          <tr key={`${item.sku}_${idx}`} className={`${darkMode ? 'border-b border-[#2E2E2E]' : 'border-b border-[rgba(215,183,151,0.15)]'} ${item.isNew ? (darkMode ? 'bg-[rgba(42,158,106,0.1)]' : 'bg-[rgba(18,119,73,0.05)]') : ''}`}>
+                          <tr key={`${item.sku}_${idx}`} className={`border-b border-[rgba(196,151,90,0.15)] ${item.isNew ? 'bg-[rgba(27,107,69,0.05)]' : ''}`}>
                             <td className="px-3 py-2">
                               <div className="relative mx-auto w-fit">
-                                <div className={`w-10 h-10 rounded-md border flex items-center justify-center ${darkMode ? 'bg-[#1A1A1A] border-[#2E2E2E]' : 'bg-[rgba(160,120,75,0.12)] border-[rgba(215,183,151,0.25)]'}`}>
-                                  <ImageIcon size={16} className={darkMode ? 'text-[#666666]' : 'text-[#999999]'} />
+                                <div className="w-10 h-10 rounded-md border flex items-center justify-center bg-[rgba(160,120,75,0.12)] border-[rgba(196,151,90,0.25)]">
+                                  <ImageIcon size={16} className="text-[#8C8178]" />
                                 </div>
-                                {/* Action icons — top-right corner of image */}
+                                {/* Action icons -- top-right corner of image */}
                                 <div className="absolute -top-1 -right-6 flex flex-col gap-0.5">
                                   <button
                                     type="button"
                                     onClick={() => handleOpenSizing(key, idx, item)}
-                                    className={`p-0.5 rounded transition-colors relative ${darkMode ? 'text-[#999999] hover:text-[#D7B797] hover:bg-[rgba(215,183,151,0.15)]' : 'text-[#666666] hover:text-[#6B4D30] hover:bg-[rgba(160,120,75,0.18)]'}`}
+                                    className="p-0.5 rounded transition-colors relative text-[#8C8178] hover:text-[#7D5A28] hover:bg-[rgba(160,120,75,0.18)]"
                                     title="Sizing"
                                   >
                                     <Ruler size={12} />
                                     {isSizingComplete(key, idx) && (
-                                      <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-[#2A9E6A] rounded-full flex items-center justify-center">
+                                      <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-[#1B6B45] rounded-full flex items-center justify-center">
                                         <Check size={6} className="text-white" />
                                       </span>
                                     )}
@@ -1430,7 +1395,7 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
                                   <button
                                     type="button"
                                     onClick={() => handleDeleteSkuRow(key, idx)}
-                                    className={`p-0.5 rounded transition-colors ${darkMode ? 'text-[#999999] hover:text-[#F85149] hover:bg-[rgba(248,81,73,0.15)]' : 'text-[#666666] hover:text-[#F85149] hover:bg-[rgba(248,81,73,0.1)]'}`}
+                                    className="p-0.5 rounded transition-colors text-[#8C8178] hover:text-[#DC3545] hover:bg-[rgba(220,53,69,0.1)]"
                                     title={t('proposal.deleteSku')}
                                   >
                                     <Trash2 size={12} />
@@ -1444,7 +1409,7 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
                                   <select
                                     value={item.sku}
                                     onChange={(e) => handleSkuSelect(key, idx, e.target.value)}
-                                    className={`w-full px-3 py-2 rounded-lg border-2 text-sm focus:outline-none focus:ring-2 font-['JetBrains_Mono'] ${darkMode ? 'border-[#2A9E6A] bg-[#121212] text-[#F2F2F2] focus:ring-[rgba(42,158,106,0.3)]' : 'border-[#127749] bg-white text-[#333333] focus:ring-[rgba(18,119,73,0.3)]'}`}
+                                    className="w-full px-3 py-2 rounded-lg border-2 text-sm focus:outline-none focus:ring-2 font-['JetBrains_Mono'] border-[#1B6B45] bg-white text-[#2C2417] focus:ring-[rgba(27,107,69,0.3)]"
                                   >
                                     <option value="">{t('proposal.selectSku')}</option>
                                     {skuCatalog.map(sku => (
@@ -1457,18 +1422,18 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
                               </>
                             ) : (
                               <>
-                                <td className={`px-3 py-2 font-semibold font-['JetBrains_Mono'] ${darkMode ? 'text-[#F2F2F2]' : 'text-[#333333]'}`}>{item.sku}</td>
-                                <td className={`px-3 py-2 ${darkMode ? 'text-[#F2F2F2]' : 'text-[#333333]'}`}>{item.name}</td>
+                                <td className="px-3 py-2 font-semibold font-['JetBrains_Mono'] text-[#2C2417]">{item.sku}</td>
+                                <td className="px-3 py-2 text-[#2C2417]">{item.name}</td>
                               </>
                             )}
-                            <td className={`px-3 py-2 ${darkMode ? 'text-[#999999]' : 'text-[#666666]'}`}>{item.productType}</td>
-                            <td className={`px-3 py-2 ${darkMode ? 'text-[#999999]' : 'text-[#666666]'}`}>{item.theme}</td>
-                            <td className={`px-3 py-2 ${darkMode ? 'text-[#999999]' : 'text-[#666666]'}`}>{item.color}</td>
-                            <td className={`px-3 py-2 ${darkMode ? 'text-[#999999]' : 'text-[#666666]'}`}>{item.composition}</td>
-                            <td className={`px-3 py-2 text-right font-['JetBrains_Mono'] ${darkMode ? 'text-[#999999]' : 'text-[#666666]'}`}>{formatCurrency(item.unitCost)}</td>
-                            <td className={`px-3 py-2 text-right font-medium font-['JetBrains_Mono'] ${darkMode ? 'text-[#2A9E6A]' : 'text-[#127749]'}`}>{formatCurrency(item.srp)}</td>
+                            <td className="px-3 py-2 text-[#8C8178]">{item.productType}</td>
+                            <td className="px-3 py-2 text-[#8C8178]">{item.theme}</td>
+                            <td className="px-3 py-2 text-[#8C8178]">{item.color}</td>
+                            <td className="px-3 py-2 text-[#8C8178]">{item.composition}</td>
+                            <td className="px-3 py-2 text-right font-['JetBrains_Mono'] text-[#8C8178]">{formatCurrency(item.unitCost)}</td>
+                            <td className="px-3 py-2 text-right font-medium font-['JetBrains_Mono'] text-[#1B6B45]">{formatCurrency(item.srp)}</td>
                             <td className="px-3 py-2 text-center">
-                              <div className={`px-2.5 py-1.5 rounded-md font-semibold font-['JetBrains_Mono'] inline-block ${darkMode ? 'bg-[rgba(215,183,151,0.1)] text-[#D7B797]' : 'bg-[rgba(160,120,75,0.18)] text-[#8A6340]'}`}>
+                              <div className="px-2.5 py-1.5 rounded-md font-semibold font-['JetBrains_Mono'] inline-block bg-[rgba(160,120,75,0.18)] text-[#7D5A28]">
                                 {item.order}
                               </div>
                             </td>
@@ -1480,18 +1445,18 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
                                   onChange={(e) => setEditValue(e.target.value)}
                                   onBlur={() => handleSaveEdit(rexKey)}
                                   onKeyDown={(e) => handleKeyDown(e, rexKey)}
-                                  className={`w-20 px-2 py-1.5 text-center border-2 rounded-md focus:outline-none focus:ring-2 text-sm font-semibold font-['JetBrains_Mono'] ${darkMode ? 'border-[#D7B797] bg-[#121212] text-[#F2F2F2] focus:ring-[rgba(215,183,151,0.3)]' : 'border-[#D7B797] bg-white text-[#333333] focus:ring-[rgba(215,183,151,0.3)]'}`}
+                                  className="w-20 px-2 py-1.5 text-center border-2 rounded-md focus:outline-none focus:ring-2 text-sm font-semibold font-['JetBrains_Mono'] border-[#C4975A] bg-white text-[#2C2417] focus:ring-[rgba(196,151,90,0.3)]"
                                   autoFocus
                                 />
                               ) : (
                                 <button
                                   type="button"
                                   onClick={() => handleStartEdit(rexKey, item.rex)}
-                                  className={`px-2.5 py-1.5 rounded-md inline-flex items-center gap-1 font-['JetBrains_Mono'] transition-colors ${darkMode ? 'bg-[rgba(215,183,151,0.1)] text-[#D7B797] hover:bg-[rgba(215,183,151,0.15)]' : 'bg-[rgba(160,120,75,0.18)] text-[#8A6340] hover:bg-[rgba(215,183,151,0.25)]'}`}
+                                  className="px-2.5 py-1.5 rounded-md inline-flex items-center gap-1 font-['JetBrains_Mono'] transition-colors bg-[rgba(160,120,75,0.18)] text-[#7D5A28] hover:bg-[rgba(196,151,90,0.25)]"
                                   title="Edit Rex"
                                 >
                                   {item.rex}
-                                  <Pencil size={12} className={darkMode ? 'text-[#999999]' : 'text-[#8A6340]'} />
+                                  <Pencil size={12} className="text-[#7D5A28]" />
                                 </button>
                               )}
                             </td>
@@ -1503,27 +1468,27 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
                                   onChange={(e) => setEditValue(e.target.value)}
                                   onBlur={() => handleSaveEdit(ttpKey)}
                                   onKeyDown={(e) => handleKeyDown(e, ttpKey)}
-                                  className={`w-20 px-2 py-1.5 text-center border-2 rounded-md focus:outline-none focus:ring-2 text-sm font-semibold font-['JetBrains_Mono'] ${darkMode ? 'border-[#D7B797] bg-[#121212] text-[#F2F2F2] focus:ring-[rgba(215,183,151,0.3)]' : 'border-[#D7B797] bg-white text-[#333333] focus:ring-[rgba(215,183,151,0.3)]'}`}
+                                  className="w-20 px-2 py-1.5 text-center border-2 rounded-md focus:outline-none focus:ring-2 text-sm font-semibold font-['JetBrains_Mono'] border-[#C4975A] bg-white text-[#2C2417] focus:ring-[rgba(196,151,90,0.3)]"
                                   autoFocus
                                 />
                               ) : (
                                 <button
                                   type="button"
                                   onClick={() => handleStartEdit(ttpKey, item.ttp)}
-                                  className={`px-2.5 py-1.5 rounded-md inline-flex items-center gap-1 font-['JetBrains_Mono'] transition-colors ${darkMode ? 'bg-[rgba(215,183,151,0.1)] text-[#D7B797] hover:bg-[rgba(215,183,151,0.15)]' : 'bg-[rgba(160,120,75,0.18)] text-[#8A6340] hover:bg-[rgba(215,183,151,0.25)]'}`}
+                                  className="px-2.5 py-1.5 rounded-md inline-flex items-center gap-1 font-['JetBrains_Mono'] transition-colors bg-[rgba(160,120,75,0.18)] text-[#7D5A28] hover:bg-[rgba(196,151,90,0.25)]"
                                   title="Edit TTP"
                                 >
                                   {item.ttp}
-                                  <Pencil size={12} className={darkMode ? 'text-[#999999]' : 'text-[#8A6340]'} />
+                                  <Pencil size={12} className="text-[#7D5A28]" />
                                 </button>
                               )}
                             </td>
-                            <td className={`px-3 py-2 text-right font-['JetBrains_Mono'] ${darkMode ? 'text-[#2A9E6A]' : 'text-[#127749]'}`}>{formatCurrency(item.ttlValue)}</td>
+                            <td className="px-3 py-2 text-right font-['JetBrains_Mono'] text-[#1B6B45]">{formatCurrency(item.ttlValue)}</td>
                             <td className="px-3 py-2 text-center">
                               <select
                                 value={item.customerTarget}
                                 onChange={(e) => handleSelectChange(key, idx, 'customerTarget', e.target.value)}
-                                className={`px-2.5 py-1.5 rounded-md border text-sm focus:outline-none focus:ring-2 ${darkMode ? 'border-[#2E2E2E] bg-[#1A1A1A] text-[#F2F2F2] focus:ring-[rgba(215,183,151,0.3)] focus:border-[#D7B797]' : 'border-[rgba(215,183,151,0.3)] bg-white text-[#333333] focus:ring-[rgba(215,183,151,0.3)] focus:border-[#D7B797]'}`}
+                                className="px-2.5 py-1.5 rounded-md border text-sm focus:outline-none focus:ring-2 border-[rgba(196,151,90,0.3)] bg-white text-[#2C2417] focus:ring-[rgba(196,151,90,0.3)] focus:border-[#C4975A]"
                               >
                                 <option value="New">New</option>
                                 <option value="Existing">Existing</option>
@@ -1533,12 +1498,12 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
                         );
                         })}
                         {/* Add new row button */}
-                        <tr className={`border-t border-dashed ${darkMode ? 'border-[#2E2E2E] bg-[rgba(215,183,151,0.03)]' : 'border-[rgba(215,183,151,0.3)] bg-[rgba(215,183,151,0.03)]'}`}>
+                        <tr className="border-t border-dashed border-[rgba(196,151,90,0.3)] bg-[rgba(196,151,90,0.03)]">
                           <td colSpan={14} className="px-3 py-3">
                             <button
                               type="button"
                               onClick={() => handleAddSkuRow(key)}
-                              className={`w-full flex items-center justify-center gap-2 py-2 text-sm rounded-lg transition-colors border border-dashed ${darkMode ? 'text-[#999999] hover:text-[#D7B797] hover:bg-[rgba(215,183,151,0.08)] border-[#2E2E2E] hover:border-[rgba(215,183,151,0.5)]' : 'text-[#666666] hover:text-[#8A6340] hover:bg-[rgba(160,120,75,0.12)] border-[rgba(215,183,151,0.3)] hover:border-[rgba(215,183,151,0.5)]'}`}
+                              className="w-full flex items-center justify-center gap-2 py-2 text-sm rounded-lg transition-colors border border-dashed text-[#8C8178] hover:text-[#7D5A28] hover:bg-[rgba(160,120,75,0.12)] border-[rgba(196,151,90,0.3)] hover:border-[rgba(196,151,90,0.5)]"
                             >
                               <Plus size={16} />
                               <span>Add new SKU</span>
@@ -1558,20 +1523,20 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
       {/* Sizing Popup Modal */}
       {sizingPopup.open && sizingPopup.item && (
         <div className="fixed inset-0 bg-black/60 flex items-end md:items-center justify-center z-50">
-          <div className={`rounded-t-2xl md:rounded-2xl shadow-2xl w-full md:max-w-2xl md:mx-4 max-h-[90vh] overflow-y-auto ${darkMode ? 'bg-[#121212]' : 'bg-white'}`}>
+          <div className="rounded-t-2xl md:rounded-2xl shadow-2xl w-full md:max-w-2xl md:mx-4 max-h-[90vh] overflow-y-auto bg-white">
             {/* Header */}
-            <div className={`px-6 py-4 flex items-center justify-between ${darkMode ? 'bg-[rgba(215,183,151,0.1)] border-b border-[rgba(215,183,151,0.2)]' : 'bg-[rgba(160,120,75,0.18)] border-b border-[rgba(215,183,151,0.3)]'}`}>
+            <div className="px-6 py-4 flex items-center justify-between bg-[rgba(160,120,75,0.18)] border-b border-[rgba(196,151,90,0.3)]">
               <div>
-                <h3 className={`text-lg font-bold font-['Montserrat'] ${darkMode ? 'text-[#D7B797]' : 'text-[#8A6340]'}`}>{sizingPopup.item.productType}</h3>
-                <p className={`text-sm ${darkMode ? 'text-[#999999]' : 'text-[#6B5B4D]'}`}>
+                <h3 className="text-lg font-bold font-['Montserrat'] text-[#7D5A28]">{sizingPopup.item.productType}</h3>
+                <p className="text-sm text-[#6B5D4F]">
                   <span className="font-['JetBrains_Mono']">{sizingPopup.item.sku}</span> - {sizingPopup.item.name}
                 </p>
               </div>
               <button
                 onClick={handleCloseSizing}
-                className={`p-2 rounded-lg transition-colors ${darkMode ? 'hover:bg-[rgba(215,183,151,0.15)]' : 'hover:bg-[rgba(215,183,151,0.2)]'}`}
+                className="p-2 rounded-lg transition-colors hover:bg-[rgba(196,151,90,0.2)]"
               >
-                <X size={20} className={darkMode ? 'text-[#D7B797]' : 'text-[#8A6340]'} />
+                <X size={20} className="text-[#7D5A28]" />
               </button>
             </div>
 
@@ -1580,34 +1545,34 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className={darkMode ? 'bg-[rgba(215,183,151,0.15)] text-[#D7B797]' : 'bg-[rgba(215,183,151,0.2)] text-[#8A6340]'}>
+                    <tr className="bg-[rgba(196,151,90,0.2)] text-[#7D5A28]">
                       <th className="px-4 py-3 text-left font-semibold font-['Montserrat']">{sizingPopup.item.productType}</th>
                       <th className="px-4 py-3 text-center font-semibold font-['JetBrains_Mono']">0002</th>
                       <th className="px-4 py-3 text-center font-semibold font-['JetBrains_Mono']">0004</th>
                       <th className="px-4 py-3 text-center font-semibold font-['JetBrains_Mono']">0006</th>
                       <th className="px-4 py-3 text-center font-semibold font-['JetBrains_Mono']">0008</th>
-                      <th className={`px-4 py-3 text-center font-semibold font-['Montserrat'] ${darkMode ? 'bg-[rgba(215,183,151,0.2)]' : 'bg-[rgba(215,183,151,0.25)]'}`}>Sum</th>
+                      <th className="px-4 py-3 text-center font-semibold font-['Montserrat'] bg-[rgba(196,151,90,0.25)]">Sum</th>
                     </tr>
                   </thead>
-                  <tbody className={darkMode ? 'text-[#F2F2F2]' : 'text-[#333333]'}>
-                    <tr className={darkMode ? 'border-b border-[#2E2E2E] bg-[#1A1A1A]' : 'border-b border-[rgba(215,183,151,0.2)] bg-[rgba(160,120,75,0.08)]'}>
-                      <td className={`px-4 py-2.5 font-medium ${darkMode ? 'text-[#F2F2F2]' : 'text-[#333333]'}`}>% Sales mix</td>
+                  <tbody className="text-[#2C2417]">
+                    <tr className="border-b border-[rgba(196,151,90,0.2)] bg-[rgba(160,120,75,0.08)]">
+                      <td className="px-4 py-2.5 font-medium text-[#2C2417]">% Sales mix</td>
                       <td className="px-4 py-2.5 text-center font-['JetBrains_Mono']">6%</td>
                       <td className="px-4 py-2.5 text-center font-['JetBrains_Mono']">33%</td>
                       <td className="px-4 py-2.5 text-center font-['JetBrains_Mono']">33%</td>
                       <td className="px-4 py-2.5 text-center font-['JetBrains_Mono']">28%</td>
-                      <td className={`px-4 py-2.5 text-center font-semibold font-['JetBrains_Mono'] ${darkMode ? 'bg-[rgba(215,183,151,0.08)]' : 'bg-[rgba(160,120,75,0.12)]'}`}>100%</td>
+                      <td className="px-4 py-2.5 text-center font-semibold font-['JetBrains_Mono'] bg-[rgba(160,120,75,0.12)]">100%</td>
                     </tr>
-                    <tr className={darkMode ? 'border-b border-[#2E2E2E]' : 'border-b border-[rgba(215,183,151,0.2)]'}>
-                      <td className={`px-4 py-2.5 font-medium ${darkMode ? 'text-[#F2F2F2]' : 'text-[#333333]'}`}>% ST</td>
+                    <tr className="border-b border-[rgba(196,151,90,0.2)]">
+                      <td className="px-4 py-2.5 font-medium text-[#2C2417]">% ST</td>
                       <td className="px-4 py-2.5 text-center font-['JetBrains_Mono']">50%</td>
                       <td className="px-4 py-2.5 text-center font-['JetBrains_Mono']">43%</td>
                       <td className="px-4 py-2.5 text-center font-['JetBrains_Mono']">30%</td>
                       <td className="px-4 py-2.5 text-center font-['JetBrains_Mono']">63%</td>
-                      <td className={`px-4 py-2.5 text-center font-['JetBrains_Mono'] ${darkMode ? 'text-[#666666] bg-[rgba(215,183,151,0.08)]' : 'text-[#999999] bg-[rgba(160,120,75,0.12)]'}`}>-</td>
+                      <td className="px-4 py-2.5 text-center font-['JetBrains_Mono'] text-[#8C8178] bg-[rgba(160,120,75,0.12)]">-</td>
                     </tr>
-                    <tr className={darkMode ? 'border-b border-[#2E2E2E] bg-[rgba(215,183,151,0.08)]' : 'border-b border-[rgba(215,183,151,0.2)] bg-[rgba(160,120,75,0.12)]'}>
-                      <td className={`px-4 py-2.5 font-medium ${darkMode ? 'text-[#D7B797]' : 'text-[#8A6340]'}`}>Choice A:</td>
+                    <tr className="border-b border-[rgba(196,151,90,0.2)] bg-[rgba(160,120,75,0.12)]">
+                      <td className="px-4 py-2.5 font-medium text-[#7D5A28]">Choice A:</td>
                       {['s0002', 's0004', 's0006', 's0008'].map(size => (
                         <td key={size} className="px-2 py-2 text-center">
                           <input
@@ -1615,14 +1580,14 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
                             min="0"
                             value={getSizing(sizingPopup.blockKey, sizingPopup.itemIdx).choiceA[size]}
                             onChange={(e) => updateSizing(sizingPopup.blockKey, sizingPopup.itemIdx, 'choiceA', size, e.target.value)}
-                            className={`w-14 text-center font-['JetBrains_Mono'] text-sm rounded border py-1 focus:outline-none focus:ring-2 focus:ring-[rgba(215,183,151,0.4)] ${darkMode ? 'bg-[rgba(42,158,106,0.1)] border-[rgba(42,158,106,0.25)] text-[#D7B797]' : 'bg-emerald-50 border-emerald-200 text-[#8A6340]'}`}
+                            className="w-14 text-center font-['JetBrains_Mono'] text-sm rounded border py-1 focus:outline-none focus:ring-2 focus:ring-[rgba(196,151,90,0.4)] bg-emerald-50 border-emerald-200 text-[#7D5A28]"
                           />
                         </td>
                       ))}
-                      <td className={`px-4 py-2.5 text-center font-semibold font-['JetBrains_Mono'] ${darkMode ? 'text-[#D7B797] bg-[rgba(215,183,151,0.15)]' : 'text-[#8A6340] bg-[rgba(215,183,151,0.2)]'}`}>{calculateSum(getSizing(sizingPopup.blockKey, sizingPopup.itemIdx).choiceA)}</td>
+                      <td className="px-4 py-2.5 text-center font-semibold font-['JetBrains_Mono'] text-[#7D5A28] bg-[rgba(196,151,90,0.2)]">{calculateSum(getSizing(sizingPopup.blockKey, sizingPopup.itemIdx).choiceA)}</td>
                     </tr>
-                    <tr className={darkMode ? 'border-b border-[#2E2E2E] bg-[rgba(42,158,106,0.08)]' : 'border-b border-[rgba(215,183,151,0.2)] bg-[rgba(18,119,73,0.05)]'}>
-                      <td className={`px-4 py-2.5 font-medium ${darkMode ? 'text-[#2A9E6A]' : 'text-[#127749]'}`}>Choice B:</td>
+                    <tr className="border-b border-[rgba(196,151,90,0.2)] bg-[rgba(27,107,69,0.05)]">
+                      <td className="px-4 py-2.5 font-medium text-[#1B6B45]">Choice B:</td>
                       {['s0002', 's0004', 's0006', 's0008'].map(size => (
                         <td key={size} className="px-2 py-2 text-center">
                           <input
@@ -1630,14 +1595,14 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
                             min="0"
                             value={getSizing(sizingPopup.blockKey, sizingPopup.itemIdx).choiceB[size]}
                             onChange={(e) => updateSizing(sizingPopup.blockKey, sizingPopup.itemIdx, 'choiceB', size, e.target.value)}
-                            className={`w-14 text-center font-['JetBrains_Mono'] text-sm rounded border py-1 focus:outline-none focus:ring-2 focus:ring-[rgba(215,183,151,0.4)] ${darkMode ? 'bg-[rgba(42,158,106,0.1)] border-[rgba(42,158,106,0.25)] text-[#2A9E6A]' : 'bg-emerald-50 border-emerald-200 text-[#127749]'}`}
+                            className="w-14 text-center font-['JetBrains_Mono'] text-sm rounded border py-1 focus:outline-none focus:ring-2 focus:ring-[rgba(196,151,90,0.4)] bg-emerald-50 border-emerald-200 text-[#1B6B45]"
                           />
                         </td>
                       ))}
-                      <td className={`px-4 py-2.5 text-center font-semibold font-['JetBrains_Mono'] ${darkMode ? 'text-[#2A9E6A] bg-[rgba(42,158,106,0.15)]' : 'text-[#127749] bg-[rgba(18,119,73,0.1)]'}`}>{calculateSum(getSizing(sizingPopup.blockKey, sizingPopup.itemIdx).choiceB)}</td>
+                      <td className="px-4 py-2.5 text-center font-semibold font-['JetBrains_Mono'] text-[#1B6B45] bg-[rgba(27,107,69,0.1)]">{calculateSum(getSizing(sizingPopup.blockKey, sizingPopup.itemIdx).choiceB)}</td>
                     </tr>
-                    <tr className={darkMode ? 'bg-[rgba(42,158,106,0.05)]' : 'bg-[rgba(18,119,73,0.03)]'}>
-                      <td className={`px-4 py-2.5 font-medium ${darkMode ? 'text-[#2A9E6A]' : 'text-[#127749]'}`}>Choice C:</td>
+                    <tr className="bg-[rgba(27,107,69,0.03)]">
+                      <td className="px-4 py-2.5 font-medium text-[#1B6B45]">Choice C:</td>
                       {['s0002', 's0004', 's0006', 's0008'].map(size => (
                         <td key={size} className="px-2 py-2 text-center">
                           <input
@@ -1645,11 +1610,11 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
                             min="0"
                             value={getSizing(sizingPopup.blockKey, sizingPopup.itemIdx).choiceC[size]}
                             onChange={(e) => updateSizing(sizingPopup.blockKey, sizingPopup.itemIdx, 'choiceC', size, e.target.value)}
-                            className={`w-14 text-center font-['JetBrains_Mono'] text-sm rounded border py-1 focus:outline-none focus:ring-2 focus:ring-[rgba(215,183,151,0.4)] ${darkMode ? 'bg-[rgba(42,158,106,0.1)] border-[rgba(42,158,106,0.25)] text-[#2A9E6A]' : 'bg-emerald-50 border-emerald-200 text-[#127749]'}`}
+                            className="w-14 text-center font-['JetBrains_Mono'] text-sm rounded border py-1 focus:outline-none focus:ring-2 focus:ring-[rgba(196,151,90,0.4)] bg-emerald-50 border-emerald-200 text-[#1B6B45]"
                           />
                         </td>
                       ))}
-                      <td className={`px-4 py-2.5 text-center font-semibold font-['JetBrains_Mono'] ${darkMode ? 'text-[#2A9E6A] bg-[rgba(42,158,106,0.1)]' : 'text-[#127749] bg-[rgba(18,119,73,0.08)]'}`}>{calculateSum(getSizing(sizingPopup.blockKey, sizingPopup.itemIdx).choiceC)}</td>
+                      <td className="px-4 py-2.5 text-center font-semibold font-['JetBrains_Mono'] text-[#1B6B45] bg-[rgba(27,107,69,0.08)]">{calculateSum(getSizing(sizingPopup.blockKey, sizingPopup.itemIdx).choiceC)}</td>
                     </tr>
                   </tbody>
                 </table>
@@ -1679,13 +1644,13 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
               <div className="flex justify-end gap-3 mt-6">
                 <button
                   onClick={handleCloseSizing}
-                  className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${darkMode ? 'text-[#999999] hover:bg-[rgba(215,183,151,0.1)] hover:text-[#D7B797]' : 'text-[#666666] hover:bg-[rgba(160,120,75,0.12)] hover:text-[#8A6340]'}`}
+                  className="px-4 py-2 text-sm font-medium rounded-lg transition-colors text-[#8C8178] hover:bg-[rgba(160,120,75,0.12)] hover:text-[#7D5A28]"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleCloseSizing}
-                  className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors shadow-sm ${darkMode ? 'bg-[#D7B797] text-[#0A0A0A] hover:bg-[#C4A584]' : 'bg-[#D7B797] text-[#333333] hover:bg-[#C4A584]'}`}
+                  className="px-4 py-2 text-sm font-medium rounded-lg transition-colors shadow-sm bg-[#C4975A] text-white hover:bg-[#D4B082]"
                 >
                   Save Sizing
                 </button>

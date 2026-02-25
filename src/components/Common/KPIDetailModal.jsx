@@ -30,14 +30,14 @@ const BREAKDOWN_LABEL_KEY = {
 };
 
 const BAR_COLORS = [
-  '#D7B797', '#2A9E6A', '#58A6FF', '#F87171',
-  '#F59E0B', '#14B8A6', '#A78BFA',
+  '#C4975A', '#1B6B45', '#2563EB', '#DC3545',
+  '#D97706', '#0891B2', '#7C3AED',
 ];
 
 // Shimmer skeleton block
-const Skeleton = ({ className, darkMode }) => (
+const Skeleton = ({ className }) => (
   <div
-    className={`rounded animate-pulse ${darkMode ? 'bg-[#1E1E1E]' : 'bg-gray-100'} ${className}`}
+    className={`rounded animate-pulse bg-[#F0EBE5] ${className}`}
   />
 );
 
@@ -80,11 +80,11 @@ const KPIDetailModal = ({
 
   if (!isOpen || !mounted) return null;
 
-  const borderColor = darkMode ? 'border-[#2E2E2E]' : 'border-gray-300';
-  const textMuted = darkMode ? 'text-[#666666]' : 'text-gray-600';
-  const textPrimary = darkMode ? 'text-[#F2F2F2]' : 'text-gray-900';
-  const textSecondary = darkMode ? 'text-[#999999]' : 'text-gray-700';
-  const panelBg = darkMode ? 'bg-[#1A1A1A]' : 'bg-gray-50';
+  const borderColor = 'border-[#E8E2DB]';
+  const textMuted = 'text-[#8C8178]';
+  const textPrimary = 'text-[#2C2417]';
+  const textSecondary = 'text-[#6B5D4F]';
+  const panelBg = 'bg-[#FBF9F7]';
   const breakdownLabel = t(`home.kpiDetail.${BREAKDOWN_LABEL_KEY[cardKey] || 'breakdown'}`);
 
   const chartMax = data?.chartData
@@ -101,15 +101,11 @@ const KPIDetailModal = ({
 
       {/* Modal Card */}
       <div
-        className={`relative w-full max-w-4xl max-h-[85vh] overflow-y-auto border ${borderColor} rounded-2xl shadow-2xl animate-scale-in ${
-          darkMode ? 'bg-[#121212]' : 'bg-white'
-        }`}
+        className={`relative w-full max-w-4xl max-h-[85vh] overflow-y-auto border ${borderColor} rounded-2xl shadow-2xl animate-scale-in bg-white`}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className={`sticky top-0 z-10 flex items-center justify-between p-5 border-b ${borderColor} ${
-          darkMode ? 'bg-[#121212]' : 'bg-white'
-        }`}>
+        <div className={`sticky top-0 z-10 flex items-center justify-between p-5 border-b ${borderColor} bg-white`}>
           <div className="flex items-center gap-3">
             {Icon && (
               <div
@@ -126,11 +122,7 @@ const KPIDetailModal = ({
           </div>
           <button
             onClick={onClose}
-            className={`w-9 h-9 rounded-full border flex items-center justify-center transition-all duration-150 ${
-              darkMode
-                ? 'border-[#2E2E2E] text-[#999999] hover:bg-[rgba(248,81,73,0.15)] hover:text-[#FF7B72] hover:border-[rgba(248,81,73,0.3)]'
-                : 'border-gray-300 text-gray-500 hover:bg-red-50 hover:text-red-500 hover:border-red-300'
-            }`}
+            className={`w-9 h-9 rounded-full border flex items-center justify-center transition-all duration-150 bg-white border-[#E8E2DB] text-[#6B5D4F] hover:bg-red-50 hover:text-red-500 hover:border-red-300`}
           >
             <X size={16} />
           </button>
@@ -141,11 +133,11 @@ const KPIDetailModal = ({
           {/* Error state */}
           {error && !loading && (
             <div className={`flex flex-col items-center justify-center py-12 gap-3`}>
-              <AlertTriangle size={32} className="text-[#FF7B72]" />
+              <AlertTriangle size={32} className="text-[#DC3545]" />
               <p className={`text-sm ${textSecondary}`}>{t('home.kpiDetail.errorLoading')}</p>
               <button
                 onClick={retry}
-                className={`px-4 py-2 text-xs font-semibold rounded-lg transition-colors ${darkMode ? 'bg-[rgba(215,183,151,0.15)] text-[#D7B797] hover:bg-[rgba(215,183,151,0.25)]' : 'bg-[rgba(215,183,151,0.2)] text-[#6B4D30] hover:bg-[rgba(215,183,151,0.3)]'}`}
+                className="px-4 py-2 text-xs font-semibold rounded-lg transition-colors bg-[rgba(196,151,90,0.2)] text-[#6B4D30] hover:bg-[rgba(196,151,90,0.3)]"
               >
                 {t('home.kpiDetail.retry')}
               </button>
@@ -156,18 +148,18 @@ const KPIDetailModal = ({
           {loading && !error && (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
               <div className="space-y-4">
-                <Skeleton className="h-20 w-full" darkMode={darkMode} />
-                <Skeleton className="h-14 w-3/4" darkMode={darkMode} />
-                <Skeleton className="h-14 w-1/2" darkMode={darkMode} />
+                <Skeleton className="h-20 w-full" />
+                <Skeleton className="h-14 w-3/4" />
+                <Skeleton className="h-14 w-1/2" />
               </div>
               <div className="space-y-4">
-                <Skeleton className="h-40 w-full" darkMode={darkMode} />
+                <Skeleton className="h-40 w-full" />
               </div>
               <div className="space-y-3">
-                <Skeleton className="h-8 w-full" darkMode={darkMode} />
-                <Skeleton className="h-8 w-full" darkMode={darkMode} />
-                <Skeleton className="h-8 w-full" darkMode={darkMode} />
-                <Skeleton className="h-8 w-full" darkMode={darkMode} />
+                <Skeleton className="h-8 w-full" />
+                <Skeleton className="h-8 w-full" />
+                <Skeleton className="h-8 w-full" />
+                <Skeleton className="h-8 w-full" />
               </div>
             </div>
           )}
@@ -191,8 +183,8 @@ const KPIDetailModal = ({
                   {trendLabel && (
                     <span className={`inline-flex items-center gap-1 mt-2 px-2.5 py-1 text-xs font-semibold font-['JetBrains_Mono'] rounded ${
                       trend > 0
-                        ? 'bg-[rgba(18,119,73,0.15)] text-[#2A9E6A]'
-                        : 'bg-[rgba(248,81,73,0.15)] text-[#FF7B72]'
+                        ? 'bg-[rgba(27,107,69,0.12)] text-[#1B6B45]'
+                        : 'bg-[rgba(220,53,69,0.10)] text-[#DC3545]'
                     }`}>
                       {trend > 0 ? '\u25B2' : '\u25BC'} {trendLabel}
                     </span>
@@ -217,8 +209,8 @@ const KPIDetailModal = ({
                           key={i}
                           className={`flex items-start gap-2 px-3 py-2 rounded-lg text-xs ${
                             alert.severity === 'critical'
-                              ? 'bg-[rgba(248,81,73,0.1)] text-[#FF7B72]'
-                              : 'bg-[rgba(210,153,34,0.1)] text-[#E3B341]'
+                              ? 'bg-[rgba(220,53,69,0.1)] text-[#DC3545]'
+                              : 'bg-[rgba(217,119,6,0.1)] text-[#D97706]'
                           }`}
                         >
                           <AlertTriangle size={12} className="mt-0.5 shrink-0" />
@@ -257,7 +249,7 @@ const KPIDetailModal = ({
                             y={154}
                             textAnchor="middle"
                             fontSize="7"
-                            fill={darkMode ? '#666666' : '#6B7280'}
+                            fill="#8C8178"
                             fontFamily="Montserrat"
                           >
                             {d.label.length > 5 ? d.label.slice(0, 5) + '..' : d.label}
@@ -267,7 +259,7 @@ const KPIDetailModal = ({
                             y={140 - barH - 4}
                             textAnchor="middle"
                             fontSize="7"
-                            fill={darkMode ? '#999999' : '#6b7280'}
+                            fill="#6B5D4F"
                             fontFamily="JetBrains Mono"
                           >
                             {d.value}
@@ -303,7 +295,7 @@ const KPIDetailModal = ({
                             {item.pct != null && ` (${item.pct}%)`}
                           </span>
                         </div>
-                        <div className={`h-1.5 rounded-full overflow-hidden ${darkMode ? 'bg-[#1E1E1E]' : 'bg-gray-200'}`}>
+                        <div className="h-1.5 rounded-full overflow-hidden bg-[#E8E2DB]">
                           <div
                             className="h-full rounded-full transition-all duration-700"
                             style={{
@@ -345,15 +337,9 @@ const KPIDetailModal = ({
         </div>
 
         {/* Footer */}
-        <div className={`sticky bottom-0 flex items-center justify-between p-4 border-t ${borderColor} ${
-          darkMode ? 'bg-[#121212]' : 'bg-white'
-        }`}>
+        <div className={`sticky bottom-0 flex items-center justify-between p-4 border-t ${borderColor} bg-white`}>
           <button
-            className={`flex items-center gap-2 px-4 py-2 text-xs font-semibold rounded-lg border transition-all duration-150 ${
-              darkMode
-                ? 'border-[#2E2E2E] text-[#999999] hover:bg-[rgba(215,183,151,0.08)] hover:text-[#D7B797] hover:border-[rgba(215,183,151,0.25)]'
-                : 'border-gray-300 text-gray-600 hover:bg-gray-50 hover:text-gray-700'
-            }`}
+            className="flex items-center gap-2 px-4 py-2 text-xs font-semibold rounded-lg border transition-all duration-150 border-[#E8E2DB] text-[#6B5D4F] hover:bg-[#FBF9F7] hover:text-[#2C2417]"
           >
             <Download size={14} />
             {t('home.kpiDetail.export')}
