@@ -35,7 +35,8 @@ import {
   Layers,
   LineChart,
   PieChart,
-  Activity
+  Activity,
+  Printer
 } from 'lucide-react';
 
 // Screen configuration builder (uses t() for translations)
@@ -635,6 +636,53 @@ const AppHeader = ({
               </div>
             )}
           </div>
+
+          {/* Print + Save — moved to header row, hidden on Tickets pages */}
+          {isInPlanningWorkflow && currentScreen !== 'tickets' && currentScreen !== 'ticket-detail' && (
+          <>
+            <div className="w-px h-4 mx-1" style={{
+              background: darkMode
+                ? 'linear-gradient(180deg, transparent 0%, rgba(215,183,151,0.15) 50%, transparent 100%)'
+                : 'linear-gradient(180deg, transparent 0%, rgba(215,183,151,0.25) 50%, transparent 100%)',
+            }} />
+            <div className="flex items-center gap-2 shrink-0">
+              <button
+                onClick={() => window.print()}
+                className={`no-print px-1.5 py-1 rounded-lg transition-colors ${
+                  darkMode
+                    ? 'text-[#999] hover:bg-[rgba(215,183,151,0.08)] hover:text-[#D7B797]'
+                    : 'text-[#666] hover:bg-[rgba(160,120,75,0.12)] hover:text-[#6B4D30]'
+                }`}
+                title={t('common.print')}
+              >
+                <Printer size={14} />
+              </button>
+              <div className="relative" ref={saveButtonRef}>
+                <div className="inline-flex items-stretch rounded-lg border border-[rgba(215,183,151,0.3)] overflow-hidden">
+                  <button
+                    onClick={() => console.log('Save')}
+                    className="flex items-center px-2 py-1 transition-colors bg-[#D7B797] text-[#0A0A0A] hover:bg-[#C4A684]"
+                    title={t('header.save')}
+                  >
+                    <Save size={14} />
+                  </button>
+                  <button
+                    onClick={() => {
+                      if (!openSaveMenu && saveButtonRef.current) {
+                        const rect = saveButtonRef.current.getBoundingClientRect();
+                        setSaveMenuPosition({ top: rect.bottom + 6, right: window.innerWidth - rect.right });
+                      }
+                      setOpenSaveMenu(!openSaveMenu);
+                    }}
+                    className="flex items-center px-1 py-1 border-l border-[rgba(26,26,26,0.2)] transition-colors bg-[#D7B797] text-[#0A0A0A] hover:bg-[#C4A684]"
+                  >
+                    <ChevronDown size={12} className={`transition-transform ${openSaveMenu ? 'rotate-180' : ''}`} />
+                  </button>
+                </div>
+              </div>
+            </div>
+          </>
+          )}
         </div>
       </div>
 
@@ -711,33 +759,6 @@ const AppHeader = ({
                   </React.Fragment>
                 );
               })}
-            </div>
-
-            {/* Save Button */}
-            <div className="ml-auto relative" ref={saveButtonRef}>
-              <div className="inline-flex rounded-lg" style={{
-                boxShadow: '0 2px 8px rgba(215,183,151,0.2)',
-              }}>
-                <button
-                  onClick={() => console.log('Save')}
-                  className="flex items-center gap-1.5 px-3 py-1 text-xs font-medium font-['Montserrat'] rounded-l-lg transition-colors bg-[#D7B797] text-[#0A0A0A] hover:bg-[#C4A684]"
-                >
-                  <Save size={12} />
-                  {t('header.save')}
-                </button>
-                <button
-                  onClick={() => {
-                    if (!openSaveMenu && saveButtonRef.current) {
-                      const rect = saveButtonRef.current.getBoundingClientRect();
-                      setSaveMenuPosition({ top: rect.bottom + 6, right: window.innerWidth - rect.right });
-                    }
-                    setOpenSaveMenu(!openSaveMenu);
-                  }}
-                  className="px-2 py-1 rounded-r-lg border-l border-[rgba(26,26,26,0.2)] transition-colors bg-[#D7B797] text-[#0A0A0A] hover:bg-[#C4A684]"
-                >
-                  <ChevronDown size={12} className={`transition-transform ${openSaveMenu ? 'rotate-180' : ''}`} />
-                </button>
-              </div>
             </div>
           </div>
         </div>
