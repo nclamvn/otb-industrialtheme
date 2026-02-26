@@ -5,7 +5,7 @@ import {
   ArrowLeft, Save, TrendingUp, Layers, Users, Tag, Info, Pencil,
   ChevronDown, Check, CheckCircle2, History, Clock, Sparkles, X,
   Calendar, User, MessageSquare, AlertCircle, CheckCircle, XCircle,
-  Send, FileText, DollarSign
+  Send, FileText, DollarSign, Loader2
 } from 'lucide-react';
 import { formatCurrency } from '../utils';
 import { GENDERS, STORES } from '../utils/constants';
@@ -91,6 +91,7 @@ const PlanningDetailPage = ({
   const { t } = useLanguage();
   const { isMobile } = useIsMobile();
   const [activeTab, setActiveTab] = useState('collection');
+  const [saving, setSaving] = useState(false);
   const [editingCell, setEditingCell] = useState(null);
   const [editValue, setEditValue] = useState('');
   const [localData, setLocalData] = useState({});
@@ -1463,16 +1464,19 @@ const PlanningDetailPage = ({
               )}
 
               <button
-                onClick={onSave}
-                disabled={isReadOnly}
+                onClick={async () => {
+                  setSaving(true);
+                  try { await onSave(); } finally { setSaving(false); }
+                }}
+                disabled={isReadOnly || saving}
                 className={`px-6 py-2.5 rounded-xl font-medium transition-all duration-200 flex items-center gap-2 shadow-lg ${
-                  isReadOnly
+                  isReadOnly || saving
                     ? 'bg-slate-300 text-slate-500 cursor-not-allowed shadow-none'
                     : 'bg-blue-600 text-white hover:bg-blue-700 shadow-blue-500/20 hover:shadow-xl'
                 }`}
               >
-                <Save size={18} />
-                {t('planningDetail.savePlanning')}
+                {saving ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
+                {saving ? (t('common.saving') || 'Saving...') : t('planningDetail.savePlanning')}
               </button>
             </div>
           </div>

@@ -8,6 +8,7 @@ import {
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useIsMobile } from '@/hooks/useIsMobile';
+import { formatDate } from '../utils';
 
 const ProfileScreen = ({ user: propUser, onUpdateUser }) => {
   const { user: authUser } = useAuth();
@@ -162,7 +163,7 @@ const ProfileScreen = ({ user: propUser, onUpdateUser }) => {
                 </div>
                 <div className="flex items-center gap-1.5 px-2 py-1 rounded-full text-xs bg-[#F0EBE5] text-[#6B5D4F]">
                   <Calendar size={12} />
-                  Joined {user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A'}
+                  Joined {user?.createdAt ? formatDate(user.createdAt) : 'N/A'}
                 </div>
               </div>
             </div>

@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { formatCurrency } from '../utils/formatters';
+import { includes as viIncludes } from '../utils/normalizeVietnamese';
 import { budgetService, masterDataService } from '../services';
 import { invalidateCache } from '../services/api';
 import { LoadingSpinner, ErrorMessage, EmptyState, ExpandableStatCard } from '../components/Common';
@@ -170,7 +171,7 @@ const BudgetManagementScreen = ({
       if (selectedYear && budget.fiscalYear !== selectedYear) return false;
       if (selectedGroupBrand && budget.groupBrand !== selectedGroupBrand) return false;
       if (selectedBrand && budget.brandId !== selectedBrand) return false;
-      if (searchQuery && !budget.budgetName.toLowerCase().includes(searchQuery.toLowerCase())) return false;
+      if (searchQuery && !viIncludes(budget.budgetName, searchQuery)) return false;
       return true;
     });
     if (sortColumn) {
@@ -853,7 +854,8 @@ const BudgetManagementScreen = ({
                 <h3 className="text-lg font-semibold font-brand">{t('budget.budgetDetail')}</h3>
                 <button
                   onClick={() => setShowViewModal(false)}
-                  className="p-2 rounded-lg transition-colors hover:bg-[#FBF9F7]"
+                  aria-label={t('common.close')}
+                  className="p-2 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg transition-colors hover:bg-[#FBF9F7]"
                 >
                   <X size={18} />
                 </button>
@@ -995,7 +997,8 @@ const BudgetManagementScreen = ({
               <h3 className="text-lg font-semibold font-brand text-[#2C2417]">{t('budget.createNewBudget')}</h3>
               <button
                 onClick={() => setShowCreateModal(false)}
-                className="p-2 rounded-lg transition-colors text-[#6B5D4F] hover:text-[#2C2417] hover:bg-[#FBF9F7]"
+                aria-label={t('common.close')}
+                className="p-2 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg transition-colors text-[#6B5D4F] hover:text-[#2C2417] hover:bg-[#FBF9F7]"
               >
                 <X size={20} />
               </button>

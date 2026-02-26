@@ -9,7 +9,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useIsMobile } from '@/hooks/useIsMobile';
 import { MobileDataCard } from '@/components/ui';
-import { formatCurrency } from '../utils';
+import { formatCurrency, formatDate } from '../utils';
 
 /* =========================
    UTILS
@@ -68,6 +68,14 @@ const TicketScreen = ({ onOpenTicketDetail }) => {
   const [viewMode, setViewMode] = useState('table'); // 'table' | 'kanban'
   const [budgetOptions, setBudgetOptions] = useState([]);
 
+  // Close popup on Escape key
+  useEffect(() => {
+    if (!showCreatePopup) return;
+    const handler = (e) => { if (e.key === 'Escape') setShowCreatePopup(false); };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [showCreatePopup]);
+
   // Fetch all tickets (budgets, plannings, proposals)
   useEffect(() => {
     if (!isAuthenticated) return;
@@ -95,7 +103,7 @@ const TicketScreen = ({ onOpenTicketDetail }) => {
             seasonGroup: b.seasonGroupId || '-',
             season: b.seasonType || '-',
             createdBy: b.createdBy?.name || 'System',
-            createdOn: b.createdAt ? new Date(b.createdAt).toISOString().split('T')[0] : '-',
+            createdOn: b.createdAt ? formatDate(b.createdAt) : '-',
             status: b.status,
             totalBudget: Number(b.totalBudget) || 0,
             data: b
@@ -112,7 +120,7 @@ const TicketScreen = ({ onOpenTicketDetail }) => {
             seasonGroup: p.budgetDetail?.budget?.seasonGroupId || '-',
             season: p.budgetDetail?.budget?.seasonType || '-',
             createdBy: p.createdBy?.name || 'System',
-            createdOn: p.createdAt ? new Date(p.createdAt).toISOString().split('T')[0] : '-',
+            createdOn: formatDate(p.createdAt) !== '—' ? formatDate(p.createdAt) : '-',
             status: p.status,
             totalBudget: Number(p.budgetDetail?.budgetAmount) || 0,
             data: p
@@ -129,7 +137,7 @@ const TicketScreen = ({ onOpenTicketDetail }) => {
             seasonGroup: pr.planning?.budgetDetail?.budget?.seasonGroupId || '-',
             season: pr.planning?.budgetDetail?.budget?.seasonType || '-',
             createdBy: pr.createdBy?.name || 'System',
-            createdOn: pr.createdAt ? new Date(pr.createdAt).toISOString().split('T')[0] : '-',
+            createdOn: formatDate(pr.createdAt) !== '—' ? formatDate(pr.createdAt) : '-',
             status: pr.status,
             totalBudget: 0,
             data: pr
@@ -433,7 +441,8 @@ const TicketScreen = ({ onOpenTicketDetail }) => {
               <h3 className="text-sm font-semibold font-brand text-content">{t('ticket.createNewTicket')}</h3>
               <button
                 onClick={() => setShowCreatePopup(false)}
-                className="p-1 rounded-md transition-colors hover:bg-surface-secondary"
+                aria-label={t('common.close')}
+                className="p-1 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md transition-colors hover:bg-surface-secondary"
               >
                 <X size={16} className="text-content-muted" />
               </button>

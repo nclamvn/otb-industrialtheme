@@ -11,6 +11,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useIsMobile } from '@/hooks/useIsMobile';
 import { formatCurrency } from '../utils';
+import { includes as viIncludes } from '../utils/normalizeVietnamese';
 import { proposalService, orderService } from '../services';
 import api, { invalidateCache } from '../services/api';
 import { ExpandableStatCard } from '../components/Common';
@@ -121,11 +122,10 @@ const ReceiptConfirmationScreen = () => {
     return receipts.filter(receipt => {
       if (statusFilter !== 'all' && receipt.status !== statusFilter) return false;
       if (searchTerm) {
-        const term = searchTerm.toLowerCase();
         return (
-          (receipt.receiptNumber || '').toLowerCase().includes(term) ||
-          (receipt.poReference || '').toLowerCase().includes(term) ||
-          (receipt.brandName || '').toLowerCase().includes(term)
+          viIncludes(receipt.receiptNumber || '', searchTerm) ||
+          viIncludes(receipt.poReference || '', searchTerm) ||
+          viIncludes(receipt.brandName || '', searchTerm)
         );
       }
       return true;

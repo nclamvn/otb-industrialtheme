@@ -120,7 +120,7 @@ const Sidebar = ({ currentScreen, setDarkMode, user, onLogout }) => {
   );
 
   return (
-    <div className={`${isCollapsed ? 'w-[60px]' : 'w-[260px]'} h-screen flex flex-col sticky top-0 z-40 transition-all duration-300 ease-in-out bg-white`}>
+    <div className={`${isCollapsed ? 'w-[60px]' : 'w-[260px]'} h-full flex flex-col z-40 transition-all duration-300 ease-in-out bg-white`}>
 
       {/* ── Logo Header — no bottom border, taller, muted brand text ── */}
       <div className="h-[48px] flex items-center justify-center flex-shrink-0">

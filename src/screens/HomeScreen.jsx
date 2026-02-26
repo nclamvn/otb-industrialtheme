@@ -83,7 +83,7 @@ const IntelCard = ({ title, value, trend, trendLabel, icon: Icon, color, variant
       onClick={onClick}
     >
       {Icon && (
-        <Icon size={52} strokeWidth={1} className="absolute -top-1 -right-1 pointer-events-none" style={{ color, opacity: 0.07 }} />
+        <Icon size={80} strokeWidth={0.8} className="absolute -bottom-3 -right-3 pointer-events-none transition-all duration-300 group-hover:scale-110 group-hover:opacity-[0.15]" style={{ color, opacity: 0.08 }} />
       )}
       <p className="text-[10px] font-semibold uppercase tracking-[0.12em] font-brand text-content-secondary relative">
         {title}

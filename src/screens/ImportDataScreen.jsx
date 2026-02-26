@@ -7,6 +7,7 @@ import {
 import { useLanguage } from '../contexts/LanguageContext';
 import { useIsMobile } from '@/hooks/useIsMobile';
 import { useDataImport } from '../hooks/useDataImport';
+import { formatDate } from '../utils';
 
 const ImportDataScreen = () => {
   const { t } = useLanguage();
@@ -513,7 +514,7 @@ const ImportDataScreen = () => {
                 <div className="flex justify-between text-xs">
                   <span className={textSecondary}>{t('import.lastImport', 'Last Import')}</span>
                   <span className={`font-medium ${textPrimary}`}>
-                    {stat.lastImportAt ? new Date(stat.lastImportAt).toLocaleDateString() : '-'}
+                    {stat.lastImportAt ? formatDate(stat.lastImportAt) : '-'}
                   </span>
                 </div>
 

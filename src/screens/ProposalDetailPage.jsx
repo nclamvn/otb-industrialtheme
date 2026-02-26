@@ -4,7 +4,7 @@ import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import {
   ArrowLeft, ArrowRight, Save, Plus, Trash2, Search,
   Package, DollarSign, ShoppingCart, Store, ChevronDown, ChevronRight,
-  Check, X, AlertCircle, Send, Hash
+  Check, X, AlertCircle, Send, Hash, Loader2
 } from 'lucide-react';
 import { formatCurrency } from '../utils';
 import { masterDataService, proposalService, budgetService } from '../services';
@@ -273,9 +273,11 @@ const ProposalDetailPage = ({ proposal, onBack, onSave }) => {
           })));
         }
       }
+      toast.success(t('common.saved') || 'Saved successfully');
       onSave && onSave({ ticketName, skuList, totals: grandTotals, savedProposal });
     } catch (err) {
       console.error('Failed to save proposal:', err);
+      toast.error(t('common.saveFailed') || 'Failed to save');
     } finally {
       setSaving(false);
     }
@@ -391,16 +393,16 @@ const ProposalDetailPage = ({ proposal, onBack, onSave }) => {
 
           {/* Actions */}
           <div className="flex items-center gap-2">
-            <button onClick={handleSave} className="flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 rounded-lg text-sm font-medium text-slate-700 transition-colors">
-              <Save size={16} />
-              {t('common.save')}
+            <button onClick={handleSave} disabled={saving} className="flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 rounded-lg text-sm font-medium text-slate-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+              {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
+              {saving ? (t('common.saving') || 'Saving...') : t('common.save')}
             </button>
             <button
               onClick={handleSubmit}
               disabled={submitting || skuList.length === 0}
               className="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <Send size={16} />
+              {submitting ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
               {submitting ? (t('common.submitting') || 'Submitting...') : t('common.submit')}
             </button>
           </div>

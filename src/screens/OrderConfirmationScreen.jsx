@@ -13,6 +13,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useIsMobile } from '@/hooks/useIsMobile';
 import { formatCurrency } from '../utils';
+import { includes as viIncludes } from '../utils/normalizeVietnamese';
 import { ExpandableStatCard } from '../components/Common';
 
 /* ═══════════════════════════════════════════════
@@ -119,10 +120,9 @@ const OrderConfirmationScreen = () => {
     return orders.filter(order => {
       if (statusFilter !== 'all' && order.status !== statusFilter) return false;
       if (searchTerm) {
-        const term = searchTerm.toLowerCase();
         return (
-          (order.poNumber || '').toLowerCase().includes(term) ||
-          (order.brandName || '').toLowerCase().includes(term)
+          viIncludes(order.poNumber || '', searchTerm) ||
+          viIncludes(order.brandName || '', searchTerm)
         );
       }
       return true;

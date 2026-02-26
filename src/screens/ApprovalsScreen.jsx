@@ -13,6 +13,7 @@ import { approvalService } from '../services';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { formatCurrency } from '../utils';
+import { includes as viIncludes } from '../utils/normalizeVietnamese';
 import { ExpandableStatCard } from '../components/Common';
 import { useIsMobile } from '@/hooks/useIsMobile';
 import { SwipeAction, MobileDataCard, MobileFilterSheet } from '@/components/ui';
@@ -132,10 +133,9 @@ const ApprovalsScreen = () => {
       if (entityFilter !== 'all' && item.entityType !== entityFilter) return false;
       if (levelFilter !== 'all' && item.level !== parseInt(levelFilter)) return false;
       if (searchTerm) {
-        const term = searchTerm.toLowerCase();
-        const name = (item.data?.name || item.data?.budgetName || '').toLowerCase();
-        const brand = (item.data?.brand?.name || item.data?.brandName || '').toLowerCase();
-        return name.includes(term) || brand.includes(term);
+        const name = item.data?.name || item.data?.budgetName || '';
+        const brand = item.data?.brand?.name || item.data?.brandName || '';
+        return viIncludes(name, searchTerm) || viIncludes(brand, searchTerm);
       }
       return true;
     });
@@ -292,7 +292,7 @@ const ApprovalsScreen = () => {
                     className={`bg-transparent outline-none text-xs w-full font-brand ${textPrimary} placeholder:${textMuted}`}
                   />
                   {searchTerm && (
-                    <button onClick={() => setSearchTerm('')}>
+                    <button onClick={() => setSearchTerm('')} aria-label={t('common.clearAll')} className="p-2 min-h-[44px] min-w-[44px] flex items-center justify-center">
                       <X size={10} className={textMuted} />
                     </button>
                   )}
@@ -593,7 +593,7 @@ const ApprovalsScreen = () => {
                 <h3 className={`text-lg font-bold font-brand ${textPrimary}`}>
                   {t('approvals.rejectSelected') || 'Reject Selected'}
                 </h3>
-                <button onClick={() => setBulkRejectModalOpen(false)} className="p-1.5 rounded-lg hover:bg-[#F0EBE5]">
+                <button onClick={() => setBulkRejectModalOpen(false)} aria-label={t('common.close')} className="p-1.5 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg hover:bg-[#F0EBE5]">
                   <X size={18} className={textMuted} />
                 </button>
               </div>
@@ -643,7 +643,7 @@ const ApprovalsScreen = () => {
                 <h3 className={`text-lg font-bold font-brand ${textPrimary}`}>
                   {actionModal.action === 'approve' ? t('approvals.confirmApprove') : t('approvals.confirmReject')}
                 </h3>
-                <button onClick={() => setActionModal(null)} className="p-1.5 rounded-lg hover:bg-[#F0EBE5]">
+                <button onClick={() => setActionModal(null)} aria-label={t('common.close')} className="p-1.5 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg hover:bg-[#F0EBE5]">
                   <X size={18} className={textMuted} />
                 </button>
               </div>

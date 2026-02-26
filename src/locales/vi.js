@@ -60,6 +60,9 @@ const vi = {
     deleting: 'Đang xóa...',
     undo: 'Hoàn tác (Ctrl+Z)',
     redo: 'Làm lại (Ctrl+Shift+Z)',
+    saved: 'Đã lưu thành công',
+    saveFailed: 'Lưu thất bại',
+    saving: 'Đang lưu...',
   },
 
   // ──────────────────────────────────────────────

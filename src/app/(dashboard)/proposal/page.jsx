@@ -49,6 +49,8 @@ export default function ProposalPage() {
       onEditProposal={handleEditProposal}
       skuContext={skuProposalContext}
       onContextUsed={() => setSkuProposalContext(null)}
+      onNavigateBack={() => router.push('/otb-analysis')}
+      onNavigateNext={() => router.push('/tickets')}
       darkMode={darkMode}
     />
   );

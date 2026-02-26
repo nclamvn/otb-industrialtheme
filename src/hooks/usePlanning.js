@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect, useCallback } from 'react';
+import toast from 'react-hot-toast';
 import { masterDataService, planningService } from '../services';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -191,11 +192,13 @@ export const usePlanning = () => {
       // Refresh plannings
       await fetchPlannings();
 
+      toast.success('Planning saved successfully');
       setShowPlanningDetail(false);
       setSelectedBudgetDetail(null);
       setCurrentPlanningId(null);
     } catch (err) {
       console.error('Failed to save planning:', err);
+      toast.error('Failed to save planning');
       setError(err.message);
     } finally {
       setLoading(false);

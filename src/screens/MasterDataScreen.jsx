@@ -10,6 +10,7 @@ import { masterDataService } from '../services';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useIsMobile } from '@/hooks/useIsMobile';
 import { formatCurrency } from '../utils';
+import { includes as viIncludes } from '../utils/normalizeVietnamese';
 
 // Config per master data type (takes t for i18n)
 const getTypeConfig = (t) => ({
@@ -32,9 +33,9 @@ const getTypeConfig = (t) => ({
     columns: [
       { key: 'skuCode', label: t('masterData.colSkuCode'), width: '140px', mono: true },
       { key: 'productName', label: t('masterData.colProductName') },
-      { key: 'productType', label: t('masterData.colCategory'), width: '150px' },
-      { key: 'color', label: t('masterData.colColor'), width: '120px' },
-      { key: 'theme', label: t('masterData.colTheme'), width: '120px' },
+      { key: 'productType', label: t('masterData.colCategory'), width: '150px', render: (v) => v?.name || v || '-' },
+      { key: 'color', label: t('masterData.colColor'), width: '120px', render: (v) => v?.name || v || '-' },
+      { key: 'theme', label: t('masterData.colTheme'), width: '120px', render: (v) => v?.name || v || '-' },
       { key: 'srp', label: t('masterData.colSRP'), width: '120px', render: (v) => v ? formatCurrency(v) : '-', mono: true },
     ],
     searchFields: ['skuCode', 'productName', 'color'],
@@ -104,11 +105,10 @@ const MasterDataScreen = ({ type = 'brands' }) => {
   // Filter by search
   const filteredData = useMemo(() => {
     if (!searchTerm.trim()) return data;
-    const term = searchTerm.toLowerCase();
     return data.filter(item =>
       config.searchFields.some(field => {
         const value = item[field];
-        return value && value.toString().toLowerCase().includes(term);
+        return value && viIncludes(value.toString(), searchTerm);
       })
     );
   }, [data, searchTerm, config.searchFields]);

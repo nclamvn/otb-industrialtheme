@@ -49,8 +49,8 @@ const ExpandableStatCard = ({
     >
       {/* Watermark Icon */}
       {Icon && (
-        <div className="absolute -bottom-1 -right-1 transition-all duration-300 group-hover:scale-110 group-hover:opacity-[0.15] pointer-events-none opacity-[0.10]">
-          <Icon size={48} color={a.color} strokeWidth={1} />
+        <div className="absolute -bottom-3 -right-3 transition-all duration-300 group-hover:scale-110 group-hover:opacity-[0.18] pointer-events-none opacity-[0.10]">
+          <Icon size={80} color={a.color} strokeWidth={0.8} />
         </div>
       )}
 

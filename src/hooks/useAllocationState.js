@@ -331,7 +331,7 @@ export function useAllocationState(t) {
     allocationComments, setAllocationComments,
     handleAllocationChange, handleSeasonTotalChange, handleBrandTotalChange, handleCommentChange,
     canUndo, canRedo, undo, redo,
-    isDirty, discardChanges, markClean,
+    isDirty, discardChanges, markClean, setCleanSnapshot,
     validate,
     saving, saveDraft, submitForApproval,
     autoSaving, lastSavedAt, setVersionId,

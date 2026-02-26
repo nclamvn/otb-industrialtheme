@@ -1,5 +1,12 @@
 // Utility functions for formatting
 
+export const formatDate = (dateStr) => {
+  if (!dateStr) return '—';
+  const d = new Date(dateStr);
+  if (isNaN(d)) return '—';
+  return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
+};
+
 // Exchange rate VND to USD (approximate)
 const VND_TO_USD_RATE = 25000;
 

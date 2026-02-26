@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import {
   Settings, Plus, Edit2, Trash2, Save, X,
   ChevronRight, Users, Building2, RefreshCw,
-  LayoutList, GitBranch
+  LayoutList, GitBranch, Loader2
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { approvalWorkflowService } from '../services/approvalWorkflowService';
@@ -432,7 +432,7 @@ const ApprovalWorkflowScreen = ({ darkMode = false }) => {
                 disabled={!formData.brandId || !formData.roleName || saving}
                 className="flex-1 px-4 py-2.5 bg-[#C4975A] hover:bg-[#B8894E] text-white font-semibold text-sm font-brand rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
-                <Save size={16} />
+                {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
                 {saving ? t('approval.saving') : editingStep ? t('common.update') : t('common.create')}
               </button>
             </div>

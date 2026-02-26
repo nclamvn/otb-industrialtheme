@@ -60,6 +60,9 @@ const en = {
     deleting: 'Deleting...',
     undo: 'Undo (Ctrl+Z)',
     redo: 'Redo (Ctrl+Shift+Z)',
+    saved: 'Saved successfully',
+    saveFailed: 'Failed to save',
+    saving: 'Saving...',
   },
 
   // ──────────────────────────────────────────────

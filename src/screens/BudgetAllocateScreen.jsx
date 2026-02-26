@@ -2,8 +2,8 @@
 
 import { useState, useRef, useEffect, useMemo, useCallback, Fragment } from 'react';
 import {
-  DollarSign, Sparkles, Clock, ChevronDown, Check, ChevronRight,
-  TrendingUp, Sun, Snowflake,
+  DollarSign, Sparkles, Clock, ChevronDown, Check, ChevronRight, ArrowLeft,
+  TrendingUp, Sun, Snowflake, BarChart3,
   Star, Layers, Tag, FileText, X, Edit, Download, Undo2, Redo2
 } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -25,9 +25,9 @@ const YEARS = Array.from({ length: 4 }, (_, i) => new Date().getFullYear() - 2 +
 
 const GROUP_BRAND_COLORS = [
   'from-[#C4975A] to-[#8A6340]',
-  'from-[#1B6B45] to-[#0d5a37]',
-  'from-[#1B6B45] to-[#1B6B45]',
-  'from-[#6366f1] to-[#4338ca]',
+  'from-[#B8894E] to-[#7A5C38]',
+  'from-[#A07B4B] to-[#6E5035]',
+  'from-[#C4975A] to-[#8A6340]',
 ];
 
 
@@ -95,18 +95,22 @@ const BudgetAllocateScreen = ({
     fetchBrands();
   }, []);
 
-  // Fetch budgets on mount (with Strict Mode ignore pattern)
+  // Filter states - all single choice
+  const [selectedYear, setSelectedYear] = useState(2025);
+
+  // Fetch budgets on mount and when year changes (with Strict Mode ignore pattern)
   useEffect(() => {
     let ignore = false;
     const load = async () => {
       setLoadingBudgets(true);
       try {
-        const response = await budgetService.getAll({ status: 'APPROVED' });
+        const response = await budgetService.getAll({ fiscalYear: selectedYear });
         if (ignore) return;
         const budgetList = (response.data || response || []).map(budget => ({
           id: budget.id,
           fiscalYear: budget.fiscalYear,
           groupBrand: typeof budget.groupBrand === 'object' ? (budget.groupBrand?.name || budget.groupBrand?.code || 'A') : (budget.groupBrand || 'A'),
+          groupBrandId: budget.groupBrandId || budget.groupBrand?.id || null,
           brandId: budget.brandId,
           brandName: budget.Brand?.name || budget.groupBrand?.name || budget.brandName || 'Unknown',
           totalBudget: budget.totalAmount || budget.totalBudget || 0,
@@ -124,12 +128,10 @@ const BudgetAllocateScreen = ({
     };
     load();
     return () => { ignore = true; };
-  }, []);
+  }, [selectedYear]);
 
   // Available budgets for dropdown selection - prefer API data
   const availableBudgets = apiBudgets.length > 0 ? apiBudgets : (propAvailableBudgets || []);
-  // Filter states - all single choice
-  const [selectedYear, setSelectedYear] = useState(2025);
   const [selectedGroupBrand, setSelectedGroupBrand] = useState(null);
   const [selectedBrand, setSelectedBrand] = useState(null);
   const [selectedSeasonGroup, setSelectedSeasonGroup] = useState(null); // null means "All Seasons"
@@ -154,9 +156,11 @@ const BudgetAllocateScreen = ({
     allocationValues, setAllocationValues,
     seasonTotalValues, setSeasonTotalValues,
     brandTotalValues, setBrandTotalValues,
+    setAllocationComments,
     isDirty, discardChanges, saving, saveDraft, submitForApproval,
     canUndo, canRedo, undo, redo, setVersionId,
     autoSaving, lastSavedAt, validate, pushUndo,
+    setCleanSnapshot, markClean,
   } = allocation;
 
   // Session recovery for draft persistence
@@ -198,6 +202,31 @@ const BudgetAllocateScreen = ({
   useEffect(() => {
     setVersionId(selectedVersionId);
   }, [selectedVersionId, setVersionId]);
+
+  // Load version data from API when a version is selected
+  useEffect(() => {
+    if (!selectedVersionId) return;
+    let ignore = false;
+    const loadVersionData = async () => {
+      try {
+        const versionData = await planningService.getOne(selectedVersionId);
+        if (ignore) return;
+        const av = versionData?.allocationValues || {};
+        const sv = versionData?.seasonTotalValues || {};
+        const bv = versionData?.brandTotalValues || {};
+        const ac = versionData?.allocationComments || {};
+        setAllocationValues(av);
+        setSeasonTotalValues(sv);
+        setBrandTotalValues(bv);
+        setAllocationComments(ac);
+        setCleanSnapshot({ allocationValues: av, seasonTotalValues: sv, brandTotalValues: bv, allocationComments: ac });
+      } catch (err) {
+        console.error('Failed to load version data:', err);
+      }
+    };
+    loadVersionData();
+    return () => { ignore = true; };
+  }, [selectedVersionId, setAllocationValues, setSeasonTotalValues, setBrandTotalValues, setAllocationComments, setCleanSnapshot]);
 
   // Save draft to localStorage when dirty
   useEffect(() => {
@@ -243,8 +272,18 @@ const BudgetAllocateScreen = ({
 
       // Set filters from allocation data
       if (allocationData.year) setSelectedYear(allocationData.year);
-      if (allocationData.groupBrand) setSelectedGroupBrand(allocationData.groupBrand);
       if (allocationData.totalBudget) setTotalBudget(allocationData.totalBudget);
+
+      // Match groupBrand by name or ID against groupBrandList
+      if (allocationData.groupBrand) {
+        if (groupBrandList.length > 0) {
+          const matchingGroup = groupBrandList.find(
+            g => g.name === allocationData.groupBrand || g.id === allocationData.groupBrand
+          );
+          if (matchingGroup) setSelectedGroupBrand(matchingGroup.id);
+        }
+        // If groupBrandList hasn't loaded yet, pendingAllocation will handle it below
+      }
 
       // Set budget ID directly if available
       if (allocationData.id) {
@@ -262,7 +301,17 @@ const BudgetAllocateScreen = ({
       // Clear allocation data from context
       if (onAllocationDataUsed) onAllocationDataUsed();
     }
-  }, [allocationData, onAllocationDataUsed]);
+  }, [allocationData, onAllocationDataUsed, groupBrandList]);
+
+  // Deferred groupBrand matching: when groupBrandList loads after pendingAllocation was set
+  useEffect(() => {
+    if (pendingAllocation?.groupBrand && groupBrandList.length > 0 && !selectedGroupBrand) {
+      const matchingGroup = groupBrandList.find(
+        g => g.name === pendingAllocation.groupBrand || g.id === pendingAllocation.groupBrand
+      );
+      if (matchingGroup) setSelectedGroupBrand(matchingGroup.id);
+    }
+  }, [pendingAllocation, groupBrandList, selectedGroupBrand]);
 
   // When availableBudgets load and we have pending allocation, try to match
   useEffect(() => {
@@ -451,9 +500,14 @@ const BudgetAllocateScreen = ({
   // Get budget data for a specific brand, season group, and sub-season
   const getBudgetData = (brandId, seasonGroupId, subSeason) => {
     const seasonType = subSeason === 'Pre' ? 'pre' : 'main';
-    const seasonId = `${seasonGroupId}_${seasonType}_${selectedYear}`;
+    const seasonId = `${seasonGroupId}-${seasonType}`;
 
     const budget = budgets.find(b =>
+      b.groupBrandId === brandId &&
+      b.seasonId === seasonId &&
+      b.fiscalYear === selectedYear &&
+      (!selectedBudgetId || b.id === selectedBudgetId)
+    ) || budgets.find(b =>
       b.groupBrandId === brandId &&
       b.seasonId === seasonId &&
       b.fiscalYear === selectedYear
@@ -461,39 +515,45 @@ const BudgetAllocateScreen = ({
 
     // Get values from allocation state first, then fall back to budget data
     const key = getAllocationKey(brandId, seasonGroupId, subSeason);
-    const allocatedRex = allocationValues[key]?.rex;
-    const allocatedTtp = allocationValues[key]?.ttp;
+    const allocValues = allocationValues[key] || {};
 
-    if (!budget && allocatedRex === undefined && allocatedTtp === undefined) {
-      return { rex: 0, ttp: 0, sum: 0, budget: null };
+    // Check if any allocation value exists for any store
+    const hasAnyAllocation = STORES.some(store => allocValues[store.id] !== undefined);
+
+    if (!budget && !hasAnyAllocation) {
+      const result = { sum: 0, budget: null };
+      STORES.forEach(store => { result[store.id] = 0; });
+      return result;
     }
 
-    const rexDetail = budget?.details?.find(d => d.storeId === 'rex');
-    const ttpDetail = budget?.details?.find(d => d.storeId === 'ttp');
+    let sum = 0;
+    const result = { budget };
+    STORES.forEach(store => {
+      const allocated = allocValues[store.id];
+      const detail = budget?.details?.find(d => d.storeId === store.id);
+      const val = allocated !== undefined ? allocated : (detail?.budgetAmount || 0);
+      result[store.id] = val;
+      sum += val;
+    });
+    result.sum = sum;
 
-    const rex = allocatedRex !== undefined ? allocatedRex : (rexDetail?.budgetAmount || 0);
-    const ttp = allocatedTtp !== undefined ? allocatedTtp : (ttpDetail?.budgetAmount || 0);
-
-    return {
-      rex,
-      ttp,
-      sum: rex + ttp,
-      budget
-    };
+    return result;
   };
 
   // Get season totals for a brand
   const getSeasonTotals = (brandId, seasonGroupId) => {
-    let rex = 0, ttp = 0, sum = 0;
+    const totals = { sum: 0 };
+    STORES.forEach(store => { totals[store.id] = 0; });
 
     SEASON_CONFIG[seasonGroupId]?.subSeasons.forEach(subSeason => {
       const data = getBudgetData(brandId, seasonGroupId, subSeason);
-      rex += data.rex;
-      ttp += data.ttp;
-      sum += data.sum;
+      STORES.forEach(store => {
+        totals[store.id] += data[store.id] || 0;
+      });
+      totals.sum += data.sum;
     });
 
-    return { rex, ttp, sum };
+    return totals;
   };
 
   // Get brand totals (handles All Seasons when selectedSeasonGroup is null)
@@ -502,14 +562,16 @@ const BudgetAllocateScreen = ({
       return getSeasonTotals(brandId, selectedSeasonGroup);
     }
     // Sum totals from all season groups
-    let rex = 0, ttp = 0, sum = 0;
+    const result = { sum: 0 };
+    STORES.forEach(store => { result[store.id] = 0; });
     SEASON_GROUPS.forEach(sg => {
       const totals = getSeasonTotals(brandId, sg);
-      rex += totals.rex;
-      ttp += totals.ttp;
-      sum += totals.sum;
+      STORES.forEach(store => {
+        result[store.id] += totals[store.id] || 0;
+      });
+      result.sum += totals.sum;
     });
-    return { rex, ttp, sum };
+    return result;
   };
 
   // Calculate mix percentage
@@ -573,12 +635,12 @@ const BudgetAllocateScreen = ({
 
     // Auto-set other filters based on selected budget
     if (budget.fiscalYear) setSelectedYear(budget.fiscalYear);
-    if (budget.groupBrand) setSelectedGroupBrand(budget.groupBrand);
+    if (budget.groupBrandId) setSelectedGroupBrand(budget.groupBrandId);
 
     // Find matching brand
-    if (budget.brandName && budget.groupBrand) {
+    if (budget.brandName && budget.groupBrandId) {
       const matchingBrand = brandList.find(
-        b => b.groupBrandId === budget.groupBrand && b.name === budget.brandName
+        b => b.groupBrandId === budget.groupBrandId && b.name === budget.brandName
       );
       if (matchingBrand) {
         setSelectedBrand(matchingBrand.id);
@@ -622,7 +684,7 @@ const BudgetAllocateScreen = ({
   return (
     <>
       {/* Filter Section — flat, no nesting */}
-      <div className="mb-3 md:mb-4 relative z-[100]">
+      <div className="mb-2 relative z-[100]">
           <div className="bg-white rounded-xl border border-border-muted">
             {/* Filter Controls */}
             <div className="px-3 py-1.5 relative z-[100]">
@@ -1030,55 +1092,49 @@ const BudgetAllocateScreen = ({
             const isGroupCollapsed = collapsedGroups[group.id];
 
             // Calculate group totals
+            const groupTotalsInit = { sum: 0 };
+            STORES.forEach(store => { groupTotalsInit[store.id] = 0; });
             const groupTotals = groupBrands.reduce((acc, brand) => {
-              const brandTotals = getBrandTotals(brand.id);
-              return {
-                rex: acc.rex + brandTotals.rex,
-                ttp: acc.ttp + brandTotals.ttp,
-                sum: acc.sum + brandTotals.sum
-              };
-            }, { rex: 0, ttp: 0, sum: 0 });
+              const brandTotals = getBrandTotals(brand.groupBrandId);
+              STORES.forEach(store => {
+                acc[store.id] += brandTotals[store.id] || 0;
+              });
+              acc.sum += brandTotals.sum;
+              return acc;
+            }, groupTotalsInit);
 
             return (
               <div key={group.id} className="rounded-xl shadow-sm border overflow-hidden bg-white border-[#E8E2DB]">
                 {/* Group Header - Collapsible with Total Budget */}
                 <div
                   onClick={() => !selectedGroupBrand && toggleGroupCollapse(group.id)}
-                  className={`px-4 py-2 bg-gradient-to-r ${group.color} border-b border-[#E8E2DB] flex items-center justify-between ${!selectedGroupBrand ? 'cursor-pointer hover:opacity-90' : ''}`}
+                  className={`px-3 py-1.5 bg-gradient-to-r ${group.color} border-b border-[#E8E2DB] flex items-center justify-between ${!selectedGroupBrand ? 'cursor-pointer hover:opacity-90' : ''}`}
                 >
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2">
                     {!selectedGroupBrand && (
                       <ChevronRight
-                        size={20}
+                        size={16}
                         className={`text-white transition-transform duration-200 ${!isGroupCollapsed ? 'rotate-90' : ''}`}
                       />
                     )}
-                    <div className="w-7 h-7 rounded-lg bg-white/20 flex items-center justify-center text-white text-sm font-bold font-brand shadow-lg">
+                    <div className="w-6 h-6 rounded-md bg-white/20 flex items-center justify-center text-white text-xs font-bold font-brand">
                       {group.id}
                     </div>
-                    <div>
-                      <div className="font-semibold text-sm text-white font-brand">{group.name}</div>
-                      <div className="text-xs text-white/80 font-data">
-                        {groupBrands.length} brand{groupBrands.length !== 1 ? 's' : ''} • {selectedSeasonGroup ? SEASON_CONFIG[selectedSeasonGroup]?.name : t('planning.allSeasonGroups')} {selectedYear}
-                      </div>
-                    </div>
+                    <span className="font-semibold text-sm text-white font-brand">{group.name}</span>
+                    <span className="text-[11px] text-white/70 font-data">
+                      {groupBrands.length} brand{groupBrands.length !== 1 ? 's' : ''} • {selectedSeasonGroup ? SEASON_CONFIG[selectedSeasonGroup]?.name : t('planning.allSeasonGroups')} {selectedYear}
+                    </span>
                   </div>
                   <div className="flex items-center gap-3">
-                    {/* Budget Allocated - show when budget is selected */}
                     {totalBudget > 0 && (selectedBudget || selectedBudgetId) && (
-                      <div className="flex items-center gap-2 px-3 py-1 bg-white/15 rounded-lg backdrop-blur-sm">
-                        <div className="text-right">
-                          <div className="text-[10px] text-white/70 font-medium font-brand">{selectedBudget?.budgetName || fallbackBudgetName}</div>
-                          <div className="text-xs font-bold text-white font-data">{t('skuProposal.budget')}: {formatCurrency(totalBudget)}</div>
-                        </div>
+                      <div className="flex items-center gap-1.5 px-2 py-0.5 bg-white/15 rounded-md text-xs">
+                        <span className="text-white/70 font-brand">{selectedBudget?.budgetName || fallbackBudgetName}</span>
+                        <span className="font-bold text-white font-data">{formatCurrency(totalBudget)}</span>
                       </div>
                     )}
-                    {/* Group Total */}
                     <div className="text-right">
-                      <div className="text-xs text-white/80 font-brand">{t('skuProposal.totalPlanned')}</div>
-                      <div className="font-bold text-sm text-white font-data">
-                        {formatCurrency(groupTotals.sum)}
-                      </div>
+                      <span className="text-[11px] text-white/70 font-brand mr-1">{t('skuProposal.totalPlanned')}:</span>
+                      <span className="font-bold text-sm text-white font-data">{formatCurrency(groupTotals.sum)}</span>
                     </div>
                   </div>
                 </div>
@@ -1088,7 +1144,7 @@ const BudgetAllocateScreen = ({
                   <div>
                     {groupBrands.map((brand) => {
                       const isBrandCollapsed = collapsedBrands[brand.id];
-                      const brandTotals = getBrandTotals(brand.id);
+                      const brandTotals = getBrandTotals(brand.groupBrandId);
 
                       return (
                         <div key={brand.id} className="last:border-b-0 border-b border-[#E8E2DB]">
@@ -1096,31 +1152,19 @@ const BudgetAllocateScreen = ({
                           {(!selectedBrand && groupBrands.length > 1) && (
                             <div
                               onClick={() => toggleBrandCollapse(brand.id)}
-                              className="px-4 py-1.5 border-b flex items-center justify-between cursor-pointer transition-colors bg-gradient-to-r from-[rgba(196,151,90,0.05)] to-[rgba(196,151,90,0.1)] border-[#E8E2DB] hover:bg-[rgba(160,120,75,0.18)]"
+                              className="px-3 py-1 border-b flex items-center justify-between cursor-pointer transition-colors bg-[rgba(196,151,90,0.06)] border-[#E8E2DB] hover:bg-[rgba(160,120,75,0.12)]"
                             >
-                              <div className="flex items-center gap-3">
+                              <div className="flex items-center gap-2">
                                 <ChevronRight
-                                  size={18}
+                                  size={14}
                                   className={`transition-transform duration-200 text-[#8C8178] ${!isBrandCollapsed ? 'rotate-90' : ''}`}
                                 />
-                                <Tag size={16} className="text-[#8C8178]" />
-                                <span className="font-semibold font-brand text-[#2C2417]">{brand.name}</span>
+                                <Tag size={13} className="text-[#8C8178]" />
+                                <span className="font-semibold text-sm font-brand text-[#2C2417]">{brand.name}</span>
                               </div>
-                              <div className="flex items-center gap-4">
-                                <div className="flex items-center gap-3">
-                                  <div className="text-right">
-                                    <span className="text-xs text-[#8C8178]">{t('proposal.rex')}: </span>
-                                    <span className="text-sm font-medium font-data text-[#6B4D30]">{formatCurrency(brandTotals.rex)}</span>
-                                  </div>
-                                  <div className="text-right">
-                                    <span className="text-xs text-[#8C8178]">{t('proposal.ttp')}: </span>
-                                    <span className="text-sm font-medium font-data text-[#6B4D30]">{formatCurrency(brandTotals.ttp)}</span>
-                                  </div>
-                                  <div className="text-right">
-                                    <span className="text-xs text-[#8C8178]">{t('skuProposal.total')}: </span>
-                                    <span className="font-semibold font-data text-[#1B6B45]">{formatCurrency(brandTotals.sum)}</span>
-                                  </div>
-                                </div>
+                              <div className="text-right">
+                                <span className="text-[11px] text-[#8C8178]">{t('skuProposal.total')}: </span>
+                                <span className="text-sm font-semibold font-data text-[#1B6B45]">{formatCurrency(brandTotals.sum)}</span>
                               </div>
                             </div>
                           )}
@@ -1128,7 +1172,7 @@ const BudgetAllocateScreen = ({
                           {/* Brand Table Content */}
                           {(!isBrandCollapsed || selectedBrand || groupBrands.length === 1) && (
                             <div className="overflow-x-auto">
-                              <table className="w-full">
+                              <table className="w-full min-w-[900px]">
                                 <thead>
                                   <tr className="bg-[rgba(196,151,90,0.2)]">
                                     <th className="px-3 py-2 text-left text-xs font-semibold w-48 font-brand text-[#333333]">
@@ -1138,14 +1182,14 @@ const BudgetAllocateScreen = ({
                                       </div>
                                     </th>
                                     {STORES.map((store) => (
-                                      <th key={store.id} className="px-3 py-2 text-center text-xs font-semibold font-brand text-[#333333]">
+                                      <th key={store.id} className="px-1.5 py-2 text-center text-xs font-semibold whitespace-nowrap font-brand text-[#333333]">
                                         <div>{store.code}</div>
-                                        <div className="text-xs font-normal font-data text-[#8C8178]">({storePercentages[store.id]}%)</div>
+                                        <div className="text-[10px] font-normal font-data text-[#8C8178]">({storePercentages[store.id]}%)</div>
                                       </th>
                                     ))}
-                                    <th className="px-3 py-2 text-center text-xs font-semibold font-brand text-[#333333]">{t('planning.totalValue')}</th>
-                                    <th className="px-3 py-2 text-center text-xs font-semibold font-brand text-[#333333]">% MIX</th>
-                                    <th className="px-3 py-2 text-center text-xs font-semibold w-24 font-brand text-[#333333]">{t('common.actions')}</th>
+                                    <th className="px-1.5 py-2 text-center text-xs font-semibold whitespace-nowrap font-brand text-[#333333]">{t('planning.totalValue')}</th>
+                                    <th className="px-1.5 py-2 text-center text-xs font-semibold whitespace-nowrap w-14 font-brand text-[#333333]">MIX</th>
+                                    <th className="px-2 py-2 text-center text-xs font-semibold w-10 font-brand text-[#333333]"></th>
                                   </tr>
                                 </thead>
                                 <tbody>
@@ -1165,74 +1209,58 @@ const BudgetAllocateScreen = ({
                                             <span className="font-semibold font-brand text-[#2C2417]">{SEASON_CONFIG[seasonGroup]?.name}</span>
                                           </div>
                                         </td>
-                                        <td className="px-2 py-1 text-center">
-                                          <input
-                                            type="text"
-                                            value={formatCurrency(getSeasonTotalValue(brand.id, seasonGroup, 'rex') || 0)}
-                                            readOnly
-                                            tabIndex={-1}
-                                            className="w-full px-2 py-1 text-center border rounded-lg text-sm font-semibold font-data cursor-default border-[#E8E2DB] text-[#2C2417] bg-[rgba(160,120,75,0.12)]"
-                                          />
-                                        </td>
-                                        <td className="px-2 py-1 text-center">
-                                          <input
-                                            type="text"
-                                            value={formatCurrency(getSeasonTotalValue(brand.id, seasonGroup, 'ttp') || 0)}
-                                            readOnly
-                                            tabIndex={-1}
-                                            className="w-full px-2 py-1 text-center border rounded-lg text-sm font-semibold font-data cursor-default border-[#E8E2DB] text-[#2C2417] bg-[rgba(160,120,75,0.12)]"
-                                          />
-
-                                        </td>
-                                        <td className="px-2 py-1 text-center">
-                                          <div className="px-2 py-1 border rounded-lg font-bold text-sm font-data bg-[rgba(160,120,75,0.18)] border-[rgba(196,151,90,0.4)] text-[#2C2417]">
-                                            {formatCurrency(getSeasonTotalValue(brand.id, seasonGroup, 'rex') + getSeasonTotalValue(brand.id, seasonGroup, 'ttp'))}
+                                        {STORES.map(store => (
+                                          <td key={store.id} className="px-1.5 py-1 text-center">
+                                            <input
+                                              type="text"
+                                              value={formatCurrency(getSeasonTotalValue(brand.groupBrandId, seasonGroup, store.id) || 0)}
+                                              readOnly
+                                              tabIndex={-1}
+                                              className="w-full px-1 py-1 text-center border rounded-lg text-xs font-semibold font-data whitespace-nowrap cursor-default border-[#E8E2DB] text-[#2C2417] bg-[rgba(160,120,75,0.12)]"
+                                            />
+                                          </td>
+                                        ))}
+                                        <td className="px-1.5 py-1 text-center">
+                                          <div className="px-1 py-1 border rounded-lg font-bold text-xs font-data whitespace-nowrap bg-[rgba(160,120,75,0.18)] border-[rgba(196,151,90,0.4)] text-[#2C2417]">
+                                            {formatCurrency(STORES.reduce((sum, store) => sum + (getSeasonTotalValue(brand.groupBrandId, seasonGroup, store.id) || 0), 0))}
                                           </div>
                                         </td>
-                                        <td className="px-3 py-1.5 text-center text-sm font-semibold font-data text-[#8C8178]">
-                                          {selectedSeasonGroup ? '100%' : `${calculateMix(getSeasonTotalValue(brand.id, seasonGroup, 'rex') + getSeasonTotalValue(brand.id, seasonGroup, 'ttp'), brand.id)}%`}
+                                        <td className="px-1.5 py-1.5 text-center text-xs font-semibold font-data text-[#8C8178]">
+                                          {selectedSeasonGroup ? '100%' : `${calculateMix(STORES.reduce((sum, store) => sum + (getSeasonTotalValue(brand.groupBrandId, seasonGroup, store.id) || 0), 0), brand.groupBrandId)}%`}
                                         </td>
                                         <td className="px-3 py-1.5"></td>
                                       </tr>
 
                                       {/* Sub-Season Rows */}
                                       {SEASON_CONFIG[seasonGroup]?.subSeasons.map((subSeason) => {
-                                        const data = getBudgetData(brand.id, seasonGroup, subSeason);
-                                        const mix = calculateMix(data.sum, brand.id);
+                                        const data = getBudgetData(brand.groupBrandId, seasonGroup, subSeason);
+                                        const mix = calculateMix(data.sum, brand.groupBrandId);
 
                                         return (
                                           <tr key={`${brand.id}-${seasonGroup}-${subSeason}`} className="border-b transition-colors border-[#E8E2DB] hover:bg-[rgba(160,120,75,0.12)]">
                                             <td className="px-3 py-1.5 pl-10">
                                               <span className="font-medium text-[#8C8178]">{subSeason}</span>
                                             </td>
-                                            <td className="px-2 py-1 text-center">
-                                              <input
-                                                type="text"
-                                                value={editingCell === `${brand.id}-${seasonGroup}-${subSeason}-rex` ? (data.rex || '') : formatCurrency(data.rex)}
-                                                onChange={(e) => handleAllocationChange(brand.id, seasonGroup, subSeason, 'rex', e.target.value)}
-                                                onFocus={() => setEditingCell(`${brand.id}-${seasonGroup}-${subSeason}-rex`)}
-                                                onBlur={() => setEditingCell(null)}
-                                                className="w-full px-2 py-1 text-center border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#C4975A] focus:border-[#C4975A] font-medium font-data transition-colors border-[#E8E2DB] text-[#2C2417] bg-white hover:border-[rgba(196,151,90,0.4)]"
-                                                placeholder="0"
-                                              />
-                                            </td>
-                                            <td className="px-2 py-1 text-center">
-                                              <input
-                                                type="text"
-                                                value={editingCell === `${brand.id}-${seasonGroup}-${subSeason}-ttp` ? (data.ttp || '') : formatCurrency(data.ttp)}
-                                                onChange={(e) => handleAllocationChange(brand.id, seasonGroup, subSeason, 'ttp', e.target.value)}
-                                                onFocus={() => setEditingCell(`${brand.id}-${seasonGroup}-${subSeason}-ttp`)}
-                                                onBlur={() => setEditingCell(null)}
-                                                className="w-full px-2 py-1 text-center border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#C4975A] focus:border-[#C4975A] font-medium font-data transition-colors border-[#E8E2DB] text-[#2C2417] bg-white hover:border-[rgba(196,151,90,0.4)]"
-                                                placeholder="0"
-                                              />
-                                            </td>
-                                            <td className="px-2 py-1 text-center">
-                                              <div className="px-2 py-1 border rounded-lg font-semibold text-sm font-data bg-[rgba(27,107,69,0.1)] border-[#1B6B45] text-[#1B6B45]">
+                                            {STORES.map(store => (
+                                              <td key={store.id} className="px-1.5 py-1 text-center">
+                                                <input
+                                                  type="text"
+                                                  data-alloc-cell
+                                                  value={editingCell === `${brand.groupBrandId}-${seasonGroup}-${subSeason}-${store.id}` ? (data[store.id] || '') : formatCurrency(data[store.id] || 0)}
+                                                  onChange={(e) => handleAllocationChange(brand.groupBrandId, seasonGroup, subSeason, store.id, e.target.value)}
+                                                  onFocus={() => setEditingCell(`${brand.groupBrandId}-${seasonGroup}-${subSeason}-${store.id}`)}
+                                                  onBlur={() => setEditingCell(null)}
+                                                  className="w-full px-1 py-1 text-center border rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-[#C4975A] focus:border-[#C4975A] font-medium font-data whitespace-nowrap transition-colors border-[#E8E2DB] text-[#2C2417] bg-white hover:border-[rgba(196,151,90,0.4)]"
+                                                  placeholder="0"
+                                                />
+                                              </td>
+                                            ))}
+                                            <td className="px-1.5 py-1 text-center">
+                                              <div className="px-1 py-1 border rounded-lg font-semibold text-xs font-data whitespace-nowrap bg-[rgba(27,107,69,0.1)] border-[#1B6B45] text-[#1B6B45]">
                                                 {formatCurrency(data.sum)}
                                               </div>
                                             </td>
-                                            <td className="px-3 py-1.5 text-center text-sm font-data text-[#8C8178]">
+                                            <td className="px-1.5 py-1.5 text-center text-xs font-data text-[#8C8178]">
                                               {mix}%
                                             </td>
                                             <td className="px-2 py-1.5 text-center">
@@ -1254,10 +1282,10 @@ const BudgetAllocateScreen = ({
                                                     });
                                                   }
                                                 }}
-                                                className="inline-flex items-center gap-1 px-2 py-1 bg-[#1B6B45] hover:bg-[#0d5a37] text-white rounded-md font-medium text-xs font-brand transition-colors"
+                                                className="inline-flex items-center justify-center w-7 h-7 bg-[#1B6B45] hover:bg-[#0d5a37] text-white rounded-md transition-colors"
+                                                title={t('nav.otbAnalysis') || 'OTB Planning'}
                                               >
                                                 <Edit size={14} />
-                                                {t('nav.otbAnalysis') || 'OTB Planning'}
                                               </button>
 
                                             </td>
@@ -1272,32 +1300,23 @@ const BudgetAllocateScreen = ({
                                     <td className="px-3 py-1.5">
                                       <span className="font-bold text-sm font-brand text-[#2C2417]">TOTAL</span>
                                     </td>
-                                    <td className="px-2 py-1 text-center">
-                                      <input
-                                        type="text"
-                                        value={formatCurrency(getBrandTotalValue(brand.id, 'rex') || 0)}
-                                        readOnly
-                                        tabIndex={-1}
-                                        className="w-full px-2 py-1 text-center border rounded-lg text-sm font-bold font-data cursor-default border-[#1B6B45] text-[#1B6B45] bg-[rgba(27,107,69,0.15)]"
-                                      />
-                                    </td>
-
-                                    <td className="px-2 py-1 text-center">
-                                      <input
-                                        type="text"
-                                        value={formatCurrency(getBrandTotalValue(brand.id, 'ttp') || 0)}
-                                        readOnly
-                                        tabIndex={-1}
-                                        className="w-full px-2 py-1 text-center border rounded-lg text-sm font-bold font-data cursor-default border-[#1B6B45] text-[#1B6B45] bg-[rgba(27,107,69,0.15)]"
-                                      />
-                                    </td>
-
-                                    <td className="px-2 py-1 text-center">
-                                      <div className="px-3 py-2 border rounded-lg font-bold text-lg font-data bg-[rgba(27,107,69,0.2)] border-[#1B6B45] text-[#1B6B45]">
-                                        {formatCurrency(getBrandTotalValue(brand.id, 'rex') + getBrandTotalValue(brand.id, 'ttp'))}
+                                    {STORES.map(store => (
+                                      <td key={store.id} className="px-1.5 py-1 text-center">
+                                        <input
+                                          type="text"
+                                          value={formatCurrency(getBrandTotalValue(brand.groupBrandId, store.id) || 0)}
+                                          readOnly
+                                          tabIndex={-1}
+                                          className="w-full px-1 py-1 text-center border rounded-lg text-xs font-bold font-data whitespace-nowrap cursor-default border-[#1B6B45] text-[#1B6B45] bg-[rgba(27,107,69,0.15)]"
+                                        />
+                                      </td>
+                                    ))}
+                                    <td className="px-1.5 py-1 text-center">
+                                      <div className="px-1 py-1 border rounded-lg font-bold text-xs font-data whitespace-nowrap bg-[rgba(27,107,69,0.2)] border-[#1B6B45] text-[#1B6B45]">
+                                        {formatCurrency(STORES.reduce((sum, store) => sum + (getBrandTotalValue(brand.groupBrandId, store.id) || 0), 0))}
                                       </div>
                                     </td>
-                                    <td className="px-3 py-1.5 text-center text-sm font-bold font-data text-[#2C2417]">100%</td>
+                                    <td className="px-1.5 py-1.5 text-center text-xs font-bold font-data text-[#2C2417]">100%</td>
                                     <td className="px-3 py-1.5"></td>
                                   </tr>
                                 </tbody>
@@ -1364,6 +1383,28 @@ const BudgetAllocateScreen = ({
               >
                 {saving && <div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" />}
                 {t('planning.saveDraft') || 'Save Draft'}
+              </button>
+              <div className="w-px h-4 bg-[#E8E2DB]" />
+              <button
+                onClick={() => {
+                  if (onOpenOtbAnalysis) {
+                    const brandId = selectedGroupBrand;
+                    const budget = availableBudgets.find(b => b.id === selectedBudgetId);
+                    onOpenOtbAnalysis({
+                      budgetId: selectedBudgetId,
+                      budgetName: budget?.budgetName || fallbackBudgetName,
+                      fiscalYear: selectedYear,
+                      brandName: budget?.brandName || budget?.groupBrand,
+                      groupBrand: selectedGroupBrand,
+                      totalBudget: totalBudget,
+                    });
+                  }
+                }}
+                className="flex items-center gap-1.5 px-3 py-1 text-xs font-semibold rounded-lg transition-all bg-gradient-to-r from-[#C4975A] to-[#B8894E] hover:from-[#B8894E] hover:to-[#A07B4B] text-white shadow-sm hover:shadow-md"
+              >
+                <BarChart3 size={13} />
+                {t('nav.otbAnalysis')}
+                <ChevronRight size={13} />
               </button>
             </div>
           </div>

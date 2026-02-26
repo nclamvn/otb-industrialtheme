@@ -2,8 +2,8 @@
 
 import { useMemo, useState, useEffect, useCallback, useRef } from 'react';
 import {
-  ChevronDown, Package, Pencil, X, Plus, Trash2,
-  Star, Layers, Check, SlidersHorizontal
+  ChevronDown, ChevronRight, Package, Pencil, X, Plus, Trash2,
+  Star, Layers, Check, SlidersHorizontal, BarChart3, Ticket, ArrowLeft
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { formatCurrency } from '../utils';
@@ -14,7 +14,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useIsMobile } from '@/hooks/useIsMobile';
 import { useAppContext } from '@/contexts/AppContext';
 import { useConfirmDialog } from '@/hooks/useConfirmDialog';
-import { MobileDataCard, MobileFilterSheet, ConfirmDialog } from '@/components/ui';
+import { MobileDataCard, MobileFilterSheet, ConfirmDialog, ProductPlaceholder } from '@/components/ui';
 
 const SEASON_GROUPS = [
   { id: 'all', label: 'Season Group' },
@@ -38,19 +38,13 @@ const CARD_BG_CLASSES = [
   'bg-[rgba(196,151,90,0.08)] border-[rgba(196,151,90,0.25)]'
 ];
 
-const SKU_VERSIONS = [
-  { id: 'v1', name: 'Version 1', createdAt: '2025-01-15', isFinal: false },
-  { id: 'v2', name: 'Version 2', createdAt: '2025-01-20', isFinal: false },
-  { id: 'v3', name: 'Version 3', createdAt: '2025-01-25', isFinal: true },
-];
-
 const SIZING_CHOICES = [
   { id: 'choice-a', name: 'Choice A', isFinal: true },
   { id: 'choice-b', name: 'Choice B', isFinal: false },
   { id: 'choice-c', name: 'Choice C', isFinal: false },
 ];
 
-const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
+const SKUProposalScreen = ({ skuContext, onContextUsed, onNavigateBack, onNavigateNext, darkMode = false }) => {
   const { t } = useLanguage();
   const { isMobile } = useIsMobile();
   const { registerSave, unregisterSave } = useAppContext();
@@ -104,20 +98,22 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
           theme: s.theme || '',
           color: s.color || '',
           composition: s.composition || '',
-          srp: Number(s.srp || s.unitCost) || 0
+          srp: Number(s.srp || s.unitCost) || 0,
+          imageUrl: s.imageUrl || s.image || s.thumbnailUrl || null
         })));
 
         // Transform proposals into SKU blocks grouped by gender/category
         const proposals = Array.isArray(proposalsRes) ? proposalsRes : (proposalsRes?.data || []);
         const blocks = [];
         proposals.forEach(p => {
+          const proposalBudgetId = p.budgetId || null;
           (p.products || []).forEach(prod => {
             const gender = (prod.gender || '').toLowerCase();
             const category = prod.category || '';
             const subCategory = prod.subCategory || '';
-            let block = blocks.find(b => b.gender === gender && b.category === category && b.subCategory === subCategory);
+            let block = blocks.find(b => b.gender === gender && b.category === category && b.subCategory === subCategory && b.budgetId === proposalBudgetId);
             if (!block) {
-              block = { gender, category, subCategory, items: [] };
+              block = { gender, category, subCategory, budgetId: proposalBudgetId, items: [] };
               blocks.push(block);
             }
             block.items.push({
@@ -133,7 +129,8 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
               rex: prod.rex || 0,
               ttp: prod.ttp || 0,
               ttlValue: Number(prod.totalValue) || 0,
-              customerTarget: prod.customerTarget || 'New'
+              customerTarget: prod.customerTarget || 'New',
+              imageUrl: prod.imageUrl || prod.image || prod.thumbnailUrl || null
             });
           });
         });
@@ -196,8 +193,8 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
   const [cardDetailsOpen, setCardDetailsOpen] = useState({});
   const [cardStoreOrderOpen, setCardStoreOrderOpen] = useState({});
   const [cardSizingOpen, setCardSizingOpen] = useState({});
-  const [skuVersion, setSkuVersion] = useState('v3');
-  const [skuVersions, setSkuVersions] = useState(SKU_VERSIONS);
+  const [skuVersion, setSkuVersion] = useState(null);
+  const [skuVersions, setSkuVersions] = useState([]);
   const [isSkuVersionOpen, setIsSkuVersionOpen] = useState(false);
   const [sizingVersion, setSizingVersion] = useState('choice-a');
   const [sizingChoices, setSizingChoices] = useState(SIZING_CHOICES);
@@ -218,6 +215,35 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  // Fetch SKU versions from API based on selected budget
+  useEffect(() => {
+    const fetchVersions = async () => {
+      const budgetId = budgetFilter !== 'all' ? budgetFilter : null;
+      if (!budgetId) {
+        setSkuVersions([]);
+        setSkuVersion(null);
+        return;
+      }
+      try {
+        const response = await proposalService.getAll({ budgetId });
+        const list = Array.isArray(response) ? response : (response?.data || []);
+        const mapped = list.map(v => ({
+          id: v.id,
+          name: v.name || v.versionName || `Version ${v.versionNumber || v.id}`,
+          createdAt: v.createdAt,
+          isFinal: v.isFinal || v.status === 'FINAL' || false,
+        }));
+        setSkuVersions(mapped);
+        // Auto-select final version or first available
+        const finalV = mapped.find(v => v.isFinal);
+        setSkuVersion(finalV ? finalV.id : (mapped[0]?.id || null));
+      } catch (err) {
+        console.error('Failed to fetch SKU versions:', err);
+      }
+    };
+    fetchVersions();
+  }, [budgetFilter]);
 
   const handleSetFinalVersion = (versionId, e) => {
     e.stopPropagation();
@@ -377,12 +403,13 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
 
   const filteredSkuBlocks = useMemo(() => {
     return skuBlocks.filter(block => {
+      if (budgetFilter !== 'all' && block.budgetId && block.budgetId !== budgetFilter) return false;
       if (genderFilter !== 'all' && block.gender !== genderFilter) return false;
       if (categoryFilter !== 'all' && block.category !== categoryFilter) return false;
       if (subCategoryFilter !== 'all' && block.subCategory !== subCategoryFilter) return false;
       return true;
     });
-  }, [genderFilter, categoryFilter, subCategoryFilter, skuBlocks]);
+  }, [budgetFilter, genderFilter, categoryFilter, subCategoryFilter, skuBlocks]);
 
   // Card view available when there's data to show
   const canShowCardView = filteredSkuBlocks.length > 0 && filteredSkuBlocks.some(b => b.items.length > 0);
@@ -398,7 +425,7 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
     const [blockKey, itemIdx, field] = cellKey.split('|');
 
     setSkuBlocks(prev => prev.map(block => {
-      const key = `${block.gender}_${block.category}_${block.subCategory}`;
+      const key = `${block.gender}_${block.category}_${block.subCategory}_${block.budgetId || ''}`;
       if (key !== blockKey) return block;
       const items = block.items.map((item, idx) => {
         if (String(idx) !== itemIdx) return item;
@@ -425,7 +452,7 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
 
   const handleSelectChange = (blockKey, itemIdx, field, value) => {
     setSkuBlocks(prev => prev.map(block => {
-      const key = `${block.gender}_${block.category}_${block.subCategory}`;
+      const key = `${block.gender}_${block.category}_${block.subCategory}_${block.budgetId || ''}`;
       if (key !== blockKey) return block;
       const items = block.items.map((item, idx) => {
         if (String(idx) !== String(itemIdx)) return item;
@@ -439,7 +466,7 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
     const nextValue = Number(value);
     const safeValue = Number.isFinite(nextValue) ? nextValue : 0;
     setSkuBlocks(prev => prev.map(block => {
-      const key = `${block.gender}_${block.category}_${block.subCategory}`;
+      const key = `${block.gender}_${block.category}_${block.subCategory}_${block.budgetId || ''}`;
       if (key !== blockKey) return block;
       const items = block.items.map((item, idx) => {
         if (String(idx) !== String(itemIdx)) return item;
@@ -455,7 +482,7 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
 
   const handleAddSkuRow = (blockKey) => {
     setSkuBlocks(prev => prev.map(block => {
-      const key = `${block.gender}_${block.category}_${block.subCategory}`;
+      const key = `${block.gender}_${block.category}_${block.subCategory}_${block.budgetId || ''}`;
       if (key !== blockKey) return block;
       const newItem = {
         sku: '',
@@ -482,7 +509,7 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
     if (!skuData) return;
 
     setSkuBlocks(prev => prev.map(block => {
-      const key = `${block.gender}_${block.category}_${block.subCategory}`;
+      const key = `${block.gender}_${block.category}_${block.subCategory}_${block.budgetId || ''}`;
       if (key !== blockKey) return block;
       const items = block.items.map((item, idx) => {
         if (idx !== itemIdx) return item;
@@ -510,7 +537,7 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
       variant: 'danger',
       onConfirm: () => {
         setSkuBlocks(prev => prev.map(block => {
-          const key = `${block.gender}_${block.category}_${block.subCategory}`;
+          const key = `${block.gender}_${block.category}_${block.subCategory}_${block.budgetId || ''}`;
           if (key !== blockKey) return block;
           const items = block.items.filter((_, idx) => idx !== itemIdx);
           return { ...block, items };
@@ -525,7 +552,7 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
       const newState = !prev;
       const keys = {};
       filteredSkuBlocks.forEach(block => {
-        const key = `${block.gender}_${block.category}_${block.subCategory}`;
+        const key = `${block.gender}_${block.category}_${block.subCategory}_${block.budgetId || ''}`;
         keys[key] = newState;
       });
       setCollapsed(keys);
@@ -609,7 +636,7 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
 
   const filteredSkuItems = useMemo(() => {
     return filteredSkuBlocks.flatMap(block => {
-      const blockKey = `${block.gender}_${block.category}_${block.subCategory}`;
+      const blockKey = `${block.gender}_${block.category}_${block.subCategory}_${block.budgetId || ''}`;
       return block.items.map((item, idx) => ({
         block,
         blockKey,
@@ -675,28 +702,28 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
         ) : (
         <div className="flex items-center gap-1.5 px-3 py-1.5 overflow-x-auto scrollbar-hide">
           <select value={budgetFilter} onChange={(e) => setBudgetFilter(e.target.value)}
-            className="shrink-0 border rounded pl-1.5 pr-4 py-1 text-[11px] bg-white border-border-muted text-content focus:outline-none focus:ring-1 focus:ring-dafc-gold/30">
+            className="shrink-0 border rounded pl-1.5 pr-6 py-1 text-[11px] appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2210%22%20height%3D%2210%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%238C8178%22%20stroke-width%3D%222.5%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22m6%209%206%206%206-6%22%2F%3E%3C%2Fsvg%3E')] bg-[length:10px] bg-[right_0.4rem_center] bg-no-repeat bg-white border-border-muted text-content focus:outline-none focus:ring-1 focus:ring-dafc-gold/30">
             {budgetOptions.map(opt => (<option key={opt.id} value={opt.id}>{opt.label}</option>))}
           </select>
           <select value={seasonGroupFilter} onChange={(e) => setSeasonGroupFilter(e.target.value)}
-            className="shrink-0 border rounded pl-1.5 pr-4 py-1 text-[11px] bg-white border-border-muted text-content focus:outline-none focus:ring-1 focus:ring-dafc-gold/30">
+            className="shrink-0 border rounded pl-1.5 pr-6 py-1 text-[11px] appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2210%22%20height%3D%2210%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%238C8178%22%20stroke-width%3D%222.5%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22m6%209%206%206%206-6%22%2F%3E%3C%2Fsvg%3E')] bg-[length:10px] bg-[right_0.4rem_center] bg-no-repeat bg-white border-border-muted text-content focus:outline-none focus:ring-1 focus:ring-dafc-gold/30">
             {SEASON_GROUPS.map(opt => (<option key={opt.id} value={opt.id}>{opt.label}</option>))}
           </select>
           <select value={seasonFilter} onChange={(e) => setSeasonFilter(e.target.value)}
-            className="shrink-0 border rounded pl-1.5 pr-4 py-1 text-[11px] bg-white border-border-muted text-content focus:outline-none focus:ring-1 focus:ring-dafc-gold/30">
+            className="shrink-0 border rounded pl-1.5 pr-6 py-1 text-[11px] appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2210%22%20height%3D%2210%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%238C8178%22%20stroke-width%3D%222.5%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22m6%209%206%206%206-6%22%2F%3E%3C%2Fsvg%3E')] bg-[length:10px] bg-[right_0.4rem_center] bg-no-repeat bg-white border-border-muted text-content focus:outline-none focus:ring-1 focus:ring-dafc-gold/30">
             {SEASONS.map(opt => (<option key={opt.id} value={opt.id}>{opt.label}</option>))}
           </select>
           <div className="h-4 w-px shrink-0 bg-border-muted" />
           <select value={genderFilter} onChange={(e) => setGenderFilter(e.target.value)}
-            className="shrink-0 border rounded pl-1.5 pr-4 py-1 text-[11px] bg-white border-border-muted text-content focus:outline-none focus:ring-1 focus:ring-dafc-gold/30">
+            className="shrink-0 border rounded pl-1.5 pr-6 py-1 text-[11px] appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2210%22%20height%3D%2210%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%238C8178%22%20stroke-width%3D%222.5%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22m6%209%206%206%206-6%22%2F%3E%3C%2Fsvg%3E')] bg-[length:10px] bg-[right_0.4rem_center] bg-no-repeat bg-white border-border-muted text-content focus:outline-none focus:ring-1 focus:ring-dafc-gold/30">
             {genderOptions.map(g => (<option key={g} value={g}>{g === 'all' ? t('skuProposal.gender') : g}</option>))}
           </select>
           <select value={categoryFilter} onChange={(e) => setCategoryFilter(e.target.value)}
-            className="shrink-0 border rounded pl-1.5 pr-4 py-1 text-[11px] bg-white border-border-muted text-content focus:outline-none focus:ring-1 focus:ring-dafc-gold/30">
+            className="shrink-0 border rounded pl-1.5 pr-6 py-1 text-[11px] appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2210%22%20height%3D%2210%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%238C8178%22%20stroke-width%3D%222.5%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22m6%209%206%206%206-6%22%2F%3E%3C%2Fsvg%3E')] bg-[length:10px] bg-[right_0.4rem_center] bg-no-repeat bg-white border-border-muted text-content focus:outline-none focus:ring-1 focus:ring-dafc-gold/30">
             {categoryOptions.map(c => (<option key={c} value={c}>{c === 'all' ? t('skuProposal.category') : c}</option>))}
           </select>
           <select value={subCategoryFilter} onChange={(e) => setSubCategoryFilter(e.target.value)}
-            className="shrink-0 border rounded pl-1.5 pr-4 py-1 text-[11px] bg-white border-border-muted text-content focus:outline-none focus:ring-1 focus:ring-dafc-gold/30">
+            className="shrink-0 border rounded pl-1.5 pr-6 py-1 text-[11px] appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2210%22%20height%3D%2210%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%238C8178%22%20stroke-width%3D%222.5%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22m6%209%206%206%206-6%22%2F%3E%3C%2Fsvg%3E')] bg-[length:10px] bg-[right_0.4rem_center] bg-no-repeat bg-white border-border-muted text-content focus:outline-none focus:ring-1 focus:ring-dafc-gold/30">
             {subCategoryOptions.map(s => (<option key={s} value={s}>{s === 'all' ? t('skuProposal.subCategory') : s}</option>))}
           </select>
         </div>
@@ -992,13 +1019,16 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
               <div key={key} className={`rounded-2xl border p-4 ${getCardBgClass(cardIdx)}`}>
                 <div className="flex flex-wrap items-center gap-3 justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-xl border flex items-center justify-center bg-[rgba(160,120,75,0.08)] border-[rgba(196,151,90,0.2)]">
-                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M6 8V19C6 19.5523 6.44772 20 7 20H17C17.5523 20 18 19.5523 18 19V8" stroke="#B8A692" strokeWidth="1.5" strokeLinecap="round"/>
-                        <path d="M4 8H20L18.5 5H5.5L4 8Z" stroke="#C4975A" strokeWidth="1.5" strokeLinejoin="round" fill="rgba(196,151,90,0.1)"/>
-                        <path d="M9 8V5.5C9 4.11929 10.1193 3 11.5 3H12.5C13.8807 3 15 4.11929 15 5.5V8" stroke="#B8A692" strokeWidth="1.5" strokeLinecap="round"/>
-                        <rect x="9" y="12" width="6" height="3" rx="1" stroke="#C4975A" strokeWidth="1.2" opacity="0.5"/>
-                      </svg>
+                    {item.imageUrl ? (
+                      <img
+                        src={item.imageUrl}
+                        alt={item.name || item.sku}
+                        className="w-14 h-14 rounded-xl object-cover bg-[#FBF9F7] border border-[rgba(196,151,90,0.2)]"
+                        onError={(e) => { e.target.onerror = null; e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }}
+                      />
+                    ) : null}
+                    <div className={`w-14 h-14 rounded-xl bg-[#FBF9F7] border border-[rgba(196,151,90,0.2)] flex items-center justify-center ${item.imageUrl ? 'hidden' : ''}`}>
+                      <ProductPlaceholder size={36} category={block.category} subCategory={block.subCategory} productType={item.productType} />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-1.5 text-sm font-semibold text-[#2C2417]">
@@ -1057,7 +1087,7 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
                     <select
                       value={item.sku}
                       onChange={(e) => handleSkuSelect(blockKey, idx, e.target.value)}
-                      className="w-full px-3 py-2 rounded-lg border-2 text-sm focus:outline-none focus:ring-2 font-data border-[#1B6B45] bg-white text-[#2C2417] focus:ring-[rgba(27,107,69,0.3)]"
+                      className="w-full px-3 pr-8 py-2 rounded-lg border-2 text-sm appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2212%22%20height%3D%2212%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%238C8178%22%20stroke-width%3D%222.5%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22m6%209%206%206%206-6%22%2F%3E%3C%2Fsvg%3E')] bg-[length:12px] bg-[right_0.6rem_center] bg-no-repeat focus:outline-none focus:ring-2 font-data border-[#1B6B45] bg-white text-[#2C2417] focus:ring-[rgba(27,107,69,0.3)]"
                     >
                       <option value="">{t('proposal.selectSku')}</option>
                       {skuCatalog.map(sku => (
@@ -1130,7 +1160,7 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
                         <select
                           value={item.customerTarget}
                           onChange={(e) => handleSelectChange(blockKey, idx, 'customerTarget', e.target.value)}
-                          className="mt-1 w-full px-3 py-2 rounded-lg border text-sm focus:outline-none focus:ring-2 bg-white border-[rgba(196,151,90,0.3)] text-[#2C2417] focus:ring-[rgba(196,151,90,0.3)] focus:border-[#C4975A]"
+                          className="mt-1 w-full px-3 pr-8 py-2 rounded-lg border text-sm appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2212%22%20height%3D%2212%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%238C8178%22%20stroke-width%3D%222.5%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22m6%209%206%206%206-6%22%2F%3E%3C%2Fsvg%3E')] bg-[length:12px] bg-[right_0.5rem_center] bg-no-repeat focus:outline-none focus:ring-2 bg-white border-[rgba(196,151,90,0.3)] text-[#2C2417] focus:ring-[rgba(196,151,90,0.3)] focus:border-[#C4975A]"
                         >
                           <option value="New">New</option>
                           <option value="Existing">Existing</option>
@@ -1273,7 +1303,7 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
             <button
               onClick={() => {
                 const firstBlock = filteredSkuBlocks[0];
-                const blockKey = `${firstBlock.gender}_${firstBlock.category}_${firstBlock.subCategory}`;
+                const blockKey = `${firstBlock.gender}_${firstBlock.category}_${firstBlock.subCategory}_${firstBlock.budgetId || ''}`;
                 handleAddSkuRow(blockKey);
               }}
               className="rounded-2xl border-2 border-dashed p-8 flex flex-col items-center justify-center gap-3 transition-all hover:scale-[1.02] border-[rgba(196,151,90,0.4)] hover:border-[#7D5A28] hover:bg-[rgba(196,151,90,0.08)]"
@@ -1294,7 +1324,7 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
         /* Mobile Table View: MobileDataCard list */
         <div className="space-y-4">
           {filteredSkuBlocks.map((block) => {
-            const key = `${block.gender}_${block.category}_${block.subCategory}`;
+            const key = `${block.gender}_${block.category}_${block.subCategory}_${block.budgetId || ''}`;
             const isCollapsed = collapsed[key];
             return (
               <div key={key} className="space-y-2">
@@ -1302,18 +1332,16 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
                 <button
                   type="button"
                   onClick={() => handleToggle(key)}
-                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-[rgba(196,151,90,0.2)] border border-[rgba(196,151,90,0.3)]"
+                  className="w-full flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[rgba(196,151,90,0.15)] border border-[rgba(196,151,90,0.3)]"
                 >
-                  <ChevronDown size={16} className={`transition-transform ${isCollapsed ? '-rotate-90' : ''} text-[#7D5A28]`} />
+                  <ChevronDown size={14} className={`transition-transform shrink-0 ${isCollapsed ? '-rotate-90' : ''} text-[#7D5A28]`} />
                   <div className="text-left flex-1 min-w-0">
-                    <div className="font-semibold text-sm text-[#7D5A28]">{block.subCategory}</div>
-                    <div className="text-xs text-[#6B5D4F]">
-                      {block.gender} / {block.category} / {block.items.length} SKUs
-                    </div>
+                    <span className="font-semibold text-sm text-[#7D5A28]">{block.subCategory}</span>
+                    <span className="text-[11px] text-[#8C8178] ml-1.5">{block.gender} &bull; {block.items.length} SKUs</span>
                   </div>
-                  <div className="text-xs text-right flex-shrink-0 text-[#6B5D4F]">
+                  <span className="text-xs font-data flex-shrink-0 text-[#6B5D4F]">
                     {formatCurrency(block.items.reduce((sum, i) => sum + i.srp, 0))}
-                  </div>
+                  </span>
                 </button>
 
                 {!isCollapsed && (
@@ -1358,46 +1386,40 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
       ) : (
         <div className="space-y-4">
           {filteredSkuBlocks.map((block) => {
-            const key = `${block.gender}_${block.category}_${block.subCategory}`;
+            const key = `${block.gender}_${block.category}_${block.subCategory}_${block.budgetId || ''}`;
             const isCollapsed = collapsed[key];
             return (
               <div key={key} className="rounded-xl border overflow-hidden bg-white border-[rgba(196,151,90,0.2)]">
                 <button
                   type="button"
                   onClick={() => handleToggle(key)}
-                  className="w-full flex items-center gap-3 px-4 py-3 bg-[rgba(196,151,90,0.2)] border-b border-[rgba(196,151,90,0.3)]"
+                  className="w-full flex items-center gap-2 px-3 py-1.5 bg-[rgba(196,151,90,0.15)] border-b border-[rgba(196,151,90,0.3)]"
                 >
-                  <ChevronDown size={16} className={`transition-transform ${isCollapsed ? '-rotate-90' : ''} text-[#7D5A28]`} />
-                  <div className="text-left">
-                    <div className="font-semibold text-[#7D5A28]">{block.subCategory}</div>
-                    <div className="text-xs text-[#6B5D4F]">
-                      {block.gender} &bull; {block.category} &bull; {block.items.length} SKUs
-                    </div>
-                  </div>
-                  <div className="ml-auto text-xs text-[#6B5D4F]">
-                    Total SRP: {formatCurrency(block.items.reduce((sum, i) => sum + i.srp, 0))}
-                  </div>
+                  <ChevronDown size={14} className={`transition-transform shrink-0 ${isCollapsed ? '-rotate-90' : ''} text-[#7D5A28]`} />
+                  <span className="font-semibold text-sm text-[#7D5A28]">{block.subCategory}</span>
+                  <span className="text-[11px] text-[#8C8178]">{block.gender} &bull; {block.category} &bull; {block.items.length} SKUs</span>
+                  <span className="ml-auto text-xs font-data text-[#6B5D4F]">
+                    {formatCurrency(block.items.reduce((sum, i) => sum + i.srp, 0))}
+                  </span>
                 </button>
 
                 {!isCollapsed && (
                   <div className="overflow-x-auto">
-                    <table className="w-full text-sm">
+                    <table className="w-full text-xs">
                       <thead>
-                        <tr className="bg-[rgba(160,120,75,0.12)] border-b border-[rgba(196,151,90,0.2)]">
-                          <th className="px-3 py-2 text-left text-xs font-semibold font-brand text-[#7D5A28]">Image</th>
-                          <th className="px-3 py-2 text-left text-xs font-semibold font-brand text-[#7D5A28]">SKU</th>
-                          <th className="px-3 py-2 text-left text-xs font-semibold font-brand text-[#7D5A28]">Name</th>
-                          <th className="px-3 py-2 text-left text-xs font-semibold font-brand text-[#7D5A28]">Product type (L3)</th>
-                          <th className="px-3 py-2 text-left text-xs font-semibold font-brand text-[#7D5A28]">Theme</th>
-                          <th className="px-3 py-2 text-left text-xs font-semibold font-brand text-[#7D5A28]">Color</th>
-                          <th className="px-3 py-2 text-left text-xs font-semibold font-brand text-[#7D5A28]">Composition</th>
-                          <th className="px-3 py-2 text-right text-xs font-semibold font-brand text-[#7D5A28]">Unit cost</th>
-                          <th className="px-3 py-2 text-right text-xs font-semibold font-brand text-[#7D5A28]">SRP</th>
-                          <th className="px-3 py-2 text-center text-xs font-semibold font-brand text-[#7D5A28]">Order</th>
-                          <th className="px-3 py-2 text-center text-xs font-semibold font-brand text-[#7D5A28]">Rex</th>
-                          <th className="px-3 py-2 text-center text-xs font-semibold font-brand text-[#7D5A28]">TTP</th>
-                          <th className="px-3 py-2 text-right text-xs font-semibold font-brand text-[#7D5A28]">TTL value</th>
-                          <th className="px-3 py-2 text-center text-xs font-semibold font-brand text-[#7D5A28]">Customer target</th>
+                        <tr className="bg-[rgba(160,120,75,0.10)] border-b border-[rgba(196,151,90,0.2)]">
+                          <th className="w-9 px-1.5 py-1.5"></th>
+                          <th className="px-2 py-1.5 text-left font-semibold font-brand text-[#8C8178] whitespace-nowrap">SKU</th>
+                          <th className="px-2 py-1.5 text-left font-semibold font-brand text-[#8C8178]">Name</th>
+                          <th className="px-2 py-1.5 text-left font-semibold font-brand text-[#8C8178] whitespace-nowrap">Type</th>
+                          <th className="px-2 py-1.5 text-left font-semibold font-brand text-[#8C8178]">Color</th>
+                          <th className="px-2 py-1.5 text-right font-semibold font-brand text-[#8C8178] whitespace-nowrap">Cost</th>
+                          <th className="px-2 py-1.5 text-right font-semibold font-brand text-[#8C8178]">SRP</th>
+                          <th className="px-2 py-1.5 text-center font-semibold font-brand text-[#8C8178]">Qty</th>
+                          <th className="px-2 py-1.5 text-center font-semibold font-brand text-[#8C8178]">Rex</th>
+                          <th className="px-2 py-1.5 text-center font-semibold font-brand text-[#8C8178]">TTP</th>
+                          <th className="px-2 py-1.5 text-right font-semibold font-brand text-[#8C8178] whitespace-nowrap">Value</th>
+                          <th className="px-2 py-1.5 text-center font-semibold font-brand text-[#8C8178]">Target</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -1407,24 +1429,27 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
                           const isEditingRex = editingCell === rexKey;
                           const isEditingTtp = editingCell === ttpKey;
                           return (
-                          <tr key={`${item.sku}_${idx}`} className={`border-b border-[rgba(196,151,90,0.15)] ${item.isNew ? 'bg-[rgba(27,107,69,0.05)]' : ''}`}>
-                            <td className="px-3 py-2">
-                              <div className="w-10 h-10 rounded-md border flex items-center justify-center mx-auto bg-[rgba(160,120,75,0.08)] border-[rgba(196,151,90,0.2)]">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                  <path d="M6 8V19C6 19.5523 6.44772 20 7 20H17C17.5523 20 18 19.5523 18 19V8" stroke="#B8A692" strokeWidth="1.5" strokeLinecap="round"/>
-                                  <path d="M4 8H20L18.5 5H5.5L4 8Z" stroke="#C4975A" strokeWidth="1.5" strokeLinejoin="round" fill="rgba(196,151,90,0.1)"/>
-                                  <path d="M9 8V5.5C9 4.11929 10.1193 3 11.5 3H12.5C13.8807 3 15 4.11929 15 5.5V8" stroke="#B8A692" strokeWidth="1.5" strokeLinecap="round"/>
-                                  <rect x="9" y="12" width="6" height="3" rx="1" stroke="#C4975A" strokeWidth="1.2" opacity="0.5"/>
-                                </svg>
+                          <tr key={`${item.sku}_${idx}`} className={`border-b border-[rgba(196,151,90,0.12)] ${item.isNew ? 'bg-[rgba(27,107,69,0.04)]' : ''}`}>
+                            <td className="px-1.5 py-1">
+                              {item.imageUrl ? (
+                                <img
+                                  src={item.imageUrl}
+                                  alt={item.name || item.sku}
+                                  className="w-8 h-8 rounded object-cover bg-[#FBF9F7] border border-[rgba(196,151,90,0.15)]"
+                                  onError={(e) => { e.target.onerror = null; e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }}
+                                />
+                              ) : null}
+                              <div className={`w-8 h-8 rounded bg-[#FBF9F7] border border-[rgba(196,151,90,0.15)] flex items-center justify-center ${item.imageUrl ? 'hidden' : ''}`}>
+                                <ProductPlaceholder size={22} category={block.category} subCategory={block.subCategory} productType={item.productType} />
                               </div>
                             </td>
                             {item.isNew ? (
                               <>
-                                <td colSpan={2} className="px-3 py-2">
+                                <td colSpan={2} className="px-2 py-1">
                                   <select
                                     value={item.sku}
                                     onChange={(e) => handleSkuSelect(key, idx, e.target.value)}
-                                    className="w-full px-3 py-2 rounded-lg border-2 text-sm focus:outline-none focus:ring-2 font-data border-[#1B6B45] bg-white text-[#2C2417] focus:ring-[rgba(27,107,69,0.3)]"
+                                    className="w-full px-2 pr-7 py-1 rounded border-2 text-xs appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2212%22%20height%3D%2212%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%238C8178%22%20stroke-width%3D%222.5%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22m6%209%206%206%206-6%22%2F%3E%3C%2Fsvg%3E')] bg-[length:10px] bg-[right_0.4rem_center] bg-no-repeat focus:outline-none focus:ring-1 font-data border-[#1B6B45] bg-white text-[#2C2417] focus:ring-[rgba(27,107,69,0.3)]"
                                   >
                                     <option value="">{t('proposal.selectSku')}</option>
                                     {skuCatalog.map(sku => (
@@ -1437,19 +1462,19 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
                               </>
                             ) : (
                               <>
-                                <td className="px-3 py-2">
-                                  <div className="flex items-center gap-1">
-                                    <span className="font-semibold font-data text-[#2C2417]">{item.sku}</span>
+                                <td className="px-2 py-1">
+                                  <div className="flex items-center gap-0.5">
+                                    <span className="font-semibold font-data text-[#2C2417] whitespace-nowrap">{item.sku}</span>
                                     <button
                                       type="button"
                                       onClick={() => handleOpenSizing(key, idx, item)}
                                       className="p-0.5 rounded transition-colors relative text-[#8C8178] hover:text-[#7D5A28] hover:bg-[rgba(160,120,75,0.18)]"
                                       title={t('skuProposal.sizing')}
                                     >
-                                      <Pencil size={11} />
+                                      <Pencil size={10} />
                                       {isSizingComplete(key, idx) && (
-                                        <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-[#1B6B45] rounded-full flex items-center justify-center">
-                                          <Check size={6} className="text-white" />
+                                        <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-[#1B6B45] rounded-full flex items-center justify-center">
+                                          <Check size={5} className="text-white" />
                                         </span>
                                       )}
                                     </button>
@@ -1459,25 +1484,23 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
                                       className="p-0.5 rounded transition-colors text-[#8C8178] hover:text-[#DC3545] hover:bg-[rgba(220,53,69,0.1)]"
                                       title={t('proposal.deleteSku')}
                                     >
-                                      <Trash2 size={11} />
+                                      <Trash2 size={10} />
                                     </button>
                                   </div>
                                 </td>
-                                <td className="px-3 py-2 text-[#2C2417]">{item.name}</td>
+                                <td className="px-2 py-1 text-[#2C2417]" title={`${item.theme || ''} · ${item.composition || ''}`}>{item.name}</td>
                               </>
                             )}
-                            <td className="px-3 py-2 text-[#8C8178]">{item.productType}</td>
-                            <td className="px-3 py-2 text-[#8C8178]">{item.theme}</td>
-                            <td className="px-3 py-2 text-[#8C8178]">{item.color}</td>
-                            <td className="px-3 py-2 text-[#8C8178]">{item.composition}</td>
-                            <td className="px-3 py-2 text-right font-data text-[#8C8178]">{formatCurrency(item.unitCost)}</td>
-                            <td className="px-3 py-2 text-right font-medium font-data text-[#1B6B45]">{formatCurrency(item.srp)}</td>
-                            <td className="px-3 py-2 text-center">
-                              <div className="px-2.5 py-1.5 rounded-md font-semibold font-data inline-block bg-[rgba(160,120,75,0.18)] text-[#7D5A28]">
+                            <td className="px-2 py-1 text-[#8C8178] whitespace-nowrap">{item.productType}</td>
+                            <td className="px-2 py-1 text-[#8C8178]">{item.color}</td>
+                            <td className="px-2 py-1 text-right font-data text-[#8C8178] whitespace-nowrap">{formatCurrency(item.unitCost)}</td>
+                            <td className="px-2 py-1 text-right font-data text-[#1B6B45] whitespace-nowrap">{formatCurrency(item.srp)}</td>
+                            <td className="px-2 py-1 text-center">
+                              <span className="px-1.5 py-0.5 rounded font-semibold font-data bg-[rgba(160,120,75,0.14)] text-[#7D5A28]">
                                 {item.order}
-                              </div>
+                              </span>
                             </td>
-                            <td className="px-3 py-2 text-center">
+                            <td className="px-2 py-1 text-center">
                               {isEditingRex ? (
                                 <input
                                   type="number"
@@ -1485,22 +1508,22 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
                                   onChange={(e) => setEditValue(e.target.value)}
                                   onBlur={() => handleSaveEdit(rexKey)}
                                   onKeyDown={(e) => handleKeyDown(e, rexKey)}
-                                  className="w-20 px-2 py-1.5 text-center border-2 rounded-md focus:outline-none focus:ring-2 text-sm font-semibold font-data border-[#C4975A] bg-white text-[#2C2417] focus:ring-[rgba(196,151,90,0.3)]"
+                                  className="w-14 px-1 py-0.5 text-center border-2 rounded focus:outline-none focus:ring-1 text-xs font-semibold font-data border-[#C4975A] bg-white text-[#2C2417] focus:ring-[rgba(196,151,90,0.3)]"
                                   autoFocus
                                 />
                               ) : (
                                 <button
                                   type="button"
                                   onClick={() => handleStartEdit(rexKey, item.rex)}
-                                  className="px-2.5 py-1.5 rounded-md inline-flex items-center gap-1 font-data transition-colors bg-[rgba(160,120,75,0.18)] text-[#7D5A28] hover:bg-[rgba(196,151,90,0.25)]"
+                                  className="px-1.5 py-0.5 rounded inline-flex items-center gap-0.5 font-data transition-colors bg-[rgba(160,120,75,0.14)] text-[#7D5A28] hover:bg-[rgba(196,151,90,0.22)]"
                                   title="Edit Rex"
                                 >
                                   {item.rex}
-                                  <Pencil size={12} className="text-[#7D5A28]" />
+                                  <Pencil size={10} className="text-[#7D5A28]" />
                                 </button>
                               )}
                             </td>
-                            <td className="px-3 py-2 text-center">
+                            <td className="px-2 py-1 text-center">
                               {isEditingTtp ? (
                                 <input
                                   type="number"
@@ -1508,27 +1531,27 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
                                   onChange={(e) => setEditValue(e.target.value)}
                                   onBlur={() => handleSaveEdit(ttpKey)}
                                   onKeyDown={(e) => handleKeyDown(e, ttpKey)}
-                                  className="w-20 px-2 py-1.5 text-center border-2 rounded-md focus:outline-none focus:ring-2 text-sm font-semibold font-data border-[#C4975A] bg-white text-[#2C2417] focus:ring-[rgba(196,151,90,0.3)]"
+                                  className="w-14 px-1 py-0.5 text-center border-2 rounded focus:outline-none focus:ring-1 text-xs font-semibold font-data border-[#C4975A] bg-white text-[#2C2417] focus:ring-[rgba(196,151,90,0.3)]"
                                   autoFocus
                                 />
                               ) : (
                                 <button
                                   type="button"
                                   onClick={() => handleStartEdit(ttpKey, item.ttp)}
-                                  className="px-2.5 py-1.5 rounded-md inline-flex items-center gap-1 font-data transition-colors bg-[rgba(160,120,75,0.18)] text-[#7D5A28] hover:bg-[rgba(196,151,90,0.25)]"
+                                  className="px-1.5 py-0.5 rounded inline-flex items-center gap-0.5 font-data transition-colors bg-[rgba(160,120,75,0.14)] text-[#7D5A28] hover:bg-[rgba(196,151,90,0.22)]"
                                   title="Edit TTP"
                                 >
                                   {item.ttp}
-                                  <Pencil size={12} className="text-[#7D5A28]" />
+                                  <Pencil size={10} className="text-[#7D5A28]" />
                                 </button>
                               )}
                             </td>
-                            <td className="px-3 py-2 text-right font-data text-[#1B6B45]">{formatCurrency(item.ttlValue)}</td>
-                            <td className="px-3 py-2 text-center">
+                            <td className="px-2 py-1 text-right font-data text-[#1B6B45] whitespace-nowrap">{formatCurrency(item.ttlValue)}</td>
+                            <td className="px-2 py-1 text-center">
                               <select
                                 value={item.customerTarget}
                                 onChange={(e) => handleSelectChange(key, idx, 'customerTarget', e.target.value)}
-                                className="px-2.5 py-1.5 rounded-md border text-sm focus:outline-none focus:ring-2 border-[rgba(196,151,90,0.3)] bg-white text-[#2C2417] focus:ring-[rgba(196,151,90,0.3)] focus:border-[#C4975A]"
+                                className="px-1.5 pr-5 py-0.5 rounded border text-xs appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2210%22%20height%3D%2210%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%238C8178%22%20stroke-width%3D%222.5%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22m6%209%206%206%206-6%22%2F%3E%3C%2Fsvg%3E')] bg-[length:10px] bg-[right_0.3rem_center] bg-no-repeat focus:outline-none focus:ring-1 border-[rgba(196,151,90,0.25)] bg-white text-[#2C2417] focus:ring-[rgba(196,151,90,0.3)] focus:border-[#C4975A]"
                               >
                                 <option value="New">New</option>
                                 <option value="Existing">Existing</option>
@@ -1539,14 +1562,14 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
                         })}
                         {/* Add new row button */}
                         <tr className="border-t border-dashed border-[rgba(196,151,90,0.3)] bg-[rgba(196,151,90,0.03)]">
-                          <td colSpan={14} className="px-3 py-3">
+                          <td colSpan={12} className="px-2 py-1.5">
                             <button
                               type="button"
                               onClick={() => handleAddSkuRow(key)}
-                              className="w-full flex items-center justify-center gap-2 py-2 text-sm rounded-lg transition-colors border border-dashed text-[#8C8178] hover:text-[#7D5A28] hover:bg-[rgba(160,120,75,0.12)] border-[rgba(196,151,90,0.3)] hover:border-[rgba(196,151,90,0.5)]"
+                              className="w-full flex items-center justify-center gap-1 py-1 text-xs transition-colors text-[#8C8178] hover:text-[#7D5A28]"
                             >
-                              <Plus size={16} />
-                              <span>Add new SKU</span>
+                              <Plus size={13} />
+                              <span>Add SKU</span>
                             </button>
                           </td>
                         </tr>
@@ -1699,6 +1722,33 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
           </div>
         </div>
       )}
+
+      {/* Sticky Bottom Action Bar */}
+      <div className="sticky bottom-0 z-50 mt-3">
+        <div className="bg-white/95 backdrop-blur-sm border border-border-muted rounded-xl px-4 py-2.5 flex items-center justify-between shadow-[0_-2px_12px_rgba(0,0,0,0.06)]">
+          <button
+            onClick={() => onNavigateBack ? onNavigateBack() : window.history.back()}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium font-brand rounded-lg transition-colors text-[#6B5D4F] hover:bg-[#F5F0EB] border border-[#E8E2DB]"
+          >
+            <ArrowLeft size={13} />
+            {t('nav.otbAnalysis')}
+          </button>
+
+          <div className="flex items-center gap-3">
+            <span className="text-[10px] font-data text-[#8C8178] hidden sm:inline">
+              {filteredSkuBlocks.reduce((sum, b) => sum + b.items.length, 0)} SKUs
+            </span>
+            <button
+              onClick={() => onNavigateNext ? onNavigateNext() : null}
+              className="flex items-center gap-1.5 px-4 py-1.5 text-xs font-semibold font-brand rounded-lg transition-all bg-gradient-to-r from-[#C4975A] to-[#B8894E] hover:from-[#B8894E] hover:to-[#A07B4B] text-white shadow-sm hover:shadow-md"
+            >
+              <Ticket size={13} />
+              {t('nav.tickets')}
+              <ChevronRight size={13} />
+            </button>
+          </div>
+        </div>
+      </div>
 
       <ConfirmDialog {...dialogProps} />
     </div>

@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import {
-  BarChart3, ChevronDown, Check,
+  BarChart3, ChevronDown, Check, ChevronRight, ArrowLeft,
   Calendar, Tag, Layers, Users, Info, Pencil, X, Star,
   Sparkles, FileText, Clock, Package
 } from 'lucide-react';
@@ -185,6 +185,26 @@ const OTBAnalysisScreen = ({ otbContext, onOpenSkuProposal, darkMode = false }) 
   const [editingCell, setEditingCell] = useState(null);
   const [editValue, setEditValue] = useState('');
   const [localData, setLocalData] = useState({});
+
+  // Load saved allocation data when version is selected
+  useEffect(() => {
+    if (!selectedVersionId) return;
+    let ignore = false;
+    const loadVersionData = async () => {
+      try {
+        const versionData = await planningService.getOne(selectedVersionId);
+        if (ignore) return;
+        const saved = versionData?.allocations;
+        if (saved && typeof saved === 'object') {
+          setLocalData(prev => ({ ...prev, ...saved }));
+        }
+      } catch (err) {
+        console.error('Failed to load OTB version data:', err);
+      }
+    };
+    loadVersionData();
+    return () => { ignore = true; };
+  }, [selectedVersionId]);
 
   // Category hierarchy collapse states
   const [expandedGenders, setExpandedGenders] = useState({ female: true, male: true });
@@ -792,104 +812,7 @@ const OTBAnalysisScreen = ({ otbContext, onOpenSkuProposal, darkMode = false }) 
     };
 
     return (
-      <div className="p-4 space-y-3">
-        {/* Category Filters — compact inline */}
-        <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border mb-3 bg-white border-border-muted">
-
-          {/* Gender Filter */}
-          <div className="relative" ref={setDropdownRef('genderFilter')}>
-            <button
-              type="button"
-              onClick={() => {
-                setOpenCategoryDropdown((prev) => (prev === 'genderFilter' ? null : 'genderFilter'));
-                setOpenDropdown(null);
-              }}
-              className="flex items-center gap-1.5 px-2.5 py-1 border rounded-md transition-all text-[11px] font-medium bg-white border-border-muted text-content hover:bg-surface-secondary"
-            >
-              <Users size={12} className="text-content-muted" />
-              <span className="truncate max-w-[100px]">{getSelectedLabel(filterOptions.genders, genderFilter)}</span>
-              <ChevronDown size={11} className={`transition-transform text-content-muted ${openCategoryDropdown === 'genderFilter' ? 'rotate-180' : ''}`} />
-            </button>
-            {openCategoryDropdown === 'genderFilter' && (
-              <div className="absolute top-full left-0 mt-1 w-full border rounded-lg shadow-md z-50 overflow-hidden bg-white border-border-muted">
-                {filterOptions.genders.map(option => (
-                  <div key={option.id} onClick={() => handleGenderFilterChange(option.id)}
-                    className="px-3 py-2 flex items-center gap-2 cursor-pointer text-xs transition-colors hover:bg-surface-secondary">
-                    <span className={genderFilter === option.id ? 'text-dafc-gold font-semibold' : 'text-content'}>{option.name}</span>
-                    {genderFilter === option.id && <Check size={12} className="text-dafc-gold ml-auto" />}
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Category Filter */}
-          <div className="relative" ref={setDropdownRef('categoryFilter')}>
-            <button
-              type="button"
-              onClick={() => {
-                setOpenCategoryDropdown((prev) => (prev === 'categoryFilter' ? null : 'categoryFilter'));
-                setOpenDropdown(null);
-              }}
-              className="flex items-center gap-1.5 px-2.5 py-1 border rounded-md transition-all text-[11px] font-medium bg-white border-border-muted text-content hover:bg-surface-secondary"
-            >
-              <Tag size={12} className="text-content-muted" />
-              <span className="truncate max-w-[120px]">{getSelectedLabel(filterOptions.categories, categoryFilter)}</span>
-              <ChevronDown size={11} className={`transition-transform text-content-muted ${openCategoryDropdown === 'categoryFilter' ? 'rotate-180' : ''}`} />
-            </button>
-            {openCategoryDropdown === 'categoryFilter' && (
-              <div className="absolute top-full left-0 mt-1 min-w-full border rounded-lg shadow-md z-50 overflow-hidden max-h-[300px] overflow-y-auto bg-white border-border-muted">
-                {filteredCategoryOptions.map(option => (
-                  <div key={option.id} onClick={() => handleCategoryFilterChange(option.id)}
-                    className="px-3 py-2 flex items-center gap-2 cursor-pointer text-xs transition-colors hover:bg-surface-secondary">
-                    <span className={categoryFilter === option.id ? 'text-dafc-gold font-semibold' : 'text-content'}>{option.name}</span>
-                    {categoryFilter === option.id && <Check size={12} className="text-dafc-gold ml-auto" />}
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Sub-Category Filter */}
-          <div className="relative" ref={setDropdownRef('subCategoryFilter')}>
-            <button
-              type="button"
-              onClick={() => {
-                setOpenCategoryDropdown((prev) => (prev === 'subCategoryFilter' ? null : 'subCategoryFilter'));
-                setOpenDropdown(null);
-              }}
-              className="flex items-center gap-1.5 px-2.5 py-1 border rounded-md transition-all text-[11px] font-medium bg-white border-border-muted text-content hover:bg-surface-secondary"
-            >
-              <Layers size={12} className="text-content-muted" />
-              <span className="truncate max-w-[120px]">{getSelectedLabel(filterOptions.subCategories, subCategoryFilter)}</span>
-              <ChevronDown size={11} className={`transition-transform text-content-muted ${openCategoryDropdown === 'subCategoryFilter' ? 'rotate-180' : ''}`} />
-            </button>
-            {openCategoryDropdown === 'subCategoryFilter' && (
-              <div className="absolute top-full left-0 mt-1 min-w-full border rounded-lg shadow-md z-50 overflow-hidden max-h-[300px] overflow-y-auto bg-white border-border-muted">
-                {filteredSubCategoryOptions.map(option => (
-                  <div key={option.id} onClick={() => handleSubCategoryFilterChange(option.id)}
-                    className="px-3 py-2 flex items-center gap-2 cursor-pointer text-xs transition-colors hover:bg-surface-secondary">
-                    <span className={subCategoryFilter === option.id ? 'text-[#1B6B45] font-semibold' : 'text-content'}>{option.name}</span>
-                    {subCategoryFilter === option.id && <Check size={12} className="text-[#1B6B45] ml-auto" />}
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Clear Filters */}
-          {(genderFilter !== 'all' || categoryFilter !== 'all' || subCategoryFilter !== 'all') && (
-            <button
-              onClick={() => { setGenderFilter('all'); setCategoryFilter('all'); setSubCategoryFilter('all'); }}
-              className="flex items-center gap-1 text-[10px] font-medium transition-colors text-content-muted hover:text-content shrink-0"
-            >
-              <X size={10} />
-              {t('common.clearAll')}
-            </button>
-          )}
-        </div>
-
-        {/* Hierarchical Content */}
+      <div className="px-4 pb-4 space-y-3">
         {filteredData.map((genderGroup) => {
           const genderTotals = calculateGenderTotals(genderGroup);
           const isGenderExpanded = expandedGenders[genderGroup.gender.id];
@@ -1102,365 +1025,428 @@ const OTBAnalysisScreen = ({ otbContext, onOpenSkuProposal, darkMode = false }) 
   };
 
   return (
-    <div className="space-y-3 md:space-y-6">
-      {/* Budget Filter Section */}
-      <div className="relative z-[100]">
-          <div className="bg-white rounded-xl border border-border-muted">
-            {/* Filter Controls — single compact row */}
-            <div className="px-3 py-1.5 relative z-[100]">
-              <div className="flex flex-wrap items-center gap-1.5">
-                {/* Budget Name Dropdown */}
-                <div className="relative" ref={setDropdownRef('budget')}>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setOpenDropdown((prev) => (prev === 'budget' ? null : 'budget'));
-                      setOpenCategoryDropdown(null);
-                    }}
-                    className={`px-2.5 py-1 border rounded-md cursor-pointer flex items-center gap-1.5 text-[11px] font-medium transition-all ${
-                      selectedBudget
-                        ? 'bg-dafc-gold/10 border-dafc-gold/40 text-[#8A6340]'
-                        : 'bg-white border-border-muted text-content hover:bg-surface-secondary'
-                    }`}
-                  >
-                    <FileText size={12} className={selectedBudget ? 'text-dafc-gold' : 'text-content-muted'} />
-                    <span className="truncate max-w-[160px]">{selectedBudget?.budgetName || t('otbAnalysis.selectBudget')}</span>
-                    <ChevronDown size={11} className={`shrink-0 transition-transform duration-200 ${openDropdown === 'budget' ? 'rotate-180' : ''}`} />
-                  </button>
-                  {openDropdown === 'budget' && (
-                    <div className="absolute top-full left-0 mt-1 border rounded-xl shadow-xl z-[9999] overflow-hidden min-w-[300px] bg-white border-[#E8E2DB]">
-                      <div className="p-2 border-b bg-[#FBF9F7] border-[#E8E2DB]">
-                        <span className="text-xs font-semibold uppercase tracking-wide font-brand text-[#6B5D4F]">{t('budget.title')}</span>
-                      </div>
-                      <div className="max-h-72 overflow-y-auto py-1">
-                        {/* Loading state */}
-                        {loadingBudgets && (
-                          <div className="px-4 py-6 flex items-center justify-center">
-                            <div className="w-5 h-5 border-2 border-[#C4975A]/30 border-t-[#C4975A] rounded-full animate-spin" />
-                            <span className="ml-2 text-sm text-[#8C8178]">{t('common.loading')}...</span>
-                          </div>
-                        )}
-                        {/* Empty state */}
-                        {!loadingBudgets && apiBudgets.length === 0 && (
-                          <div className="px-4 py-6 text-center text-sm text-[#8C8178]">
-                            {t('budget.noMatchingBudgets')}
-                          </div>
-                        )}
-                        {!loadingBudgets && apiBudgets.length > 0 && (
-                        <div
-                          onClick={() => { setSelectedBudgetId('all'); setOpenDropdown(null); }}
-                          className={`px-4 py-2.5 flex items-center justify-between cursor-pointer text-sm transition-colors ${
-                            selectedBudgetId === 'all'
-                              ? 'bg-[rgba(160,120,75,0.18)] text-[#8A6340]'
-                              : 'hover:bg-[#FBF9F7] text-[#6B5D4F]'
-                          }`}
-                        >
-                          <span className="font-medium">{t('otbAnalysis.selectBudget')}</span>
-                          {selectedBudgetId === 'all' && <Check size={14} className="text-[#C4975A]" />}
-                        </div>
-                        )}
-                        {!loadingBudgets && apiBudgets.map((budget) => (
-                          <div
-                            key={budget.id}
-                            onClick={() => {
-                              setSelectedBudgetId(budget.id);
-                              if (budget.seasonGroup) setSelectedSeasonGroup(budget.seasonGroup);
-                              if (budget.seasonType) setSelectedSeason(budget.seasonType);
-                              setOpenDropdown(null);
-                            }}
-                            className={`px-4 py-3 cursor-pointer transition-colors border-t border-[#E8E2DB] ${
-                              selectedBudgetId === budget.id
-                                ? 'bg-[rgba(160,120,75,0.18)]'
-                                : 'hover:bg-[#FBF9F7]'
-                            }`}
-                          >
-                            <div className="flex items-start justify-between">
-                              <div className="min-w-0 flex-1">
-                                <div className={`font-semibold text-sm ${selectedBudgetId === budget.id ? 'text-[#C4975A]' : 'text-[#2C2417]'}`}>
-                                  {budget.budgetName}
-                                </div>
-                                <div className="flex items-center gap-2 mt-1">
-                                  <span className="text-xs text-[#6B5D4F]">FY{budget.fiscalYear}</span>
-                                  <span className="text-[#E8E2DB]">-</span>
-                                  <span className="text-xs text-[#6B5D4F]">{budget.brandName}</span>
-                                  <span className="text-[#E8E2DB]">-</span>
-                                  <span className="text-xs font-medium text-[#C4975A] font-data">{formatCurrency(budget.totalBudget)}</span>
-                                </div>
-                              </div>
-                              {selectedBudgetId === budget.id && (
-                                <div className="w-5 h-5 rounded-full bg-[#C4975A] flex items-center justify-center flex-shrink-0 ml-2">
-                                  <Check size={12} className="text-white" strokeWidth={3} />
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                <div className="h-4 w-px hidden sm:block bg-border-muted"></div>
-
-                {/* Season Group Filter */}
-                <div className="relative" ref={setDropdownRef('seasonGroup')}>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setOpenDropdown((prev) => (prev === 'seasonGroup' ? null : 'seasonGroup'));
-                      setOpenCategoryDropdown(null);
-                    }}
-                    className={`px-2.5 py-1 border rounded-md cursor-pointer flex items-center gap-1.5 text-[11px] font-medium transition-all ${
-                      selectedSeasonGroup !== 'all'
-                        ? 'bg-dafc-gold/10 border-dafc-gold/40 text-[#8A6340]'
-                        : 'bg-white border-border-muted text-content hover:bg-surface-secondary'
-                    }`}
-                  >
-                    <Calendar size={12} className={selectedSeasonGroup !== 'all' ? 'text-dafc-gold' : 'text-content-muted'} />
-                    <span>{SEASON_GROUPS.find(s => s.id === selectedSeasonGroup)?.label || t('otbAnalysis.seasonGroup')}</span>
-                    <ChevronDown size={11} className={`shrink-0 transition-transform duration-200 ${openDropdown === 'seasonGroup' ? 'rotate-180' : ''}`} />
-                  </button>
-                  {openDropdown === 'seasonGroup' && (
-                    <div className="absolute top-full left-0 right-0 mt-1 border rounded-lg shadow-lg z-[9999] overflow-hidden bg-white border-[#E8E2DB]">
-                      {SEASON_GROUPS.map((season) => (
-                        <div
-                          key={season.id}
-                          onClick={() => { setSelectedSeasonGroup(season.id); setOpenDropdown(null); }}
-                          className={`px-3 py-2.5 flex items-center justify-between cursor-pointer text-sm transition-colors ${
-                            selectedSeasonGroup === season.id
-                              ? 'bg-[rgba(160,120,75,0.18)] text-[#8A6340]'
-                              : 'hover:bg-[#FBF9F7] text-[#2C2417]'
-                          }`}
-                        >
-                          <span className="font-medium">{season.label}</span>
-                          {selectedSeasonGroup === season.id && <Check size={14} className="text-[#C4975A]" />}
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-
-                {/* Season Filter */}
-                <div className="relative" ref={setDropdownRef('season')}>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setOpenDropdown((prev) => (prev === 'season' ? null : 'season'));
-                      setOpenCategoryDropdown(null);
-                    }}
-                    className={`px-2.5 py-1 border rounded-md cursor-pointer flex items-center gap-1.5 text-[11px] font-medium transition-all ${
-                      selectedSeason !== 'all'
-                        ? 'bg-dafc-gold/10 border-dafc-gold/40 text-[#8A6340]'
-                        : 'bg-white border-border-muted text-content hover:bg-surface-secondary'
-                    }`}
-                  >
-                    <Clock size={12} className={selectedSeason !== 'all' ? 'text-dafc-gold' : 'text-content-muted'} />
-                    <span>{SEASONS.find(s => s.id === selectedSeason)?.label || t('otbAnalysis.season')}</span>
-                    <ChevronDown size={11} className={`shrink-0 transition-transform duration-200 ${openDropdown === 'season' ? 'rotate-180' : ''}`} />
-                  </button>
-                  {openDropdown === 'season' && (
-                    <div className="absolute top-full left-0 right-0 mt-1 border rounded-lg shadow-lg z-[9999] overflow-hidden bg-white border-[#E8E2DB]">
-                      {SEASONS.map((season) => (
-                        <div
-                          key={season.id}
-                          onClick={() => { setSelectedSeason(season.id); setOpenDropdown(null); }}
-                          className={`px-3 py-2.5 flex items-center justify-between cursor-pointer text-sm transition-colors ${
-                            selectedSeason === season.id
-                              ? 'bg-[rgba(160,120,75,0.18)] text-[#8A6340]'
-                              : 'hover:bg-[#FBF9F7] text-[#2C2417]'
-                          }`}
-                        >
-                          <span className="font-medium">{season.label}</span>
-                          {selectedSeason === season.id && <Check size={14} className="text-[#C4975A]" />}
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-
-                {/* Version Filter */}
-                {selectedBudgetId && selectedBudgetId !== 'all' && (
-                <>
-                <div className="h-4 w-px hidden sm:block bg-border-muted"></div>
-                <div className="relative" ref={setDropdownRef('version')}>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setOpenDropdown((prev) => (prev === 'version' ? null : 'version'));
-                      setOpenCategoryDropdown(null);
-                    }}
-                    disabled={versions.length === 0 && !loadingVersions}
-                    className={`px-2.5 py-1 border rounded-md cursor-pointer flex items-center gap-1.5 text-[11px] font-medium transition-all ${
-                      versions.length === 0 && !loadingVersions
-                        ? 'bg-surface-secondary border-border-muted text-content-muted cursor-not-allowed opacity-50'
-                        : selectedVersion
-                          ? selectedVersion.isFinal
-                            ? 'bg-dafc-gold/15 border-dafc-gold text-[#8A6340]'
-                            : 'bg-dafc-gold/10 border-dafc-gold/40 text-[#8A6340]'
-                          : 'bg-white border-border-muted text-content hover:bg-surface-secondary'
-                    }`}
-                  >
-                    {selectedVersion?.isFinal ? (
-                      <Star size={12} className="text-dafc-gold fill-dafc-gold" />
-                    ) : (
-                      <Sparkles size={12} className={selectedVersion ? 'text-dafc-gold' : 'text-content-muted'} />
-                    )}
-                    <span className="truncate max-w-[140px]">
-                      {loadingVersions ? `${t('common.loading')}...` : selectedVersion ? selectedVersion.name : t('common.version')}
-                    </span>
-                    {selectedVersion?.isFinal && (
-                      <span className="px-1 py-px text-[8px] font-bold bg-dafc-gold text-white rounded leading-none">FINAL</span>
-                    )}
-                    <ChevronDown size={11} className={`shrink-0 transition-transform duration-200 ${openDropdown === 'version' ? 'rotate-180' : ''}`} />
-                  </button>
-                  {openDropdown === 'version' && (
-                    <div className="absolute top-full left-0 mt-1 border rounded-xl shadow-xl z-[9999] overflow-hidden min-w-[300px] bg-white border-[#E8E2DB]">
-                      <div className="p-2 border-b bg-[#FBF9F7] border-[#E8E2DB]">
-                        <span className="text-xs font-semibold uppercase tracking-wide font-brand text-[#6B5D4F]">Planning Versions</span>
-                      </div>
-                      <div className="max-h-60 overflow-y-auto py-1">
-                        {loadingVersions && (
-                          <div className="px-4 py-6 flex items-center justify-center">
-                            <div className="w-5 h-5 border-2 border-[#C4975A]/30 border-t-[#C4975A] rounded-full animate-spin" />
-                            <span className="ml-2 text-sm text-[#8C8178]">{t('common.loading')}...</span>
-                          </div>
-                        )}
-                        {!loadingVersions && versions.length === 0 && (
-                          <div className="px-4 py-6 text-center text-sm text-[#8C8178]">
-                            {t('planning.noVersions')}
-                          </div>
-                        )}
-                        {!loadingVersions && versions.map((version) => (
-                          <div
-                            key={version.id}
-                            onClick={() => { setSelectedVersionId(version.id); setOpenDropdown(null); }}
-                            className={`px-4 py-3 cursor-pointer transition-colors border-t border-[#E8E2DB] ${
-                              selectedVersionId === version.id
-                                ? 'bg-[rgba(160,120,75,0.18)]'
-                                : 'hover:bg-[#FBF9F7]'
-                            }`}
-                          >
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-2 min-w-0 flex-1">
-                                {version.isFinal && <Star size={14} className="text-[#C4975A] fill-[#C4975A] flex-shrink-0" />}
-                                <span className={`font-semibold text-sm font-brand truncate ${selectedVersionId === version.id ? 'text-[#C4975A]' : 'text-[#2C2417]'}`}>
-                                  {version.name}
-                                </span>
-                                {version.isFinal && (
-                                  <span className="px-1.5 py-0.5 text-[10px] font-bold bg-[#C4975A] text-white rounded flex-shrink-0">FINAL</span>
-                                )}
-                                <span className={`text-xs px-1.5 py-0.5 rounded flex-shrink-0 ${
-                                  version.status === 'APPROVED' ? 'bg-[rgba(27,107,69,0.15)] text-[#1B6B45]' :
-                                  version.status === 'SUBMITTED' ? 'bg-[rgba(217,119,6,0.15)] text-[#D97706]' :
-                                  'bg-[#FBF9F7] text-[#8C8178]'
-                                }`}>{version.status}</span>
-                              </div>
-                              <div className="flex items-center gap-2 flex-shrink-0 ml-2">
-                                {!version.isFinal && (
-                                  <button
-                                    onClick={(e) => handleSetFinalVersion(version.id, e)}
-                                    className="px-2 py-1 text-xs font-medium rounded transition-colors bg-[rgba(215,183,151,0.2)] text-[#8A6340] hover:bg-[rgba(215,183,151,0.35)]"
-                                  >
-                                    {t('planning.latestVersion')}
-                                  </button>
-                                )}
-                                {selectedVersionId === version.id && <Check size={14} className="text-[#C4975A]" />}
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-                </>
-                )}
-
-                {/* Budget Context Card */}
-                {((selectedBudget  && selectedSeasonGroup && selectedSeason) || budgetContext) && (
-                  <>
-                    <div className="h-4 w-px hidden sm:block bg-border-muted"></div>
-                    <div className="flex items-center gap-2.5 px-2.5 py-1 rounded-md border border-dafc-gold/30 bg-dafc-gold/5">
-                      <div className="flex flex-col">
-                        <span className="text-[11px] font-semibold font-brand truncate max-w-[130px] text-[#8A6340]">
-                          {selectedBudget?.budgetName || budgetContext?.budgetName || 'Budget'}
-                        </span>
-                        <span className="text-[10px] text-[#8A6340]/70">
-                          FY {selectedBudget?.fiscalYear || budgetContext?.fiscalYear} - {selectedBudget?.brandName || budgetContext?.brandName || 'Brand'}
-                        </span>
-                      </div>
-                      <div className="w-px h-6 bg-dafc-gold/30"></div>
-                      <div className="flex flex-col items-end">
-                        <span className="text-[11px] font-bold font-data text-[#8A6340]">
-                          {formatCurrency(
-                            budgetContext?.rex || budgetContext?.ttp
-                              ? (budgetContext.rex || 0) + (budgetContext.ttp || 0)
-                              : selectedBudget?.totalBudget || 0
-                          )}
-                        </span>
-                        <div className="flex items-center gap-2 text-[10px] font-data text-[#8A6340]/70">
-                          {budgetContext?.rex || budgetContext?.ttp ? (
-                            <>
-                              <span>Rex: {formatCurrency(budgetContext?.rex || 0)}</span>
-                              <span>TTP: {formatCurrency(budgetContext?.ttp || 0)}</span>
-                            </>
-                          ) : selectedBudget?.details?.length > 0 ? (
-                            selectedBudget.details.map(d => (
-                              <span key={d.id || d.store?.code}>{d.store?.code || d.storeCode}: {formatCurrency(Number(d.budgetAmount) || 0)}</span>
-                            ))
-                          ) : (
-                            <span>{t('otbAnalysis.totalBudget')}</span>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </>
-                )}
-              </div>
-            </div>
-          </div>
-      </div>
-
-      {/* Tabs & Content */}
-      {selectedBudget && selectedSeason && selectedSeasonGroup && (
-      <div className="rounded-xl border overflow-hidden bg-white border-border-muted">
-        {/* Tabs */}
-        <div className="border-b px-3 overflow-x-auto border-border-muted bg-surface-secondary">
-          <div className="flex gap-0.5">
-            {TABS.map(tab => {
-              const Icon = tab.icon;
-              const isActive = activeTab === tab.id;
-              return (
+    <div className="space-y-0">
+      {/* Unified Header: Filters + Budget Context + Tabs */}
+      <div className="relative z-[100] bg-white rounded-xl border border-border-muted overflow-hidden">
+        {/* Row 1: Filters + Budget Summary */}
+        <div className="px-3 py-1.5 relative z-[100] border-b border-[#E8E2DB]/60">
+          <div className="flex items-center justify-between gap-2">
+            {/* Left: Filter Controls */}
+            <div className="flex flex-wrap items-center gap-1.5 min-w-0">
+              {/* Budget Name Dropdown */}
+              <div className="relative" ref={setDropdownRef('budget')}>
                 <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`px-3 py-2 text-[11px] font-medium font-brand flex items-center gap-1.5 border-b-2 transition-all duration-200 ${
-                    isActive
-                      ? 'border-dafc-gold text-[#8A6340] bg-white -mb-px rounded-t-md'
-                      : 'border-transparent text-content-muted hover:text-content hover:bg-white/50 rounded-t-md'
+                  type="button"
+                  onClick={() => {
+                    setOpenDropdown((prev) => (prev === 'budget' ? null : 'budget'));
+                    setOpenCategoryDropdown(null);
+                  }}
+                  className={`px-2.5 py-1 border rounded-md cursor-pointer flex items-center gap-1.5 text-[11px] font-medium transition-all ${
+                    selectedBudget
+                      ? 'bg-dafc-gold/10 border-dafc-gold/40 text-[#8A6340]'
+                      : 'bg-white border-border-muted text-content hover:bg-surface-secondary'
                   }`}
                 >
-                  <Icon size={12} />
-                  {tab.label}
+                  <FileText size={12} className={selectedBudget ? 'text-dafc-gold' : 'text-content-muted'} />
+                  <span className="truncate max-w-[160px]">{selectedBudget?.budgetName || t('otbAnalysis.selectBudget')}</span>
+                  <ChevronDown size={11} className={`shrink-0 transition-transform duration-200 ${openDropdown === 'budget' ? 'rotate-180' : ''}`} />
                 </button>
-              );
-            })}
+                {openDropdown === 'budget' && (
+                  <div className="absolute top-full left-0 mt-1 border rounded-xl shadow-xl z-[9999] overflow-hidden min-w-[300px] bg-white border-[#E8E2DB]">
+                    <div className="p-2 border-b bg-[#FBF9F7] border-[#E8E2DB]">
+                      <span className="text-xs font-semibold uppercase tracking-wide font-brand text-[#6B5D4F]">{t('budget.title')}</span>
+                    </div>
+                    <div className="max-h-72 overflow-y-auto py-1">
+                      {loadingBudgets && (
+                        <div className="px-4 py-6 flex items-center justify-center">
+                          <div className="w-5 h-5 border-2 border-[#C4975A]/30 border-t-[#C4975A] rounded-full animate-spin" />
+                          <span className="ml-2 text-sm text-[#8C8178]">{t('common.loading')}...</span>
+                        </div>
+                      )}
+                      {!loadingBudgets && apiBudgets.length === 0 && (
+                        <div className="px-4 py-6 text-center text-sm text-[#8C8178]">
+                          {t('budget.noMatchingBudgets')}
+                        </div>
+                      )}
+                      {!loadingBudgets && apiBudgets.length > 0 && (
+                      <div
+                        onClick={() => { setSelectedBudgetId('all'); setOpenDropdown(null); }}
+                        className={`px-4 py-2.5 flex items-center justify-between cursor-pointer text-sm transition-colors ${
+                          selectedBudgetId === 'all'
+                            ? 'bg-[rgba(160,120,75,0.18)] text-[#8A6340]'
+                            : 'hover:bg-[#FBF9F7] text-[#6B5D4F]'
+                        }`}
+                      >
+                        <span className="font-medium">{t('otbAnalysis.selectBudget')}</span>
+                        {selectedBudgetId === 'all' && <Check size={14} className="text-[#C4975A]" />}
+                      </div>
+                      )}
+                      {!loadingBudgets && apiBudgets.map((budget) => (
+                        <div
+                          key={budget.id}
+                          onClick={() => {
+                            setSelectedBudgetId(budget.id);
+                            if (budget.seasonGroup) setSelectedSeasonGroup(budget.seasonGroup);
+                            if (budget.seasonType) setSelectedSeason(budget.seasonType);
+                            setOpenDropdown(null);
+                          }}
+                          className={`px-4 py-3 cursor-pointer transition-colors border-t border-[#E8E2DB] ${
+                            selectedBudgetId === budget.id
+                              ? 'bg-[rgba(160,120,75,0.18)]'
+                              : 'hover:bg-[#FBF9F7]'
+                          }`}
+                        >
+                          <div className="flex items-start justify-between">
+                            <div className="min-w-0 flex-1">
+                              <div className={`font-semibold text-sm ${selectedBudgetId === budget.id ? 'text-[#C4975A]' : 'text-[#2C2417]'}`}>
+                                {budget.budgetName}
+                              </div>
+                              <div className="flex items-center gap-2 mt-1">
+                                <span className="text-xs text-[#6B5D4F]">FY{budget.fiscalYear}</span>
+                                <span className="text-[#E8E2DB]">-</span>
+                                <span className="text-xs text-[#6B5D4F]">{budget.brandName}</span>
+                                <span className="text-[#E8E2DB]">-</span>
+                                <span className="text-xs font-medium text-[#C4975A] font-data">{formatCurrency(budget.totalBudget)}</span>
+                              </div>
+                            </div>
+                            {selectedBudgetId === budget.id && (
+                              <div className="w-5 h-5 rounded-full bg-[#C4975A] flex items-center justify-center flex-shrink-0 ml-2">
+                                <Check size={12} className="text-white" strokeWidth={3} />
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div className="h-4 w-px hidden sm:block bg-border-muted"></div>
+
+              {/* Season Group Filter */}
+              <div className="relative" ref={setDropdownRef('seasonGroup')}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setOpenDropdown((prev) => (prev === 'seasonGroup' ? null : 'seasonGroup'));
+                    setOpenCategoryDropdown(null);
+                  }}
+                  className={`px-2.5 py-1 border rounded-md cursor-pointer flex items-center gap-1.5 text-[11px] font-medium transition-all ${
+                    selectedSeasonGroup !== 'all'
+                      ? 'bg-dafc-gold/10 border-dafc-gold/40 text-[#8A6340]'
+                      : 'bg-white border-border-muted text-content hover:bg-surface-secondary'
+                  }`}
+                >
+                  <Calendar size={12} className={selectedSeasonGroup !== 'all' ? 'text-dafc-gold' : 'text-content-muted'} />
+                  <span>{SEASON_GROUPS.find(s => s.id === selectedSeasonGroup)?.label || t('otbAnalysis.seasonGroup')}</span>
+                  <ChevronDown size={11} className={`shrink-0 transition-transform duration-200 ${openDropdown === 'seasonGroup' ? 'rotate-180' : ''}`} />
+                </button>
+                {openDropdown === 'seasonGroup' && (
+                  <div className="absolute top-full left-0 right-0 mt-1 border rounded-lg shadow-lg z-[9999] overflow-hidden bg-white border-[#E8E2DB]">
+                    {SEASON_GROUPS.map((season) => (
+                      <div
+                        key={season.id}
+                        onClick={() => { setSelectedSeasonGroup(season.id); setOpenDropdown(null); }}
+                        className={`px-3 py-2.5 flex items-center justify-between cursor-pointer text-sm transition-colors ${
+                          selectedSeasonGroup === season.id
+                            ? 'bg-[rgba(160,120,75,0.18)] text-[#8A6340]'
+                            : 'hover:bg-[#FBF9F7] text-[#2C2417]'
+                        }`}
+                      >
+                        <span className="font-medium">{season.label}</span>
+                        {selectedSeasonGroup === season.id && <Check size={14} className="text-[#C4975A]" />}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Season Filter */}
+              <div className="relative" ref={setDropdownRef('season')}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setOpenDropdown((prev) => (prev === 'season' ? null : 'season'));
+                    setOpenCategoryDropdown(null);
+                  }}
+                  className={`px-2.5 py-1 border rounded-md cursor-pointer flex items-center gap-1.5 text-[11px] font-medium transition-all ${
+                    selectedSeason !== 'all'
+                      ? 'bg-dafc-gold/10 border-dafc-gold/40 text-[#8A6340]'
+                      : 'bg-white border-border-muted text-content hover:bg-surface-secondary'
+                  }`}
+                >
+                  <Clock size={12} className={selectedSeason !== 'all' ? 'text-dafc-gold' : 'text-content-muted'} />
+                  <span>{SEASONS.find(s => s.id === selectedSeason)?.label || t('otbAnalysis.season')}</span>
+                  <ChevronDown size={11} className={`shrink-0 transition-transform duration-200 ${openDropdown === 'season' ? 'rotate-180' : ''}`} />
+                </button>
+                {openDropdown === 'season' && (
+                  <div className="absolute top-full left-0 right-0 mt-1 border rounded-lg shadow-lg z-[9999] overflow-hidden bg-white border-[#E8E2DB]">
+                    {SEASONS.map((season) => (
+                      <div
+                        key={season.id}
+                        onClick={() => { setSelectedSeason(season.id); setOpenDropdown(null); }}
+                        className={`px-3 py-2.5 flex items-center justify-between cursor-pointer text-sm transition-colors ${
+                          selectedSeason === season.id
+                            ? 'bg-[rgba(160,120,75,0.18)] text-[#8A6340]'
+                            : 'hover:bg-[#FBF9F7] text-[#2C2417]'
+                        }`}
+                      >
+                        <span className="font-medium">{season.label}</span>
+                        {selectedSeason === season.id && <Check size={14} className="text-[#C4975A]" />}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Version Filter */}
+              {selectedBudgetId && selectedBudgetId !== 'all' && (
+              <>
+              <div className="h-4 w-px hidden sm:block bg-border-muted"></div>
+              <div className="relative" ref={setDropdownRef('version')}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setOpenDropdown((prev) => (prev === 'version' ? null : 'version'));
+                    setOpenCategoryDropdown(null);
+                  }}
+                  disabled={versions.length === 0 && !loadingVersions}
+                  className={`px-2.5 py-1 border rounded-md cursor-pointer flex items-center gap-1.5 text-[11px] font-medium transition-all ${
+                    versions.length === 0 && !loadingVersions
+                      ? 'bg-surface-secondary border-border-muted text-content-muted cursor-not-allowed opacity-50'
+                      : selectedVersion
+                        ? selectedVersion.isFinal
+                          ? 'bg-dafc-gold/15 border-dafc-gold text-[#8A6340]'
+                          : 'bg-dafc-gold/10 border-dafc-gold/40 text-[#8A6340]'
+                        : 'bg-white border-border-muted text-content hover:bg-surface-secondary'
+                  }`}
+                >
+                  {selectedVersion?.isFinal ? (
+                    <Star size={12} className="text-dafc-gold fill-dafc-gold" />
+                  ) : (
+                    <Sparkles size={12} className={selectedVersion ? 'text-dafc-gold' : 'text-content-muted'} />
+                  )}
+                  <span className="truncate max-w-[140px]">
+                    {loadingVersions ? `${t('common.loading')}...` : selectedVersion ? selectedVersion.name : t('common.version')}
+                  </span>
+                  {selectedVersion?.isFinal && (
+                    <span className="px-1 py-px text-[8px] font-bold bg-dafc-gold text-white rounded leading-none">FINAL</span>
+                  )}
+                  <ChevronDown size={11} className={`shrink-0 transition-transform duration-200 ${openDropdown === 'version' ? 'rotate-180' : ''}`} />
+                </button>
+                {openDropdown === 'version' && (
+                  <div className="absolute top-full left-0 mt-1 border rounded-xl shadow-xl z-[9999] overflow-hidden min-w-[300px] bg-white border-[#E8E2DB]">
+                    <div className="p-2 border-b bg-[#FBF9F7] border-[#E8E2DB]">
+                      <span className="text-xs font-semibold uppercase tracking-wide font-brand text-[#6B5D4F]">Planning Versions</span>
+                    </div>
+                    <div className="max-h-60 overflow-y-auto py-1">
+                      {loadingVersions && (
+                        <div className="px-4 py-6 flex items-center justify-center">
+                          <div className="w-5 h-5 border-2 border-[#C4975A]/30 border-t-[#C4975A] rounded-full animate-spin" />
+                          <span className="ml-2 text-sm text-[#8C8178]">{t('common.loading')}...</span>
+                        </div>
+                      )}
+                      {!loadingVersions && versions.length === 0 && (
+                        <div className="px-4 py-6 text-center text-sm text-[#8C8178]">
+                          {t('planning.noVersions')}
+                        </div>
+                      )}
+                      {!loadingVersions && versions.map((version) => (
+                        <div
+                          key={version.id}
+                          onClick={() => { setSelectedVersionId(version.id); setOpenDropdown(null); }}
+                          className={`px-4 py-3 cursor-pointer transition-colors border-t border-[#E8E2DB] ${
+                            selectedVersionId === version.id
+                              ? 'bg-[rgba(160,120,75,0.18)]'
+                              : 'hover:bg-[#FBF9F7]'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2 min-w-0 flex-1">
+                              {version.isFinal && <Star size={14} className="text-[#C4975A] fill-[#C4975A] flex-shrink-0" />}
+                              <span className={`font-semibold text-sm font-brand truncate ${selectedVersionId === version.id ? 'text-[#C4975A]' : 'text-[#2C2417]'}`}>
+                                {version.name}
+                              </span>
+                              {version.isFinal && (
+                                <span className="px-1.5 py-0.5 text-[10px] font-bold bg-[#C4975A] text-white rounded flex-shrink-0">FINAL</span>
+                              )}
+                              <span className={`text-xs px-1.5 py-0.5 rounded flex-shrink-0 ${
+                                version.status === 'APPROVED' ? 'bg-[rgba(27,107,69,0.15)] text-[#1B6B45]' :
+                                version.status === 'SUBMITTED' ? 'bg-[rgba(217,119,6,0.15)] text-[#D97706]' :
+                                'bg-[#FBF9F7] text-[#8C8178]'
+                              }`}>{version.status}</span>
+                            </div>
+                            <div className="flex items-center gap-2 flex-shrink-0 ml-2">
+                              {!version.isFinal && (
+                                <button
+                                  onClick={(e) => handleSetFinalVersion(version.id, e)}
+                                  className="px-2 py-1 text-xs font-medium rounded transition-colors bg-[rgba(215,183,151,0.2)] text-[#8A6340] hover:bg-[rgba(215,183,151,0.35)]"
+                                >
+                                  {t('planning.latestVersion')}
+                                </button>
+                              )}
+                              {selectedVersionId === version.id && <Check size={14} className="text-[#C4975A]" />}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+              </>
+              )}
+            </div>
+
+            {/* Right: Budget Summary (inline) */}
+            {((selectedBudget && selectedSeasonGroup && selectedSeason) || budgetContext) && (
+              <div className="hidden sm:flex items-center gap-2 pl-3 border-l border-[#E8E2DB]/60 flex-shrink-0">
+                <div className="text-right">
+                  <div className="text-[11px] font-semibold font-brand text-[#8A6340] truncate max-w-[120px]">
+                    {selectedBudget?.budgetName || budgetContext?.budgetName || 'Budget'}
+                  </div>
+                  <div className="text-[10px] text-[#8A6340]/60">
+                    FY {selectedBudget?.fiscalYear || budgetContext?.fiscalYear} · {selectedBudget?.brandName || budgetContext?.brandName || 'Brand'}
+                  </div>
+                </div>
+                <span className="text-sm font-bold font-data text-[#8A6340]">
+                  {formatCurrency(
+                    budgetContext?.rex || budgetContext?.ttp
+                      ? (budgetContext.rex || 0) + (budgetContext.ttp || 0)
+                      : selectedBudget?.totalBudget || 0
+                  )}
+                </span>
+              </div>
+            )}
           </div>
         </div>
 
-        {/* Hint for editable cells */}
-        <div className="px-3 py-1.5 border-b flex items-center gap-1.5 text-[10px] bg-dafc-gold/8 border-dafc-gold/15 text-[#8A6340]">
-          <Pencil size={10} className="animate-bounce" style={{ animationDuration: '2s' }} />
-          <span>Click on cells with gold background in "% Buy Proposed" column to edit</span>
-        </div>
+        {/* Row 2: Tabs + Category Filters (inline) + Edit Hint */}
+        {selectedBudget && selectedSeason && selectedSeasonGroup && (
+          <div className="flex items-center px-3 border-b border-[#E8E2DB]/60 bg-[#FBF9F7]/50">
+            <div className="flex gap-0.5 shrink-0">
+              {TABS.map(tab => {
+                const Icon = tab.icon;
+                const isActive = activeTab === tab.id;
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`px-3 py-2 text-[11px] font-medium font-brand flex items-center gap-1.5 border-b-2 transition-all duration-200 ${
+                      isActive
+                        ? 'border-dafc-gold text-[#8A6340] bg-white -mb-px rounded-t-md'
+                        : 'border-transparent text-content-muted hover:text-content hover:bg-white/50 rounded-t-md'
+                    }`}
+                  >
+                    <Icon size={12} />
+                    {tab.label}
+                  </button>
+                );
+              })}
+            </div>
 
-        {/* Content */}
-        <div className="max-h-[calc(100vh-350px)] overflow-y-auto">
-          {activeTab === 'collection' && renderCollectionTab()}
-          {activeTab === 'gender' && renderGenderTab()}
-          {activeTab === 'category' && renderCategoryTab()}
-        </div>
+            {/* Inline Category Filters — visible only when Category tab active */}
+            {activeTab === 'category' && (
+              <>
+                <div className="w-px h-5 bg-[#E8E2DB] mx-2 shrink-0" />
+                <div className="flex items-center gap-1 overflow-x-auto scrollbar-hide min-w-0">
+                  {[
+                    { key: 'genderFilter', value: genderFilter, options: filterOptions.genders, onChange: handleGenderFilterChange },
+                    { key: 'categoryFilter', value: categoryFilter, options: filteredCategoryOptions, onChange: handleCategoryFilterChange },
+                    { key: 'subCategoryFilter', value: subCategoryFilter, options: filteredSubCategoryOptions, onChange: handleSubCategoryFilterChange },
+                  ].map((filter, idx) => {
+                    const nonAllOptions = filter.options.filter(o => o.id !== 'all');
+                    if (nonAllOptions.length === 0) return null;
+                    return (
+                      <React.Fragment key={filter.key}>
+                        {idx > 0 && <span className="text-[#D4CCC3] mx-0.5 shrink-0">/</span>}
+                        {nonAllOptions.map(option => (
+                          <button
+                            key={option.id}
+                            onClick={() => filter.onChange(filter.value === option.id ? 'all' : option.id)}
+                            className={`px-2 py-0.5 rounded text-[10px] font-medium transition-all whitespace-nowrap shrink-0 ${
+                              filter.value === option.id
+                                ? 'bg-[#8A6340] text-white shadow-sm'
+                                : 'text-[#8C8178] hover:text-[#6B5D4F] hover:bg-[#EDE5DC]'
+                            }`}
+                          >
+                            {option.name}
+                          </button>
+                        ))}
+                      </React.Fragment>
+                    );
+                  })}
+                  {(genderFilter !== 'all' || categoryFilter !== 'all' || subCategoryFilter !== 'all') && (
+                    <button
+                      onClick={() => { setGenderFilter('all'); setCategoryFilter('all'); setSubCategoryFilter('all'); }}
+                      className="p-0.5 rounded transition-colors text-[#8C8178] hover:text-[#2C2417] hover:bg-[#F5F0EB] shrink-0 ml-0.5"
+                      title={t('common.clearAll')}
+                    >
+                      <X size={11} />
+                    </button>
+                  )}
+                </div>
+              </>
+            )}
+
+            <div className="ml-auto hidden md:flex items-center gap-1.5 text-[10px] text-[#8A6340]/60 shrink-0 pl-2">
+              <Pencil size={9} />
+              <span>Click gold cells to edit</span>
+            </div>
+          </div>
+        )}
+
+        {/* Tab Content */}
+        {selectedBudget && selectedSeason && selectedSeasonGroup && (
+          <div className="max-h-[calc(100vh-280px)] overflow-y-auto">
+            {activeTab === 'collection' && renderCollectionTab()}
+            {activeTab === 'gender' && renderGenderTab()}
+            {activeTab === 'category' && renderCategoryTab()}
+          </div>
+        )}
       </div>
+
+      {/* Sticky Bottom Action Bar */}
+      {selectedBudget && selectedSeason && selectedSeasonGroup && (
+        <div className="sticky bottom-0 z-50 mt-3">
+          <div className="bg-white/95 backdrop-blur-sm border border-border-muted rounded-xl px-4 py-2.5 flex items-center justify-between shadow-[0_-2px_12px_rgba(0,0,0,0.06)]">
+            <button
+              onClick={() => window.history.back()}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium font-brand rounded-lg transition-colors text-[#6B5D4F] hover:bg-[#F5F0EB] border border-[#E8E2DB]"
+            >
+              <ArrowLeft size={13} />
+              {t('nav.budgetAllocation')}
+            </button>
+
+            <div className="flex items-center gap-2">
+              {selectedVersion && (
+                <span className="text-[10px] font-data text-[#8C8178] hidden sm:inline">
+                  {selectedVersion.name}{selectedVersion.isFinal ? ' (Final)' : ''}
+                </span>
+              )}
+              <button
+                onClick={() => {
+                  if (onOpenSkuProposal) {
+                    onOpenSkuProposal({
+                      budgetId: selectedBudgetId !== 'all' ? selectedBudgetId : budgetContext?.budgetId,
+                      budgetName: selectedBudget?.budgetName || budgetContext?.budgetName,
+                      fiscalYear: selectedBudget?.fiscalYear || budgetContext?.fiscalYear,
+                      brandName: selectedBudget?.brandName || budgetContext?.brandName,
+                      seasonGroup: selectedSeasonGroup !== 'all' ? selectedSeasonGroup : budgetContext?.seasonGroup,
+                      season: selectedSeason !== 'all' ? selectedSeason : budgetContext?.season,
+                    });
+                  }
+                }}
+                className="flex items-center gap-1.5 px-4 py-1.5 text-xs font-semibold font-brand rounded-lg transition-all bg-gradient-to-r from-[#C4975A] to-[#B8894E] hover:from-[#B8894E] hover:to-[#A07B4B] text-white shadow-sm hover:shadow-md"
+              >
+                <Package size={13} />
+                {t('nav.skuProposal')}
+                <ChevronRight size={13} />
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

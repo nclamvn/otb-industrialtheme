@@ -37,6 +37,7 @@ import {
   Activity,
   Printer
 } from 'lucide-react';
+import { normalize as viNormalize } from '../../utils/normalizeVietnamese';
 
 // Screen configuration builder (uses t() for translations)
 const getScreenConfig = (t) => ({
@@ -226,11 +227,11 @@ const AppHeader = ({
   // Search results from screen config
   const searchResults = useMemo(() => {
     if (!searchQuery.trim()) return [];
-    const q = searchQuery.toLowerCase();
+    const q = viNormalize(searchQuery);
     return Object.entries(SCREEN_CONFIG)
       .filter(([id, cfg]) => {
-        const label = (cfg.label || '').toLowerCase();
-        const shortLabel = (cfg.shortLabel || '').toLowerCase();
+        const label = viNormalize(cfg.label || '');
+        const shortLabel = viNormalize(cfg.shortLabel || '');
         return label.includes(q) || shortLabel.includes(q) || id.includes(q);
       })
       .map(([id, cfg]) => ({ id, ...cfg }))
@@ -296,9 +297,9 @@ const AppHeader = ({
   }, []);
 
   return (
-    <div className="sticky top-0 z-40 bg-canvas">
+    <div className="z-40 bg-canvas">
       {/* Main Header — blends with page bg, no bottom border */}
-      <div className={`${isMobile ? 'px-3' : 'px-5'} py-2.5 flex items-center justify-between`}>
+      <div className={`${isMobile ? 'px-3' : 'px-5'} py-1.5 flex items-center justify-between`}>
         {/* Left - Page Title — bare icon, larger text */}
         <div className="flex items-center gap-2.5">
           <CurrentIcon size={16} strokeWidth={2} className="text-dafc-gold" />
@@ -405,8 +406,9 @@ const AppHeader = ({
           {/* Language Toggle — plain text ghost */}
           <button
             onClick={() => setLanguage(language === 'en' ? 'vi' : 'en')}
-            className="p-1.5 rounded-lg transition-all duration-200 text-content-muted hover:text-dafc-gold-darker"
+            className="p-1.5 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg transition-all duration-200 text-content-muted hover:text-dafc-gold-darker"
             title={language === 'en' ? 'Chuyển sang Tiếng Việt' : 'Switch to English'}
+            aria-label={language === 'en' ? 'Chuyển sang Tiếng Việt' : 'Switch to English'}
           >
             <span className="text-[11px] font-bold font-data">
               {language === 'en' ? 'EN' : 'VN'}
@@ -496,8 +498,9 @@ const AppHeader = ({
             <div className="flex items-center gap-2 shrink-0">
               <button
                 onClick={() => window.print()}
-                className="no-print p-1.5 rounded-lg transition-colors text-content-muted hover:text-content-secondary"
+                className="no-print p-1.5 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg transition-colors text-content-muted hover:text-content-secondary"
                 title={t('common.print')}
+                aria-label={t('common.print')}
               >
                 <Printer size={14} />
               </button>
@@ -537,7 +540,7 @@ const AppHeader = ({
 
       {/* KPI Dot Stepper — only for Planning workflow, hidden on mobile */}
       {!isMobile && currentScreen !== 'budget-management' && isInPlanningWorkflow && (
-        <div className="px-5 pb-2.5">
+        <div className="px-5 pb-1">
           <div className="flex items-center gap-1">
             {PLANNING_STEPS.map((step, index) => {
               const config = SCREEN_CONFIG[step.id];

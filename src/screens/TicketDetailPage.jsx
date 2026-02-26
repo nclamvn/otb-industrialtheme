@@ -19,6 +19,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useIsMobile } from '@/hooks/useIsMobile';
 import RiskScoreCard from '../components/RiskScoreCard';
+import { ProductPlaceholder } from '@/components/ui';
 
 /* =========================
    DAFC DESIGN SYSTEM COLORS
@@ -165,13 +166,18 @@ const SKUCard = ({ item, block, cardIdx, darkMode }) => {
     <div className={`rounded-2xl border bg-gradient-to-br ${style} shadow-sm overflow-hidden transition-all hover:shadow-md`}>
       <div className="p-5">
         <div className="flex items-start gap-4">
-          <div className="w-16 h-16 rounded-xl border flex items-center justify-center shrink-0 shadow-sm bg-white/80 border-white/50">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M6 8V19C6 19.5523 6.44772 20 7 20H17C17.5523 20 18 19.5523 18 19V8" stroke="#B8A692" strokeWidth="1.5" strokeLinecap="round"/>
-              <path d="M4 8H20L18.5 5H5.5L4 8Z" stroke="#C4975A" strokeWidth="1.5" strokeLinejoin="round" fill="rgba(196,151,90,0.1)"/>
-              <path d="M9 8V5.5C9 4.11929 10.1193 3 11.5 3H12.5C13.8807 3 15 4.11929 15 5.5V8" stroke="#B8A692" strokeWidth="1.5" strokeLinecap="round"/>
-              <rect x="9" y="12" width="6" height="3" rx="1" stroke="#C4975A" strokeWidth="1.2" opacity="0.5"/>
-            </svg>
+          <div className="w-16 h-16 rounded-xl border flex items-center justify-center shrink-0 shadow-sm bg-white/80 border-white/50 overflow-hidden">
+            {item.imageUrl ? (
+              <img
+                src={item.imageUrl}
+                alt={item.name || item.sku}
+                className="w-full h-full object-cover"
+                onError={(e) => { e.target.onerror = null; e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }}
+              />
+            ) : null}
+            <div className={`w-full h-full flex items-center justify-center ${item.imageUrl ? 'hidden' : ''}`}>
+              <ProductPlaceholder size={44} category={block.category} subCategory={block.subCategory} productType={productType} />
+            </div>
           </div>
           <div className="flex-1 min-w-0">
             <div className="font-semibold text-base truncate font-brand text-[#2C2417]">
@@ -329,8 +335,8 @@ const getApprovalStepStatus = (stepId, currentStep, approvalHistory) => {
 };
 
 const ApprovalProgressBar = ({ currentStep, approvalHistory, darkMode, t }) => (
-  <div className="border rounded-xl shadow-sm p-5 bg-white border-[#E8E2DB]">
-    <h3 className="text-xs font-semibold uppercase tracking-wider mb-5 font-brand text-[#8C8178]">
+  <div className="border rounded-lg p-3 bg-white border-[#E8E2DB]">
+    <h3 className="text-[10px] font-semibold uppercase tracking-wider mb-3 font-brand text-[#8C8178]">
       {t ? t('ticketDetail.approvalHistory') : 'Approval Progress'}
     </h3>
     <div className="flex items-start">
@@ -338,20 +344,20 @@ const ApprovalProgressBar = ({ currentStep, approvalHistory, darkMode, t }) => (
         const status = getApprovalStepStatus(step.id, currentStep, approvalHistory);
         return (
           <React.Fragment key={step.id}>
-            <div className="flex flex-col items-center" style={{ minWidth: 90 }}>
-              <div className={`w-11 h-11 rounded-full flex items-center justify-center border-2 transition-all ${
-                status === 'approved' ? 'bg-[#1B6B45] border-[#1B6B45] text-white' :
+            <div className="flex flex-col items-center" style={{ minWidth: 70 }}>
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 transition-all ${
+                status === 'approved' ? 'bg-[#C4975A] border-[#C4975A] text-white' :
                 status === 'rejected' ? 'bg-[#DC3545] border-[#DC3545] text-white' :
-                status === 'current' ? 'bg-[#C4975A] border-[#C4975A] text-white animate-pulse' :
+                status === 'current' ? 'bg-[#8A6340] border-[#8A6340] text-white animate-pulse' :
                 'bg-[#FBF9F7] border-[#D4CBBC] text-[#8C8178]'
               }`}>
-                {status === 'approved' ? <Check size={20} strokeWidth={3} /> :
-                 status === 'rejected' ? <X size={20} strokeWidth={3} /> :
-                 status === 'current' ? <Clock size={18} /> :
-                 <span className="text-sm font-bold">{index + 1}</span>}
+                {status === 'approved' ? <Check size={14} strokeWidth={3} /> :
+                 status === 'rejected' ? <X size={14} strokeWidth={3} /> :
+                 status === 'current' ? <Clock size={13} /> :
+                 <span className="text-[11px] font-bold">{index + 1}</span>}
               </div>
-              <div className={`text-xs mt-2 font-medium text-center leading-tight ${
-                status === 'approved' ? 'text-[#1B6B45]' :
+              <div className={`text-[10px] mt-1.5 font-medium text-center leading-tight ${
+                status === 'approved' ? 'text-[#8A6340]' :
                 status === 'rejected' ? 'text-[#DC3545]' :
                 status === 'current' ? 'text-[#C4975A]' :
                 'text-[#8C8178]'
@@ -359,24 +365,24 @@ const ApprovalProgressBar = ({ currentStep, approvalHistory, darkMode, t }) => (
                 {step.label}
               </div>
               {(status === 'approved' || status === 'rejected') && (
-                <span className={`mt-1 px-2 py-0.5 text-[10px] font-bold rounded-full ${
+                <span className={`mt-0.5 px-1.5 py-px text-[9px] font-bold rounded-full ${
                   status === 'approved'
-                    ? 'bg-emerald-100 text-emerald-700'
+                    ? 'bg-[rgba(196,151,90,0.15)] text-[#8A6340]'
                     : 'bg-red-100 text-red-700'
                 }`}>
                   {status === 'approved' ? 'Approved' : 'Rejected'}
                 </span>
               )}
               {status === 'current' && (
-                <span className="mt-1 px-2 py-0.5 text-[10px] font-bold rounded-full bg-amber-100 text-amber-700">
+                <span className="mt-0.5 px-1.5 py-px text-[9px] font-bold rounded-full bg-[rgba(196,151,90,0.15)] text-[#8A6340]">
                   In Review
                 </span>
               )}
             </div>
             {index < APPROVAL_STEPS.length - 1 && (
-              <div className={`flex-1 h-0.5 mt-5 mx-1 rounded-full transition-all ${
+              <div className={`flex-1 h-0.5 mt-4 mx-0.5 rounded-full transition-all ${
                 getApprovalStepStatus(APPROVAL_STEPS[index + 1].id, currentStep, approvalHistory) !== 'waiting'
-                  ? 'bg-[#1B6B45]'
+                  ? 'bg-[#C4975A]'
                   : 'bg-[#E8E2DB]'
               }`} />
             )}
@@ -388,69 +394,69 @@ const ApprovalProgressBar = ({ currentStep, approvalHistory, darkMode, t }) => (
 );
 
 const StatusTrackingPanel = ({ approvalHistory, ticket, darkMode, t }) => (
-  <div className="border rounded-xl shadow-sm p-5 bg-white border-[#E8E2DB]">
-    <h3 className="text-xs font-semibold uppercase tracking-wider mb-4 font-brand text-[#8C8178]">
+  <div className="border rounded-lg p-3 bg-white border-[#E8E2DB]">
+    <h3 className="text-[10px] font-semibold uppercase tracking-wider mb-3 font-brand text-[#8C8178]">
       {t ? t('common.status') : 'Status Tracking'}
     </h3>
 
     <div className="space-y-0">
       {approvalHistory?.length > 0 ? (
         approvalHistory.map((item, index) => (
-          <div key={index} className="flex gap-3">
+          <div key={index} className="flex gap-2.5">
             <div className="flex flex-col items-center">
-              <div className={`w-2.5 h-2.5 rounded-full mt-1.5 shrink-0 ${
-                item.action === 'approved' ? 'bg-[#1B6B45]' :
+              <div className={`w-2 h-2 rounded-full mt-1.5 shrink-0 ${
+                item.action === 'approved' ? 'bg-[#C4975A]' :
                 item.action === 'rejected' ? 'bg-[#DC3545]' :
-                item.action === 'submitted' ? 'bg-[#C4975A]' :
+                item.action === 'submitted' ? 'bg-[#8A6340]' :
                 'bg-[#8C8178]'
               }`} />
               {index < approvalHistory.length - 1 && (
-                <div className="w-px flex-1 min-h-[20px] bg-[#E8E2DB]" />
+                <div className="w-px flex-1 min-h-[16px] bg-[#E8E2DB]" />
               )}
             </div>
-            <div className="flex-1 pb-4">
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className={`px-2 py-0.5 text-[10px] font-bold rounded-full ${
-                  item.action === 'approved' ? 'bg-emerald-100 text-emerald-700' :
+            <div className="flex-1 pb-3">
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <span className={`px-1.5 py-px text-[9px] font-bold rounded-full ${
+                  item.action === 'approved' ? 'bg-[rgba(196,151,90,0.15)] text-[#8A6340]' :
                   item.action === 'rejected' ? 'bg-red-100 text-red-700' :
-                  'bg-amber-100 text-amber-700'
+                  'bg-[rgba(196,151,90,0.12)] text-[#8A6340]'
                 }`}>
                   {item.action.charAt(0).toUpperCase() + item.action.slice(1)}
                 </span>
-                <span className="text-xs text-[#8C8178]">
+                <span className="text-[10px] text-[#8C8178]">
                   by {item.stepLabel || item.role || '-'}
                 </span>
               </div>
               {item.decidedAt && (
-                <div className="text-[10px] mt-0.5 font-data text-[#8C8178]">
+                <div className="text-[9px] mt-0.5 font-data text-[#8C8178]">
                   {new Date(item.decidedAt).toLocaleString('vi-VN')}
                 </div>
               )}
               {item.comment && (
-                <div className="mt-1.5 px-3 py-2 rounded-lg text-xs italic bg-[#FBF9F7] text-[#6B5D4F] border border-[#E8E2DB]">
-                  "{item.comment}"
+                <div className="mt-1 px-2 py-1.5 rounded text-[10px] italic bg-[#FBF9F7] text-[#6B5D4F] border border-[#E8E2DB]">
+                  &ldquo;{item.comment}&rdquo;
                 </div>
               )}
             </div>
           </div>
         ))
       ) : (
-        <div className="text-sm italic text-[#8C8178]">
+        <div className="text-xs italic text-[#8C8178]">
           {t ? t('ticketDetail.approvalHistory') : 'No approval history yet'}
         </div>
       )}
     </div>
 
-    <div className="mt-4 pt-4 border-t border-[#E8E2DB]">
+    <div className="mt-3 pt-3 border-t border-[#E8E2DB]">
       <div className="flex items-center justify-between">
-        <span className="text-xs text-[#8C8178]">{t ? t('common.status') : 'Current Status'}:</span>
-        <span className={`px-3 py-1 text-xs font-bold rounded-full ${
+        <span className="text-[10px] text-[#8C8178]">{t ? t('common.status') : 'Current Status'}:</span>
+        <span className={`px-2 py-0.5 text-[10px] font-bold rounded-full ${
           ['APPROVED', 'LEVEL2_APPROVED', 'FINAL'].includes(ticket?.status?.toUpperCase())
-            ? 'bg-emerald-100 text-emerald-700'
+            ? 'bg-[rgba(196,151,90,0.15)] text-[#8A6340]'
           : ['REJECTED', 'LEVEL1_REJECTED', 'LEVEL2_REJECTED'].includes(ticket?.status?.toUpperCase())
             ? 'bg-red-100 text-red-700'
           : ['SUBMITTED', 'LEVEL1_APPROVED'].includes(ticket?.status?.toUpperCase())
-            ? 'bg-amber-100 text-amber-700'
+            ? 'bg-[rgba(196,151,90,0.12)] text-[#8A6340]'
           : 'bg-[#FBF9F7] text-[#6B5D4F]'
         }`}>
           {ticket?.status?.replace(/_/g, ' ') || 'Draft'}
@@ -678,7 +684,8 @@ export default function TicketDetailPage({ ticket, onBack, darkMode = true }) {
                 order: Number(item.quantity) || 0,
                 rex: Math.floor(Number(item.quantity) / 2) || 0,
                 ttp: Math.ceil(Number(item.quantity) / 2) || 0,
-                ttlValue: Number(item.totalValue) || 0
+                ttlValue: Number(item.totalValue) || 0,
+                imageUrl: item.sku?.imageUrl || item.sku?.image || null
               });
               groupedSkus[key].otbPropose += Number(item.totalValue) || 0;
             });
@@ -859,55 +866,53 @@ export default function TicketDetailPage({ ticket, onBack, darkMode = true }) {
     <div className="p-3 md:p-6 min-h-screen space-y-3 md:space-y-6 bg-[#FBF9F7]">
       {/* Back Button & Header */}
       {onBack && (
-        <div className="flex items-center justify-between gap-4 mb-4 p-4 rounded-xl bg-gradient-to-r from-[#1B6B45] to-[#1B6B45]/80">
-          <div className="flex items-center gap-4">
+        <div className="flex items-center justify-between gap-3 mb-3 px-4 py-2.5 rounded-lg bg-gradient-to-r from-[#8A6340] to-[#C4975A]">
+          <div className="flex items-center gap-3">
             <button
               onClick={onBack}
-              className="p-2 rounded-lg transition-all hover:bg-white/10 text-white"
+              className="p-1.5 rounded transition-all hover:bg-white/10 text-white"
             >
-              <ArrowLeft size={24} />
+              <ArrowLeft size={18} />
             </button>
             <div>
-              <h1 className="text-lg font-semibold font-brand text-white">
+              <h1 className="text-sm font-semibold font-brand text-white">
                 {t('ticketDetail.title')}
               </h1>
-              <p className="text-xs text-white/70">
-                {ticket?.entityType?.charAt(0).toUpperCase() + ticket?.entityType?.slice(1)} • {ticket?.name}
+              <p className="text-[11px] text-white/70">
+                {ticket?.entityType?.charAt(0).toUpperCase() + ticket?.entityType?.slice(1)} · {ticket?.name}
               </p>
             </div>
           </div>
 
           {/* Action Buttons */}
-          <div className="flex items-center gap-3">
-            {/* Submit — only for DRAFT */}
+          <div className="flex items-center gap-2">
             {ticket?.status?.toUpperCase() === 'DRAFT' && (
               <button
                 onClick={handleSubmitTicket}
                 disabled={actionLoading}
-                className="flex items-center gap-2 px-4 py-2 bg-white/20 hover:bg-white/30 text-white font-semibold rounded-lg transition-all text-sm border border-white/20 backdrop-blur-sm disabled:opacity-50"
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-white/20 hover:bg-white/30 text-white font-semibold rounded transition-all text-xs border border-white/20 disabled:opacity-50"
               >
-                <Send size={16} />
+                <Send size={13} />
                 {t('common.submit')}
               </button>
             )}
 
-            {/* Approve / Reject — for pending approvers */}
             {canApprove() && (
               <>
                 <button
                   onClick={handleRejectTicket}
                   disabled={actionLoading}
-                  className="flex items-center gap-2 px-4 py-2 bg-[#DC3545]/20 hover:bg-[#DC3545]/30 text-white font-semibold rounded-lg transition-all text-sm border border-[#DC3545]/30 backdrop-blur-sm disabled:opacity-50"
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-[#DC3545]/20 hover:bg-[#DC3545]/30 text-white font-semibold rounded transition-all text-xs border border-[#DC3545]/30 disabled:opacity-50"
                 >
-                  <XCircle size={16} />
+                  <XCircle size={13} />
                   {t('ticketDetail.reject')}
                 </button>
                 <button
                   onClick={handleApproveTicket}
                   disabled={actionLoading}
-                  className="flex items-center gap-2 px-4 py-2 bg-white/25 hover:bg-white/35 text-white font-semibold rounded-lg transition-all text-sm border border-white/30 backdrop-blur-sm disabled:opacity-50"
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-white/25 hover:bg-white/35 text-white font-semibold rounded transition-all text-xs border border-white/30 disabled:opacity-50"
                 >
-                  <CheckCircle size={16} />
+                  <CheckCircle size={13} />
                   {t('ticketDetail.approve')}
                 </button>
               </>
@@ -1071,13 +1076,18 @@ export default function TicketDetailPage({ ticket, onBack, darkMode = true }) {
                   {displaySkuData.flatMap(block => block.items.map((item, idx) => (
                     <tr key={`${item.sku}_${idx}`} className="transition-colors hover:bg-[rgba(196,151,90,0.1)]">
                       <td className="px-4 py-3">
-                        <div className="w-10 h-10 rounded-lg border flex items-center justify-center bg-[rgba(160,120,75,0.08)] border-[rgba(196,151,90,0.2)]">
-                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M6 8V19C6 19.5523 6.44772 20 7 20H17C17.5523 20 18 19.5523 18 19V8" stroke="#B8A692" strokeWidth="1.5" strokeLinecap="round"/>
-                            <path d="M4 8H20L18.5 5H5.5L4 8Z" stroke="#C4975A" strokeWidth="1.5" strokeLinejoin="round" fill="rgba(196,151,90,0.1)"/>
-                            <path d="M9 8V5.5C9 4.11929 10.1193 3 11.5 3H12.5C13.8807 3 15 4.11929 15 5.5V8" stroke="#B8A692" strokeWidth="1.5" strokeLinecap="round"/>
-                            <rect x="9" y="12" width="6" height="3" rx="1" stroke="#C4975A" strokeWidth="1.2" opacity="0.5"/>
-                          </svg>
+                        <div className="w-10 h-10 rounded-lg border flex items-center justify-center bg-[rgba(160,120,75,0.06)] border-[rgba(196,151,90,0.2)] overflow-hidden">
+                          {item.imageUrl ? (
+                            <img
+                              src={item.imageUrl}
+                              alt={item.name || item.sku}
+                              className="w-full h-full object-cover"
+                              onError={(e) => { e.target.onerror = null; e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }}
+                            />
+                          ) : null}
+                          <div className={`w-full h-full flex items-center justify-center ${item.imageUrl ? 'hidden' : ''}`}>
+                            <ProductPlaceholder size={28} category={block.category} subCategory={block.subCategory} productType={item.productType || block.productType} />
+                          </div>
                         </div>
                       </td>
                       <td className="px-4 py-3 font-data text-sm text-[#C4975A]">{item.sku}</td>
@@ -1123,30 +1133,22 @@ export default function TicketDetailPage({ ticket, onBack, darkMode = true }) {
               <button
                 type="button"
                 onClick={() => setCollapsed((p) => ({ ...p, [key]: !p[key] }))}
-                className="w-full flex items-center gap-4 px-5 py-4 transition-all bg-gradient-to-r from-[#1E3A5F] via-[#2A4A7F] to-[#1E3A5F] text-white hover:from-[#234470] hover:via-[#305490] hover:to-[#234470]"
+                className="w-full flex items-center gap-2 px-3 py-1.5 transition-all bg-gradient-to-r from-[#C4975A] to-[#8A6340] text-white hover:from-[#B8894E] hover:to-[#7A5C38]"
               >
-                <ChevronDown size={18} className={`transition-transform shrink-0 ${isCollapsed ? '-rotate-90' : ''}`} />
-                <div className="text-left flex-1 min-w-0">
-                  <div className="font-semibold text-lg font-brand">{block.subCategory}</div>
-                  <div className="text-sm mt-0.5 text-blue-200">
-                    {block.gender} • {block.productType} • <span className="font-data">{block.items.length}</span> SKUs
-                  </div>
-                </div>
-                <div className="flex items-center gap-6 shrink-0">
-                  <div className="text-right">
-                    <div className="text-xs uppercase tracking-wide text-blue-200">% Buy propose</div>
-                    <div className="text-lg font-bold font-data text-[#C4975A]">{block.pctBuyPropose}%</div>
-                  </div>
-                  <div className="w-px h-8 bg-blue-400/30" />
-                  <div className="text-right">
-                    <div className="text-xs uppercase tracking-wide text-blue-200">OTB propose</div>
-                    <div className="text-lg font-bold font-data text-[#C4975A]">{formatCurrency(block.otbPropose)}</div>
-                  </div>
-                  <div className="w-px h-8 bg-blue-400/30" />
-                  <div className="text-right">
-                    <div className="text-xs uppercase tracking-wide text-blue-200">Total SRP</div>
-                    <div className="text-lg font-semibold font-data text-[#C4975A]">{formatCurrency(totalSrp)}</div>
-                  </div>
+                <ChevronDown size={14} className={`transition-transform shrink-0 ${isCollapsed ? '-rotate-90' : ''}`} />
+                <span className="font-semibold text-sm font-brand">{block.subCategory}</span>
+                <span className="text-[11px] text-white/70">
+                  {block.gender} • {block.productType} • {block.items.length} SKUs
+                </span>
+                <div className="flex items-center gap-3 ml-auto shrink-0">
+                  <span className="text-[11px] text-white/70">Buy:</span>
+                  <span className="text-xs font-bold font-data">{block.pctBuyPropose}%</span>
+                  <div className="w-px h-3.5 bg-white/30" />
+                  <span className="text-[11px] text-white/70">OTB:</span>
+                  <span className="text-xs font-bold font-data">{formatCurrency(block.otbPropose)}</span>
+                  <div className="w-px h-3.5 bg-white/30" />
+                  <span className="text-[11px] text-white/70">SRP:</span>
+                  <span className="text-xs font-bold font-data">{formatCurrency(totalSrp)}</span>
                 </div>
               </button>
 
