@@ -1,11 +1,14 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import {
   FileCheck, CheckCircle, XCircle, Clock, Loader2,
-  Filter, Search, ChevronDown, Eye, MessageSquare,
-  X, AlertTriangle, Shield, ArrowUpRight
+  Search, ChevronDown, Eye, MessageSquare,
+  X, AlertTriangle, Shield, ArrowUpRight,
+  CheckSquare, Square, MinusSquare,
+  Wallet, BarChart3, Package, ClipboardList
 } from 'lucide-react';
+import toast from 'react-hot-toast';
 import { approvalService } from '../services';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -28,9 +31,15 @@ const STATUS_CONFIG = {
 };
 
 const ENTITY_ICONS = {
-  budget: '💰',
-  planning: '📊',
-  proposal: '📦',
+  budget: { icon: Wallet, color: '#C4975A' },
+  planning: { icon: BarChart3, color: '#2563EB' },
+  proposal: { icon: Package, color: '#7C3AED' },
+};
+const ENTITY_FALLBACK = { icon: ClipboardList, color: '#8C8178' };
+const EntityIcon = ({ type, size = 16 }) => {
+  const cfg = ENTITY_ICONS[type] || ENTITY_FALLBACK;
+  const Icon = cfg.icon;
+  return <Icon size={size} strokeWidth={2} style={{ color: cfg.color }} />;
 };
 
 /* ═══════════════════════════════════════════════
@@ -50,6 +59,12 @@ const ApprovalsScreen = () => {
   const [comment, setComment] = useState('');
   const [processing, setProcessing] = useState(false);
   const [showMobileFilters, setShowMobileFilters] = useState(false);
+
+  // Bulk selection state
+  const [selectedIds, setSelectedIds] = useState(new Set());
+  const [bulkProcessing, setBulkProcessing] = useState(false);
+  const [bulkRejectModalOpen, setBulkRejectModalOpen] = useState(false);
+  const [bulkRejectComment, setBulkRejectComment] = useState('');
 
   // Fetch pending approvals
   useEffect(() => {
@@ -92,6 +107,25 @@ const ApprovalsScreen = () => {
     }
   };
 
+  // Bulk selection helpers
+  const getItemKey = (item) => `${item.entityType}:${item.entityId}`;
+
+  const toggleSelect = useCallback((key) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+  }, []);
+
+  const deselectAll = useCallback(() => setSelectedIds(new Set()), []);
+
+  // Clear selection when filters/data change
+  useEffect(() => {
+    setSelectedIds(new Set());
+  }, [entityFilter, levelFilter, searchTerm, items]);
+
   // Filtered items
   const filtered = useMemo(() => {
     return items.filter(item => {
@@ -106,6 +140,59 @@ const ApprovalsScreen = () => {
       return true;
     });
   }, [items, entityFilter, levelFilter, searchTerm]);
+
+  // Select all toggle
+  const toggleSelectAll = useCallback(() => {
+    setSelectedIds(prev => {
+      if (prev.size === filtered.length && filtered.length > 0) return new Set();
+      return new Set(filtered.map(getItemKey));
+    });
+  }, [filtered]);
+
+  // Bulk approve/reject handler
+  const handleBulkAction = useCallback(async (action, comment) => {
+    if (selectedIds.size === 0) return;
+    if (action === 'reject' && !bulkRejectModalOpen) {
+      setBulkRejectComment('');
+      setBulkRejectModalOpen(true);
+      return;
+    }
+
+    const selectedItems = filtered.filter((item) => selectedIds.has(getItemKey(item)));
+    if (selectedItems.length === 0) return;
+
+    setBulkProcessing(true);
+    let successCount = 0;
+    let failCount = 0;
+
+    for (const item of selectedItems) {
+      try {
+        if (action === 'approve') {
+          await approvalService.approve(item.entityType, item.entityId, item.level);
+        } else {
+          await approvalService.reject(item.entityType, item.entityId, item.level, comment || '');
+        }
+        successCount++;
+      } catch (err) {
+        failCount++;
+        console.error(`Failed to ${action} ${item.entityType} ${item.entityId}:`, err);
+      }
+    }
+
+    setBulkProcessing(false);
+    setSelectedIds(new Set());
+    setBulkRejectModalOpen(false);
+    setBulkRejectComment('');
+
+    if (successCount > 0) {
+      toast.success(`${action === 'approve' ? t('approvals.approve') : t('approvals.reject')}: ${successCount} ${t('approvals.itemsProcessed') || 'items processed'}`);
+    }
+    if (failCount > 0) {
+      toast.error(`${failCount} ${t('approvals.itemsFailed') || 'items failed'}`);
+    }
+
+    await fetchPendingApprovals();
+  }, [selectedIds, filtered, t, bulkRejectModalOpen]);
 
   // Stats
   const stats = useMemo(() => {
@@ -150,13 +237,13 @@ const ApprovalsScreen = () => {
           title={t('budget.filters')}
           filters={[
             { key: 'entityFilter', label: t('approvals.colType'), type: 'select', options: [
-              { value: 'all', label: t('approvals.allTypes') },
+              { value: 'all', label: t('approvals.colType') },
               { value: 'budget', label: t('approvals.typeBudget') },
               { value: 'planning', label: t('approvals.typePlanning') },
               { value: 'proposal', label: t('approvals.typeProposal') },
             ]},
             { key: 'levelFilter', label: t('approvals.colLevel'), type: 'select', options: [
-              { value: 'all', label: t('approvals.allLevels') },
+              { value: 'all', label: t('approvals.colLevel') },
               { value: '1', label: 'Level 1' },
               { value: '2', label: 'Level 2' },
             ]},
@@ -169,16 +256,11 @@ const ApprovalsScreen = () => {
       )}
 
       {/* Compact Header + Filters */}
-      <div className={`border ${border} rounded-xl px-3 py-2 mb-3`} style={{
-        background: 'linear-gradient(135deg, #ffffff 0%, rgba(196,151,90,0.04) 35%, rgba(196,151,90,0.12) 100%)',
-        boxShadow: 'inset 0 -1px 0 rgba(196,151,90,0.05)',
-      }}>
+      <div className={`border ${border} rounded-xl px-3 py-2 mb-3 bg-white`}>
         <div className="flex items-center gap-3">
-          <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 bg-[rgba(196,151,90,0.15)]">
-            <FileCheck size={14} className="text-[#A67B3D]" />
-          </div>
+          <FileCheck size={14} className="text-content-muted flex-shrink-0" />
           <div className="flex-shrink-0">
-            <h1 className={`text-sm font-semibold font-['Montserrat'] ${textPrimary} leading-tight`}>
+            <h1 className={`text-sm font-semibold font-brand ${textPrimary} leading-tight`}>
               {t('screenConfig.approvals')}
             </h1>
             <p className={`text-[10px] ${textMuted} leading-tight`}>
@@ -196,8 +278,7 @@ const ApprovalsScreen = () => {
                     : 'text-[#8C8178]'
                 }`}
               >
-                <Filter size={12} />
-                {t('budget.filters')}
+                <ChevronDown size={12} />
               </button>
             ) : (
               <>
@@ -208,7 +289,7 @@ const ApprovalsScreen = () => {
                     placeholder={t('approvals.searchPlaceholder')}
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className={`bg-transparent outline-none text-xs w-full font-['Montserrat'] ${textPrimary} placeholder:${textMuted}`}
+                    className={`bg-transparent outline-none text-xs w-full font-brand ${textPrimary} placeholder:${textMuted}`}
                   />
                   {searchTerm && (
                     <button onClick={() => setSearchTerm('')}>
@@ -221,9 +302,9 @@ const ApprovalsScreen = () => {
                   <select
                     value={entityFilter}
                     onChange={(e) => setEntityFilter(e.target.value)}
-                    className={`appearance-none px-2 py-1 pr-6 rounded-lg border ${border} bg-[#FBF9F7] text-xs font-['Montserrat'] ${textPrimary} outline-none cursor-pointer`}
+                    className={`appearance-none px-2 py-1 pr-6 rounded-lg border ${border} bg-[#FBF9F7] text-xs font-brand ${textPrimary} outline-none cursor-pointer`}
                   >
-                    <option value="all">{t('approvals.allTypes')}</option>
+                    <option value="all">{t('approvals.colType')}</option>
                     <option value="budget">{t('approvals.typeBudget')}</option>
                     <option value="planning">{t('approvals.typePlanning')}</option>
                     <option value="proposal">{t('approvals.typeProposal')}</option>
@@ -235,9 +316,9 @@ const ApprovalsScreen = () => {
                   <select
                     value={levelFilter}
                     onChange={(e) => setLevelFilter(e.target.value)}
-                    className={`appearance-none px-2 py-1 pr-6 rounded-lg border ${border} bg-[#FBF9F7] text-xs font-['Montserrat'] ${textPrimary} outline-none cursor-pointer`}
+                    className={`appearance-none px-2 py-1 pr-6 rounded-lg border ${border} bg-[#FBF9F7] text-xs font-brand ${textPrimary} outline-none cursor-pointer`}
                   >
-                    <option value="all">{t('approvals.allLevels')}</option>
+                    <option value="all">{t('approvals.colLevel')}</option>
                     <option value="1">Level 1</option>
                     <option value="2">Level 2</option>
                   </select>
@@ -246,7 +327,7 @@ const ApprovalsScreen = () => {
 
                 <button
                   onClick={fetchPendingApprovals}
-                  className={`px-2.5 py-1 rounded-lg border ${border} text-xs font-medium font-['Montserrat'] transition-all text-[#A67B3D] hover:bg-[rgba(196,151,90,0.1)]`}
+                  className={`px-2.5 py-1 rounded-lg border ${border} text-xs font-medium font-brand transition-all text-[#A67B3D] hover:bg-[rgba(196,151,90,0.1)]`}
                 >
                   {t('common.refresh')}
                 </button>
@@ -302,9 +383,7 @@ const ApprovalsScreen = () => {
       </div>
 
       {/* Table */}
-      <div className={`border ${border} rounded-xl overflow-hidden`} style={{
-        background: 'linear-gradient(135deg, #ffffff 0%, rgba(196,151,90,0.03) 35%, rgba(196,151,90,0.08) 100%)',
-      }}>
+      <div className={`border ${border} rounded-xl overflow-hidden bg-white`}>
         {loading ? (
           <div className="flex flex-col items-center justify-center py-20">
             <Loader2 size={32} className="animate-spin text-[#A67B3D]" />
@@ -314,14 +393,14 @@ const ApprovalsScreen = () => {
           <div className="flex flex-col items-center justify-center py-20">
             <AlertTriangle size={32} className="text-[#DC3545]" />
             <p className={`text-sm mt-3 ${textSecondary}`}>{error}</p>
-            <button onClick={fetchPendingApprovals} className="mt-3 px-4 py-2 rounded-xl bg-[#C4975A] text-white text-sm font-medium font-['Montserrat']">
+            <button onClick={fetchPendingApprovals} className="mt-3 px-4 py-2 rounded-xl bg-[#C4975A] text-white text-sm font-medium font-brand">
               {t('common.tryAgain')}
             </button>
           </div>
         ) : filtered.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20">
             <CheckCircle size={48} className="text-[#1B6B45]" />
-            <p className={`text-base font-semibold mt-4 font-['Montserrat'] ${textPrimary}`}>{t('approvals.allCaughtUp')}</p>
+            <p className={`text-base font-semibold mt-4 font-brand ${textPrimary}`}>{t('approvals.allCaughtUp')}</p>
             <p className={`text-sm mt-1 ${textSecondary}`}>{t('approvals.noPendingItems')}</p>
           </div>
         ) : isMobile ? (
@@ -343,7 +422,7 @@ const ApprovalsScreen = () => {
                 >
                   <MobileDataCard
                     title={name}
-                    subtitle={`${ENTITY_ICONS[item.entityType] || '📋'} ${item.entityType} · ${brand}`}
+                    subtitle={<span className="inline-flex items-center gap-1"><EntityIcon type={item.entityType} size={12} />{item.entityType} · {brand}</span>}
                     status={sc.label}
                     statusColor={sc.color === '#1B6B45' ? 'success' : sc.color === '#DC3545' ? 'critical' : sc.color === '#2563EB' ? 'info' : 'warning'}
                     metrics={[
@@ -361,12 +440,60 @@ const ApprovalsScreen = () => {
           </div>
         ) : (
           /* Desktop: Table */
+          <>
+          {/* Bulk Action Toolbar */}
+          {selectedIds.size > 0 && (
+            <div className={`border ${border} rounded-xl px-3 py-2 mb-3 flex flex-wrap items-center gap-2 bg-white`}>
+              <span className={`text-xs font-semibold font-brand ${textPrimary}`}>
+                {selectedIds.size} {t('approvals.itemsSelected') || 'selected'}
+              </span>
+              <div className="flex items-center gap-2 ml-auto">
+                <button
+                  disabled={bulkProcessing}
+                  onClick={() => handleBulkAction('approve')}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold font-brand text-white bg-[#1B6B45] hover:bg-[#155a39] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {bulkProcessing ? <Loader2 size={13} className="animate-spin" /> : <CheckCircle size={13} />}
+                  {t('approvals.approveSelected') || 'Approve Selected'}
+                </button>
+                <button
+                  disabled={bulkProcessing}
+                  onClick={() => handleBulkAction('reject')}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold font-brand text-white bg-[#DC3545] hover:bg-[#c82333] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {bulkProcessing ? <Loader2 size={13} className="animate-spin" /> : <XCircle size={13} />}
+                  {t('approvals.rejectSelected') || 'Reject Selected'}
+                </button>
+                <button
+                  disabled={bulkProcessing}
+                  onClick={deselectAll}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border ${border} text-xs font-medium font-brand transition-colors text-[#8C8178] hover:bg-[#F0EBE5] disabled:opacity-50`}
+                >
+                  <X size={13} />
+                  {t('approvals.deselectAll') || 'Deselect'}
+                </button>
+              </div>
+            </div>
+          )}
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
                 <tr className={`bg-[#FBF9F7] border-b ${border}`}>
+                  <th className="px-3 py-2 w-8">
+                    <button
+                      onClick={toggleSelectAll}
+                      className={`flex items-center justify-center ${textMuted} hover:text-[#A67B3D] transition-colors`}
+                    >
+                      {selectedIds.size === filtered.length && filtered.length > 0
+                        ? <CheckSquare size={16} className="text-[#A67B3D]" />
+                        : selectedIds.size > 0
+                          ? <MinusSquare size={16} className="text-[#A67B3D]" />
+                          : <Square size={16} />
+                      }
+                    </button>
+                  </th>
                   {[t('approvals.colType'), t('approvals.colName'), t('approvals.colBrand'), t('approvals.colLevel'), t('approvals.colStatus'), t('approvals.colSubmitted'), t('common.actions')].map((h) => (
-                    <th key={h} className={`px-3 py-2 text-left text-[10px] font-semibold uppercase tracking-wider font-['Montserrat'] ${textMuted}`}>
+                    <th key={h} className={`px-3 py-2 text-left text-[10px] font-semibold uppercase tracking-wider font-brand ${textMuted}`}>
                       {h}
                     </th>
                   ))}
@@ -378,41 +505,54 @@ const ApprovalsScreen = () => {
                   const sc = STATUS_CONFIG[status] || STATUS_CONFIG.SUBMITTED;
                   const name = item.data?.name || item.data?.budgetName || `${item.entityType} #${item.entityId}`;
                   const brand = item.data?.brand?.name || item.data?.brandName || '-';
+                  const itemKey = getItemKey(item);
+                  const isSelected = selectedIds.has(itemKey);
 
                   return (
                     <tr
                       key={`${item.entityType}-${item.entityId}-${idx}`}
-                      className={`border-b ${border} transition-colors hover:bg-[#FBF9F7]`}
+                      className={`border-b ${border} transition-colors ${isSelected ? 'bg-[rgba(196,151,90,0.08)]' : 'hover:bg-[#FBF9F7]'}`}
                     >
+                      <td className="px-3 py-1.5 w-8">
+                        <button
+                          onClick={() => toggleSelect(itemKey)}
+                          className={`flex items-center justify-center ${textMuted} hover:text-[#A67B3D] transition-colors`}
+                        >
+                          {isSelected
+                            ? <CheckSquare size={16} className="text-[#A67B3D]" />
+                            : <Square size={16} />
+                          }
+                        </button>
+                      </td>
                       <td className="px-3 py-1.5">
                         <div className="flex items-center gap-2">
-                          <span className="text-base">{ENTITY_ICONS[item.entityType] || '📋'}</span>
-                          <span className={`text-sm font-medium font-['Montserrat'] capitalize ${textPrimary}`}>
+                          <EntityIcon type={item.entityType} size={16} />
+                          <span className={`text-sm font-medium font-brand capitalize ${textPrimary}`}>
                             {item.entityType}
                           </span>
                         </div>
                       </td>
                       <td className="px-3 py-1.5">
-                        <span className={`text-sm font-medium font-['Montserrat'] ${textPrimary}`}>{name}</span>
+                        <span className={`text-sm font-medium font-brand ${textPrimary}`}>{name}</span>
                       </td>
                       <td className="px-3 py-1.5">
-                        <span className={`text-sm font-['Montserrat'] ${textSecondary}`}>{brand}</span>
+                        <span className={`text-sm font-brand ${textSecondary}`}>{brand}</span>
                       </td>
                       <td className="px-3 py-1.5">
-                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold font-['JetBrains_Mono']"
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold font-data"
                           style={{ color: item.level === 1 ? '#2563EB' : '#A371F7', backgroundColor: item.level === 1 ? 'rgba(37,99,235,0.12)' : 'rgba(163,113,247,0.12)' }}>
                           L{item.level}
                         </span>
                       </td>
                       <td className="px-3 py-1.5">
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold font-['JetBrains_Mono']"
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold font-data"
                           style={{ color: sc.color, backgroundColor: sc.bg }}>
                           <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: sc.color }} />
                           {sc.label}
                         </span>
                       </td>
                       <td className="px-3 py-1.5">
-                        <span className={`text-xs font-['JetBrains_Mono'] ${textMuted}`}>
+                        <span className={`text-xs font-data ${textMuted}`}>
                           {item.submittedAt ? new Date(item.submittedAt).toLocaleDateString('vi-VN') : '-'}
                         </span>
                       </td>
@@ -420,14 +560,14 @@ const ApprovalsScreen = () => {
                         <div className="flex items-center gap-2">
                           <button
                             onClick={() => { setActionModal({ item, action: 'approve' }); setComment(''); }}
-                            className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold font-['Montserrat'] transition-all bg-[rgba(27,107,69,0.12)] text-[#1B6B45] hover:bg-[rgba(27,107,69,0.2)]"
+                            className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold font-brand transition-all bg-[rgba(27,107,69,0.12)] text-[#1B6B45] hover:bg-[rgba(27,107,69,0.2)]"
                           >
                             <CheckCircle size={13} />
                             {t('approvals.approve')}
                           </button>
                           <button
                             onClick={() => { setActionModal({ item, action: 'reject' }); setComment(''); }}
-                            className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold font-['Montserrat'] transition-all bg-[rgba(220,53,69,0.1)] text-[#DC3545] hover:bg-[rgba(220,53,69,0.18)]"
+                            className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold font-brand transition-all bg-[rgba(220,53,69,0.1)] text-[#DC3545] hover:bg-[rgba(220,53,69,0.18)]"
                           >
                             <XCircle size={13} />
                             {t('approvals.reject')}
@@ -440,19 +580,67 @@ const ApprovalsScreen = () => {
               </tbody>
             </table>
           </div>
+          </>
         )}
       </div>
+
+      {/* Bulk Reject Comment Modal */}
+      {bulkRejectModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <div className={`w-full max-w-md mx-4 rounded-2xl border ${border} shadow-2xl bg-white`}>
+            <div className={`p-5 border-b ${border}`}>
+              <div className="flex items-center justify-between">
+                <h3 className={`text-lg font-bold font-brand ${textPrimary}`}>
+                  {t('approvals.rejectSelected') || 'Reject Selected'}
+                </h3>
+                <button onClick={() => setBulkRejectModalOpen(false)} className="p-1.5 rounded-lg hover:bg-[#F0EBE5]">
+                  <X size={18} className={textMuted} />
+                </button>
+              </div>
+            </div>
+            <div className="p-5">
+              <p className={`text-sm mb-3 ${textSecondary}`}>
+                {selectedIds.size} {t('approvals.itemsSelected') || 'items selected'}
+              </p>
+              <label className={`block text-xs font-semibold uppercase tracking-wider mb-2 ${textMuted}`}>
+                {t('approvals.rejectReason') || 'Reason for rejection'}
+              </label>
+              <textarea
+                value={bulkRejectComment}
+                onChange={(e) => setBulkRejectComment(e.target.value)}
+                rows={3}
+                className={`w-full px-3 py-2 rounded-xl border ${border} bg-[#FBF9F7] text-sm font-brand ${textPrimary} outline-none resize-none focus:border-[#C4975A]`}
+                placeholder={t('approvals.commentPlaceholder')}
+              />
+            </div>
+            <div className={`p-5 border-t ${border} flex justify-end gap-3`}>
+              <button
+                onClick={() => setBulkRejectModalOpen(false)}
+                className={`px-4 py-2 rounded-xl border ${border} text-sm font-medium font-brand ${textSecondary} transition-all hover:bg-[#F0EBE5]`}
+              >
+                {t('common.cancel')}
+              </button>
+              <button
+                onClick={() => handleBulkAction('reject', bulkRejectComment)}
+                disabled={bulkProcessing}
+                className="px-5 py-2 rounded-xl text-sm font-semibold font-brand transition-all disabled:opacity-50 bg-[#DC3545] text-white hover:bg-[#c82333]"
+              >
+                {bulkProcessing ? (
+                  <Loader2 size={16} className="animate-spin mx-auto" />
+                ) : (t('approvals.rejectSelected') || 'Reject Selected')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Action Modal */}
       {actionModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-          <div className={`w-full max-w-md mx-4 rounded-2xl border ${border} shadow-2xl`} style={{
-            background: 'linear-gradient(135deg, #ffffff 0%, rgba(196,151,90,0.05) 35%, rgba(196,151,90,0.14) 100%)',
-            boxShadow: 'inset 0 -1px 0 rgba(196,151,90,0.06)',
-          }}>
+          <div className={`w-full max-w-md mx-4 rounded-2xl border ${border} shadow-2xl bg-white`}>
             <div className={`p-5 border-b ${border}`}>
               <div className="flex items-center justify-between">
-                <h3 className={`text-lg font-bold font-['Montserrat'] ${textPrimary}`}>
+                <h3 className={`text-lg font-bold font-brand ${textPrimary}`}>
                   {actionModal.action === 'approve' ? t('approvals.confirmApprove') : t('approvals.confirmReject')}
                 </h3>
                 <button onClick={() => setActionModal(null)} className="p-1.5 rounded-lg hover:bg-[#F0EBE5]">
@@ -463,7 +651,7 @@ const ApprovalsScreen = () => {
             <div className="p-5">
               <div className="mb-4">
                 <div className={`text-sm ${textSecondary}`}>
-                  {ENTITY_ICONS[actionModal.item.entityType]} <span className="capitalize font-medium">{actionModal.item.entityType}</span>
+                  <span className="inline-flex items-center gap-1.5"><EntityIcon type={actionModal.item.entityType} size={14} /><span className="capitalize font-medium">{actionModal.item.entityType}</span></span>
                   {' — '}
                   <span className={textPrimary}>{actionModal.item.data?.name || actionModal.item.data?.budgetName || `#${actionModal.item.entityId}`}</span>
                 </div>
@@ -476,7 +664,7 @@ const ApprovalsScreen = () => {
                   value={comment}
                   onChange={(e) => setComment(e.target.value)}
                   rows={3}
-                  className={`w-full px-3 py-2 rounded-xl border ${border} bg-[#FBF9F7] text-sm font-['Montserrat'] ${textPrimary} outline-none resize-none focus:border-[#C4975A]`}
+                  className={`w-full px-3 py-2 rounded-xl border ${border} bg-[#FBF9F7] text-sm font-brand ${textPrimary} outline-none resize-none focus:border-[#C4975A]`}
                   placeholder={t('approvals.commentPlaceholder')}
                 />
               </div>
@@ -484,14 +672,14 @@ const ApprovalsScreen = () => {
             <div className={`p-5 border-t ${border} flex justify-end gap-3`}>
               <button
                 onClick={() => setActionModal(null)}
-                className={`px-4 py-2 rounded-xl border ${border} text-sm font-medium font-['Montserrat'] ${textSecondary} transition-all hover:bg-[#F0EBE5]`}
+                className={`px-4 py-2 rounded-xl border ${border} text-sm font-medium font-brand ${textSecondary} transition-all hover:bg-[#F0EBE5]`}
               >
                 {t('common.cancel')}
               </button>
               <button
                 onClick={handleAction}
                 disabled={processing}
-                className={`px-5 py-2 rounded-xl text-sm font-semibold font-['Montserrat'] transition-all disabled:opacity-50 ${
+                className={`px-5 py-2 rounded-xl text-sm font-semibold font-brand transition-all disabled:opacity-50 ${
                   actionModal.action === 'approve'
                     ? 'bg-[#1B6B45] text-white hover:bg-[#155a39]'
                     : 'bg-[#DC3545] text-white hover:bg-[#c82333]'

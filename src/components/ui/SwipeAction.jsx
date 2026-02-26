@@ -45,7 +45,7 @@ export default function SwipeAction({
         >
           <div className="flex items-center gap-2 text-white">
             <Check size={20} />
-            <span className="text-sm font-semibold font-['Montserrat']">{rightLabel}</span>
+            <span className="text-sm font-semibold font-brand">{rightLabel}</span>
           </div>
         </motion.div>
       )}
@@ -57,7 +57,7 @@ export default function SwipeAction({
           style={{ backgroundColor: leftColor, opacity: leftOpacity }}
         >
           <div className="flex items-center gap-2 text-white">
-            <span className="text-sm font-semibold font-['Montserrat']">{leftLabel}</span>
+            <span className="text-sm font-semibold font-brand">{leftLabel}</span>
             <X size={20} />
           </div>
         </motion.div>

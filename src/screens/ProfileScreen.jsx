@@ -78,7 +78,7 @@ const ProfileScreen = ({ user: propUser, onUpdateUser }) => {
       {/* Page Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-lg font-semibold font-['Montserrat'] text-[#2C2417]">
+          <h1 className="text-lg font-semibold font-brand text-[#2C2417]">
             {t('profile.title')}
           </h1>
           <p className="text-xs mt-0.5 text-[#6B5D4F]">
@@ -131,7 +131,7 @@ const ProfileScreen = ({ user: propUser, onUpdateUser }) => {
           <div className="flex items-center gap-5">
             {/* Avatar */}
             <div className="relative group">
-              <div className="w-20 h-20 rounded-full flex items-center justify-center text-2xl font-bold font-['Montserrat'] border-[#C4975A] text-[#A67B3D]"
+              <div className="w-20 h-20 rounded-full flex items-center justify-center text-2xl font-bold font-brand border-[#C4975A] text-[#A67B3D]"
               style={{ borderWidth: '3px', borderStyle: 'solid' }}
               >
                 {user?.name?.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() || 'U'}
@@ -146,7 +146,7 @@ const ProfileScreen = ({ user: propUser, onUpdateUser }) => {
 
             {/* Name & Role */}
             <div className="flex-1">
-              <h2 className="text-xl font-bold font-['Montserrat'] text-[#2C2417]">
+              <h2 className="text-xl font-bold font-brand text-[#2C2417]">
                 {user?.name || 'User'}
               </h2>
               <div className="flex items-center gap-2 mt-1">
@@ -187,7 +187,7 @@ const ProfileScreen = ({ user: propUser, onUpdateUser }) => {
         background: 'linear-gradient(135deg, #FFFFFF 0%, rgba(196,151,90,0.04) 35%, rgba(196,151,90,0.10) 100%)',
         boxShadow: 'inset 0 -1px 0 rgba(44,36,23,0.06)',
       }}>
-        <h3 className="text-base font-semibold font-['Montserrat'] mb-4 text-[#2C2417]">
+        <h3 className="text-base font-semibold font-brand mb-4 text-[#2C2417]">
           {t('profile.security')}
         </h3>
         <div className="space-y-3">

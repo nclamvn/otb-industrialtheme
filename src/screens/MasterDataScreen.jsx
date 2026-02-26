@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo, useCallback } from 'react';
 import {
   Search, ChevronLeft, ChevronRight,
   Building2, Package, FolderTree, Tag,
-  RefreshCw, Filter, X
+  RefreshCw, X
 } from 'lucide-react';
 import { masterDataService } from '../services';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -137,22 +137,15 @@ const MasterDataScreen = ({ type = 'brands' }) => {
   return (
     <div className="space-y-3">
       {/* Header + Search - Merged compact */}
-      <div className="rounded-lg border overflow-hidden border-[#E8E2DB]" style={{
-        background: 'linear-gradient(135deg, #FFFFFF 0%, rgba(196,151,90,0.05) 35%, rgba(196,151,90,0.14) 100%)',
-        boxShadow: 'inset 0 -1px 0 rgba(44,36,23,0.06)',
-      }}>
+      <div className="rounded-lg border overflow-hidden border-[#E8E2DB] bg-white">
         <div className="flex flex-wrap items-center justify-between gap-2 px-3 py-2">
           <div className="flex items-center gap-2.5">
-            <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{
-              background: 'linear-gradient(135deg, rgba(196,151,90,0.12) 0%, rgba(196,151,90,0.22) 100%)',
-            }}>
-              <Icon size={14} className="text-[#A67B3D]" />
-            </div>
+            <Icon size={14} className="text-content-muted" />
             <div>
-              <h1 className="text-sm font-bold font-['Montserrat'] leading-tight text-[#2C2417]">
+              <h1 className="text-sm font-bold font-brand leading-tight text-[#2C2417]">
                 {config.title}
               </h1>
-              <p className="text-[10px] font-['JetBrains_Mono'] text-[#8C8178]">
+              <p className="text-[10px] font-data text-[#8C8178]">
                 {loading ? t('common.loading') : t('masterData.records', { count: filteredData.length })}
               </p>
             </div>
@@ -167,7 +160,7 @@ const MasterDataScreen = ({ type = 'brands' }) => {
                 value={searchTerm}
                 onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
                 placeholder={`${t('masterData.search')} ${config.title.toLowerCase()}...`}
-                className="w-40 md:w-56 pl-8 pr-7 py-1 border rounded-md text-xs font-['Montserrat'] transition-all focus:outline-none focus:ring-1 focus:ring-[#D4B082] bg-[#FFFFFF] border-[#E8E2DB] text-[#2C2417] placeholder-[#8C8178]"
+                className="w-40 md:w-56 pl-8 pr-7 py-1 border rounded-md text-xs font-brand transition-all focus:outline-none focus:ring-1 focus:ring-[#D4B082] bg-[#FFFFFF] border-[#E8E2DB] text-[#2C2417] placeholder-[#8C8178]"
               />
               {searchTerm && (
                 <button
@@ -182,7 +175,7 @@ const MasterDataScreen = ({ type = 'brands' }) => {
             <button
               onClick={fetchData}
               disabled={loading}
-              className="flex items-center gap-1.5 px-2.5 py-1 rounded-md font-medium text-xs font-['Montserrat'] transition-all text-[#6B5D4F] hover:text-[#A67B3D] hover:bg-[rgba(196,151,90,0.12)] border border-[#E8E2DB]"
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-md font-medium text-xs font-brand transition-all text-[#6B5D4F] hover:text-[#A67B3D] hover:bg-[rgba(196,151,90,0.12)] border border-[#E8E2DB]"
             >
               <RefreshCw size={12} className={loading ? 'animate-spin' : ''} />
               {t('masterData.refresh')}
@@ -192,20 +185,18 @@ const MasterDataScreen = ({ type = 'brands' }) => {
       </div>
 
       {/* Data Table */}
-      <div className="rounded-lg border overflow-hidden border-[#E8E2DB]" style={{
-        background: 'linear-gradient(135deg, #FFFFFF 0%, rgba(196,151,90,0.03) 35%, rgba(196,151,90,0.08) 100%)',
-      }}>
+      <div className="rounded-lg border overflow-hidden border-[#E8E2DB] bg-white">
         {loading ? (
           <div className="p-10 text-center">
             <RefreshCw size={24} className="animate-spin mx-auto mb-3 text-[#A67B3D]" />
-            <p className="text-xs font-['Montserrat'] text-[#8C8178]">{t('masterData.loadingData')}</p>
+            <p className="text-xs font-brand text-[#8C8178]">{t('masterData.loadingData')}</p>
           </div>
         ) : error ? (
           <div className="p-10 text-center">
-            <p className="text-[#DC3545] mb-3 text-xs font-['Montserrat']">{error}</p>
+            <p className="text-[#DC3545] mb-3 text-xs font-brand">{error}</p>
             <button
               onClick={fetchData}
-              className="px-3 py-1.5 bg-[#C4975A] text-[#FFFFFF] rounded-md font-medium text-xs font-['Montserrat'] hover:bg-[#A67B3D] transition-colors"
+              className="px-3 py-1.5 bg-[#C4975A] text-[#FFFFFF] rounded-md font-medium text-xs font-brand hover:bg-[#A67B3D] transition-colors"
             >
               {t('masterData.tryAgain')}
             </button>
@@ -213,7 +204,7 @@ const MasterDataScreen = ({ type = 'brands' }) => {
         ) : filteredData.length === 0 ? (
           <div className="p-10 text-center">
             <Icon size={32} className="mx-auto mb-3 text-[#D4CBBC]" />
-            <p className="text-xs font-['Montserrat'] text-[#8C8178]">
+            <p className="text-xs font-brand text-[#8C8178]">
               {searchTerm ? t('masterData.noResultsFound') : t('masterData.noDataAvailable')}
             </p>
           </div>
@@ -223,13 +214,13 @@ const MasterDataScreen = ({ type = 'brands' }) => {
               <table className="w-full">
                 <thead>
                   <tr className="bg-[#FBF9F7]">
-                    <th className="px-3 py-2 text-left text-[10px] font-semibold uppercase tracking-wider font-['Montserrat'] w-10 text-[#8C8178]">
+                    <th className="px-3 py-2 text-left text-[10px] font-semibold uppercase tracking-wider font-brand w-10 text-[#8C8178]">
                       #
                     </th>
                     {config.columns.map((col) => (
                       <th
                         key={col.key}
-                        className="px-3 py-2 text-left text-[10px] font-semibold uppercase tracking-wider font-['Montserrat'] text-[#8C8178]"
+                        className="px-3 py-2 text-left text-[10px] font-semibold uppercase tracking-wider font-brand text-[#8C8178]"
                         style={{ width: col.width }}
                       >
                         {col.label}
@@ -243,7 +234,7 @@ const MasterDataScreen = ({ type = 'brands' }) => {
                       key={item.id || index}
                       className="border-t transition-colors border-[#E8E2DB] hover:bg-[rgba(196,151,90,0.05)]"
                     >
-                      <td className="px-3 py-1.5 text-xs font-['JetBrains_Mono'] text-[#D4CBBC]">
+                      <td className="px-3 py-1.5 text-xs font-data text-[#D4CBBC]">
                         {(currentPage - 1) * pageSize + index + 1}
                       </td>
                       {config.columns.map((col) => {
@@ -254,7 +245,7 @@ const MasterDataScreen = ({ type = 'brands' }) => {
                           <td
                             key={col.key}
                             className={`px-3 py-1.5 text-xs ${
-                              col.mono ? "font-['JetBrains_Mono']" : "font-['Montserrat']"
+                              col.mono ? "font-data" : "font-brand"
                             } text-[#2C2417]`}
                           >
                             {col.badge ? renderBadge(displayValue) : displayValue}
@@ -270,7 +261,7 @@ const MasterDataScreen = ({ type = 'brands' }) => {
             {/* Pagination */}
             {totalPages > 1 && (
               <div className="flex items-center justify-between px-3 py-1.5 border-t border-[#E8E2DB]">
-                <p className="text-[10px] font-['JetBrains_Mono'] text-[#8C8178]">
+                <p className="text-[10px] font-data text-[#8C8178]">
                   {(currentPage - 1) * pageSize + 1}–{Math.min(currentPage * pageSize, filteredData.length)} of {filteredData.length}
                 </p>
                 <div className="flex items-center gap-1">
@@ -281,7 +272,7 @@ const MasterDataScreen = ({ type = 'brands' }) => {
                   >
                     <ChevronLeft size={14} />
                   </button>
-                  <span className="px-2 py-0.5 text-[10px] font-['JetBrains_Mono'] text-[#2C2417]">
+                  <span className="px-2 py-0.5 text-[10px] font-data text-[#2C2417]">
                     {currentPage} / {totalPages}
                   </span>
                   <button

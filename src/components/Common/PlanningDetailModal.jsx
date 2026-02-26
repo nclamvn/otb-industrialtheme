@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useMemo, useEffect, useRef } from 'react';
-import { X, Save, TrendingUp, Layers, Users, Tag, Info, Pencil, Filter, ChevronDown, Check, CheckCircle2, History, Clock, Sparkles } from 'lucide-react';
+import { X, Save, TrendingUp, Layers, Users, Tag, Info, Pencil, ChevronDown, Check, CheckCircle2, History, Clock, Sparkles } from 'lucide-react';
 import { formatCurrency } from '../../utils';
 import { GENDERS, STORES } from '../../utils/constants';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -80,7 +80,7 @@ const EditableCell = React.memo(({ cellKey, value, isEditing, editValue, onStart
           onChange={(e) => onChangeValue(e.target.value)}
           onBlur={() => onSaveEdit(cellKey)}
           onKeyDown={(e) => onKeyDown(e, cellKey)}
-          className="w-20 px-2 py-1.5 text-center border-2 border-[#C4975A] rounded-lg focus:outline-none focus:ring-2 focus:ring-[rgba(196,151,90,0.5)] bg-[#FFFFFF] text-[#2C2417] font-['JetBrains_Mono'] transform scale-105 transition-transform"
+          className="w-20 px-2 py-1.5 text-center border-2 border-[#C4975A] rounded-lg focus:outline-none focus:ring-2 focus:ring-[rgba(196,151,90,0.5)] bg-[#FFFFFF] text-[#2C2417] font-data transform scale-105 transition-transform"
           autoFocus
         />
       </div>
@@ -91,7 +91,7 @@ const EditableCell = React.memo(({ cellKey, value, isEditing, editValue, onStart
     return (
       <div className="flex items-center justify-center">
         <div className="flex items-center gap-1.5 px-3 py-1.5 bg-[#FBF9F7] border border-[#E8E2DB] rounded-lg min-w-[70px] justify-center">
-          <span className="text-[#6B5D4F] font-['JetBrains_Mono']">{typeof value === 'number' ? value.toFixed(0) : value}%</span>
+          <span className="text-[#6B5D4F] font-data">{typeof value === 'number' ? value.toFixed(0) : value}%</span>
         </div>
       </div>
     );
@@ -104,7 +104,7 @@ const EditableCell = React.memo(({ cellKey, value, isEditing, editValue, onStart
       title="Click to edit"
     >
       <div className="flex items-center gap-1.5 px-3 py-1.5 bg-[rgba(196,151,90,0.08)] border border-[rgba(196,151,90,0.25)] rounded-lg hover:bg-[rgba(196,151,90,0.15)] hover:border-[rgba(196,151,90,0.4)] hover:scale-105 transition-all min-w-[70px] justify-center">
-        <span className="text-[#2C2417] font-['JetBrains_Mono']">{typeof value === 'number' ? value.toFixed(0) : value}%</span>
+        <span className="text-[#2C2417] font-data">{typeof value === 'number' ? value.toFixed(0) : value}%</span>
         <Pencil size={12} className="text-[#C4975A] opacity-0 group-hover:opacity-100 transition-opacity" />
       </div>
     </div>
@@ -276,9 +276,9 @@ const PlanningDetailModal = ({
 
   // Generate filter options from CATEGORY_STRUCTURE
   const filterOptions = useMemo(() => {
-    const genders = [{ id: 'all', name: t('planningDetail.allGenders') }];
-    const categories = [{ id: 'all', name: t('planningDetail.allCategories') }];
-    const subCategories = [{ id: 'all', name: t('planningDetail.allSubCategories') }];
+    const genders = [{ id: 'all', name: t('planningDetail.gender') }];
+    const categories = [{ id: 'all', name: t('planningDetail.category') }];
+    const subCategories = [{ id: 'all', name: t('planningDetail.subCategory') || 'Sub-Category' }];
 
     CATEGORY_STRUCTURE.forEach(genderGroup => {
       genders.push({ id: genderGroup.gender.id, name: genderGroup.gender.name });
@@ -301,7 +301,7 @@ const PlanningDetailModal = ({
   const filteredCategoryOptions = useMemo(() => {
     if (genderFilter === 'all') return filterOptions.categories;
     return [
-      { id: 'all', name: t('planningDetail.allCategories') },
+      { id: 'all', name: t('planningDetail.category') },
       ...filterOptions.categories.filter(c => c.id !== 'all' && c.genderId === genderFilter)
     ];
   }, [genderFilter, filterOptions.categories]);
@@ -315,7 +315,7 @@ const PlanningDetailModal = ({
     if (categoryFilter !== 'all') {
       options = options.filter(sc => sc.id === 'all' || sc.categoryId === categoryFilter);
     }
-    return [{ id: 'all', name: t('planningDetail.allSubCategories') }, ...options.filter(o => o.id !== 'all')];
+    return [{ id: 'all', name: t('planningDetail.subCategory') || 'Sub-Category' }, ...options.filter(o => o.id !== 'all')];
   }, [genderFilter, categoryFilter, filterOptions.subCategories]);
 
   // Reset dependent filters when parent filter changes
@@ -359,7 +359,7 @@ const PlanningDetailModal = ({
 
   // Common table header style - Light Theme
   const headerClass = "bg-[#FBF9F7] text-[#2C2417]";
-  const headerCellClass = "px-4 py-3 text-center text-xs font-semibold uppercase tracking-wide font-['Montserrat']";
+  const headerCellClass = "px-4 py-3 text-center text-xs font-semibold uppercase tracking-wide font-brand";
   const groupRowClass = "bg-[rgba(196,151,90,0.08)] border-l-4 border-[#C4975A]";
   const subGroupRowClass = "bg-[#FFFFFF] border-l-4 border-[#E8E2DB]";
   const sumRowClass = "bg-[#1B6B45] text-white font-semibold";
@@ -421,7 +421,7 @@ const PlanningDetailModal = ({
                 <tr className={groupRowClass}>
                   <td className="px-4 py-3" colSpan={8}>
                     <div className="flex items-center gap-2">
-                      <span className="font-bold text-[#C4975A] font-['Montserrat']">{t(colData.section.nameKey)}</span>
+                      <span className="font-bold text-[#C4975A] font-brand">{t(colData.section.nameKey)}</span>
                       <Info size={14} className="text-[#8C8178]" />
                     </div>
                   </td>
@@ -440,10 +440,10 @@ const PlanningDetailModal = ({
                       <td className="px-4 py-3 pl-8">
                         <span className="text-[#6B5D4F]">{storeRow.store.name}</span>
                       </td>
-                      <td className="px-4 py-3 text-center text-[#6B5D4F] font-['JetBrains_Mono']">{storeRow.buyPct.toFixed(1)}%</td>
-                      <td className="px-4 py-3 text-center text-[#6B5D4F] font-['JetBrains_Mono']">{storeRow.salesPct.toFixed(0)}%</td>
-                      <td className="px-4 py-3 text-center text-[#6B5D4F] font-['JetBrains_Mono']">{storeRow.stPct.toFixed(0)}%</td>
-                      <td className="px-4 py-3 text-center text-[#6B5D4F] font-['JetBrains_Mono']">{storeRow.moc.toFixed(1)}</td>
+                      <td className="px-4 py-3 text-center text-[#6B5D4F] font-data">{storeRow.buyPct.toFixed(1)}%</td>
+                      <td className="px-4 py-3 text-center text-[#6B5D4F] font-data">{storeRow.salesPct.toFixed(0)}%</td>
+                      <td className="px-4 py-3 text-center text-[#6B5D4F] font-data">{storeRow.stPct.toFixed(0)}%</td>
+                      <td className="px-4 py-3 text-center text-[#6B5D4F] font-data">{storeRow.moc.toFixed(1)}</td>
                       <td className={`px-4 py-3 ${isReadOnly ? 'bg-[#FBF9F7]' : 'bg-[rgba(196,151,90,0.08)]'}`}>
                         <EditableCell
                           cellKey={cellKey}
@@ -457,8 +457,8 @@ const PlanningDetailModal = ({
                           readOnly={isReadOnly}
                         />
                       </td>
-                      <td className="px-4 py-3 text-center font-medium text-[#2C2417] font-['JetBrains_Mono']">{formatCurrency(storeRow.otbValue)}</td>
-                      <td className={`px-4 py-3 text-center font-medium font-['JetBrains_Mono'] ${
+                      <td className="px-4 py-3 text-center font-medium text-[#2C2417] font-data">{formatCurrency(storeRow.otbValue)}</td>
+                      <td className={`px-4 py-3 text-center font-medium font-data ${
                         storeRow.variance < 0 ? 'text-[#DC3545]' : storeRow.variance > 0 ? 'text-[#1B6B45]' : 'text-[#6B5D4F]'
                       }`}>
                         {storeRow.variance > 0 ? '+' : ''}{storeRow.variance.toFixed(0)}%
@@ -471,14 +471,14 @@ const PlanningDetailModal = ({
 
             {/* SUM Row */}
             <tr className={sumRowClass}>
-              <td className="px-4 py-4 font-bold font-['Montserrat']">{t('planningDetail.sum')}</td>
-              <td className="px-4 py-4 text-center font-['JetBrains_Mono']">100%</td>
-              <td className="px-4 py-4 text-center font-['JetBrains_Mono']">100%</td>
-              <td className="px-4 py-4 text-center font-['JetBrains_Mono']">-</td>
-              <td className="px-4 py-4 text-center font-['JetBrains_Mono']">-</td>
-              <td className="px-4 py-4 text-center font-['JetBrains_Mono']">100%</td>
-              <td className="px-4 py-4 text-center font-['JetBrains_Mono']">{formatCurrency(grandTotals.otbValue)}</td>
-              <td className="px-4 py-4 text-center font-['JetBrains_Mono']">-</td>
+              <td className="px-4 py-4 font-bold font-brand">{t('planningDetail.sum')}</td>
+              <td className="px-4 py-4 text-center font-data">100%</td>
+              <td className="px-4 py-4 text-center font-data">100%</td>
+              <td className="px-4 py-4 text-center font-data">-</td>
+              <td className="px-4 py-4 text-center font-data">-</td>
+              <td className="px-4 py-4 text-center font-data">100%</td>
+              <td className="px-4 py-4 text-center font-data">{formatCurrency(grandTotals.otbValue)}</td>
+              <td className="px-4 py-4 text-center font-data">-</td>
             </tr>
           </tbody>
         </table>
@@ -530,7 +530,7 @@ const PlanningDetailModal = ({
                 <tr className={groupRowClass}>
                   <td className="px-4 py-3" colSpan={7}>
                     <div className="flex items-center gap-2">
-                      <span className="font-bold text-[#C4975A] font-['Montserrat']">{genData.gender.name}</span>
+                      <span className="font-bold text-[#C4975A] font-brand">{genData.gender.name}</span>
                       <Info size={14} className="text-[#8C8178]" />
                     </div>
                   </td>
@@ -549,9 +549,9 @@ const PlanningDetailModal = ({
                       <td className="px-4 py-3 pl-8">
                         <span className="text-[#6B5D4F]">{storeRow.store.name}</span>
                       </td>
-                      <td className="px-4 py-3 text-center text-[#6B5D4F] font-['JetBrains_Mono']">{storeRow.buyPct.toFixed(1)}%</td>
-                      <td className="px-4 py-3 text-center text-[#6B5D4F] font-['JetBrains_Mono']">{storeRow.salesPct.toFixed(0)}%</td>
-                      <td className="px-4 py-3 text-center text-[#6B5D4F] font-['JetBrains_Mono']">{storeRow.stPct.toFixed(0)}%</td>
+                      <td className="px-4 py-3 text-center text-[#6B5D4F] font-data">{storeRow.buyPct.toFixed(1)}%</td>
+                      <td className="px-4 py-3 text-center text-[#6B5D4F] font-data">{storeRow.salesPct.toFixed(0)}%</td>
+                      <td className="px-4 py-3 text-center text-[#6B5D4F] font-data">{storeRow.stPct.toFixed(0)}%</td>
                       <td className={`px-4 py-3 ${isReadOnly ? 'bg-[#FBF9F7]' : 'bg-[rgba(196,151,90,0.08)]'}`}>
                         <EditableCell
                           cellKey={cellKey}
@@ -565,8 +565,8 @@ const PlanningDetailModal = ({
                           readOnly={isReadOnly}
                         />
                       </td>
-                      <td className="px-4 py-3 text-center font-medium text-[#2C2417] font-['JetBrains_Mono']">{formatCurrency(storeRow.otbValue)}</td>
-                      <td className={`px-4 py-3 text-center font-medium font-['JetBrains_Mono'] ${
+                      <td className="px-4 py-3 text-center font-medium text-[#2C2417] font-data">{formatCurrency(storeRow.otbValue)}</td>
+                      <td className={`px-4 py-3 text-center font-medium font-data ${
                         storeRow.variance < 0 ? 'text-[#DC3545]' : storeRow.variance > 0 ? 'text-[#1B6B45]' : 'text-[#6B5D4F]'
                       }`}>
                         {storeRow.variance > 0 ? '+' : ''}{storeRow.variance.toFixed(0)}%
@@ -579,13 +579,13 @@ const PlanningDetailModal = ({
 
             {/* SUM Row */}
             <tr className={sumRowClass}>
-              <td className="px-4 py-4 font-bold font-['Montserrat']">{t('planningDetail.sum')}</td>
-              <td className="px-4 py-4 text-center font-['JetBrains_Mono']">100%</td>
-              <td className="px-4 py-4 text-center font-['JetBrains_Mono']">100%</td>
-              <td className="px-4 py-4 text-center font-['JetBrains_Mono']">-</td>
-              <td className="px-4 py-4 text-center font-['JetBrains_Mono']">100%</td>
-              <td className="px-4 py-4 text-center font-['JetBrains_Mono']">{formatCurrency(grandTotals.otbValue)}</td>
-              <td className="px-4 py-4 text-center font-['JetBrains_Mono']">-</td>
+              <td className="px-4 py-4 font-bold font-brand">{t('planningDetail.sum')}</td>
+              <td className="px-4 py-4 text-center font-data">100%</td>
+              <td className="px-4 py-4 text-center font-data">100%</td>
+              <td className="px-4 py-4 text-center font-data">-</td>
+              <td className="px-4 py-4 text-center font-data">100%</td>
+              <td className="px-4 py-4 text-center font-data">{formatCurrency(grandTotals.otbValue)}</td>
+              <td className="px-4 py-4 text-center font-data">-</td>
             </tr>
           </tbody>
         </table>
@@ -676,11 +676,6 @@ const PlanningDetailModal = ({
         {/* Filter Section */}
         <div className="px-6 py-4 bg-[#FBF9F7] border-b border-[#E8E2DB]">
           <div className="flex items-center gap-6">
-            <div className="flex items-center gap-2 text-[#6B5D4F]">
-              <Filter size={16} />
-              <span className="font-medium text-sm font-['Montserrat']">{t('planningDetail.filters')}</span>
-            </div>
-
             {/* Gender Filter */}
             <div className="relative" ref={genderDropdownRef}>
               <button
@@ -830,17 +825,17 @@ const PlanningDetailModal = ({
                   <>
                     {/* Gender Total Row */}
                     <tr key={`total-${genderGroup.gender.id}`} className={`${sumRowClass}`}>
-                      <td className="px-4 py-3 uppercase font-bold font-['Montserrat']" colSpan={3}>
+                      <td className="px-4 py-3 uppercase font-bold font-brand" colSpan={3}>
                         {t('planningDetail.total')} {genderGroup.gender.name.toUpperCase()}
                       </td>
-                      <td className="px-4 py-3 text-center font-['JetBrains_Mono']">{genderTotals.buyPct}%</td>
-                      <td className="px-4 py-3 text-center font-['JetBrains_Mono']">{genderTotals.salesPct}%</td>
-                      <td className="px-4 py-3 text-center font-['JetBrains_Mono']">{genderTotals.stPct}%</td>
-                      <td className="px-4 py-3 text-center bg-[rgba(27,107,69,0.3)] font-['JetBrains_Mono']">{genderTotals.buyProposed}%</td>
-                      <td className="px-4 py-3 text-center font-['JetBrains_Mono']">{genderTotals.otbProposed.toLocaleString()}</td>
-                      <td className={`px-4 py-3 text-center font-['JetBrains_Mono'] ${genderTotals.varPct < 0 ? 'text-[#DC3545]' : ''}`}>{genderTotals.varPct}%</td>
-                      <td className="px-4 py-3 text-center font-['JetBrains_Mono']">{genderTotals.otbSubmitted.toLocaleString()}</td>
-                      <td className="px-4 py-3 text-center font-['JetBrains_Mono']">{genderTotals.buyActual}%</td>
+                      <td className="px-4 py-3 text-center font-data">{genderTotals.buyPct}%</td>
+                      <td className="px-4 py-3 text-center font-data">{genderTotals.salesPct}%</td>
+                      <td className="px-4 py-3 text-center font-data">{genderTotals.stPct}%</td>
+                      <td className="px-4 py-3 text-center bg-[rgba(27,107,69,0.3)] font-data">{genderTotals.buyProposed}%</td>
+                      <td className="px-4 py-3 text-center font-data">{genderTotals.otbProposed.toLocaleString()}</td>
+                      <td className={`px-4 py-3 text-center font-data ${genderTotals.varPct < 0 ? 'text-[#DC3545]' : ''}`}>{genderTotals.varPct}%</td>
+                      <td className="px-4 py-3 text-center font-data">{genderTotals.otbSubmitted.toLocaleString()}</td>
+                      <td className="px-4 py-3 text-center font-data">{genderTotals.buyActual}%</td>
                     </tr>
 
                     {/* Categories and SubCategories */}
@@ -885,9 +880,9 @@ const PlanningDetailModal = ({
                                 ) : null}
 
                                 <td className="px-4 py-2.5 text-[#6B5D4F]">{subCat.name}</td>
-                                <td className="px-4 py-2.5 text-center text-[#6B5D4F] font-['JetBrains_Mono']">{rowData.buyPct || 0}%</td>
-                                <td className="px-4 py-2.5 text-center text-[#6B5D4F] font-['JetBrains_Mono']">{rowData.salesPct || 0}%</td>
-                                <td className="px-4 py-2.5 text-center text-[#6B5D4F] font-['JetBrains_Mono']">{rowData.stPct || 0}%</td>
+                                <td className="px-4 py-2.5 text-center text-[#6B5D4F] font-data">{rowData.buyPct || 0}%</td>
+                                <td className="px-4 py-2.5 text-center text-[#6B5D4F] font-data">{rowData.salesPct || 0}%</td>
+                                <td className="px-4 py-2.5 text-center text-[#6B5D4F] font-data">{rowData.stPct || 0}%</td>
                                 <td className={`px-4 py-2.5 ${isReadOnly ? 'bg-[#FBF9F7]' : 'bg-[rgba(196,151,90,0.08)]'}`}>
                                   <EditableCell
                                     cellKey={cellKey}
@@ -901,12 +896,12 @@ const PlanningDetailModal = ({
                                     readOnly={isReadOnly}
                                   />
                                 </td>
-                                <td className="px-4 py-2.5 text-center text-[#2C2417] font-['JetBrains_Mono']">{(rowData.otbProposed || 0).toLocaleString()}</td>
-                                <td className={`px-4 py-2.5 text-center font-['JetBrains_Mono'] ${(rowData.varPct || 0) < 0 ? 'text-[#DC3545]' : 'text-[#6B5D4F]'}`}>
+                                <td className="px-4 py-2.5 text-center text-[#2C2417] font-data">{(rowData.otbProposed || 0).toLocaleString()}</td>
+                                <td className={`px-4 py-2.5 text-center font-data ${(rowData.varPct || 0) < 0 ? 'text-[#DC3545]' : 'text-[#6B5D4F]'}`}>
                                   {rowData.varPct || 0}%
                                 </td>
-                                <td className="px-4 py-2.5 text-center text-[#6B5D4F] font-['JetBrains_Mono']">{(rowData.otbSubmitted || 0).toLocaleString()}</td>
-                                <td className="px-4 py-2.5 text-center text-[#6B5D4F] font-['JetBrains_Mono']">{rowData.buyActual || 0}%</td>
+                                <td className="px-4 py-2.5 text-center text-[#6B5D4F] font-data">{(rowData.otbSubmitted || 0).toLocaleString()}</td>
+                                <td className="px-4 py-2.5 text-center text-[#6B5D4F] font-data">{rowData.buyActual || 0}%</td>
                               </tr>
                             );
                           })}
@@ -914,16 +909,16 @@ const PlanningDetailModal = ({
                           {/* Category Subtotal Row */}
                           <tr key={`subtotal-${genderGroup.gender.id}-${cat.id}`} className="bg-[rgba(27,107,69,0.10)] border-l-4 border-[#1B6B45] font-medium">
                             <td className="px-4 py-2.5 text-[#1B6B45] italic text-right pr-6">{t('planningDetail.subtotal')}</td>
-                            <td className="px-4 py-2.5 text-center text-[#1B6B45] font-['JetBrains_Mono']">{catTotals.buyPct}%</td>
-                            <td className="px-4 py-2.5 text-center text-[#1B6B45] font-['JetBrains_Mono']">{catTotals.salesPct}%</td>
-                            <td className="px-4 py-2.5 text-center text-[#1B6B45] font-['JetBrains_Mono']">{catTotals.stPct}%</td>
-                            <td className="px-4 py-2.5 text-center text-[#1B6B45] bg-[rgba(27,107,69,0.15)] font-['JetBrains_Mono']">{catTotals.buyProposed}%</td>
-                            <td className="px-4 py-2.5 text-center text-[#1B6B45] font-['JetBrains_Mono']">{catTotals.otbProposed.toLocaleString()}</td>
-                            <td className={`px-4 py-2.5 text-center font-['JetBrains_Mono'] ${catTotals.varPct < 0 ? 'text-[#DC3545]' : 'text-[#1B6B45]'}`}>
+                            <td className="px-4 py-2.5 text-center text-[#1B6B45] font-data">{catTotals.buyPct}%</td>
+                            <td className="px-4 py-2.5 text-center text-[#1B6B45] font-data">{catTotals.salesPct}%</td>
+                            <td className="px-4 py-2.5 text-center text-[#1B6B45] font-data">{catTotals.stPct}%</td>
+                            <td className="px-4 py-2.5 text-center text-[#1B6B45] bg-[rgba(27,107,69,0.15)] font-data">{catTotals.buyProposed}%</td>
+                            <td className="px-4 py-2.5 text-center text-[#1B6B45] font-data">{catTotals.otbProposed.toLocaleString()}</td>
+                            <td className={`px-4 py-2.5 text-center font-data ${catTotals.varPct < 0 ? 'text-[#DC3545]' : 'text-[#1B6B45]'}`}>
                               {catTotals.varPct}%
                             </td>
-                            <td className="px-4 py-2.5 text-center text-[#1B6B45] font-['JetBrains_Mono']">{catTotals.otbSubmitted.toLocaleString()}</td>
-                            <td className="px-4 py-2.5 text-center text-[#1B6B45] font-['JetBrains_Mono']">{catTotals.buyActual}%</td>
+                            <td className="px-4 py-2.5 text-center text-[#1B6B45] font-data">{catTotals.otbSubmitted.toLocaleString()}</td>
+                            <td className="px-4 py-2.5 text-center text-[#1B6B45] font-data">{catTotals.buyActual}%</td>
                           </tr>
                         </>
                       );
@@ -953,7 +948,7 @@ const PlanningDetailModal = ({
         <div className="bg-[#C4975A] px-8 py-5 flex items-center justify-between relative overflow-hidden rounded-t-2xl">
           <div className="relative z-10 flex items-center gap-6">
             <div>
-              <h2 className="text-xl font-bold text-[#FFFFFF] flex items-center gap-3 font-['Montserrat']">
+              <h2 className="text-xl font-bold text-[#FFFFFF] flex items-center gap-3 font-brand">
                 <TrendingUp size={22} />
                 {t('planningDetail.title')}
               </h2>
@@ -1099,7 +1094,7 @@ const PlanningDetailModal = ({
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`px-5 py-3 font-medium text-sm flex items-center gap-2 border-b-2 transition-all duration-200 font-['Montserrat'] ${
+                  className={`px-5 py-3 font-medium text-sm flex items-center gap-2 border-b-2 transition-all duration-200 font-brand ${
                     isActive
                       ? 'border-[#C4975A] text-[#C4975A] bg-[#FFFFFF] -mb-px rounded-t-lg'
                       : 'border-transparent text-[#8C8178] hover:text-[#C4975A] hover:bg-[rgba(196,151,90,0.08)] rounded-t-lg'
@@ -1133,20 +1128,20 @@ const PlanningDetailModal = ({
           <div className="flex items-center gap-6">
             <div className="text-sm">
               <span className="text-[#8C8178]">{t('planningDetail.totalBudget')}</span>
-              <span className="ml-2 font-bold text-[#C4975A] font-['JetBrains_Mono']">
+              <span className="ml-2 font-bold text-[#C4975A] font-data">
                 {formatCurrency(selectedBudgetDetail.budget?.totalBudget || 0)}
               </span>
             </div>
             <div className="text-sm">
               <span className="text-[#8C8178]">{t('planningDetail.allocated')}</span>
-              <span className="ml-2 font-bold text-[#1B6B45] font-['JetBrains_Mono']">
+              <span className="ml-2 font-bold text-[#1B6B45] font-data">
                 {formatCurrency(grandTotals.otbValue)}
               </span>
             </div>
             {versions.length > 0 && (
               <div className="text-sm animate-in fade-in slide-in-from-left duration-300">
                 <span className="text-[#8C8178]">{t('planningDetail.versions')}</span>
-                <span className="ml-2 font-bold text-[#C4975A] font-['JetBrains_Mono']">
+                <span className="ml-2 font-bold text-[#C4975A] font-data">
                   {versions.length} {t('planningDetail.approved')}
                 </span>
               </div>
@@ -1207,7 +1202,7 @@ const PlanningDetailModal = ({
               <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center animate-bounce">
                 <CheckCircle2 size={40} />
               </div>
-              <div className="text-xl font-bold font-['Montserrat']">{t('planningDetail.versionApproved', { version: versions.length })}</div>
+              <div className="text-xl font-bold font-brand">{t('planningDetail.versionApproved', { version: versions.length })}</div>
               <div className="text-white/70 text-sm">{t('planningDetail.planningDataSaved')}</div>
             </div>
           </div>

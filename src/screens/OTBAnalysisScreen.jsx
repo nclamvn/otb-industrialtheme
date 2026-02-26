@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import {
-  BarChart3, Filter, ChevronDown, Check,
+  BarChart3, ChevronDown, Check,
   Calendar, Tag, Layers, Users, Info, Pencil, X, Star,
   Sparkles, FileText, Clock, Package
 } from 'lucide-react';
@@ -13,6 +13,7 @@ import { budgetService, masterDataService, planningService } from '../services';
 
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useIsMobile } from '@/hooks/useIsMobile';
+import { useAppContext } from '@/contexts/AppContext';
 
 // Constants
 const SEASON_GROUPS = [
@@ -43,7 +44,7 @@ const EditableCell = React.memo(({ cellKey, value, isEditing, editValue, onStart
           onChange={(e) => onChangeValue(e.target.value)}
           onBlur={() => onSaveEdit(cellKey)}
           onKeyDown={(e) => onKeyDown(e, cellKey)}
-          className="w-20 px-2 py-1.5 text-center border-2 border-[#C4975A] rounded-lg focus:outline-none focus:ring-2 focus:ring-[rgba(196,151,90,0.5)] font-['JetBrains_Mono'] font-medium transition-all bg-white text-[#2C2417]"
+          className="w-20 px-2 py-1.5 text-center border-2 border-[#C4975A] rounded-lg focus:outline-none focus:ring-2 focus:ring-[rgba(196,151,90,0.5)] font-data font-medium transition-all bg-white text-[#2C2417]"
           autoFocus
         />
       </div>
@@ -54,7 +55,7 @@ const EditableCell = React.memo(({ cellKey, value, isEditing, editValue, onStart
     return (
       <div className="flex items-center justify-center">
         <div className="flex items-center gap-1.5 px-3 py-1.5 border rounded-lg min-w-[70px] justify-center bg-[#FBF9F7] border-[#C4B5A5]">
-          <span className="font-['JetBrains_Mono'] font-medium text-[#8C8178]">
+          <span className="font-data font-medium text-[#8C8178]">
             {typeof value === 'number' ? value.toFixed(0) : value}%
           </span>
         </div>
@@ -69,7 +70,7 @@ const EditableCell = React.memo(({ cellKey, value, isEditing, editValue, onStart
       title={t ? t('otbAnalysis.clickToEdit') : 'Click to edit'}
     >
       <div className="flex items-center gap-1.5 px-3 py-1.5 border rounded-lg transition-all min-w-[70px] justify-center bg-[rgba(160,120,75,0.18)] border-[rgba(215,183,151,0.4)] hover:bg-[rgba(215,183,151,0.25)] hover:border-[rgba(215,183,151,0.5)]">
-        <span className="font-['JetBrains_Mono'] font-medium text-[#8A6340]">
+        <span className="font-data font-medium text-[#8A6340]">
           {typeof value === 'number' ? value.toFixed(0) : value}%
         </span>
         <Pencil size={12} className="opacity-0 group-hover:opacity-100 transition-opacity text-[#8A6340]" />
@@ -81,6 +82,7 @@ const EditableCell = React.memo(({ cellKey, value, isEditing, editValue, onStart
 const OTBAnalysisScreen = ({ otbContext, onOpenSkuProposal, darkMode = false }) => {
   const { t } = useLanguage();
   const { isMobile } = useIsMobile();
+  const { registerSave, unregisterSave } = useAppContext();
   const [activeTab, setActiveTab] = useState('collection');
 
   // API data states
@@ -418,14 +420,39 @@ const OTBAnalysisScreen = ({ otbContext, onOpenSkuProposal, darkMode = false }) 
     }
   };
 
+  // Save allocations to backend
+  const handleSaveAllocations = useCallback(async () => {
+    if (!selectedVersionId) {
+      toast.error(t('planning.selectVersion') || 'Select a version first');
+      return;
+    }
+    try {
+      await planningService.update(selectedVersionId, { allocations: localData });
+      toast.success(t('planning.savedSuccessfully') || 'Allocations saved');
+    } catch (err) {
+      console.error('Failed to save allocations:', err);
+      toast.error(t('approval.failedToSave') || 'Failed to save');
+    }
+  }, [selectedVersionId, localData, t]);
+
+  // Register save handler with AppContext
+  useEffect(() => {
+    if (selectedVersionId && registerSave) {
+      registerSave(handleSaveAllocations);
+      return () => unregisterSave?.();
+    }
+  }, [selectedVersionId, handleSaveAllocations, registerSave, unregisterSave]);
+
   // Clear all filters
   const clearFilters = () => {
     setSelectedBudgetId('all');
+    setSelectedSeasonGroup('');
+    setSelectedSeason('');
     setSelectedVersionId(null);
     setVersions([]);
   };
 
-  const hasActiveFilters = selectedBudgetId !== 'all' || selectedSeasonGroup !== 'all' || selectedSeason !== 'all' || selectedVersionId;
+  const hasActiveFilters = selectedBudgetId !== 'all' || (selectedSeasonGroup && selectedSeasonGroup !== 'all') || (selectedSeason && selectedSeason !== 'all') || selectedVersionId;
   const selectedBudget = selectedBudgetId === 'all'
     ? null
     : apiBudgets.find(b => b.id === selectedBudgetId);
@@ -459,9 +486,9 @@ const OTBAnalysisScreen = ({ otbContext, onOpenSkuProposal, darkMode = false }) 
 
   // Generate filter options from categoryStructure
   const filterOptions = useMemo(() => {
-    const genders = [{ id: 'all', name: 'All Genders' }];
-    const categories = [{ id: 'all', name: 'All Categories' }];
-    const subCategories = [{ id: 'all', name: 'All Sub-Categories' }];
+    const genders = [{ id: 'all', name: t('otbAnalysis.gender') }];
+    const categories = [{ id: 'all', name: t('otbAnalysis.category') }];
+    const subCategories = [{ id: 'all', name: t('otbAnalysis.subCategory') }];
 
     categoryStructure.forEach(genderGroup => {
       genders.push({ id: genderGroup.gender.id, name: genderGroup.gender.name });
@@ -484,7 +511,7 @@ const OTBAnalysisScreen = ({ otbContext, onOpenSkuProposal, darkMode = false }) 
   const filteredCategoryOptions = useMemo(() => {
     if (genderFilter === 'all') return filterOptions.categories;
     return [
-      { id: 'all', name: 'All Categories' },
+      { id: 'all', name: t('otbAnalysis.category') },
       ...filterOptions.categories.filter(c => c.id !== 'all' && c.genderId === genderFilter)
     ];
   }, [genderFilter, filterOptions.categories]);
@@ -498,7 +525,7 @@ const OTBAnalysisScreen = ({ otbContext, onOpenSkuProposal, darkMode = false }) 
     if (categoryFilter !== 'all') {
       options = options.filter(sc => sc.id === 'all' || sc.categoryId === categoryFilter);
     }
-    return [{ id: 'all', name: 'All Sub-Categories' }, ...options.filter(o => o.id !== 'all')];
+    return [{ id: 'all', name: t('otbAnalysis.subCategory') }, ...options.filter(o => o.id !== 'all')];
   }, [genderFilter, categoryFilter, filterOptions.subCategories]);
 
   // Reset dependent filters when parent filter changes
@@ -521,7 +548,7 @@ const OTBAnalysisScreen = ({ otbContext, onOpenSkuProposal, darkMode = false }) 
   };
 
   // Common table styles - DAFC Design System
-  const headerCellClass = "px-4 py-3 text-center text-xs font-semibold tracking-wide font-['Montserrat']";
+  const headerCellClass = "px-4 py-3 text-center text-xs font-semibold tracking-wide font-brand";
   const headerDarkCell = 'bg-[#FBF9F7] text-[#6B5D4F]';
   const headerGoldCell = 'bg-[rgba(215,183,151,0.3)] text-[#8A6340]';
   const headerBrownCell = 'bg-[rgba(139,115,85,0.2)] text-[#5C4033]';
@@ -552,7 +579,7 @@ const OTBAnalysisScreen = ({ otbContext, onOpenSkuProposal, darkMode = false }) 
                 <tr className={groupRowClass}>
                   <td className="px-4 py-3" colSpan={8}>
                     <div className="flex items-center gap-2">
-                      <span className="font-bold font-['Montserrat'] text-[#8A6340]">{section.name}</span>
+                      <span className="font-bold font-brand text-[#8A6340]">{section.name}</span>
                       <Info size={14} className="text-[#6B5D4F]" />
                     </div>
                   </td>
@@ -573,10 +600,10 @@ const OTBAnalysisScreen = ({ otbContext, onOpenSkuProposal, darkMode = false }) 
                       <td className="px-4 py-3 pl-8">
                         <span className="text-[#8C8178]">{store.name}</span>
                       </td>
-                      <td className="px-4 py-3 text-center font-['JetBrains_Mono'] text-[#8C8178]">{(cellData.buyPct || 0).toFixed(1)}%</td>
-                      <td className="px-4 py-3 text-center font-['JetBrains_Mono'] text-[#8C8178]">{(cellData.salesPct || 0).toFixed(0)}%</td>
-                      <td className="px-4 py-3 text-center font-['JetBrains_Mono'] text-[#8C8178]">{(cellData.stPct || 0).toFixed(0)}%</td>
-                      <td className="px-4 py-3 text-center font-['JetBrains_Mono'] text-[#8C8178]">{cellData.moc || 0}</td>
+                      <td className="px-4 py-3 text-center font-data text-[#8C8178]">{(cellData.buyPct || 0).toFixed(1)}%</td>
+                      <td className="px-4 py-3 text-center font-data text-[#8C8178]">{(cellData.salesPct || 0).toFixed(0)}%</td>
+                      <td className="px-4 py-3 text-center font-data text-[#8C8178]">{(cellData.stPct || 0).toFixed(0)}%</td>
+                      <td className="px-4 py-3 text-center font-data text-[#8C8178]">{cellData.moc || 0}</td>
                       <td className="px-4 py-3 bg-[rgba(160,120,75,0.12)]">
                         <EditableCell
                           cellKey={cellKey}
@@ -590,8 +617,8 @@ const OTBAnalysisScreen = ({ otbContext, onOpenSkuProposal, darkMode = false }) 
                           darkMode={darkMode}
                         />
                       </td>
-                      <td className="px-4 py-3 text-center font-medium font-['JetBrains_Mono'] text-[#2C2417]">{formatCurrency(cellData.otbValue || 0)}</td>
-                      <td className={`px-4 py-3 text-center font-medium font-['JetBrains_Mono'] ${
+                      <td className="px-4 py-3 text-center font-medium font-data text-[#2C2417]">{formatCurrency(cellData.otbValue || 0)}</td>
+                      <td className={`px-4 py-3 text-center font-medium font-data ${
                         variance < 0 ? 'text-[#DC3545]' : variance > 0 ? 'text-[#1B6B45]' : 'text-[#8C8178]'
                       }`}>
                         {variance > 0 ? '+' : ''}{variance.toFixed(0)}%
@@ -603,14 +630,14 @@ const OTBAnalysisScreen = ({ otbContext, onOpenSkuProposal, darkMode = false }) 
             ))}
 
             <tr className={sumRowClass}>
-              <td className="px-4 py-4 font-bold font-['Montserrat']">{t('otbAnalysis.total')}</td>
-              <td className="px-4 py-4 text-center font-['JetBrains_Mono']">100%</td>
-              <td className="px-4 py-4 text-center font-['JetBrains_Mono']">100%</td>
-              <td className="px-4 py-4 text-center font-['JetBrains_Mono']">-</td>
-              <td className="px-4 py-4 text-center font-['JetBrains_Mono']">-</td>
-              <td className="px-4 py-4 text-center font-['JetBrains_Mono']">100%</td>
-              <td className="px-4 py-4 text-center font-['JetBrains_Mono']">{formatCurrency(grandTotals.otbValue)}</td>
-              <td className="px-4 py-4 text-center font-['JetBrains_Mono']">-</td>
+              <td className="px-4 py-4 font-bold font-brand">{t('otbAnalysis.total')}</td>
+              <td className="px-4 py-4 text-center font-data">100%</td>
+              <td className="px-4 py-4 text-center font-data">100%</td>
+              <td className="px-4 py-4 text-center font-data">-</td>
+              <td className="px-4 py-4 text-center font-data">-</td>
+              <td className="px-4 py-4 text-center font-data">100%</td>
+              <td className="px-4 py-4 text-center font-data">{formatCurrency(grandTotals.otbValue)}</td>
+              <td className="px-4 py-4 text-center font-data">-</td>
             </tr>
           </tbody>
         </table>
@@ -640,7 +667,7 @@ const OTBAnalysisScreen = ({ otbContext, onOpenSkuProposal, darkMode = false }) 
                 <tr className={groupRowClass}>
                   <td className="px-4 py-3" colSpan={7}>
                     <div className="flex items-center gap-2">
-                      <span className="font-bold font-['Montserrat'] text-[#8A6340]">{gen.name}</span>
+                      <span className="font-bold font-brand text-[#8A6340]">{gen.name}</span>
                       <Info size={14} className="text-[#6B5D4F]" />
                     </div>
                   </td>
@@ -661,9 +688,9 @@ const OTBAnalysisScreen = ({ otbContext, onOpenSkuProposal, darkMode = false }) 
                       <td className="px-4 py-3 pl-8">
                         <span className="text-[#8C8178]">{store.name}</span>
                       </td>
-                      <td className="px-4 py-3 text-center font-['JetBrains_Mono'] text-[#8C8178]">{(cellData.buyPct || 0).toFixed(1)}%</td>
-                      <td className="px-4 py-3 text-center font-['JetBrains_Mono'] text-[#8C8178]">{(cellData.salesPct || 0).toFixed(0)}%</td>
-                      <td className="px-4 py-3 text-center font-['JetBrains_Mono'] text-[#8C8178]">{(cellData.stPct || 0).toFixed(0)}%</td>
+                      <td className="px-4 py-3 text-center font-data text-[#8C8178]">{(cellData.buyPct || 0).toFixed(1)}%</td>
+                      <td className="px-4 py-3 text-center font-data text-[#8C8178]">{(cellData.salesPct || 0).toFixed(0)}%</td>
+                      <td className="px-4 py-3 text-center font-data text-[#8C8178]">{(cellData.stPct || 0).toFixed(0)}%</td>
                       <td className="px-4 py-3 bg-[rgba(160,120,75,0.12)]">
                         <EditableCell
                           cellKey={cellKey}
@@ -677,8 +704,8 @@ const OTBAnalysisScreen = ({ otbContext, onOpenSkuProposal, darkMode = false }) 
                           darkMode={darkMode}
                         />
                       </td>
-                      <td className="px-4 py-3 text-center font-medium font-['JetBrains_Mono'] text-[#2C2417]">{formatCurrency(cellData.otbValue || 0)}</td>
-                      <td className={`px-4 py-3 text-center font-medium font-['JetBrains_Mono'] ${
+                      <td className="px-4 py-3 text-center font-medium font-data text-[#2C2417]">{formatCurrency(cellData.otbValue || 0)}</td>
+                      <td className={`px-4 py-3 text-center font-medium font-data ${
                         variance < 0 ? 'text-[#DC3545]' : variance > 0 ? 'text-[#1B6B45]' : 'text-[#8C8178]'
                       }`}>
                         {variance > 0 ? '+' : ''}{variance.toFixed(0)}%
@@ -690,13 +717,13 @@ const OTBAnalysisScreen = ({ otbContext, onOpenSkuProposal, darkMode = false }) 
             ))}
 
             <tr className={sumRowClass}>
-              <td className="px-4 py-4 font-bold font-['Montserrat']">{t('otbAnalysis.total')}</td>
-              <td className="px-4 py-4 text-center font-['JetBrains_Mono']">100%</td>
-              <td className="px-4 py-4 text-center font-['JetBrains_Mono']">100%</td>
-              <td className="px-4 py-4 text-center font-['JetBrains_Mono']">-</td>
-              <td className="px-4 py-4 text-center font-['JetBrains_Mono']">100%</td>
-              <td className="px-4 py-4 text-center font-['JetBrains_Mono']">{formatCurrency(grandTotals.otbValue)}</td>
-              <td className="px-4 py-4 text-center font-['JetBrains_Mono']">-</td>
+              <td className="px-4 py-4 font-bold font-brand">{t('otbAnalysis.total')}</td>
+              <td className="px-4 py-4 text-center font-data">100%</td>
+              <td className="px-4 py-4 text-center font-data">100%</td>
+              <td className="px-4 py-4 text-center font-data">-</td>
+              <td className="px-4 py-4 text-center font-data">100%</td>
+              <td className="px-4 py-4 text-center font-data">{formatCurrency(grandTotals.otbValue)}</td>
+              <td className="px-4 py-4 text-center font-data">-</td>
             </tr>
           </tbody>
         </table>
@@ -766,131 +793,100 @@ const OTBAnalysisScreen = ({ otbContext, onOpenSkuProposal, darkMode = false }) 
 
     return (
       <div className="p-4 space-y-3">
-        {/* Filter Section */}
-        <div className="px-4 py-3 rounded-xl border mb-4 bg-[#FBF9F7] border-[#E8E2DB]">
-          <div className="flex flex-wrap items-center gap-3 md:gap-6">
-            <div className="flex items-center gap-2 text-[#8C8178]">
-              <Filter size={16} />
-              <span className="font-medium text-sm font-['Montserrat']">{t('otbAnalysis.filters')}:</span>
-            </div>
+        {/* Category Filters — compact inline */}
+        <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border mb-3 bg-white border-border-muted">
 
-            {/* Gender Filter */}
-            <div className="relative" ref={setDropdownRef('genderFilter')}>
-              <button
-                type="button"
-                onClick={() => {
-                  setOpenCategoryDropdown((prev) => (prev === 'genderFilter' ? null : 'genderFilter'));
-                  setOpenDropdown(null);
-                }}
-                className="flex items-center gap-2 px-4 py-2 border-2 rounded-lg transition-all min-w-[150px] bg-white border-[#E8E2DB] hover:border-[rgba(215,183,151,0.5)]"
-              >
-                <Users size={14} className="text-[#C4975A]" />
-                <span className="text-sm font-medium flex-1 text-left truncate text-[#2C2417]">
-                  {getSelectedLabel(filterOptions.genders, genderFilter)}
-                </span>
-                <ChevronDown size={16} className={`transition-transform text-[#6B5D4F] ${openCategoryDropdown === 'genderFilter' ? 'rotate-180' : ''}`} />
-              </button>
-              {openCategoryDropdown === 'genderFilter' && (
-                <div className="absolute top-full left-0 mt-1 w-full border-2 rounded-lg shadow-lg z-50 overflow-hidden bg-white border-[#E8E2DB]">
-                  {filterOptions.genders.map(option => (
-                    <div
-                      key={option.id}
-                      onClick={() => handleGenderFilterChange(option.id)}
-                      className="px-4 py-2.5 flex items-center gap-2 cursor-pointer transition-colors hover:bg-[rgba(160,120,75,0.12)]"
-                    >
-                      <span className={`text-sm ${genderFilter === option.id ? 'text-[#C4975A] font-semibold' : 'text-[#2C2417]'}`}>
-                        {option.name}
-                      </span>
-                      {genderFilter === option.id && <Check size={14} className="text-[#C4975A] ml-auto" />}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Category Filter */}
-            <div className="relative" ref={setDropdownRef('categoryFilter')}>
-              <button
-                type="button"
-                onClick={() => {
-                  setOpenCategoryDropdown((prev) => (prev === 'categoryFilter' ? null : 'categoryFilter'));
-                  setOpenDropdown(null);
-                }}
-                className="flex items-center gap-2 px-4 py-2 border-2 rounded-lg transition-all min-w-[180px] bg-white border-[#E8E2DB] hover:border-[rgba(215,183,151,0.5)]"
-              >
-                <Tag size={14} className="text-[#C4975A]" />
-                <span className="text-sm font-medium flex-1 text-left truncate text-[#2C2417]">
-                  {getSelectedLabel(filterOptions.categories, categoryFilter)}
-                </span>
-                <ChevronDown size={16} className={`transition-transform text-[#6B5D4F] ${openCategoryDropdown === 'categoryFilter' ? 'rotate-180' : ''}`} />
-              </button>
-              {openCategoryDropdown === 'categoryFilter' && (
-                <div className="absolute top-full left-0 mt-1 w-full border-2 rounded-lg shadow-lg z-50 overflow-hidden max-h-[300px] overflow-y-auto bg-white border-[#E8E2DB]">
-                  {filteredCategoryOptions.map(option => (
-                    <div
-                      key={option.id}
-                      onClick={() => handleCategoryFilterChange(option.id)}
-                      className="px-4 py-2.5 flex items-center gap-2 cursor-pointer transition-colors hover:bg-[rgba(160,120,75,0.12)]"
-                    >
-                      <span className={`text-sm ${categoryFilter === option.id ? 'text-[#C4975A] font-semibold' : 'text-[#2C2417]'}`}>
-                        {option.name}
-                      </span>
-                      {categoryFilter === option.id && <Check size={14} className="text-[#C4975A] ml-auto" />}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Sub-Category Filter */}
-            <div className="relative" ref={setDropdownRef('subCategoryFilter')}>
-              <button
-                type="button"
-                onClick={() => {
-                  setOpenCategoryDropdown((prev) => (prev === 'subCategoryFilter' ? null : 'subCategoryFilter'));
-                  setOpenDropdown(null);
-                }}
-                className="flex items-center gap-2 px-4 py-2 border-2 rounded-lg transition-all min-w-[180px] bg-white border-[#E8E2DB] hover:border-[rgba(215,183,151,0.5)]"
-              >
-                <Layers size={14} className="text-[#1B6B45]" />
-                <span className="text-sm font-medium flex-1 text-left truncate text-[#2C2417]">
-                  {getSelectedLabel(filterOptions.subCategories, subCategoryFilter)}
-                </span>
-                <ChevronDown size={16} className={`transition-transform text-[#6B5D4F] ${openCategoryDropdown === 'subCategoryFilter' ? 'rotate-180' : ''}`} />
-              </button>
-              {openCategoryDropdown === 'subCategoryFilter' && (
-                <div className="absolute top-full left-0 mt-1 w-full border-2 rounded-lg shadow-lg z-50 overflow-hidden max-h-[300px] overflow-y-auto bg-white border-[#E8E2DB]">
-                  {filteredSubCategoryOptions.map(option => (
-                    <div
-                      key={option.id}
-                      onClick={() => handleSubCategoryFilterChange(option.id)}
-                      className="px-4 py-2.5 flex items-center gap-2 cursor-pointer transition-colors hover:bg-[rgba(160,120,75,0.12)]"
-                    >
-                      <span className={`text-sm ${subCategoryFilter === option.id ? 'text-[#1B6B45] font-semibold' : 'text-[#2C2417]'}`}>
-                        {option.name}
-                      </span>
-                      {subCategoryFilter === option.id && <Check size={14} className="text-[#1B6B45] ml-auto" />}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Clear Filters */}
-            {(genderFilter !== 'all' || categoryFilter !== 'all' || subCategoryFilter !== 'all') && (
-              <button
-                onClick={() => {
-                  setGenderFilter('all');
-                  setCategoryFilter('all');
-                  setSubCategoryFilter('all');
-                }}
-                className="flex items-center gap-2 px-4 py-2 bg-[#DC3545] text-white rounded-lg hover:bg-[#DC3545]/90 transition-all shadow-md hover:shadow-lg text-sm font-medium"
-              >
-                <X size={14} />
-                {t('common.clearAll')}
-              </button>
+          {/* Gender Filter */}
+          <div className="relative" ref={setDropdownRef('genderFilter')}>
+            <button
+              type="button"
+              onClick={() => {
+                setOpenCategoryDropdown((prev) => (prev === 'genderFilter' ? null : 'genderFilter'));
+                setOpenDropdown(null);
+              }}
+              className="flex items-center gap-1.5 px-2.5 py-1 border rounded-md transition-all text-[11px] font-medium bg-white border-border-muted text-content hover:bg-surface-secondary"
+            >
+              <Users size={12} className="text-content-muted" />
+              <span className="truncate max-w-[100px]">{getSelectedLabel(filterOptions.genders, genderFilter)}</span>
+              <ChevronDown size={11} className={`transition-transform text-content-muted ${openCategoryDropdown === 'genderFilter' ? 'rotate-180' : ''}`} />
+            </button>
+            {openCategoryDropdown === 'genderFilter' && (
+              <div className="absolute top-full left-0 mt-1 w-full border rounded-lg shadow-md z-50 overflow-hidden bg-white border-border-muted">
+                {filterOptions.genders.map(option => (
+                  <div key={option.id} onClick={() => handleGenderFilterChange(option.id)}
+                    className="px-3 py-2 flex items-center gap-2 cursor-pointer text-xs transition-colors hover:bg-surface-secondary">
+                    <span className={genderFilter === option.id ? 'text-dafc-gold font-semibold' : 'text-content'}>{option.name}</span>
+                    {genderFilter === option.id && <Check size={12} className="text-dafc-gold ml-auto" />}
+                  </div>
+                ))}
+              </div>
             )}
           </div>
+
+          {/* Category Filter */}
+          <div className="relative" ref={setDropdownRef('categoryFilter')}>
+            <button
+              type="button"
+              onClick={() => {
+                setOpenCategoryDropdown((prev) => (prev === 'categoryFilter' ? null : 'categoryFilter'));
+                setOpenDropdown(null);
+              }}
+              className="flex items-center gap-1.5 px-2.5 py-1 border rounded-md transition-all text-[11px] font-medium bg-white border-border-muted text-content hover:bg-surface-secondary"
+            >
+              <Tag size={12} className="text-content-muted" />
+              <span className="truncate max-w-[120px]">{getSelectedLabel(filterOptions.categories, categoryFilter)}</span>
+              <ChevronDown size={11} className={`transition-transform text-content-muted ${openCategoryDropdown === 'categoryFilter' ? 'rotate-180' : ''}`} />
+            </button>
+            {openCategoryDropdown === 'categoryFilter' && (
+              <div className="absolute top-full left-0 mt-1 min-w-full border rounded-lg shadow-md z-50 overflow-hidden max-h-[300px] overflow-y-auto bg-white border-border-muted">
+                {filteredCategoryOptions.map(option => (
+                  <div key={option.id} onClick={() => handleCategoryFilterChange(option.id)}
+                    className="px-3 py-2 flex items-center gap-2 cursor-pointer text-xs transition-colors hover:bg-surface-secondary">
+                    <span className={categoryFilter === option.id ? 'text-dafc-gold font-semibold' : 'text-content'}>{option.name}</span>
+                    {categoryFilter === option.id && <Check size={12} className="text-dafc-gold ml-auto" />}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Sub-Category Filter */}
+          <div className="relative" ref={setDropdownRef('subCategoryFilter')}>
+            <button
+              type="button"
+              onClick={() => {
+                setOpenCategoryDropdown((prev) => (prev === 'subCategoryFilter' ? null : 'subCategoryFilter'));
+                setOpenDropdown(null);
+              }}
+              className="flex items-center gap-1.5 px-2.5 py-1 border rounded-md transition-all text-[11px] font-medium bg-white border-border-muted text-content hover:bg-surface-secondary"
+            >
+              <Layers size={12} className="text-content-muted" />
+              <span className="truncate max-w-[120px]">{getSelectedLabel(filterOptions.subCategories, subCategoryFilter)}</span>
+              <ChevronDown size={11} className={`transition-transform text-content-muted ${openCategoryDropdown === 'subCategoryFilter' ? 'rotate-180' : ''}`} />
+            </button>
+            {openCategoryDropdown === 'subCategoryFilter' && (
+              <div className="absolute top-full left-0 mt-1 min-w-full border rounded-lg shadow-md z-50 overflow-hidden max-h-[300px] overflow-y-auto bg-white border-border-muted">
+                {filteredSubCategoryOptions.map(option => (
+                  <div key={option.id} onClick={() => handleSubCategoryFilterChange(option.id)}
+                    className="px-3 py-2 flex items-center gap-2 cursor-pointer text-xs transition-colors hover:bg-surface-secondary">
+                    <span className={subCategoryFilter === option.id ? 'text-[#1B6B45] font-semibold' : 'text-content'}>{option.name}</span>
+                    {subCategoryFilter === option.id && <Check size={12} className="text-[#1B6B45] ml-auto" />}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Clear Filters */}
+          {(genderFilter !== 'all' || categoryFilter !== 'all' || subCategoryFilter !== 'all') && (
+            <button
+              onClick={() => { setGenderFilter('all'); setCategoryFilter('all'); setSubCategoryFilter('all'); }}
+              className="flex items-center gap-1 text-[10px] font-medium transition-colors text-content-muted hover:text-content shrink-0"
+            >
+              <X size={10} />
+              {t('common.clearAll')}
+            </button>
+          )}
         </div>
 
         {/* Hierarchical Content */}
@@ -913,11 +909,11 @@ const OTBAnalysisScreen = ({ otbContext, onOpenSkuProposal, darkMode = false }) 
                   />
                 </button>
                 <Users size={18} className="text-[#8A6340]" />
-                <span className="font-bold text-lg font-['Montserrat'] text-[#5C4A3A]">{genderGroup.gender.name}</span>
+                <span className="font-bold text-lg font-brand text-[#5C4A3A]">{genderGroup.gender.name}</span>
                 <span className="ml-auto text-sm text-[#8A6340]">
                   {genderGroup.categories.length} categories
                 </span>
-                <div className="flex items-center gap-4 ml-4 text-sm font-['JetBrains_Mono'] text-[#5C4A3A]">
+                <div className="flex items-center gap-4 ml-4 text-sm font-data text-[#5C4A3A]">
                   <span>Buy: <strong>{genderTotals.buyPct}%</strong></span>
                   <span>Sales: <strong>{genderTotals.salesPct}%</strong></span>
                   <span>OTB: <strong>{genderTotals.otbProposed.toLocaleString()}</strong></span>
@@ -946,13 +942,13 @@ const OTBAnalysisScreen = ({ otbContext, onOpenSkuProposal, darkMode = false }) 
                             />
                           </button>
                           <Tag size={16} className="text-[#C4975A]" />
-                          <span className="font-semibold font-['Montserrat'] text-[#8A6340]">
+                          <span className="font-semibold font-brand text-[#8A6340]">
                             {cat.name}
                           </span>
                           <span className="ml-auto text-sm text-[#6B5D4F]">
                             {cat.subCategories.length} sub-categories
                           </span>
-                          <div className="flex items-center gap-4 ml-4 text-sm font-['JetBrains_Mono'] text-[#8C8178]">
+                          <div className="flex items-center gap-4 ml-4 text-sm font-data text-[#8C8178]">
                             <span>Buy: <strong>{catTotals.buyPct}%</strong></span>
                             <span>Proposed: <strong>{catTotals.buyProposed}%</strong></span>
                             <span>OTB: <strong>{catTotals.otbProposed.toLocaleString()}</strong></span>
@@ -965,16 +961,16 @@ const OTBAnalysisScreen = ({ otbContext, onOpenSkuProposal, darkMode = false }) 
                             <table className="w-full text-sm">
                               <thead>
                                 <tr>
-                                  <th className={`px-4 py-2 text-left text-xs font-semibold font-['Montserrat'] ${headerDarkCell}`}>{t('nav.subCategories')}</th>
-                                  <th className={`px-3 py-2 text-center text-xs font-semibold font-['Montserrat'] ${headerDarkCell}`}>{t('otbAnalysis.pctBuy')}</th>
-                                  <th className={`px-3 py-2 text-center text-xs font-semibold font-['Montserrat'] ${headerDarkCell}`}>{t('otbAnalysis.pctSales')}</th>
-                                  <th className={`px-3 py-2 text-center text-xs font-semibold font-['Montserrat'] ${headerDarkCell}`}>{t('otbAnalysis.pctST')}</th>
-                                  <th className={`px-3 py-2 text-center text-xs font-semibold font-['Montserrat'] ${headerGoldCell}`}>{t('otbAnalysis.pctProposed')}</th>
-                                  <th className={`px-3 py-2 text-center text-xs font-semibold font-['Montserrat'] ${headerBrownCell}`}>{t('otbAnalysis.dollarOTB')}</th>
-                                  <th className={`px-3 py-2 text-center text-xs font-semibold font-['Montserrat'] ${headerDarkBrownCell}`}>{t('otbAnalysis.variance')}</th>
-                                  <th className={`px-3 py-2 text-center text-xs font-semibold font-['Montserrat'] ${headerDarkCell}`}>{t('common.submit')}</th>
-                                  <th className={`px-3 py-2 text-center text-xs font-semibold font-['Montserrat'] ${headerDarkCell}`}>% Actual</th>
-                                  <th className={`px-3 py-2 text-center text-xs font-semibold font-['Montserrat'] ${headerDarkCell}`}>{t('common.actions')}</th>
+                                  <th className={`px-4 py-2 text-left text-xs font-semibold font-brand ${headerDarkCell}`}>{t('nav.subCategories')}</th>
+                                  <th className={`px-3 py-2 text-center text-xs font-semibold font-brand ${headerDarkCell}`}>{t('otbAnalysis.pctBuy')}</th>
+                                  <th className={`px-3 py-2 text-center text-xs font-semibold font-brand ${headerDarkCell}`}>{t('otbAnalysis.pctSales')}</th>
+                                  <th className={`px-3 py-2 text-center text-xs font-semibold font-brand ${headerDarkCell}`}>{t('otbAnalysis.pctST')}</th>
+                                  <th className={`px-3 py-2 text-center text-xs font-semibold font-brand ${headerGoldCell}`}>{t('otbAnalysis.pctProposed')}</th>
+                                  <th className={`px-3 py-2 text-center text-xs font-semibold font-brand ${headerBrownCell}`}>{t('otbAnalysis.dollarOTB')}</th>
+                                  <th className={`px-3 py-2 text-center text-xs font-semibold font-brand ${headerDarkBrownCell}`}>{t('otbAnalysis.variance')}</th>
+                                  <th className={`px-3 py-2 text-center text-xs font-semibold font-brand ${headerDarkCell}`}>{t('common.submit')}</th>
+                                  <th className={`px-3 py-2 text-center text-xs font-semibold font-brand ${headerDarkCell}`}>% Actual</th>
+                                  <th className={`px-3 py-2 text-center text-xs font-semibold font-brand ${headerDarkCell}`}>{t('common.actions')}</th>
                                 </tr>
                               </thead>
                               <tbody>
@@ -994,9 +990,9 @@ const OTBAnalysisScreen = ({ otbContext, onOpenSkuProposal, darkMode = false }) 
                                           <span className="text-[#2C2417]">{subCat.name}</span>
                                         </div>
                                       </td>
-                                      <td className="px-3 py-2.5 text-center font-['JetBrains_Mono'] text-[#8C8178]">{rowData.buyPct || 0}%</td>
-                                      <td className="px-3 py-2.5 text-center font-['JetBrains_Mono'] text-[#8C8178]">{rowData.salesPct || 0}%</td>
-                                      <td className="px-3 py-2.5 text-center font-['JetBrains_Mono'] text-[#8C8178]">{rowData.stPct || 0}%</td>
+                                      <td className="px-3 py-2.5 text-center font-data text-[#8C8178]">{rowData.buyPct || 0}%</td>
+                                      <td className="px-3 py-2.5 text-center font-data text-[#8C8178]">{rowData.salesPct || 0}%</td>
+                                      <td className="px-3 py-2.5 text-center font-data text-[#8C8178]">{rowData.stPct || 0}%</td>
                                       <td className="px-3 py-2.5 bg-[rgba(160,120,75,0.12)]">
                                         <EditableCell
                                           cellKey={cellKey}
@@ -1010,18 +1006,18 @@ const OTBAnalysisScreen = ({ otbContext, onOpenSkuProposal, darkMode = false }) 
                                           darkMode={darkMode}
                                         />
                                       </td>
-                                      <td className="px-3 py-2.5 text-center font-medium font-['JetBrains_Mono'] text-[#2C2417]">
+                                      <td className="px-3 py-2.5 text-center font-medium font-data text-[#2C2417]">
                                         {(rowData.otbProposed || 0).toLocaleString()}
                                       </td>
-                                      <td className={`px-3 py-2.5 text-center font-medium font-['JetBrains_Mono'] ${
+                                      <td className={`px-3 py-2.5 text-center font-medium font-data ${
                                         (rowData.varPct || 0) < 0 ? 'text-[#DC3545]' : 'text-[#1B6B45]'
                                       }`}>
                                         {(rowData.varPct || 0) > 0 ? '+' : ''}{rowData.varPct || 0}%
                                       </td>
-                                      <td className="px-3 py-2.5 text-center font-['JetBrains_Mono'] text-[#8C8178]">
+                                      <td className="px-3 py-2.5 text-center font-data text-[#8C8178]">
                                         {(rowData.otbSubmitted || 0).toLocaleString()}
                                       </td>
-                                      <td className="px-3 py-2.5 text-center font-['JetBrains_Mono'] text-[#8C8178]">{rowData.buyActual || 0}%</td>
+                                      <td className="px-3 py-2.5 text-center font-data text-[#8C8178]">{rowData.buyActual || 0}%</td>
                                       <td className="px-3 py-2.5 text-center">
                                         <button
                                           onClick={() => {
@@ -1055,19 +1051,19 @@ const OTBAnalysisScreen = ({ otbContext, onOpenSkuProposal, darkMode = false }) 
                                 })}
                                 {/* Category Subtotal Row */}
                                 <tr className="bg-gradient-to-r from-[rgba(215,183,151,0.25)] to-[rgba(215,183,151,0.2)] font-medium">
-                                  <td className="px-4 py-2 font-semibold font-['Montserrat'] text-[#5C4A32]">{t('otbAnalysis.subTotal')}</td>
-                                  <td className="px-3 py-2 text-center font-['JetBrains_Mono'] text-[#5C4A32]">{catTotals.buyPct}%</td>
-                                  <td className="px-3 py-2 text-center font-['JetBrains_Mono'] text-[#5C4A32]">{catTotals.salesPct}%</td>
-                                  <td className="px-3 py-2 text-center font-['JetBrains_Mono'] text-[#5C4A32]">{catTotals.stPct}%</td>
-                                  <td className="px-3 py-2 text-center bg-[rgba(160,120,75,0.18)] font-bold font-['JetBrains_Mono'] text-[#8A6340]">{catTotals.buyProposed}%</td>
-                                  <td className="px-3 py-2 text-center font-bold font-['JetBrains_Mono'] text-[#5C4A32]">{catTotals.otbProposed.toLocaleString()}</td>
-                                  <td className={`px-3 py-2 text-center font-bold font-['JetBrains_Mono'] ${
+                                  <td className="px-4 py-2 font-semibold font-brand text-[#5C4A32]">{t('otbAnalysis.subTotal')}</td>
+                                  <td className="px-3 py-2 text-center font-data text-[#5C4A32]">{catTotals.buyPct}%</td>
+                                  <td className="px-3 py-2 text-center font-data text-[#5C4A32]">{catTotals.salesPct}%</td>
+                                  <td className="px-3 py-2 text-center font-data text-[#5C4A32]">{catTotals.stPct}%</td>
+                                  <td className="px-3 py-2 text-center bg-[rgba(160,120,75,0.18)] font-bold font-data text-[#8A6340]">{catTotals.buyProposed}%</td>
+                                  <td className="px-3 py-2 text-center font-bold font-data text-[#5C4A32]">{catTotals.otbProposed.toLocaleString()}</td>
+                                  <td className={`px-3 py-2 text-center font-bold font-data ${
                                     catTotals.varPct < 0 ? 'text-[#DC3545]' : 'text-[#5C4A32]'
                                   }`}>
                                     {catTotals.varPct > 0 ? '+' : ''}{catTotals.varPct}%
                                   </td>
-                                  <td className="px-3 py-2 text-center font-['JetBrains_Mono'] text-[#5C4A32]">{catTotals.otbSubmitted.toLocaleString()}</td>
-                                  <td className="px-3 py-2 text-center font-['JetBrains_Mono'] text-[#5C4A32]">{catTotals.buyActual}%</td>
+                                  <td className="px-3 py-2 text-center font-data text-[#5C4A32]">{catTotals.otbSubmitted.toLocaleString()}</td>
+                                  <td className="px-3 py-2 text-center font-data text-[#5C4A32]">{catTotals.buyActual}%</td>
                                   <td className="px-3 py-2"></td>
                                 </tr>
                               </tbody>
@@ -1081,10 +1077,10 @@ const OTBAnalysisScreen = ({ otbContext, onOpenSkuProposal, darkMode = false }) 
                   {/* Gender Total */}
                   <div className="rounded-xl p-3 border bg-[rgba(160,120,75,0.18)] border-[rgba(215,183,151,0.4)]">
                     <div className="flex items-center justify-between">
-                      <span className="font-bold font-['Montserrat'] text-[#8A6340]">
+                      <span className="font-bold font-brand text-[#8A6340]">
                         TOTAL {genderGroup.gender.name.toUpperCase()}
                       </span>
-                      <div className="flex items-center gap-6 text-sm font-['JetBrains_Mono'] text-[#8A6340]">
+                      <div className="flex items-center gap-6 text-sm font-data text-[#8A6340]">
                         <span>% Buy: <strong>{genderTotals.buyPct}%</strong></span>
                         <span>% Sales: <strong>{genderTotals.salesPct}%</strong></span>
                         <span>% ST: <strong>{genderTotals.stPct}%</strong></span>
@@ -1107,61 +1103,34 @@ const OTBAnalysisScreen = ({ otbContext, onOpenSkuProposal, darkMode = false }) 
 
   return (
     <div className="space-y-3 md:space-y-6">
-      {/* Header Section - Same style as Planning page */}
-      <div className="backdrop-blur-xl rounded-2xl shadow-xl border p-3 md:p-6 relative z-[100] bg-gradient-to-br from-white to-[rgba(215,183,151,0.1)] border-[#E8E2DB]">
-        <div className="absolute top-0 right-0 w-64 h-64 rounded-full blur-3xl bg-gradient-to-br from-[rgba(215,183,151,0.2)] to-transparent"></div>
-        <div className="absolute bottom-0 left-0 w-64 h-64 rounded-full blur-3xl bg-gradient-to-tr from-[rgba(215,183,151,0.15)] to-transparent"></div>
-
-        <div className="relative">
-          {/* Filter Section - Redesigned like Planning page */}
-          <div className="rounded-xl border shadow-sm bg-white border-[#E8E2DB]">
-            {/* Filter Header */}
-            <div className="flex items-center justify-between px-4 py-3 border-b bg-gradient-to-r from-[#FBF9F7] to-[rgba(215,183,151,0.1)] border-[#E8E2DB]">
-              <div className="flex items-center gap-2">
-                <Filter size={16} className="text-[#6B5D4F]" />
-                <span className="text-sm font-semibold font-['Montserrat'] text-[#2C2417]">{t('otbAnalysis.filters')}</span>
-              </div>
-              {hasActiveFilters && (
-                <button
-                  onClick={clearFilters}
-                  className="flex items-center gap-1 text-xs transition-colors text-[#6B5D4F] hover:text-[#8C8178]"
-                >
-                  <X size={12} />
-                  {t('common.clearAllFilters')}
-                </button>
-              )}
-            </div>
-
-            {/* Filter Controls */}
-            <div className="p-4 relative z-[100]">
-              <div className="flex flex-wrap items-end gap-3">
+      {/* Budget Filter Section */}
+      <div className="relative z-[100]">
+          <div className="bg-white rounded-xl border border-border-muted">
+            {/* Filter Controls — single compact row */}
+            <div className="px-3 py-1.5 relative z-[100]">
+              <div className="flex flex-wrap items-center gap-1.5">
                 {/* Budget Name Dropdown */}
-                <div className="relative min-w-[200px]" ref={setDropdownRef('budget')}>
-                  <label className="block text-xs font-medium mb-1.5 text-[#6B5D4F]">
-                    {t('budget.budgetName')}
-                  </label>
+                <div className="relative" ref={setDropdownRef('budget')}>
                   <button
                     type="button"
                     onClick={() => {
                       setOpenDropdown((prev) => (prev === 'budget' ? null : 'budget'));
                       setOpenCategoryDropdown(null);
                     }}
-                    className={`w-full px-3 py-2.5 border rounded-lg font-medium cursor-pointer flex items-center justify-between text-sm transition-all ${
+                    className={`px-2.5 py-1 border rounded-md cursor-pointer flex items-center gap-1.5 text-[11px] font-medium transition-all ${
                       selectedBudget
-                        ? 'bg-[rgba(160,120,75,0.18)] border-[rgba(215,183,151,0.4)] text-[#8A6340] hover:border-[rgba(215,183,151,0.5)]'
-                        : 'bg-white border-[#E8E2DB] text-[#2C2417] hover:border-[#E8E2DB]/80 hover:bg-[#FBF9F7]'
+                        ? 'bg-dafc-gold/10 border-dafc-gold/40 text-[#8A6340]'
+                        : 'bg-white border-border-muted text-content hover:bg-surface-secondary'
                     }`}
                   >
-                    <div className="flex items-center gap-2 truncate">
-                      <FileText size={14} className={selectedBudget ? 'text-[#C4975A]' : 'text-[#6B5D4F]'} />
-                      <span className="truncate">{selectedBudget?.budgetName || t('otbAnalysis.selectBudget')}</span>
-                    </div>
-                    <ChevronDown size={16} className={`flex-shrink-0 transition-transform duration-200 ${openDropdown === 'budget' ? 'rotate-180' : ''}`} />
+                    <FileText size={12} className={selectedBudget ? 'text-dafc-gold' : 'text-content-muted'} />
+                    <span className="truncate max-w-[160px]">{selectedBudget?.budgetName || t('otbAnalysis.selectBudget')}</span>
+                    <ChevronDown size={11} className={`shrink-0 transition-transform duration-200 ${openDropdown === 'budget' ? 'rotate-180' : ''}`} />
                   </button>
                   {openDropdown === 'budget' && (
                     <div className="absolute top-full left-0 mt-1 border rounded-xl shadow-xl z-[9999] overflow-hidden min-w-[300px] bg-white border-[#E8E2DB]">
                       <div className="p-2 border-b bg-[#FBF9F7] border-[#E8E2DB]">
-                        <span className="text-xs font-semibold uppercase tracking-wide font-['Montserrat'] text-[#6B5D4F]">{t('budget.title')}</span>
+                        <span className="text-xs font-semibold uppercase tracking-wide font-brand text-[#6B5D4F]">{t('budget.title')}</span>
                       </div>
                       <div className="max-h-72 overflow-y-auto py-1">
                         {/* Loading state */}
@@ -1215,7 +1184,7 @@ const OTBAnalysisScreen = ({ otbContext, onOpenSkuProposal, darkMode = false }) 
                                   <span className="text-[#E8E2DB]">-</span>
                                   <span className="text-xs text-[#6B5D4F]">{budget.brandName}</span>
                                   <span className="text-[#E8E2DB]">-</span>
-                                  <span className="text-xs font-medium text-[#C4975A] font-['JetBrains_Mono']">{formatCurrency(budget.totalBudget)}</span>
+                                  <span className="text-xs font-medium text-[#C4975A] font-data">{formatCurrency(budget.totalBudget)}</span>
                                 </div>
                               </div>
                               {selectedBudgetId === budget.id && (
@@ -1231,31 +1200,25 @@ const OTBAnalysisScreen = ({ otbContext, onOpenSkuProposal, darkMode = false }) 
                   )}
                 </div>
 
-                {/* Divider */}
-                <div className="h-10 w-px hidden sm:block bg-[#E8E2DB]"></div>
+                <div className="h-4 w-px hidden sm:block bg-border-muted"></div>
 
                 {/* Season Group Filter */}
-                <div className="relative min-w-[140px]" ref={setDropdownRef('seasonGroup')}>
-                  <label className="block text-xs font-medium mb-1.5 text-[#6B5D4F]">
-                    {t('otbAnalysis.seasonGroup')}
-                  </label>
+                <div className="relative" ref={setDropdownRef('seasonGroup')}>
                   <button
                     type="button"
                     onClick={() => {
                       setOpenDropdown((prev) => (prev === 'seasonGroup' ? null : 'seasonGroup'));
                       setOpenCategoryDropdown(null);
                     }}
-                    className={`w-full px-3 py-2.5 border rounded-lg font-medium cursor-pointer flex items-center justify-between text-sm transition-all ${
+                    className={`px-2.5 py-1 border rounded-md cursor-pointer flex items-center gap-1.5 text-[11px] font-medium transition-all ${
                       selectedSeasonGroup !== 'all'
-                        ? 'bg-[rgba(160,120,75,0.18)] border-[rgba(215,183,151,0.4)] text-[#8A6340] hover:border-[rgba(215,183,151,0.5)]'
-                        : 'bg-white border-[#E8E2DB] text-[#2C2417] hover:border-[#E8E2DB]/80 hover:bg-[#FBF9F7]'
+                        ? 'bg-dafc-gold/10 border-dafc-gold/40 text-[#8A6340]'
+                        : 'bg-white border-border-muted text-content hover:bg-surface-secondary'
                     }`}
                   >
-                    <div className="flex items-center gap-2">
-                      <Calendar size={14} className={selectedSeasonGroup !== 'all' ? 'text-[#C4975A]' : 'text-[#6B5D4F]'} />
-                      <span>{SEASON_GROUPS.find(s => s.id === selectedSeasonGroup)?.label || t('otbAnalysis.seasonGroup')}</span>
-                    </div>
-                    <ChevronDown size={16} className={`transition-transform duration-200 ${openDropdown === 'seasonGroup' ? 'rotate-180' : ''}`} />
+                    <Calendar size={12} className={selectedSeasonGroup !== 'all' ? 'text-dafc-gold' : 'text-content-muted'} />
+                    <span>{SEASON_GROUPS.find(s => s.id === selectedSeasonGroup)?.label || t('otbAnalysis.seasonGroup')}</span>
+                    <ChevronDown size={11} className={`shrink-0 transition-transform duration-200 ${openDropdown === 'seasonGroup' ? 'rotate-180' : ''}`} />
                   </button>
                   {openDropdown === 'seasonGroup' && (
                     <div className="absolute top-full left-0 right-0 mt-1 border rounded-lg shadow-lg z-[9999] overflow-hidden bg-white border-[#E8E2DB]">
@@ -1278,27 +1241,22 @@ const OTBAnalysisScreen = ({ otbContext, onOpenSkuProposal, darkMode = false }) 
                 </div>
 
                 {/* Season Filter */}
-                <div className="relative min-w-[140px]" ref={setDropdownRef('season')}>
-                  <label className="block text-xs font-medium mb-1.5 text-[#6B5D4F]">
-                    {t('otbAnalysis.season')}
-                  </label>
+                <div className="relative" ref={setDropdownRef('season')}>
                   <button
                     type="button"
                     onClick={() => {
                       setOpenDropdown((prev) => (prev === 'season' ? null : 'season'));
                       setOpenCategoryDropdown(null);
                     }}
-                    className={`w-full px-3 py-2.5 border rounded-lg font-medium cursor-pointer flex items-center justify-between text-sm transition-all ${
+                    className={`px-2.5 py-1 border rounded-md cursor-pointer flex items-center gap-1.5 text-[11px] font-medium transition-all ${
                       selectedSeason !== 'all'
-                        ? 'bg-[rgba(160,120,75,0.18)] border-[rgba(215,183,151,0.4)] text-[#8A6340] hover:border-[rgba(215,183,151,0.5)]'
-                        : 'bg-white border-[#E8E2DB] text-[#2C2417] hover:border-[#E8E2DB]/80 hover:bg-[#FBF9F7]'
+                        ? 'bg-dafc-gold/10 border-dafc-gold/40 text-[#8A6340]'
+                        : 'bg-white border-border-muted text-content hover:bg-surface-secondary'
                     }`}
                   >
-                    <div className="flex items-center gap-2">
-                      <Clock size={14} className={selectedSeason !== 'all' ? 'text-[#C4975A]' : 'text-[#6B5D4F]'} />
-                      <span>{SEASONS.find(s => s.id === selectedSeason)?.label || t('otbAnalysis.season')}</span>
-                    </div>
-                    <ChevronDown size={16} className={`transition-transform duration-200 ${openDropdown === 'season' ? 'rotate-180' : ''}`} />
+                    <Clock size={12} className={selectedSeason !== 'all' ? 'text-dafc-gold' : 'text-content-muted'} />
+                    <span>{SEASONS.find(s => s.id === selectedSeason)?.label || t('otbAnalysis.season')}</span>
+                    <ChevronDown size={11} className={`shrink-0 transition-transform duration-200 ${openDropdown === 'season' ? 'rotate-180' : ''}`} />
                   </button>
                   {openDropdown === 'season' && (
                     <div className="absolute top-full left-0 right-0 mt-1 border rounded-lg shadow-lg z-[9999] overflow-hidden bg-white border-[#E8E2DB]">
@@ -1323,11 +1281,8 @@ const OTBAnalysisScreen = ({ otbContext, onOpenSkuProposal, darkMode = false }) 
                 {/* Version Filter */}
                 {selectedBudgetId && selectedBudgetId !== 'all' && (
                 <>
-                <div className="h-10 w-px hidden sm:block bg-[#E8E2DB]"></div>
-                <div className="relative min-w-[200px]" ref={setDropdownRef('version')}>
-                  <label className="block text-xs font-medium mb-1.5 text-[#6B5D4F]">
-                    Version
-                  </label>
+                <div className="h-4 w-px hidden sm:block bg-border-muted"></div>
+                <div className="relative" ref={setDropdownRef('version')}>
                   <button
                     type="button"
                     onClick={() => {
@@ -1335,35 +1290,33 @@ const OTBAnalysisScreen = ({ otbContext, onOpenSkuProposal, darkMode = false }) 
                       setOpenCategoryDropdown(null);
                     }}
                     disabled={versions.length === 0 && !loadingVersions}
-                    className={`w-full px-3 py-2.5 border rounded-lg font-medium cursor-pointer flex items-center justify-between text-sm transition-all ${
+                    className={`px-2.5 py-1 border rounded-md cursor-pointer flex items-center gap-1.5 text-[11px] font-medium transition-all ${
                       versions.length === 0 && !loadingVersions
-                        ? 'bg-[#FBF9F7] border-[#E8E2DB] text-[#6B5D4F] cursor-not-allowed opacity-50'
+                        ? 'bg-surface-secondary border-border-muted text-content-muted cursor-not-allowed opacity-50'
                         : selectedVersion
                           ? selectedVersion.isFinal
-                            ? 'bg-[rgba(215,183,151,0.2)] border-[#C4975A] text-[#8A6340]'
-                            : 'bg-[rgba(160,120,75,0.18)] border-[rgba(215,183,151,0.4)] text-[#8A6340]'
-                          : 'bg-white border-[#E8E2DB] text-[#2C2417] hover:border-[#E8E2DB]/80 hover:bg-[#FBF9F7]'
+                            ? 'bg-dafc-gold/15 border-dafc-gold text-[#8A6340]'
+                            : 'bg-dafc-gold/10 border-dafc-gold/40 text-[#8A6340]'
+                          : 'bg-white border-border-muted text-content hover:bg-surface-secondary'
                     }`}
                   >
-                    <div className="flex items-center gap-2 truncate">
-                      {selectedVersion?.isFinal ? (
-                        <Star size={14} className="text-[#C4975A] fill-[#C4975A]" />
-                      ) : (
-                        <Sparkles size={14} className={selectedVersion ? 'text-[#C4975A]' : 'text-[#6B5D4F]'} />
-                      )}
-                      <span className="truncate">
-                        {loadingVersions ? `${t('common.loading')}...` : selectedVersion ? selectedVersion.name : t('common.version')}
-                      </span>
-                      {selectedVersion?.isFinal && (
-                        <span className="px-1.5 py-0.5 text-[10px] font-bold bg-[#C4975A] text-white rounded flex-shrink-0">FINAL</span>
-                      )}
-                    </div>
-                    <ChevronDown size={16} className={`shrink-0 transition-transform duration-200 ${openDropdown === 'version' ? 'rotate-180' : ''}`} />
+                    {selectedVersion?.isFinal ? (
+                      <Star size={12} className="text-dafc-gold fill-dafc-gold" />
+                    ) : (
+                      <Sparkles size={12} className={selectedVersion ? 'text-dafc-gold' : 'text-content-muted'} />
+                    )}
+                    <span className="truncate max-w-[140px]">
+                      {loadingVersions ? `${t('common.loading')}...` : selectedVersion ? selectedVersion.name : t('common.version')}
+                    </span>
+                    {selectedVersion?.isFinal && (
+                      <span className="px-1 py-px text-[8px] font-bold bg-dafc-gold text-white rounded leading-none">FINAL</span>
+                    )}
+                    <ChevronDown size={11} className={`shrink-0 transition-transform duration-200 ${openDropdown === 'version' ? 'rotate-180' : ''}`} />
                   </button>
                   {openDropdown === 'version' && (
                     <div className="absolute top-full left-0 mt-1 border rounded-xl shadow-xl z-[9999] overflow-hidden min-w-[300px] bg-white border-[#E8E2DB]">
                       <div className="p-2 border-b bg-[#FBF9F7] border-[#E8E2DB]">
-                        <span className="text-xs font-semibold uppercase tracking-wide font-['Montserrat'] text-[#6B5D4F]">Planning Versions</span>
+                        <span className="text-xs font-semibold uppercase tracking-wide font-brand text-[#6B5D4F]">Planning Versions</span>
                       </div>
                       <div className="max-h-60 overflow-y-auto py-1">
                         {loadingVersions && (
@@ -1390,7 +1343,7 @@ const OTBAnalysisScreen = ({ otbContext, onOpenSkuProposal, darkMode = false }) 
                             <div className="flex items-center justify-between">
                               <div className="flex items-center gap-2 min-w-0 flex-1">
                                 {version.isFinal && <Star size={14} className="text-[#C4975A] fill-[#C4975A] flex-shrink-0" />}
-                                <span className={`font-semibold text-sm font-['Montserrat'] truncate ${selectedVersionId === version.id ? 'text-[#C4975A]' : 'text-[#2C2417]'}`}>
+                                <span className={`font-semibold text-sm font-brand truncate ${selectedVersionId === version.id ? 'text-[#C4975A]' : 'text-[#2C2417]'}`}>
                                   {version.name}
                                 </span>
                                 {version.isFinal && (
@@ -1426,26 +1379,26 @@ const OTBAnalysisScreen = ({ otbContext, onOpenSkuProposal, darkMode = false }) 
                 {/* Budget Context Card */}
                 {((selectedBudget  && selectedSeasonGroup && selectedSeason) || budgetContext) && (
                   <>
-                    <div className="h-10 w-px hidden sm:block bg-[#E8E2DB]"></div>
-                    <div className="flex items-center gap-4 px-4 py-2 rounded-xl border border-[rgba(215,183,151,0.4)] bg-gradient-to-r from-[rgba(215,183,151,0.15)] to-[rgba(215,183,151,0.1)]">
+                    <div className="h-4 w-px hidden sm:block bg-border-muted"></div>
+                    <div className="flex items-center gap-2.5 px-2.5 py-1 rounded-md border border-dafc-gold/30 bg-dafc-gold/5">
                       <div className="flex flex-col">
-                        <span className="text-sm font-semibold font-['Montserrat'] truncate max-w-[160px] text-[#8A6340]">
+                        <span className="text-[11px] font-semibold font-brand truncate max-w-[130px] text-[#8A6340]">
                           {selectedBudget?.budgetName || budgetContext?.budgetName || 'Budget'}
                         </span>
-                        <span className="text-xs text-[#8A6340]/70">
+                        <span className="text-[10px] text-[#8A6340]/70">
                           FY {selectedBudget?.fiscalYear || budgetContext?.fiscalYear} - {selectedBudget?.brandName || budgetContext?.brandName || 'Brand'}
                         </span>
                       </div>
-                      <div className="w-px h-10 bg-[rgba(215,183,151,0.4)]"></div>
+                      <div className="w-px h-6 bg-dafc-gold/30"></div>
                       <div className="flex flex-col items-end">
-                        <span className="text-sm font-bold font-['JetBrains_Mono'] text-[#8A6340]">
+                        <span className="text-[11px] font-bold font-data text-[#8A6340]">
                           {formatCurrency(
                             budgetContext?.rex || budgetContext?.ttp
                               ? (budgetContext.rex || 0) + (budgetContext.ttp || 0)
                               : selectedBudget?.totalBudget || 0
                           )}
                         </span>
-                        <div className="flex items-center gap-3 text-xs font-['JetBrains_Mono'] text-[#8A6340]/70">
+                        <div className="flex items-center gap-2 text-[10px] font-data text-[#8A6340]/70">
                           {budgetContext?.rex || budgetContext?.ttp ? (
                             <>
                               <span>Rex: {formatCurrency(budgetContext?.rex || 0)}</span>
@@ -1466,15 +1419,13 @@ const OTBAnalysisScreen = ({ otbContext, onOpenSkuProposal, darkMode = false }) 
               </div>
             </div>
           </div>
-        </div>
       </div>
-
 
       {/* Tabs & Content */}
       {selectedBudget && selectedSeason && selectedSeasonGroup && (
-      <div className="rounded-xl shadow-lg border overflow-hidden bg-white border-[#E8E2DB]">
+      <div className="rounded-xl border overflow-hidden bg-white border-border-muted">
         {/* Tabs */}
-        <div className="border-b px-3 md:px-4 overflow-x-auto border-[#E8E2DB] bg-[#FBF9F7]">
+        <div className="border-b px-3 overflow-x-auto border-border-muted bg-surface-secondary">
           <div className="flex gap-0.5">
             {TABS.map(tab => {
               const Icon = tab.icon;
@@ -1483,13 +1434,13 @@ const OTBAnalysisScreen = ({ otbContext, onOpenSkuProposal, darkMode = false }) 
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`px-4 py-2.5 text-xs font-medium font-['Montserrat'] flex items-center gap-1.5 border-b-2 transition-all duration-200 ${
+                  className={`px-3 py-2 text-[11px] font-medium font-brand flex items-center gap-1.5 border-b-2 transition-all duration-200 ${
                     isActive
-                      ? 'border-[#C4975A] text-[#8A6340] bg-white -mb-px rounded-t-md'
-                      : 'border-transparent text-[#6B5D4F] hover:text-[#8C8178] hover:bg-white/50 rounded-t-md'
+                      ? 'border-dafc-gold text-[#8A6340] bg-white -mb-px rounded-t-md'
+                      : 'border-transparent text-content-muted hover:text-content hover:bg-white/50 rounded-t-md'
                   }`}
                 >
-                  <Icon size={14} />
+                  <Icon size={12} />
                   {tab.label}
                 </button>
               );
@@ -1498,8 +1449,8 @@ const OTBAnalysisScreen = ({ otbContext, onOpenSkuProposal, darkMode = false }) 
         </div>
 
         {/* Hint for editable cells */}
-        <div className="px-4 py-2 border-b flex items-center gap-1.5 text-xs bg-[rgba(160,120,75,0.12)] border-[rgba(215,183,151,0.2)] text-[#8A6340]">
-          <Pencil size={12} className="animate-bounce" style={{ animationDuration: '2s' }} />
+        <div className="px-3 py-1.5 border-b flex items-center gap-1.5 text-[10px] bg-dafc-gold/8 border-dafc-gold/15 text-[#8A6340]">
+          <Pencil size={10} className="animate-bounce" style={{ animationDuration: '2s' }} />
           <span>Click on cells with gold background in "% Buy Proposed" column to edit</span>
         </div>
 

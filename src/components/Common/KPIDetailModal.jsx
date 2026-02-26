@@ -116,7 +116,7 @@ const KPIDetailModal = ({
               </div>
             )}
             <div>
-              <h2 className={`text-lg font-bold font-['Montserrat'] ${textPrimary}`}>{title}</h2>
+              <h2 className={`text-lg font-bold font-brand ${textPrimary}`}>{title}</h2>
               <p className={`text-xs ${textMuted}`}>{subtitle}</p>
             </div>
           </div>
@@ -171,17 +171,17 @@ const KPIDetailModal = ({
               <div className="space-y-4">
                 {/* Big number */}
                 <div className={`border ${borderColor} rounded-xl p-4 ${panelBg}`}>
-                  <p className={`text-xs font-medium uppercase tracking-wider ${textMuted} font-['Montserrat']`}>
+                  <p className={`text-xs font-medium uppercase tracking-wider ${textMuted} font-brand`}>
                     {t('home.kpiDetail.currentValue')}
                   </p>
                   <div
-                    className={`mt-2 text-3xl font-bold font-['JetBrains_Mono'] tabular-nums`}
+                    className={`mt-2 text-3xl font-bold font-data tabular-nums`}
                     style={{ color: accentColor }}
                   >
                     {currentValue}
                   </div>
                   {trendLabel && (
-                    <span className={`inline-flex items-center gap-1 mt-2 px-2.5 py-1 text-xs font-semibold font-['JetBrains_Mono'] rounded ${
+                    <span className={`inline-flex items-center gap-1 mt-2 px-2.5 py-1 text-xs font-semibold font-data rounded ${
                       trend > 0
                         ? 'bg-[rgba(27,107,69,0.12)] text-[#1B6B45]'
                         : 'bg-[rgba(220,53,69,0.10)] text-[#DC3545]'
@@ -194,7 +194,7 @@ const KPIDetailModal = ({
 
                 {/* Alerts */}
                 <div className={`border ${borderColor} rounded-xl p-4 ${panelBg}`}>
-                  <p className={`text-xs font-medium uppercase tracking-wider ${textMuted} font-['Montserrat'] mb-3`}>
+                  <p className={`text-xs font-medium uppercase tracking-wider ${textMuted} font-brand mb-3`}>
                     {t('home.kpiDetail.activeAlerts')}
                   </p>
                   {data.alerts.length === 0 ? (
@@ -224,7 +224,7 @@ const KPIDetailModal = ({
 
               {/* Column 2: Chart Panel */}
               <div className={`border ${borderColor} rounded-xl p-4 ${panelBg}`}>
-                <p className={`text-xs font-medium uppercase tracking-wider ${textMuted} font-['Montserrat'] mb-4`}>
+                <p className={`text-xs font-medium uppercase tracking-wider ${textMuted} font-brand mb-4`}>
                   {t('home.kpiDetail.trendAnalysis')}
                 </p>
                 {data.chartData.length > 0 ? (
@@ -277,7 +277,7 @@ const KPIDetailModal = ({
 
               {/* Column 3: Breakdown Panel */}
               <div className={`border ${borderColor} rounded-xl p-4 ${panelBg}`}>
-                <p className={`text-xs font-medium uppercase tracking-wider ${textMuted} font-['Montserrat'] mb-4`}>
+                <p className={`text-xs font-medium uppercase tracking-wider ${textMuted} font-brand mb-4`}>
                   {breakdownLabel}
                 </p>
                 {data.breakdown.length > 0 ? (
@@ -285,10 +285,10 @@ const KPIDetailModal = ({
                     {data.breakdown.slice(0, 8).map((item, i) => (
                       <div key={i}>
                         <div className="flex items-center justify-between mb-1">
-                          <span className={`text-xs font-medium ${textPrimary} font-['Montserrat'] truncate max-w-[60%]`}>
+                          <span className={`text-xs font-medium ${textPrimary} font-brand truncate max-w-[60%]`}>
                             {item.label}
                           </span>
-                          <span className={`text-xs font-['JetBrains_Mono'] tabular-nums ${textSecondary}`}>
+                          <span className={`text-xs font-data tabular-nums ${textSecondary}`}>
                             {typeof item.value === 'number' && item.value > 999
                               ? `${(item.value / 1_000_000).toFixed(1)}M`
                               : item.value}
@@ -308,10 +308,10 @@ const KPIDetailModal = ({
                     ))}
                     {data.summary && (
                       <div className={`pt-3 mt-3 border-t ${borderColor} flex items-center justify-between`}>
-                        <span className={`text-xs font-semibold ${textMuted} font-['Montserrat'] uppercase`}>
+                        <span className={`text-xs font-semibold ${textMuted} font-brand uppercase`}>
                           {t('home.kpiDetail.total')}
                         </span>
-                        <span className={`text-sm font-bold font-['JetBrains_Mono'] tabular-nums`} style={{ color: accentColor }}>
+                        <span className={`text-sm font-bold font-data tabular-nums`} style={{ color: accentColor }}>
                           {data.summary.total > 999
                             ? `${(data.summary.total / 1_000_000).toFixed(1)}M`
                             : data.summary.total}

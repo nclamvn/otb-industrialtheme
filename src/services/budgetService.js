@@ -80,6 +80,17 @@ export const budgetService = {
   async delete(id) {
     const response = await api.delete(`/budgets/${id}`);
     return response.data;
+  },
+
+  // Archive budget (APPROVED only)
+  async archive(id) {
+    try {
+      const response = await api.patch(`/budgets/${id}/archive`);
+      return response.data?.data ?? response.data;
+    } catch (err) {
+      console.error('[budgetService.archive]', id, err?.response?.status, err?.message);
+      throw err;
+    }
   }
 };
 

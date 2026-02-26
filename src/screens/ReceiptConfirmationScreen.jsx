@@ -6,11 +6,13 @@ import {
   Search, ChevronDown, X, AlertTriangle, FileText,
   ClipboardCheck, XCircle, AlertCircle, BarChart3
 } from 'lucide-react';
+import toast from 'react-hot-toast';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useIsMobile } from '@/hooks/useIsMobile';
 import { formatCurrency } from '../utils';
-import { proposalService } from '../services/proposalService';
+import { proposalService, orderService } from '../services';
+import api, { invalidateCache } from '../services/api';
 import { ExpandableStatCard } from '../components/Common';
 
 /* ═══════════════════════════════════════════════
@@ -47,27 +49,34 @@ const ReceiptConfirmationScreen = () => {
     setLoading(true);
     setError(null);
     try {
-      // Derive receipts from approved proposals
-      const response = await proposalService.getAll({ status: 'APPROVED' });
-      const data = response.data || response;
-      const proposals = Array.isArray(data) ? data : [];
-      const mapped = proposals.map((p, idx) => ({
-        id: p.id || idx + 1,
-        receiptNumber: `REC-${String(idx + 1).padStart(5, '0')}`,
-        poReference: p.proposalCode || `PO-${String(idx + 1).padStart(5, '0')}`,
-        brandName: p.budget?.groupBrand?.name || p.brandName || '-',
-        itemCount: p.products?.length || p.skuCount || 0,
-        orderedQty: p.products?.reduce((sum, pr) => sum + (pr.totalQuantity || 0), 0) || p.totalQty || 0,
-        receivedQty: 0,
-        status: 'PENDING',
-        receivedDate: null,
-        createdAt: p.updatedAt || p.createdAt || new Date().toISOString(),
-      }));
-      setReceipts(mapped);
+      // Try dedicated receipts endpoint first
+      const response = await api.get('/receipts');
+      const data = response.data.data || response.data;
+      setReceipts(Array.isArray(data) ? data : []);
     } catch (err) {
-      console.error('Failed to fetch receipts:', err);
-      setError(t('receiptConfirm.failedToLoad'));
-      setReceipts([]);
+      // Fallback: derive receipts from approved proposals
+      try {
+        const response = await proposalService.getAll({ status: 'APPROVED' });
+        const data = response.data || response;
+        const proposals = Array.isArray(data) ? data : [];
+        const mapped = proposals.map((p, idx) => ({
+          id: p.id || idx + 1,
+          receiptNumber: `REC-${String(idx + 1).padStart(5, '0')}`,
+          poReference: p.proposalCode || `PO-${String(idx + 1).padStart(5, '0')}`,
+          brandName: p.budget?.groupBrand?.name || p.brandName || '-',
+          itemCount: p.products?.length || p.skuCount || 0,
+          orderedQty: p.products?.reduce((sum, pr) => sum + (pr.totalQuantity || 0), 0) || p.totalQty || 0,
+          receivedQty: p.receivedQty || 0,
+          status: p.receiptStatus || 'PENDING',
+          receivedDate: p.receivedDate || null,
+          createdAt: p.updatedAt || p.createdAt || new Date().toISOString(),
+        }));
+        setReceipts(mapped);
+      } catch (innerErr) {
+        console.error('Failed to fetch receipts:', innerErr);
+        setError(t('receiptConfirm.failedToLoad'));
+        setReceipts([]);
+      }
     } finally {
       setLoading(false);
     }
@@ -75,19 +84,36 @@ const ReceiptConfirmationScreen = () => {
 
   const handleConfirmReceipt = async (receipt) => {
     setProcessing(true);
-    // Local state update (no backend endpoint for receipts yet)
-    setReceipts(prev => prev.map(r => r.id === receipt.id ? { ...r, status: 'CONFIRMED', receivedQty: r.orderedQty, receivedDate: new Date().toISOString() } : r));
-    setProcessing(false);
-    setConfirmModal(null);
+    try {
+      await orderService.confirmReceipt(receipt.id, { receivedQty: receipt.orderedQty });
+      invalidateCache('/receipts');
+      invalidateCache('/orders');
+      toast.success(t('receiptConfirm.receiptConfirmed') || 'Receipt confirmed');
+      fetchReceipts();
+    } catch (err) {
+      console.error('Failed to confirm receipt:', err);
+      toast.error(err.userMessage || err.response?.data?.message || 'Failed to confirm receipt');
+    } finally {
+      setProcessing(false);
+      setConfirmModal(null);
+    }
   };
 
   const handleFlagDiscrepancy = async (receipt) => {
     setProcessing(true);
-    // Local state update (no backend endpoint for receipts yet)
-    setReceipts(prev => prev.map(r => r.id === receipt.id ? { ...r, status: 'DISCREPANCY', discrepancyNote } : r));
-    setProcessing(false);
-    setConfirmModal(null);
-    setDiscrepancyNote('');
+    try {
+      await orderService.flagDiscrepancy(receipt.id, discrepancyNote);
+      invalidateCache('/receipts');
+      toast.success(t('receiptConfirm.discrepancyFlagged') || 'Discrepancy flagged');
+      fetchReceipts();
+    } catch (err) {
+      console.error('Failed to flag discrepancy:', err);
+      toast.error(err.userMessage || err.response?.data?.message || 'Failed to flag discrepancy');
+    } finally {
+      setProcessing(false);
+      setConfirmModal(null);
+      setDiscrepancyNote('');
+    }
   };
 
   // Filtered
@@ -137,17 +163,11 @@ const ReceiptConfirmationScreen = () => {
   return (
     <div className={`min-h-screen ${bg} p-4`}>
       {/* Compact Header + Filters */}
-      <div className={`border ${border} rounded-xl px-3 py-2 mb-3`} style={{
-        background: 'linear-gradient(135deg, #ffffff 0%, rgba(196,151,90,0.04) 35%, rgba(196,151,90,0.12) 100%)',
-        boxShadow: 'inset 0 -1px 0 rgba(196,151,90,0.05)',
-      }}>
+      <div className={`border ${border} rounded-xl px-3 py-2 mb-3 bg-white`}>
         <div className="flex flex-wrap items-center gap-3">
-          {/* Icon + Title */}
-          <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 bg-[rgba(196,151,90,0.15)]">
-            <Receipt size={14} className="text-[#A67B3D]" />
-          </div>
+          <Receipt size={14} className="text-content-muted flex-shrink-0" />
           <div className="flex-shrink-0">
-            <h1 className={`text-sm font-semibold font-['Montserrat'] ${textPrimary} leading-tight`}>
+            <h1 className={`text-sm font-semibold font-brand ${textPrimary} leading-tight`}>
               {t('screenConfig.receiptConfirmation')}
             </h1>
             <p className={`text-[10px] ${textMuted} leading-tight`}>
@@ -155,16 +175,15 @@ const ReceiptConfirmationScreen = () => {
             </p>
           </div>
 
-          {/* Inline Filters */}
           <div className="flex flex-wrap items-center gap-2 ml-auto">
-            <div className={`flex items-center gap-1.5 px-2 py-1 rounded-lg border ${border} bg-[#FBF9F7] w-48`}>
+            <div className={`flex items-center gap-1.5 px-2 py-1 rounded-lg border ${border} bg-white w-48`}>
               <Search size={12} className={textMuted} />
               <input
                 type="text"
                 placeholder={t('receiptConfirm.searchPlaceholder')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className={`bg-transparent outline-none text-xs w-full font-['Montserrat'] ${textPrimary} placeholder:${textMuted}`}
+                className={`bg-transparent outline-none text-xs w-full font-brand ${textPrimary} placeholder:${textMuted}`}
               />
               {searchTerm && (
                 <button onClick={() => setSearchTerm('')}>
@@ -177,9 +196,9 @@ const ReceiptConfirmationScreen = () => {
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className={`appearance-none px-2 py-1 pr-6 rounded-lg border ${border} bg-[#FBF9F7] text-xs font-['Montserrat'] ${textPrimary} outline-none cursor-pointer`}
+                className={`appearance-none px-2 py-1 pr-6 rounded-lg border ${border} bg-white text-xs font-brand ${textPrimary} outline-none cursor-pointer`}
               >
-                <option value="all">{t('receiptConfirm.allStatuses')}</option>
+                <option value="all">{t('common.status')}</option>
                 <option value="PENDING">{t('receiptConfirm.statusPending')}</option>
                 <option value="CONFIRMED">{t('receiptConfirm.statusConfirmed')}</option>
                 <option value="DISCREPANCY">{t('receiptConfirm.statusDiscrepancy')}</option>
@@ -190,7 +209,7 @@ const ReceiptConfirmationScreen = () => {
 
             <button
               onClick={fetchReceipts}
-              className={`px-2.5 py-1 rounded-lg border ${border} text-xs font-medium font-['Montserrat'] transition-all text-[#A67B3D] hover:bg-[rgba(196,151,90,0.1)]`}
+              className={`px-2.5 py-1 rounded-lg border ${border} text-xs font-medium font-brand transition-all text-[#A67B3D] hover:bg-surface-secondary`}
             >
               {t('common.refresh')}
             </button>
@@ -242,9 +261,7 @@ const ReceiptConfirmationScreen = () => {
       </div>
 
       {/* Table */}
-      <div className={`border ${border} rounded-xl overflow-hidden`} style={{
-        background: 'linear-gradient(135deg, #ffffff 0%, rgba(196,151,90,0.03) 35%, rgba(196,151,90,0.08) 100%)',
-      }}>
+      <div className={`border ${border} rounded-xl overflow-hidden bg-white`}>
         {loading ? (
           <div className="flex flex-col items-center justify-center py-20">
             <Loader2 size={32} className="animate-spin text-[#A67B3D]" />
@@ -254,14 +271,14 @@ const ReceiptConfirmationScreen = () => {
           <div className="flex flex-col items-center justify-center py-20">
             <AlertTriangle size={32} className="text-[#DC3545]" />
             <p className={`text-sm mt-3 ${textSecondary}`}>{error}</p>
-            <button onClick={fetchReceipts} className="mt-3 px-4 py-2 rounded-xl bg-[#C4975A] text-white text-sm font-medium font-['Montserrat']">
+            <button onClick={fetchReceipts} className="mt-3 px-4 py-2 rounded-xl bg-[#C4975A] text-white text-sm font-medium font-brand">
               {t('common.tryAgain')}
             </button>
           </div>
         ) : filtered.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20">
             <ClipboardCheck size={48} className={textMuted} />
-            <p className={`text-base font-semibold mt-4 font-['Montserrat'] ${textPrimary}`}>{t('receiptConfirm.noReceipts')}</p>
+            <p className={`text-base font-semibold mt-4 font-brand ${textPrimary}`}>{t('receiptConfirm.noReceipts')}</p>
             <p className={`text-sm mt-1 ${textSecondary}`}>{t('receiptConfirm.noReceiptsDesc')}</p>
           </div>
         ) : (
@@ -270,7 +287,7 @@ const ReceiptConfirmationScreen = () => {
               <thead>
                 <tr className={`bg-[#FBF9F7] border-b ${border}`}>
                   {[t('receiptConfirm.colReceipt'), t('receiptConfirm.colPORef'), t('receiptConfirm.colBrand'), t('receiptConfirm.colItems'), t('receiptConfirm.colStatus'), t('receiptConfirm.colDate'), t('common.actions')].map((h) => (
-                    <th key={h} className={`px-3 py-2 text-left text-[10px] font-semibold uppercase tracking-wider font-['Montserrat'] ${textMuted}`}>
+                    <th key={h} className={`px-3 py-2 text-left text-[10px] font-semibold uppercase tracking-wider font-brand ${textMuted}`}>
                       {h}
                     </th>
                   ))}
@@ -282,20 +299,20 @@ const ReceiptConfirmationScreen = () => {
                   return (
                     <tr key={receipt.id || idx} className={`border-b ${border} transition-colors hover:bg-[#FBF9F7]`}>
                       <td className="px-3 py-1.5">
-                        <span className={`text-sm font-semibold font-['JetBrains_Mono'] ${textPrimary}`}>{receipt.receiptNumber}</span>
+                        <span className={`text-sm font-semibold font-data ${textPrimary}`}>{receipt.receiptNumber}</span>
                       </td>
                       <td className="px-3 py-1.5">
-                        <span className={`text-sm font-['JetBrains_Mono'] ${textSecondary}`}>{receipt.poReference}</span>
+                        <span className={`text-sm font-data ${textSecondary}`}>{receipt.poReference}</span>
                       </td>
                       <td className="px-3 py-1.5">
-                        <span className={`text-sm font-['Montserrat'] ${textPrimary}`}>{receipt.brandName}</span>
+                        <span className={`text-sm font-brand ${textPrimary}`}>{receipt.brandName}</span>
                       </td>
                       <td className="px-3 py-1.5">
-                        <span className={`text-sm font-['JetBrains_Mono'] ${textPrimary}`}>{receipt.itemCount}</span>
+                        <span className={`text-sm font-data ${textPrimary}`}>{receipt.itemCount}</span>
                       </td>
                       <td className="px-3 py-1.5">
                         <span
-                          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold font-['JetBrains_Mono']"
+                          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold font-data"
                           style={{ color: sc.color, backgroundColor: sc.bg }}
                         >
                           <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: sc.color }} />
@@ -303,7 +320,7 @@ const ReceiptConfirmationScreen = () => {
                         </span>
                       </td>
                       <td className="px-3 py-1.5">
-                        <span className={`text-xs font-['JetBrains_Mono'] ${textMuted}`}>
+                        <span className={`text-xs font-data ${textMuted}`}>
                           {receipt.receivedDate
                             ? new Date(receipt.receivedDate).toLocaleDateString('vi-VN')
                             : receipt.createdAt
@@ -317,14 +334,14 @@ const ReceiptConfirmationScreen = () => {
                           <div className="flex items-center gap-2">
                             <button
                               onClick={() => { setConfirmModal({ receipt, action: 'confirm' }); setDiscrepancyNote(''); }}
-                              className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold font-['Montserrat'] transition-all bg-[rgba(27,107,69,0.12)] text-[#1B6B45] hover:bg-[rgba(27,107,69,0.2)]"
+                              className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold font-brand transition-all bg-[rgba(27,107,69,0.12)] text-[#1B6B45] hover:bg-[rgba(27,107,69,0.2)]"
                             >
                               <CheckCircle size={13} />
                               {t('common.confirm')}
                             </button>
                             <button
                               onClick={() => { setConfirmModal({ receipt, action: 'discrepancy' }); setDiscrepancyNote(''); }}
-                              className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold font-['Montserrat'] transition-all bg-[rgba(220,53,69,0.1)] text-[#DC3545] hover:bg-[rgba(220,53,69,0.18)]"
+                              className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold font-brand transition-all bg-[rgba(220,53,69,0.1)] text-[#DC3545] hover:bg-[rgba(220,53,69,0.18)]"
                             >
                               <AlertCircle size={13} />
                               {t('receiptConfirm.flag')}
@@ -332,13 +349,13 @@ const ReceiptConfirmationScreen = () => {
                           </div>
                         )}
                         {receipt.status === 'CONFIRMED' && (
-                          <span className={`text-xs font-['Montserrat'] text-[#1B6B45]`}>
+                          <span className={`text-xs font-brand text-[#1B6B45]`}>
                             <CheckCircle size={14} className="inline mr-1" />
                             {t('receiptConfirm.verified')}
                           </span>
                         )}
                         {receipt.status === 'DISCREPANCY' && (
-                          <span className={`text-xs font-['Montserrat'] text-[#DC3545]`}>
+                          <span className={`text-xs font-brand text-[#DC3545]`}>
                             <AlertCircle size={14} className="inline mr-1" />
                             {t('receiptConfirm.underReview')}
                           </span>
@@ -359,7 +376,7 @@ const ReceiptConfirmationScreen = () => {
           <div className={`w-full max-w-md mx-4 rounded-2xl border ${border} ${cardBg} shadow-2xl`}>
             <div className={`p-5 border-b ${border}`}>
               <div className="flex items-center justify-between">
-                <h3 className={`text-lg font-bold font-['Montserrat'] ${textPrimary}`}>
+                <h3 className={`text-lg font-bold font-brand ${textPrimary}`}>
                   {confirmModal.action === 'confirm' ? t('receiptConfirm.confirmReceipt') : t('receiptConfirm.flagDiscrepancy')}
                 </h3>
                 <button onClick={() => setConfirmModal(null)} className="p-1.5 rounded-lg hover:bg-[#F0EBE5]">
@@ -372,15 +389,15 @@ const ReceiptConfirmationScreen = () => {
                 <div className="space-y-2">
                   <div className="flex justify-between">
                     <span className={`text-xs ${textMuted}`}>{t('receiptConfirm.colReceipt')}</span>
-                    <span className={`text-sm font-semibold font-['JetBrains_Mono'] ${textPrimary}`}>{confirmModal.receipt.receiptNumber}</span>
+                    <span className={`text-sm font-semibold font-data ${textPrimary}`}>{confirmModal.receipt.receiptNumber}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className={`text-xs ${textMuted}`}>{t('receiptConfirm.colPORef')}</span>
-                    <span className={`text-sm font-['JetBrains_Mono'] ${textSecondary}`}>{confirmModal.receipt.poReference}</span>
+                    <span className={`text-sm font-data ${textSecondary}`}>{confirmModal.receipt.poReference}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className={`text-xs ${textMuted}`}>{t('receiptConfirm.colBrand')}</span>
-                    <span className={`text-sm font-['Montserrat'] ${textPrimary}`}>{confirmModal.receipt.brandName}</span>
+                    <span className={`text-sm font-brand ${textPrimary}`}>{confirmModal.receipt.brandName}</span>
                   </div>
                 </div>
               </div>
@@ -394,7 +411,7 @@ const ReceiptConfirmationScreen = () => {
                     value={discrepancyNote}
                     onChange={(e) => setDiscrepancyNote(e.target.value)}
                     rows={3}
-                    className={`w-full px-3 py-2 rounded-xl border ${border} bg-[#FBF9F7] text-sm font-['Montserrat'] ${textPrimary} outline-none resize-none focus:border-[#C4975A]`}
+                    className={`w-full px-3 py-2 rounded-xl border ${border} bg-[#FBF9F7] text-sm font-brand ${textPrimary} outline-none resize-none focus:border-[#C4975A]`}
                     placeholder={t('receiptConfirm.discrepancyPlaceholder')}
                   />
                 </div>
@@ -403,14 +420,14 @@ const ReceiptConfirmationScreen = () => {
             <div className={`p-5 border-t ${border} flex justify-end gap-3`}>
               <button
                 onClick={() => setConfirmModal(null)}
-                className={`px-4 py-2 rounded-xl border ${border} text-sm font-medium font-['Montserrat'] ${textSecondary} transition-all hover:bg-[#F0EBE5]`}
+                className={`px-4 py-2 rounded-xl border ${border} text-sm font-medium font-brand ${textSecondary} transition-all hover:bg-[#F0EBE5]`}
               >
                 {t('common.back')}
               </button>
               <button
                 onClick={() => confirmModal.action === 'confirm' ? handleConfirmReceipt(confirmModal.receipt) : handleFlagDiscrepancy(confirmModal.receipt)}
                 disabled={processing || (confirmModal.action === 'discrepancy' && !discrepancyNote.trim())}
-                className={`px-5 py-2 rounded-xl text-sm font-semibold font-['Montserrat'] transition-all disabled:opacity-50 ${
+                className={`px-5 py-2 rounded-xl text-sm font-semibold font-brand transition-all disabled:opacity-50 ${
                   confirmModal.action === 'confirm'
                     ? 'bg-[#1B6B45] text-white hover:bg-[#155936]'
                     : 'bg-[#DC3545] text-white hover:bg-[#c82333]'

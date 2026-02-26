@@ -116,7 +116,7 @@ const BudgetAlertsBanner = ({ budgetId, darkMode = true }) => {
             <div className="min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
                 <span
-                  className="font-semibold font-['Montserrat'] text-xs leading-tight"
+                  className="font-semibold font-brand text-xs leading-tight"
                   style={{ color: theme.text }}
                 >
                   {topAlert.title}
@@ -203,7 +203,7 @@ const BudgetAlertsBanner = ({ budgetId, darkMode = true }) => {
                     </div>
                     <div className="min-w-0">
                       <div
-                        className="font-semibold text-sm font-['Montserrat']"
+                        className="font-semibold text-sm font-brand"
                         style={{ color: t.text }}
                       >
                         {alert.title}
@@ -215,7 +215,7 @@ const BudgetAlertsBanner = ({ budgetId, darkMode = true }) => {
                         {alert.message}
                       </div>
                       {alert.budget && (
-                        <div className="text-[11px] mt-1.5 font-['JetBrains_Mono'] text-[#8C8178]">
+                        <div className="text-[11px] mt-1.5 font-data text-[#8C8178]">
                           {alert.budget.groupBrand?.name} — {alert.budget.budgetCode}
                         </div>
                       )}

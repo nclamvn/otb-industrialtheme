@@ -28,7 +28,7 @@ export default function MobileDataCard({
       {/* Header Row */}
       <div className="flex items-start justify-between gap-3">
         <div className="flex-1 min-w-0">
-          <h4 className="text-sm font-semibold font-['Montserrat'] truncate text-[#2C2417]">
+          <h4 className="text-sm font-semibold font-brand truncate text-[#2C2417]">
             {title}
           </h4>
           {subtitle && (
@@ -54,7 +54,7 @@ export default function MobileDataCard({
               <div className="text-[11px] text-[#8C8178]">
                 {metric.label}
               </div>
-              <div className={`text-sm font-semibold font-['JetBrains_Mono'] ${
+              <div className={`text-sm font-semibold font-data ${
                 metric.color || 'text-[#2C2417]'
               }`}>
                 {metric.value}
@@ -74,7 +74,7 @@ export default function MobileDataCard({
             <button
               key={i}
               onClick={(e) => { e.stopPropagation(); action.onClick?.(); }}
-              className={`flex-1 py-2 px-3 rounded-lg text-xs font-semibold font-['Montserrat'] transition-colors ${
+              className={`flex-1 py-2 px-3 rounded-lg text-xs font-semibold font-brand transition-colors ${
                 action.primary
                   ? 'bg-[#C4975A] text-white active:bg-[#A67B3D]'
                   : 'bg-[#FBF9F7] text-[#6B5D4F] active:bg-[#E8E2DB]'

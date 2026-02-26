@@ -4,17 +4,20 @@ import { useState, useEffect, useCallback } from 'react';
 import {
   Settings, Plus, Edit2, Trash2, Save, X,
   ChevronRight, Users, Building2, RefreshCw,
-  LayoutList, GitBranch, Filter
+  LayoutList, GitBranch
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { approvalWorkflowService } from '../services/approvalWorkflowService';
 import { masterDataService } from '../services';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useIsMobile } from '@/hooks/useIsMobile';
+import { useConfirmDialog } from '@/hooks/useConfirmDialog';
+import { ConfirmDialog } from '@/components/ui';
 
 const ApprovalWorkflowScreen = ({ darkMode = false }) => {
   const { t } = useLanguage();
   const { isMobile } = useIsMobile();
+  const { dialogProps, confirm } = useConfirmDialog();
   const [steps, setSteps] = useState([]);
   const [brands, setBrands] = useState([]);
   const [availableRoles, setAvailableRoles] = useState([]);
@@ -119,17 +122,23 @@ const ApprovalWorkflowScreen = ({ darkMode = false }) => {
     }
   };
 
-  const handleDelete = async (id) => {
-    const reason = window.prompt(t('approval.confirmDelete'));
-    if (reason !== 'delete') return;
-    try {
-      await approvalWorkflowService.delete(id);
-      toast.success(t('approval.stepDeleted'));
-      fetchSteps();
-    } catch (err) {
-      console.error('Failed to delete:', err);
-      toast.error(t('approval.failedToDeleteStep'));
-    }
+  const handleDelete = (id) => {
+    confirm({
+      title: t('approval.confirmDelete'),
+      message: t('approval.deleteStepWarning') || 'This action cannot be undone.',
+      confirmLabel: t('common.delete'),
+      variant: 'danger',
+      onConfirm: async () => {
+        try {
+          await approvalWorkflowService.delete(id);
+          toast.success(t('approval.stepDeleted'));
+          fetchSteps();
+        } catch (err) {
+          console.error('Failed to delete:', err);
+          toast.error(t('approval.failedToDeleteStep'));
+        }
+      },
+    });
   };
 
   // Group steps by brand for progress view
@@ -143,19 +152,14 @@ const ApprovalWorkflowScreen = ({ darkMode = false }) => {
   return (
     <div className="space-y-3">
       {/* Compact Header + Filters */}
-      <div className="rounded-xl border px-3 py-2 border-[#E8E2DB]" style={{
-        background: 'linear-gradient(135deg, #ffffff 0%, rgba(196,151,90,0.04) 35%, rgba(196,151,90,0.12) 100%)',
-        boxShadow: 'inset 0 -1px 0 rgba(196,151,90,0.05)',
-      }}>
+      <div className="rounded-xl border px-3 py-2 border-[#E8E2DB] bg-white">
         <div className="flex flex-wrap items-center gap-3">
-          <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 bg-[rgba(160,120,75,0.18)]">
-            <Settings size={14} className="text-[#6B4D30]" />
-          </div>
+          <Settings size={14} className="text-content-muted flex-shrink-0" />
           <div className="flex-shrink-0">
-            <h1 className="text-sm font-semibold font-['Montserrat'] text-[#2C2417] leading-tight">
+            <h1 className="text-sm font-semibold font-brand text-[#2C2417] leading-tight">
               {t('approval.title')}
             </h1>
-            <p className="text-[10px] font-['Montserrat'] text-[#8C8178] leading-tight">
+            <p className="text-[10px] font-brand text-[#8C8178] leading-tight">
               {t('approval.subtitle')}
             </p>
           </div>
@@ -165,9 +169,9 @@ const ApprovalWorkflowScreen = ({ darkMode = false }) => {
             <select
               value={selectedBrandId}
               onChange={(e) => setSelectedBrandId(e.target.value)}
-              className="px-2 py-1 border rounded-lg text-xs font-['Montserrat'] transition-all focus:outline-none focus:ring-1 focus:ring-[#C4975A] bg-white border-[#E8E2DB] text-[#2C2417]"
+              className="px-2 py-1 border rounded-lg text-xs font-brand transition-all focus:outline-none focus:ring-1 focus:ring-[#C4975A] bg-white border-[#E8E2DB] text-[#2C2417]"
             >
-              <option value="all">{t('approval.allBrands')}</option>
+              <option value="all">{t('approval.brand')}</option>
               {brands.map(brand => (
                 <option key={brand.id} value={brand.id}>{brand.name || brand.code}</option>
               ))}
@@ -176,13 +180,13 @@ const ApprovalWorkflowScreen = ({ darkMode = false }) => {
             <button
               onClick={fetchSteps}
               disabled={loading}
-              className="p-1.5 rounded-lg transition-colors text-[#8C8178] hover:text-[#6B4D30] hover:bg-[rgba(160,120,75,0.18)]"
+              className="p-1.5 rounded-lg transition-colors text-content-muted hover:text-content hover:bg-surface-secondary"
             >
               <RefreshCw size={13} className={loading ? 'animate-spin' : ''} />
             </button>
 
             {/* View Toggle */}
-            <div className="flex items-center gap-0.5 p-0.5 rounded-lg bg-[rgba(160,120,75,0.12)]">
+            <div className="flex items-center gap-0.5 p-0.5 rounded-lg bg-surface-secondary">
               <button
                 onClick={() => setViewMode('table')}
                 className={`p-1.5 rounded-md transition-colors ${
@@ -209,7 +213,7 @@ const ApprovalWorkflowScreen = ({ darkMode = false }) => {
 
             <button
               onClick={openAddModal}
-              className="flex items-center gap-1.5 px-2.5 py-1 bg-[#C4975A] hover:bg-[#B8894E] text-white font-semibold text-xs font-['Montserrat'] rounded-lg transition-colors"
+              className="flex items-center gap-1.5 px-2.5 py-1 bg-[#C4975A] hover:bg-[#B8894E] text-white font-semibold text-xs font-brand rounded-lg transition-colors"
             >
               <Plus size={13} />
               {t('approval.addStep')}
@@ -222,43 +226,41 @@ const ApprovalWorkflowScreen = ({ darkMode = false }) => {
       {loading ? (
         <div className="p-16 text-center">
           <RefreshCw size={32} className="animate-spin mx-auto mb-4 text-[#6B4D30]" />
-          <p className="text-sm font-['Montserrat'] text-[#8C8178]">{t('approval.loadingSteps')}</p>
+          <p className="text-sm font-brand text-[#8C8178]">{t('approval.loadingSteps')}</p>
         </div>
       ) : viewMode === 'table' ? (
         /* Table View */
-        <div className="rounded-xl border overflow-hidden border-[#E8E2DB]" style={{
-          background: 'linear-gradient(135deg, #ffffff 0%, rgba(196,151,90,0.03) 35%, rgba(196,151,90,0.08) 100%)',
-        }}>
+        <div className="rounded-xl border overflow-hidden border-[#E8E2DB] bg-white">
           <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="bg-[rgba(160,120,75,0.12)]">
-                <th className="px-3 py-2 text-left text-[10px] font-semibold uppercase tracking-wider font-['Montserrat'] text-[#8C8178]">{t('approval.brand')}</th>
-                <th className="px-3 py-2 text-left text-[10px] font-semibold uppercase tracking-wider font-['Montserrat'] w-16 text-[#8C8178]">{t('approval.step')}</th>
-                <th className="px-3 py-2 text-left text-[10px] font-semibold uppercase tracking-wider font-['Montserrat'] text-[#8C8178]">{t('approval.roleUser')}</th>
-                <th className="px-3 py-2 text-left text-[10px] font-semibold uppercase tracking-wider font-['Montserrat'] text-[#8C8178]">{t('common.description')}</th>
-                <th className="px-3 py-2 text-right text-[10px] font-semibold uppercase tracking-wider font-['Montserrat'] w-24 text-[#8C8178]">{t('common.actions')}</th>
+              <tr className="bg-surface-secondary">
+                <th className="px-3 py-2 text-left text-[10px] font-semibold uppercase tracking-wider font-brand text-[#8C8178]">{t('approval.brand')}</th>
+                <th className="px-3 py-2 text-left text-[10px] font-semibold uppercase tracking-wider font-brand w-16 text-[#8C8178]">{t('approval.step')}</th>
+                <th className="px-3 py-2 text-left text-[10px] font-semibold uppercase tracking-wider font-brand text-[#8C8178]">{t('approval.roleUser')}</th>
+                <th className="px-3 py-2 text-left text-[10px] font-semibold uppercase tracking-wider font-brand text-[#8C8178]">{t('common.description')}</th>
+                <th className="px-3 py-2 text-right text-[10px] font-semibold uppercase tracking-wider font-brand w-24 text-[#8C8178]">{t('common.actions')}</th>
               </tr>
             </thead>
             <tbody>
               {steps.length === 0 ? (
                 <tr>
-                  <td colSpan="5" className="px-3 py-12 text-center text-xs font-['Montserrat'] text-[#8C8178]">
+                  <td colSpan="5" className="px-3 py-12 text-center text-xs font-brand text-[#8C8178]">
                     {t('approval.noStepsConfigured')}
                   </td>
                 </tr>
               ) : (
                 steps.map((step) => (
                   <tr key={step.id} className="border-t transition-colors border-[#E8E2DB] hover:bg-[rgba(196,151,90,0.06)]">
-                    <td className="px-3 py-1.5 text-xs font-semibold font-['Montserrat'] text-[#2C2417]">
+                    <td className="px-3 py-1.5 text-xs font-semibold font-brand text-[#2C2417]">
                       {step.brand?.name || '-'}
                     </td>
                     <td className="px-3 py-1.5">
-                      <span className="inline-flex items-center justify-center w-6 h-6 rounded-full font-bold text-[10px] font-['JetBrains_Mono'] bg-[rgba(196,151,90,0.2)] text-[#6B4D30]">
+                      <span className="inline-flex items-center justify-center w-6 h-6 rounded-full font-bold text-[10px] font-data bg-[rgba(196,151,90,0.2)] text-[#6B4D30]">
                         {step.stepNumber}
                       </span>
                     </td>
-                    <td className="px-3 py-1.5 text-xs font-['Montserrat'] text-[#2C2417]">
+                    <td className="px-3 py-1.5 text-xs font-brand text-[#2C2417]">
                       <div className="flex items-center gap-1.5">
                         <Users size={12} className="text-[#8C8178]" />
                         {step.roleName}
@@ -267,7 +269,7 @@ const ApprovalWorkflowScreen = ({ darkMode = false }) => {
                         )}
                       </div>
                     </td>
-                    <td className="px-3 py-1.5 text-xs font-['Montserrat'] text-[#8C8178]">
+                    <td className="px-3 py-1.5 text-xs font-brand text-[#8C8178]">
                       {step.description || '-'}
                     </td>
                     <td className="px-3 py-1.5 text-right">
@@ -295,10 +297,8 @@ const ApprovalWorkflowScreen = ({ darkMode = false }) => {
         /* Progress View */
         <div className="space-y-3">
           {Object.entries(stepsByBrand).map(([brandName, brandSteps]) => (
-            <div key={brandName} className="rounded-xl border p-4 border-[#E8E2DB]" style={{
-              background: 'linear-gradient(135deg, #ffffff 0%, rgba(196,151,90,0.03) 35%, rgba(196,151,90,0.08) 100%)',
-            }}>
-              <h3 className="text-sm font-semibold font-['Montserrat'] mb-3 flex items-center gap-2 text-[#2C2417]">
+            <div key={brandName} className="rounded-xl border p-4 border-[#E8E2DB] bg-white">
+              <h3 className="text-sm font-semibold font-brand mb-3 flex items-center gap-2 text-[#2C2417]">
                 <Building2 size={15} className="text-[#6B4D30]" />
                 {brandName}
               </h3>
@@ -307,9 +307,9 @@ const ApprovalWorkflowScreen = ({ darkMode = false }) => {
                   <div key={step.id} className="flex items-center gap-4">
                     <div className="flex flex-col items-center">
                       <div className="w-12 h-12 rounded-full flex items-center justify-center border-2 bg-[rgba(160,120,75,0.18)] border-[#C4975A]">
-                        <span className="font-bold font-['JetBrains_Mono'] text-[#6B4D30]">{step.stepNumber}</span>
+                        <span className="font-bold font-data text-[#6B4D30]">{step.stepNumber}</span>
                       </div>
-                      <span className="mt-2 text-sm font-medium font-['Montserrat'] text-center max-w-[100px] text-[#2C2417]">
+                      <span className="mt-2 text-sm font-medium font-brand text-center max-w-[100px] text-[#2C2417]">
                         {step.roleName}
                       </span>
                     </div>
@@ -324,7 +324,7 @@ const ApprovalWorkflowScreen = ({ darkMode = false }) => {
           {Object.keys(stepsByBrand).length === 0 && (
             <div className="p-16 text-center rounded-xl border bg-white border-[#E8E2DB]">
               <Settings size={48} className="mx-auto mb-4 text-[#E8E2DB]" />
-              <p className="text-sm font-['Montserrat'] text-[#8C8178]">
+              <p className="text-sm font-brand text-[#8C8178]">
                 {t('approval.noStepsProgress')}
               </p>
             </div>
@@ -340,7 +340,7 @@ const ApprovalWorkflowScreen = ({ darkMode = false }) => {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold font-['Montserrat'] text-[#2C2417]">
+              <h2 className="text-xl font-bold font-brand text-[#2C2417]">
                 {editingStep ? t('approval.editStep') : t('approval.addNewStep')}
               </h2>
               <button
@@ -354,12 +354,12 @@ const ApprovalWorkflowScreen = ({ darkMode = false }) => {
             <div className="space-y-4">
               {/* Brand */}
               <div>
-                <label className="block text-xs font-medium mb-1.5 font-['Montserrat'] text-[#8C8178]">{t('approval.brand')}</label>
+                <label className="block text-xs font-medium mb-1.5 font-brand text-[#8C8178]">{t('approval.brand')}</label>
                 <select
                   value={formData.brandId}
                   onChange={(e) => setFormData(prev => ({ ...prev, brandId: e.target.value }))}
                   disabled={!!editingStep}
-                  className="w-full px-3 py-2.5 border rounded-lg text-sm font-['Montserrat'] focus:outline-none focus:ring-2 focus:ring-[#C4975A] disabled:opacity-50 bg-white border-[#E8E2DB] text-[#2C2417]"
+                  className="w-full px-3 py-2.5 border rounded-lg text-sm font-brand focus:outline-none focus:ring-2 focus:ring-[#C4975A] disabled:opacity-50 bg-white border-[#E8E2DB] text-[#2C2417]"
                 >
                   <option value="">{t('approval.selectBrand')}</option>
                   {brands.map(brand => (
@@ -370,19 +370,19 @@ const ApprovalWorkflowScreen = ({ darkMode = false }) => {
 
               {/* Step Number */}
               <div>
-                <label className="block text-xs font-medium mb-1.5 font-['Montserrat'] text-[#8C8178]">{t('approval.stepNumber')}</label>
+                <label className="block text-xs font-medium mb-1.5 font-brand text-[#8C8178]">{t('approval.stepNumber')}</label>
                 <input
                   type="number"
                   min="1"
                   value={formData.stepNumber}
                   onChange={(e) => setFormData(prev => ({ ...prev, stepNumber: parseInt(e.target.value) || 1 }))}
-                  className="w-full px-3 py-2.5 border rounded-lg text-sm font-['JetBrains_Mono'] focus:outline-none focus:ring-2 focus:ring-[#C4975A] bg-white border-[#E8E2DB] text-[#2C2417]"
+                  className="w-full px-3 py-2.5 border rounded-lg text-sm font-data focus:outline-none focus:ring-2 focus:ring-[#C4975A] bg-white border-[#E8E2DB] text-[#2C2417]"
                 />
               </div>
 
               {/* Role */}
               <div>
-                <label className="block text-xs font-medium mb-1.5 font-['Montserrat'] text-[#8C8178]">{t('approval.role')}</label>
+                <label className="block text-xs font-medium mb-1.5 font-brand text-[#8C8178]">{t('approval.role')}</label>
                 <div className="grid grid-cols-2 gap-2">
                   {(availableRoles.length > 0 ? availableRoles : [
                     { code: 'BRAND_MANAGER', name: 'Brand Manager' },
@@ -395,7 +395,7 @@ const ApprovalWorkflowScreen = ({ darkMode = false }) => {
                       key={role.code}
                       type="button"
                       onClick={() => setFormData(prev => ({ ...prev, roleName: role.name, roleCode: role.code }))}
-                      className={`px-3 py-2 text-sm font-['Montserrat'] rounded-lg border transition-colors ${
+                      className={`px-3 py-2 text-sm font-brand rounded-lg border transition-colors ${
                         formData.roleCode === role.code
                           ? 'bg-[rgba(196,151,90,0.2)] border-[#C4975A] text-[#6B4D30]'
                           : 'border-[#E8E2DB] text-[#8C8178] hover:border-[rgba(196,151,90,0.4)]'
@@ -409,13 +409,13 @@ const ApprovalWorkflowScreen = ({ darkMode = false }) => {
 
               {/* Description */}
               <div>
-                <label className="block text-xs font-medium mb-1.5 font-['Montserrat'] text-[#8C8178]">{t('approval.descriptionOptional')}</label>
+                <label className="block text-xs font-medium mb-1.5 font-brand text-[#8C8178]">{t('approval.descriptionOptional')}</label>
                 <input
                   type="text"
                   value={formData.description}
                   onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
                   placeholder={t('approval.descriptionPlaceholder')}
-                  className="w-full px-3 py-2.5 border rounded-lg text-sm font-['Montserrat'] focus:outline-none focus:ring-2 focus:ring-[#C4975A] bg-white border-[#E8E2DB] text-[#2C2417] placeholder-[#6B5D4F]"
+                  className="w-full px-3 py-2.5 border rounded-lg text-sm font-brand focus:outline-none focus:ring-2 focus:ring-[#C4975A] bg-white border-[#E8E2DB] text-[#2C2417] placeholder-[#6B5D4F]"
                 />
               </div>
             </div>
@@ -423,14 +423,14 @@ const ApprovalWorkflowScreen = ({ darkMode = false }) => {
             <div className="flex gap-3 mt-6">
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="flex-1 px-4 py-2.5 border rounded-lg font-medium text-sm font-['Montserrat'] transition-colors border-[#E8E2DB] text-[#8C8178] hover:bg-[rgba(160,120,75,0.12)]"
+                className="flex-1 px-4 py-2.5 border rounded-lg font-medium text-sm font-brand transition-colors border-[#E8E2DB] text-[#8C8178] hover:bg-[rgba(160,120,75,0.12)]"
               >
                 {t('common.cancel')}
               </button>
               <button
                 onClick={handleSave}
                 disabled={!formData.brandId || !formData.roleName || saving}
-                className="flex-1 px-4 py-2.5 bg-[#C4975A] hover:bg-[#B8894E] text-white font-semibold text-sm font-['Montserrat'] rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="flex-1 px-4 py-2.5 bg-[#C4975A] hover:bg-[#B8894E] text-white font-semibold text-sm font-brand rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 <Save size={16} />
                 {saving ? t('approval.saving') : editingStep ? t('common.update') : t('common.create')}
@@ -439,6 +439,8 @@ const ApprovalWorkflowScreen = ({ darkMode = false }) => {
           </div>
         </div>
       )}
+
+      <ConfirmDialog {...dialogProps} />
     </div>
   );
 };

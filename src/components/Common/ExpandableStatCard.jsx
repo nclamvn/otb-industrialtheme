@@ -62,7 +62,7 @@ const ExpandableStatCard = ({
         <div className="flex items-center justify-between gap-2">
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-1.5">
-              <p className="text-[10px] font-medium uppercase tracking-wider text-[#6B5D4F] font-['Montserrat']">{title}</p>
+              <p className="text-[10px] font-medium uppercase tracking-wider text-[#6B5D4F] font-brand">{title}</p>
               {hasExpandContent && (
                 <ChevronDown
                   size={10}
@@ -70,14 +70,14 @@ const ExpandableStatCard = ({
                 />
               )}
             </div>
-            <div className="mt-0.5 text-lg font-bold font-['JetBrains_Mono'] tabular-nums leading-tight text-[#2C2417]">
+            <div className="mt-0.5 text-lg font-bold font-data tabular-nums leading-tight text-[#2C2417]">
               {value}
             </div>
 
             {/* Trend badge + sub in a row */}
             <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
               {trendLabel && (
-                <span className={`inline-flex items-center gap-0.5 px-1.5 py-0.5 text-[9px] font-semibold font-['JetBrains_Mono'] rounded ${
+                <span className={`inline-flex items-center gap-0.5 px-1.5 py-0.5 text-[9px] font-semibold font-data rounded ${
                   trend > 0
                     ? 'bg-[rgba(27,107,69,0.12)] text-[#1B6B45]'
                     : trend < 0
@@ -95,9 +95,9 @@ const ExpandableStatCard = ({
               <div className="mt-1.5">
                 <div className="flex items-center justify-between mb-0.5">
                   {progressLabel && (
-                    <span className="text-[9px] font-medium text-[#6B5D4F] font-['Montserrat']">{progressLabel}</span>
+                    <span className="text-[9px] font-medium text-[#6B5D4F] font-brand">{progressLabel}</span>
                   )}
-                  <span className="text-[9px] font-semibold font-['JetBrains_Mono'] text-[#6B5D4F]">
+                  <span className="text-[9px] font-semibold font-data text-[#6B5D4F]">
                     {Math.round(progress)}%
                   </span>
                 </div>
@@ -142,7 +142,7 @@ const ExpandableStatCard = ({
         <div className="px-3 pb-2.5 border-t border-[#E8E2DB]">
           {/* Expand title */}
           {expandTitle && (
-            <p className="text-[9px] font-semibold uppercase tracking-wider mt-2 mb-1.5 text-[#6B5D4F] font-['Montserrat']">
+            <p className="text-[9px] font-semibold uppercase tracking-wider mt-2 mb-1.5 text-[#6B5D4F] font-brand">
               {expandTitle}
             </p>
           )}
@@ -153,7 +153,7 @@ const ExpandableStatCard = ({
               {badges.map((badge, i) => (
                 <span
                   key={i}
-                  className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[9px] font-semibold font-['JetBrains_Mono']"
+                  className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[9px] font-semibold font-data"
                   style={{
                     backgroundColor: `${badge.color || a.color}18`,
                     color: badge.color || a.color,
@@ -175,10 +175,10 @@ const ExpandableStatCard = ({
                 return (
                   <div key={i}>
                     <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-medium text-[#2C2417] font-['Montserrat'] truncate max-w-[60%]">
+                      <span className="text-[10px] font-medium text-[#2C2417] font-brand truncate max-w-[60%]">
                         {item.label}
                       </span>
-                      <span className="text-[9px] font-['JetBrains_Mono'] tabular-nums text-[#6B5D4F]">
+                      <span className="text-[9px] font-data tabular-nums text-[#6B5D4F]">
                         {item.displayValue || item.value}
                       </span>
                     </div>

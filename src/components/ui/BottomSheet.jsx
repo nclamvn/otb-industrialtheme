@@ -80,7 +80,7 @@ export default function BottomSheet({
             {/* Title */}
             {title && (
               <div className="px-5 pb-3 border-b border-[#E8E2DB]">
-                <h3 className="text-base font-semibold font-['Montserrat'] text-[#2C2417]">
+                <h3 className="text-base font-semibold font-brand text-[#2C2417]">
                   {title}
                 </h3>
               </div>

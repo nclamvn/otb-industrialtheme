@@ -43,7 +43,7 @@ export default function MobileFilterSheet({
           <select
             value={value}
             onChange={(e) => handleChange(filter.key, e.target.value)}
-            className="w-full h-12 px-3 rounded-lg border text-sm font-['Montserrat'] appearance-none bg-[#FBF9F7] border-[#E8E2DB] text-[#2C2417]"
+            className="w-full h-12 px-3 rounded-lg border text-sm font-brand appearance-none bg-[#FBF9F7] border-[#E8E2DB] text-[#2C2417]"
           >
             <option value="">{filter.placeholder || `Select ${filter.label}`}</option>
             {(filter.options || []).map(opt => (
@@ -59,7 +59,7 @@ export default function MobileFilterSheet({
             value={value}
             onChange={(e) => handleChange(filter.key, e.target.value)}
             placeholder={filter.placeholder || `Search ${filter.label}`}
-            className="w-full h-12 px-3 rounded-lg border text-sm font-['Montserrat'] bg-[#FBF9F7] border-[#E8E2DB] text-[#2C2417] placeholder:text-[#8C8178]"
+            className="w-full h-12 px-3 rounded-lg border text-sm font-brand bg-[#FBF9F7] border-[#E8E2DB] text-[#2C2417] placeholder:text-[#8C8178]"
           />
         );
 
@@ -69,7 +69,7 @@ export default function MobileFilterSheet({
             type="date"
             value={value}
             onChange={(e) => handleChange(filter.key, e.target.value)}
-            className="w-full h-12 px-3 rounded-lg border text-sm font-['Montserrat'] bg-[#FBF9F7] border-[#E8E2DB] text-[#2C2417]"
+            className="w-full h-12 px-3 rounded-lg border text-sm font-brand bg-[#FBF9F7] border-[#E8E2DB] text-[#2C2417]"
           />
         );
 
@@ -97,7 +97,7 @@ export default function MobileFilterSheet({
       <div className="px-5 py-4 space-y-5">
         {filters.map((filter) => (
           <div key={filter.key}>
-            <label className="block text-xs font-semibold font-['Montserrat'] uppercase tracking-wider mb-2 text-[#6B5D4F]">
+            <label className="block text-xs font-semibold font-brand uppercase tracking-wider mb-2 text-[#6B5D4F]">
               {filter.label}
             </label>
             {renderFilter(filter)}
@@ -109,14 +109,14 @@ export default function MobileFilterSheet({
       <div className="sticky bottom-0 px-5 py-4 border-t flex gap-3 bg-white border-[#E8E2DB]">
         <button
           onClick={handleReset}
-          className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-semibold font-['Montserrat'] transition-colors bg-[#FBF9F7] text-[#6B5D4F] active:bg-[#E8E2DB]"
+          className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-semibold font-brand transition-colors bg-[#FBF9F7] text-[#6B5D4F] active:bg-[#E8E2DB]"
         >
           <RotateCcw size={14} />
           Reset
         </button>
         <button
           onClick={handleApply}
-          className="flex-1 py-3 rounded-xl text-sm font-semibold font-['Montserrat'] bg-[#C4975A] text-white active:bg-[#A67B3D] transition-colors"
+          className="flex-1 py-3 rounded-xl text-sm font-semibold font-brand bg-[#C4975A] text-white active:bg-[#A67B3D] transition-colors"
         >
           Apply Filters
         </button>

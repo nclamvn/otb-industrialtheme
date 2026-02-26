@@ -7,7 +7,7 @@ import { getScreenIdFromPathname } from '@/utils/routeMap';
 import AuthGuard from '@/components/AuthGuard';
 import { Sidebar } from '@/components/Layout';
 import AppHeader from '@/components/Layout/AppHeader';
-import MobileBottomNav from '@/components/layout/MobileBottomNav';
+import MobileBottomNav from '@/components/Layout/MobileBottomNav';
 import { BudgetModal } from '@/components/Common';
 
 export default function DashboardLayout({ children }) {

@@ -6,12 +6,16 @@ import {
   Type, Zap, Database, HardDrive, Trash2, Download,
   ChevronRight, Check, Info, AlertTriangle
 } from 'lucide-react';
+import toast from 'react-hot-toast';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useIsMobile } from '@/hooks/useIsMobile';
+import { useConfirmDialog } from '@/hooks/useConfirmDialog';
+import { ConfirmDialog } from '@/components/ui';
 
 const SettingsScreen = ({ user }) => {
   const { t, language, setLanguage } = useLanguage();
   const { isMobile } = useIsMobile();
+  const { dialogProps, confirm } = useConfirmDialog();
   const [settings, setSettings] = useState({
     notifications: {
       email: true,
@@ -45,12 +49,9 @@ const SettingsScreen = ({ user }) => {
   };
 
   const SettingSection = ({ title, description, children }) => (
-    <div className="rounded-xl border overflow-hidden border-[#E8E2DB]" style={{
-      background: 'linear-gradient(135deg, #FFFFFF 0%, rgba(215,183,151,0.04) 35%, rgba(215,183,151,0.10) 100%)',
-      boxShadow: 'inset 0 -1px 0 rgba(44,36,23,0.06)',
-    }}>
+    <div className="rounded-xl border overflow-hidden border-[#E8E2DB] bg-white">
       <div className="px-3 md:px-5 py-3 md:py-4 border-b border-[#E8E2DB]">
-        <h3 className="text-base font-semibold font-['Montserrat'] text-[#2C2417]">
+        <h3 className="text-base font-semibold font-brand text-[#2C2417]">
           {title}
         </h3>
         {description && (
@@ -108,7 +109,7 @@ const SettingsScreen = ({ user }) => {
     <div className="space-y-3 md:space-y-6">
       {/* Page Header */}
       <div>
-        <h1 className="text-lg font-semibold font-['Montserrat'] text-[#2C2417]">
+        <h1 className="text-lg font-semibold font-brand text-[#2C2417]">
           {t('settings.title')}
         </h1>
         <p className="text-xs mt-0.5 text-[#6B5D4F]">
@@ -226,7 +227,7 @@ const SettingsScreen = ({ user }) => {
           icon={Download}
           label={t('settings.exportData')}
           description={t('settings.exportDataDesc')}
-          onClick={() => alert(t('settings.exportComingSoon'))}
+          onClick={() => toast(t('settings.exportComingSoon'))}
         >
           <ChevronRight size={18} className="text-[#8C8178]" />
         </SettingRow>
@@ -235,7 +236,7 @@ const SettingsScreen = ({ user }) => {
           icon={HardDrive}
           label={t('settings.clearCache')}
           description={t('settings.clearCacheDesc')}
-          onClick={() => alert(t('settings.cacheCleared'))}
+          onClick={() => toast.success(t('settings.cacheCleared'))}
         >
           <ChevronRight size={18} className="text-[#8C8178]" />
         </SettingRow>
@@ -248,9 +249,13 @@ const SettingsScreen = ({ user }) => {
           label={t('settings.deleteAccount')}
           description={t('settings.deleteAccountDesc')}
           onClick={() => {
-            if (window.confirm(t('settings.deleteConfirm'))) {
-              alert(t('settings.accountDeletionSubmitted'));
-            }
+            confirm({
+              title: t('settings.deleteAccount'),
+              message: t('settings.deleteConfirm'),
+              confirmLabel: t('common.delete'),
+              variant: 'danger',
+              onConfirm: () => toast.success(t('settings.accountDeletionSubmitted')),
+            });
           }}
         >
           <span className="text-xs font-medium px-2 py-1 rounded bg-red-100 text-[#DC3545]">
@@ -268,7 +273,7 @@ const SettingsScreen = ({ user }) => {
             className="h-10 w-auto object-contain"
           />
           <div className="flex-1">
-            <div className="text-sm font-semibold font-['Montserrat'] text-[#2C2417]">
+            <div className="text-sm font-semibold font-brand text-[#2C2417]">
               {t('settings.otbSystem')}
             </div>
             <div className="text-xs text-[#6B5D4F]">
@@ -281,6 +286,8 @@ const SettingsScreen = ({ user }) => {
           </div>
         </div>
       </div>
+
+      <ConfirmDialog {...dialogProps} />
     </div>
   );
 };

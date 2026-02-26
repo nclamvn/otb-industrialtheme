@@ -225,7 +225,7 @@ const DevTicketScreen = ({ darkMode = false }) => {
             <FileText size={28} className="text-[#6B4D30]" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold font-['Montserrat'] text-[#2C2417]">
+            <h1 className="text-2xl font-bold font-brand text-[#2C2417]">
               {t('devTicket.title')}
             </h1>
             <p className="text-sm mt-1 text-[#6B5D4F]">
@@ -238,7 +238,7 @@ const DevTicketScreen = ({ darkMode = false }) => {
         <div className="rounded-xl border p-4 bg-[#FBF9F7] border-[#E8E2DB]">
           <div className="flex items-center gap-2 mb-3">
             <GitBranch size={16} className="text-[#6B5D4F]" />
-            <span className="text-sm font-semibold font-['Montserrat'] text-[#6B5D4F]">
+            <span className="text-sm font-semibold font-brand text-[#6B5D4F]">
               {t('devTicket.navigationFlow')}
             </span>
           </div>
@@ -291,7 +291,7 @@ const DevTicketScreen = ({ darkMode = false }) => {
                 </div>
                 <div className="flex-1 text-left">
                   <div className="flex items-center gap-3">
-                    <h2 className="text-lg font-semibold font-['Montserrat'] text-[#2C2417]">
+                    <h2 className="text-lg font-semibold font-brand text-[#2C2417]">
                       {page.name}
                     </h2>
                     {getStatusIcon(page.status)}
@@ -312,19 +312,19 @@ const DevTicketScreen = ({ darkMode = false }) => {
                   <div className="grid grid-cols-2 gap-4 p-4 rounded-lg bg-[#FBF9F7]">
                     <div>
                       <span className="text-xs font-medium text-[#6B5D4F]">{t('devTicket.component')}</span>
-                      <p className="text-sm font-['JetBrains_Mono'] mt-1 text-[#2C2417]">{page.component}</p>
+                      <p className="text-sm font-data mt-1 text-[#2C2417]">{page.component}</p>
                     </div>
                     <div>
                       <span className="text-xs font-medium text-[#6B5D4F]">{t('devTicket.filePath')}</span>
-                      <p className="text-sm font-['JetBrains_Mono'] mt-1 text-[#2C2417]">{page.file}</p>
+                      <p className="text-sm font-data mt-1 text-[#2C2417]">{page.file}</p>
                     </div>
                     <div>
                       <span className="text-xs font-medium text-[#6B5D4F]">{t('devTicket.route')}</span>
-                      <p className="text-sm font-['JetBrains_Mono'] mt-1 text-[#2C2417]">{page.route}</p>
+                      <p className="text-sm font-data mt-1 text-[#2C2417]">{page.route}</p>
                     </div>
                     <div>
                       <span className="text-xs font-medium text-[#6B5D4F]">{t('devTicket.screenId')}</span>
-                      <p className="text-sm font-['JetBrains_Mono'] mt-1 text-[#2C2417]">{page.id}</p>
+                      <p className="text-sm font-data mt-1 text-[#2C2417]">{page.id}</p>
                     </div>
                   </div>
 
@@ -340,23 +340,23 @@ const DevTicketScreen = ({ darkMode = false }) => {
                         className={`transition-transform ${expandedSections[`${page.id}_props`] ? '' : '-rotate-90'}`}
                       />
                       <Code size={16} className="text-[#6B5D4F]" />
-                      <span className="text-sm font-semibold font-['Montserrat']">{t('devTicket.props')} ({page.props.length})</span>
+                      <span className="text-sm font-semibold font-brand">{t('devTicket.props')} ({page.props.length})</span>
                     </button>
                     {expandedSections[`${page.id}_props`] && (
                       <div className="rounded-lg border overflow-hidden border-[#E8E2DB]">
                         <table className="w-full text-sm">
                           <thead>
                             <tr className="bg-[rgba(160,120,75,0.18)]">
-                              <th className="px-4 py-2 text-left text-xs font-semibold font-['Montserrat'] text-[#8C8178]">{t('common.name')}</th>
-                              <th className="px-4 py-2 text-left text-xs font-semibold font-['Montserrat'] text-[#8C8178]">Type</th>
-                              <th className="px-4 py-2 text-left text-xs font-semibold font-['Montserrat'] text-[#8C8178]">{t('common.description')}</th>
+                              <th className="px-4 py-2 text-left text-xs font-semibold font-brand text-[#8C8178]">{t('common.name')}</th>
+                              <th className="px-4 py-2 text-left text-xs font-semibold font-brand text-[#8C8178]">Type</th>
+                              <th className="px-4 py-2 text-left text-xs font-semibold font-brand text-[#8C8178]">{t('common.description')}</th>
                             </tr>
                           </thead>
                           <tbody>
                             {page.props.map((prop, idx) => (
                               <tr key={prop.name} className={idx % 2 === 0 ? 'bg-white' : 'bg-[#FBF9F7]'}>
-                                <td className="px-4 py-2 font-['JetBrains_Mono'] text-xs text-[#6B4D30]">{prop.name}</td>
-                                <td className="px-4 py-2 font-['JetBrains_Mono'] text-xs text-[#D97706]">{prop.type}</td>
+                                <td className="px-4 py-2 font-data text-xs text-[#6B4D30]">{prop.name}</td>
+                                <td className="px-4 py-2 font-data text-xs text-[#D97706]">{prop.type}</td>
                                 <td className="px-4 py-2 text-[#6B5D4F]">{prop.description}</td>
                               </tr>
                             ))}
@@ -378,7 +378,7 @@ const DevTicketScreen = ({ darkMode = false }) => {
                         className={`transition-transform ${expandedSections[`${page.id}_features`] ? '' : '-rotate-90'}`}
                       />
                       <Layers size={16} className="text-[#6B5D4F]" />
-                      <span className="text-sm font-semibold font-['Montserrat']">{t('devTicket.features')} ({page.features.length})</span>
+                      <span className="text-sm font-semibold font-brand">{t('devTicket.features')} ({page.features.length})</span>
                     </button>
                     {expandedSections[`${page.id}_features`] && (
                       <ul className="space-y-2 pl-6 text-[#6B5D4F]">
@@ -404,7 +404,7 @@ const DevTicketScreen = ({ darkMode = false }) => {
                         className={`transition-transform ${expandedSections[`${page.id}_navigation`] ? '' : '-rotate-90'}`}
                       />
                       <ExternalLink size={16} className="text-[#6B5D4F]" />
-                      <span className="text-sm font-semibold font-['Montserrat']">{t('devTicket.navigation')}</span>
+                      <span className="text-sm font-semibold font-brand">{t('devTicket.navigation')}</span>
                     </button>
                     {expandedSections[`${page.id}_navigation`] && (
                       <div className="grid grid-cols-2 gap-4">
@@ -458,7 +458,7 @@ const DevTicketScreen = ({ darkMode = false }) => {
       <div className="rounded-xl border p-5 bg-white border-[#E8E2DB]">
         <div className="flex items-center gap-2 mb-4">
           <Database size={16} className="text-[#6B5D4F]" />
-          <span className="text-sm font-semibold font-['Montserrat'] text-[#6B5D4F]">{t('devTicket.summary')}</span>
+          <span className="text-sm font-semibold font-brand text-[#6B5D4F]">{t('devTicket.summary')}</span>
         </div>
         <div className="grid grid-cols-4 gap-4">
           {/* Total Pages */}
@@ -481,7 +481,7 @@ const DevTicketScreen = ({ darkMode = false }) => {
               <FileText size={14} color={CARD_ACCENTS.pages.color} />
             </div>
             <div className="relative z-10">
-              <p className="text-2xl font-bold font-['JetBrains_Mono'] text-[#2C2417]">{PLANNING_PAGES.length}</p>
+              <p className="text-2xl font-bold font-data text-[#2C2417]">{PLANNING_PAGES.length}</p>
               <p className="text-xs mt-1 text-[#6B5D4F]">{t('devTicket.totalPages')}</p>
             </div>
           </div>
@@ -506,7 +506,7 @@ const DevTicketScreen = ({ darkMode = false }) => {
               <CircleCheckBig size={14} color={CARD_ACCENTS.done.color} />
             </div>
             <div className="relative z-10">
-              <p className="text-2xl font-bold font-['JetBrains_Mono'] text-[#1B6B45]">
+              <p className="text-2xl font-bold font-data text-[#1B6B45]">
                 {PLANNING_PAGES.filter(p => p.status === 'completed').length}
               </p>
               <p className="text-xs mt-1 text-[#6B5D4F]">{t('devTicket.completed')}</p>
@@ -533,7 +533,7 @@ const DevTicketScreen = ({ darkMode = false }) => {
               <Code2 size={14} color={CARD_ACCENTS.props.color} />
             </div>
             <div className="relative z-10">
-              <p className="text-2xl font-bold font-['JetBrains_Mono'] text-[#2C2417]">
+              <p className="text-2xl font-bold font-data text-[#2C2417]">
                 {PLANNING_PAGES.reduce((sum, p) => sum + p.props.length, 0)}
               </p>
               <p className="text-xs mt-1 text-[#6B5D4F]">{t('devTicket.totalProps')}</p>
@@ -560,7 +560,7 @@ const DevTicketScreen = ({ darkMode = false }) => {
               <Sparkles size={14} color={CARD_ACCENTS.features.color} />
             </div>
             <div className="relative z-10">
-              <p className="text-2xl font-bold font-['JetBrains_Mono'] text-[#2C2417]">
+              <p className="text-2xl font-bold font-data text-[#2C2417]">
                 {PLANNING_PAGES.reduce((sum, p) => sum + p.features.length, 0)}
               </p>
               <p className="text-xs mt-1 text-[#6B5D4F]">{t('devTicket.totalFeatures')}</p>

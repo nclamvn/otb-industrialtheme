@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import {
   ArrowLeft, ArrowRight, Save, Plus, Trash2, Search,
   Package, DollarSign, ShoppingCart, Store, ChevronDown, ChevronRight,
@@ -11,10 +11,15 @@ import { masterDataService, proposalService, budgetService } from '../services';
 // Stores loaded dynamically from API; minimal fallback for offline
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useIsMobile } from '@/hooks/useIsMobile';
+import { useConfirmDialog } from '@/hooks/useConfirmDialog';
+import { ConfirmDialog } from '@/components/ui';
+import toast from 'react-hot-toast';
 
 const ProposalDetailPage = ({ proposal, onBack, onSave }) => {
   const { t } = useLanguage();
   const { isMobile } = useIsMobile();
+  const { dialogProps, confirm } = useConfirmDialog();
+  const [submitting, setSubmitting] = useState(false);
   const [ticketName, setTicketName] = useState(proposal?.ticketName || proposal?.subCategory?.name || 'New Proposal');
 
   // API data states
@@ -189,8 +194,17 @@ const ProposalDetailPage = ({ proposal, onBack, onSave }) => {
     setSkuFormData({});
   };
 
-  const handleRemoveSku = (skuId) => setSkuList(prev => prev.filter(s => s.id !== skuId));
-  
+  const handleRemoveSku = useCallback((skuId) => {
+    const sku = skuList.find(s => s.id === skuId);
+    confirm({
+      title: t('proposal.removeSku') || 'Remove SKU',
+      message: `${t('proposal.removeSkuConfirm') || 'Remove'} ${sku?.code || skuId}? ${t('planning.discardChangesDesc') || 'This action cannot be undone.'}`,
+      confirmLabel: t('common.delete') || 'Remove',
+      variant: 'danger',
+      onConfirm: () => setSkuList(prev => prev.filter(s => s.id !== skuId)),
+    });
+  }, [skuList, confirm, t]);
+
 
   const handleAddStore = (skuId, storeId) => {
     setSkuList(prev => prev.map(sku => {
@@ -267,6 +281,46 @@ const ProposalDetailPage = ({ proposal, onBack, onSave }) => {
     }
   };
 
+  const handleSubmit = useCallback(async () => {
+    if (skuList.length === 0) {
+      toast.error(t('proposal.noSkuToSubmit') || 'Add at least one SKU before submitting');
+      return;
+    }
+    setSubmitting(true);
+    try {
+      // Save first, then submit
+      const proposalData = { ticketName, budgetId: proposal?.budgetId };
+      let savedId = proposal?.id;
+      if (!savedId) {
+        const created = await proposalService.create(proposalData);
+        savedId = created?.id;
+      } else {
+        await proposalService.update(savedId, proposalData);
+      }
+      if (savedId && skuList.length > 0) {
+        await proposalService.bulkAddProducts(savedId, skuList.map(sku => ({
+          skuId: sku.id,
+          skuCode: sku.code,
+          productName: sku.name,
+          unitCost: sku.unitCost,
+          orderQty: sku.stores.reduce((sum, s) => sum + s.quantity, 0),
+          stores: sku.stores,
+        })));
+      }
+      // Submit for approval
+      if (savedId) {
+        await proposalService.submit(savedId);
+      }
+      toast.success(t('proposal.submittedSuccess') || 'Proposal submitted for approval');
+      onSave && onSave({ ticketName, skuList, totals: grandTotals, submitted: true });
+    } catch (err) {
+      console.error('Failed to submit proposal:', err);
+      toast.error(t('proposal.submitFailed') || 'Failed to submit proposal');
+    } finally {
+      setSubmitting(false);
+    }
+  }, [skuList, ticketName, proposal, grandTotals, onSave, t]);
+
   const budgetUsagePercent = (grandTotals.totalValue / budgetInfo.remainingBudget) * 100;
   const isOverBudget = grandTotals.totalValue > budgetInfo.remainingBudget;
 
@@ -341,9 +395,13 @@ const ProposalDetailPage = ({ proposal, onBack, onSave }) => {
               <Save size={16} />
               {t('common.save')}
             </button>
-            <button className="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-sm font-medium transition-colors">
+            <button
+              onClick={handleSubmit}
+              disabled={submitting || skuList.length === 0}
+              className="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
               <Send size={16} />
-              {t('common.submit')}
+              {submitting ? (t('common.submitting') || 'Submitting...') : t('common.submit')}
             </button>
           </div>
         </div>
@@ -820,6 +878,7 @@ const ProposalDetailPage = ({ proposal, onBack, onSave }) => {
           </div>
         </div>
       )}
+      <ConfirmDialog {...dialogProps} />
     </div>
   );
 };

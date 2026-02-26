@@ -11,7 +11,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from 'recharts';
-import { Image as ImageIcon, ChevronDown, ChevronUp, Package, Ruler, ArrowLeft, Loader2, Check, X, Clock, Send, CheckCircle, XCircle, LayoutGrid, List, Store } from 'lucide-react';
+import { ChevronDown, ChevronUp, Package, Ruler, ArrowLeft, Loader2, Check, X, Clock, Send, CheckCircle, XCircle, LayoutGrid, List, Store } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { formatCurrency } from '../utils';
 import { budgetService, planningService, proposalService } from '../services';
@@ -44,7 +44,7 @@ const CARD_STYLES = [
 
 const CollectionBarChart = ({ data, darkMode, t }) => (
   <div className="border rounded-xl shadow-sm p-3 md:p-6 bg-white border-[#E8E2DB]">
-    <h3 className="text-base font-semibold font-['Montserrat'] text-[#6B5D4F]">{t ? t('planningDetail.collection') : 'Collection Allocation'}</h3>
+    <h3 className="text-base font-semibold font-brand text-[#6B5D4F]">{t ? t('planningDetail.collection') : 'Collection Allocation'}</h3>
     <p className="text-sm mb-4 text-[#6B5D4F]">Carry Over vs Seasonal — REX & TTP by collection</p>
     <div className="h-[300px]" style={{ minWidth: 0, minHeight: 0 }}>
       <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
@@ -74,7 +74,7 @@ const CollectionBarChart = ({ data, darkMode, t }) => (
 
 const GenderBarChart = ({ data, darkMode, t }) => (
   <div className="border rounded-xl shadow-sm p-3 md:p-6 bg-white border-[#E8E2DB]">
-    <h3 className="text-base font-semibold font-['Montserrat'] text-[#6B5D4F]">{t ? t('planningDetail.gender') : 'Gender Allocation'}</h3>
+    <h3 className="text-base font-semibold font-brand text-[#6B5D4F]">{t ? t('planningDetail.gender') : 'Gender Allocation'}</h3>
     <p className="text-sm mb-4 text-[#6B5D4F]">Male vs Female — REX & TTP by gender</p>
     <div className="h-[300px]" style={{ minWidth: 0, minHeight: 0 }}>
       <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
@@ -108,7 +108,7 @@ const GenderBarChart = ({ data, darkMode, t }) => (
 
 const SizingTable = ({ productType, darkMode }) => (
   <div className="rounded-xl border overflow-hidden border-[#E8E2DB] bg-white">
-    <div className="px-4 py-2.5 text-sm font-semibold border-b font-['Montserrat'] text-[#6B5D4F] bg-[#FBF9F7] border-[#E8E2DB]">
+    <div className="px-4 py-2.5 text-sm font-semibold border-b font-brand text-[#6B5D4F] bg-[#FBF9F7] border-[#E8E2DB]">
       Sizing
     </div>
     <div className="overflow-x-auto">
@@ -116,37 +116,37 @@ const SizingTable = ({ productType, darkMode }) => (
         <thead>
           <tr className="bg-[rgba(196,151,90,0.18)] text-[#8C8178]">
             <th className="px-3 py-2 text-left">{productType}</th>
-            <th className="px-3 py-2 text-center font-['JetBrains_Mono']">0002</th>
-            <th className="px-3 py-2 text-center font-['JetBrains_Mono']">0004</th>
-            <th className="px-3 py-2 text-center font-['JetBrains_Mono']">0006</th>
-            <th className="px-3 py-2 text-center font-['JetBrains_Mono']">0008</th>
+            <th className="px-3 py-2 text-center font-data">0002</th>
+            <th className="px-3 py-2 text-center font-data">0004</th>
+            <th className="px-3 py-2 text-center font-data">0006</th>
+            <th className="px-3 py-2 text-center font-data">0008</th>
             <th className="px-3 py-2 text-center">Sum</th>
           </tr>
         </thead>
         <tbody>
           <tr className="border-t border-[#E8E2DB]">
             <td className="px-3 py-2 text-[#6B5D4F]">% Sales mix</td>
-            <td className="px-3 py-2 text-center font-['JetBrains_Mono'] text-[#6B5D4F]">6%</td>
-            <td className="px-3 py-2 text-center font-['JetBrains_Mono'] text-[#6B5D4F]">33%</td>
-            <td className="px-3 py-2 text-center font-['JetBrains_Mono'] text-[#6B5D4F]">33%</td>
-            <td className="px-3 py-2 text-center font-['JetBrains_Mono'] text-[#6B5D4F]">28%</td>
-            <td className="px-3 py-2 text-center font-semibold font-['JetBrains_Mono'] text-[#2C2417]">100%</td>
+            <td className="px-3 py-2 text-center font-data text-[#6B5D4F]">6%</td>
+            <td className="px-3 py-2 text-center font-data text-[#6B5D4F]">33%</td>
+            <td className="px-3 py-2 text-center font-data text-[#6B5D4F]">33%</td>
+            <td className="px-3 py-2 text-center font-data text-[#6B5D4F]">28%</td>
+            <td className="px-3 py-2 text-center font-semibold font-data text-[#2C2417]">100%</td>
           </tr>
           <tr className="border-t border-[#E8E2DB]">
             <td className="px-3 py-2 text-[#6B5D4F]">% ST</td>
-            <td className="px-3 py-2 text-center font-['JetBrains_Mono'] text-[#6B5D4F]">50%</td>
-            <td className="px-3 py-2 text-center font-['JetBrains_Mono'] text-[#6B5D4F]">43%</td>
-            <td className="px-3 py-2 text-center font-['JetBrains_Mono'] text-[#6B5D4F]">30%</td>
-            <td className="px-3 py-2 text-center font-['JetBrains_Mono'] text-[#6B5D4F]">63%</td>
+            <td className="px-3 py-2 text-center font-data text-[#6B5D4F]">50%</td>
+            <td className="px-3 py-2 text-center font-data text-[#6B5D4F]">43%</td>
+            <td className="px-3 py-2 text-center font-data text-[#6B5D4F]">30%</td>
+            <td className="px-3 py-2 text-center font-data text-[#6B5D4F]">63%</td>
             <td className="px-3 py-2 text-center text-[#6B5D4F]">-</td>
           </tr>
           <tr className="border-t border-[#E8E2DB] bg-[rgba(217,119,6,0.18)]">
             <td className="px-3 py-2 font-semibold text-[#8A6340]">Final Choice</td>
-            <td className="px-3 py-2 text-center font-['JetBrains_Mono'] text-[#2C2417]">0</td>
-            <td className="px-3 py-2 text-center font-['JetBrains_Mono'] text-[#2C2417]">3</td>
-            <td className="px-3 py-2 text-center font-['JetBrains_Mono'] text-[#2C2417]">3</td>
-            <td className="px-3 py-2 text-center font-['JetBrains_Mono'] text-[#2C2417]">2</td>
-            <td className="px-3 py-2 text-center font-semibold font-['JetBrains_Mono'] text-[#2C2417]">8</td>
+            <td className="px-3 py-2 text-center font-data text-[#2C2417]">0</td>
+            <td className="px-3 py-2 text-center font-data text-[#2C2417]">3</td>
+            <td className="px-3 py-2 text-center font-data text-[#2C2417]">3</td>
+            <td className="px-3 py-2 text-center font-data text-[#2C2417]">2</td>
+            <td className="px-3 py-2 text-center font-semibold font-data text-[#2C2417]">8</td>
           </tr>
         </tbody>
       </table>
@@ -166,11 +166,16 @@ const SKUCard = ({ item, block, cardIdx, darkMode }) => {
       <div className="p-5">
         <div className="flex items-start gap-4">
           <div className="w-16 h-16 rounded-xl border flex items-center justify-center shrink-0 shadow-sm bg-white/80 border-white/50">
-            <ImageIcon size={24} className="text-[#6B5D4F]" />
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M6 8V19C6 19.5523 6.44772 20 7 20H17C17.5523 20 18 19.5523 18 19V8" stroke="#B8A692" strokeWidth="1.5" strokeLinecap="round"/>
+              <path d="M4 8H20L18.5 5H5.5L4 8Z" stroke="#C4975A" strokeWidth="1.5" strokeLinejoin="round" fill="rgba(196,151,90,0.1)"/>
+              <path d="M9 8V5.5C9 4.11929 10.1193 3 11.5 3H12.5C13.8807 3 15 4.11929 15 5.5V8" stroke="#B8A692" strokeWidth="1.5" strokeLinecap="round"/>
+              <rect x="9" y="12" width="6" height="3" rx="1" stroke="#C4975A" strokeWidth="1.2" opacity="0.5"/>
+            </svg>
           </div>
           <div className="flex-1 min-w-0">
-            <div className="font-semibold text-base truncate font-['Montserrat'] text-[#2C2417]">
-              <span className="font-['JetBrains_Mono']">{item.sku}</span> • {item.name}
+            <div className="font-semibold text-base truncate font-brand text-[#2C2417]">
+              <span className="font-data">{item.sku}</span> • {item.name}
             </div>
             <div className="text-sm mt-0.5 text-[#6B5D4F]">
               {block.gender} • {block.subCategory}
@@ -206,19 +211,19 @@ const SKUCard = ({ item, block, cardIdx, darkMode }) => {
         <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-2">
           <div className="rounded-lg border px-3 py-2.5 bg-white/60 border-white/50">
             <p className="text-xs uppercase tracking-wide text-[#6B5D4F]">Rex</p>
-            <p className="text-base font-bold text-[#C4975A] font-['JetBrains_Mono']">{item.rex}</p>
+            <p className="text-base font-bold text-[#C4975A] font-data">{item.rex}</p>
           </div>
           <div className="rounded-lg border px-3 py-2.5 bg-white/60 border-white/50">
             <p className="text-xs uppercase tracking-wide text-[#6B5D4F]">TTP</p>
-            <p className="text-base font-bold text-[#1B6B45] font-['JetBrains_Mono']">{item.ttp}</p>
+            <p className="text-base font-bold text-[#1B6B45] font-data">{item.ttp}</p>
           </div>
           <div className="rounded-lg border px-3 py-2.5 bg-white/60 border-white/50">
             <p className="text-xs uppercase tracking-wide text-[#6B5D4F]">Order</p>
-            <p className="text-base font-bold font-['JetBrains_Mono'] text-[#2C2417]">{item.order}</p>
+            <p className="text-base font-bold font-data text-[#2C2417]">{item.order}</p>
           </div>
           <div className="rounded-lg border px-3 py-2.5 bg-white/60 border-white/50">
             <p className="text-xs uppercase tracking-wide text-[#6B5D4F]">TTL value</p>
-            <p className="text-base font-bold font-['JetBrains_Mono'] text-[#2C2417]">{formatCurrency(item.ttlValue)}</p>
+            <p className="text-base font-bold font-data text-[#2C2417]">{formatCurrency(item.ttlValue)}</p>
           </div>
         </div>
 
@@ -243,7 +248,7 @@ const SKUCard = ({ item, block, cardIdx, darkMode }) => {
               </div>
               <div>
                 <span className="text-sm text-[#6B5D4F]">SRP</span>
-                <div className="font-medium text-lg font-['JetBrains_Mono'] text-[#2C2417]">{formatCurrency(item.srp)}</div>
+                <div className="font-medium text-lg font-data text-[#2C2417]">{formatCurrency(item.srp)}</div>
               </div>
             </div>
           </div>
@@ -251,14 +256,14 @@ const SKUCard = ({ item, block, cardIdx, darkMode }) => {
 
         {storeOrderOpen && (
           <div className="mt-4 rounded-xl border overflow-hidden border-[#E8E2DB] bg-white">
-            <div className="px-4 py-2.5 text-sm font-semibold border-b font-['Montserrat'] text-[#6B5D4F] bg-[#FBF9F7] border-[#E8E2DB]">Store Order</div>
+            <div className="px-4 py-2.5 text-sm font-semibold border-b font-brand text-[#6B5D4F] bg-[#FBF9F7] border-[#E8E2DB]">Store Order</div>
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="bg-[rgba(196,151,90,0.18)] text-[#8C8178]">
                     <th className="px-3 py-2 text-left">Store</th>
-                    <th className="px-3 py-2 text-center font-['JetBrains_Mono']">ORDER</th>
-                    <th className="px-3 py-2 text-right font-['JetBrains_Mono']">TTL VALUE</th>
+                    <th className="px-3 py-2 text-center font-data">ORDER</th>
+                    <th className="px-3 py-2 text-right font-data">TTL VALUE</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -268,8 +273,8 @@ const SKUCard = ({ item, block, cardIdx, darkMode }) => {
                         <span className="w-2 h-2 rounded-full bg-[#C4975A]" />REX
                       </span>
                     </td>
-                    <td className="px-3 py-2 text-center font-['JetBrains_Mono'] text-[#2C2417]">{item.rex || 0}</td>
-                    <td className="px-3 py-2 text-right font-['JetBrains_Mono'] text-[#2C2417]">{formatCurrency((item.rex || 0) * (item.srp || 0))}</td>
+                    <td className="px-3 py-2 text-center font-data text-[#2C2417]">{item.rex || 0}</td>
+                    <td className="px-3 py-2 text-right font-data text-[#2C2417]">{formatCurrency((item.rex || 0) * (item.srp || 0))}</td>
                   </tr>
                   <tr className="border-t border-[#E8E2DB]">
                     <td className="px-3 py-2 text-[#6B5D4F]">
@@ -277,13 +282,13 @@ const SKUCard = ({ item, block, cardIdx, darkMode }) => {
                         <span className="w-2 h-2 rounded-full bg-[#1B6B45]" />TTP
                       </span>
                     </td>
-                    <td className="px-3 py-2 text-center font-['JetBrains_Mono'] text-[#2C2417]">{item.ttp || 0}</td>
-                    <td className="px-3 py-2 text-right font-['JetBrains_Mono'] text-[#2C2417]">{formatCurrency((item.ttp || 0) * (item.srp || 0))}</td>
+                    <td className="px-3 py-2 text-center font-data text-[#2C2417]">{item.ttp || 0}</td>
+                    <td className="px-3 py-2 text-right font-data text-[#2C2417]">{formatCurrency((item.ttp || 0) * (item.srp || 0))}</td>
                   </tr>
                   <tr className="border-t-2 border-[#C4975A]/40 bg-[rgba(196,151,90,0.12)]">
                     <td className="px-3 py-2 font-semibold text-[#8A6340]">Total</td>
-                    <td className="px-3 py-2 text-center font-bold font-['JetBrains_Mono'] text-[#2C2417]">{item.order || ((item.rex || 0) + (item.ttp || 0))}</td>
-                    <td className="px-3 py-2 text-right font-bold font-['JetBrains_Mono'] text-[#2C2417]">{formatCurrency(item.ttlValue || (item.order || 0) * (item.srp || 0))}</td>
+                    <td className="px-3 py-2 text-center font-bold font-data text-[#2C2417]">{item.order || ((item.rex || 0) + (item.ttp || 0))}</td>
+                    <td className="px-3 py-2 text-right font-bold font-data text-[#2C2417]">{formatCurrency(item.ttlValue || (item.order || 0) * (item.srp || 0))}</td>
                   </tr>
                 </tbody>
               </table>
@@ -325,7 +330,7 @@ const getApprovalStepStatus = (stepId, currentStep, approvalHistory) => {
 
 const ApprovalProgressBar = ({ currentStep, approvalHistory, darkMode, t }) => (
   <div className="border rounded-xl shadow-sm p-5 bg-white border-[#E8E2DB]">
-    <h3 className="text-xs font-semibold uppercase tracking-wider mb-5 font-['Montserrat'] text-[#8C8178]">
+    <h3 className="text-xs font-semibold uppercase tracking-wider mb-5 font-brand text-[#8C8178]">
       {t ? t('ticketDetail.approvalHistory') : 'Approval Progress'}
     </h3>
     <div className="flex items-start">
@@ -384,7 +389,7 @@ const ApprovalProgressBar = ({ currentStep, approvalHistory, darkMode, t }) => (
 
 const StatusTrackingPanel = ({ approvalHistory, ticket, darkMode, t }) => (
   <div className="border rounded-xl shadow-sm p-5 bg-white border-[#E8E2DB]">
-    <h3 className="text-xs font-semibold uppercase tracking-wider mb-4 font-['Montserrat'] text-[#8C8178]">
+    <h3 className="text-xs font-semibold uppercase tracking-wider mb-4 font-brand text-[#8C8178]">
       {t ? t('common.status') : 'Status Tracking'}
     </h3>
 
@@ -417,7 +422,7 @@ const StatusTrackingPanel = ({ approvalHistory, ticket, darkMode, t }) => (
                 </span>
               </div>
               {item.decidedAt && (
-                <div className="text-[10px] mt-0.5 font-['JetBrains_Mono'] text-[#8C8178]">
+                <div className="text-[10px] mt-0.5 font-data text-[#8C8178]">
                   {new Date(item.decidedAt).toLocaleString('vi-VN')}
                 </div>
               )}
@@ -469,6 +474,8 @@ export default function TicketDetailPage({ ticket, onBack, darkMode = true }) {
   const [detailData, setDetailData] = useState(null);
   const [skuData, setSkuData] = useState([]);
   const [skuViewMode, setSkuViewMode] = useState('card');
+  const [showRejectModal, setShowRejectModal] = useState(false);
+  const [rejectReason, setRejectReason] = useState('');
 
   // Determine the right service based on entity type
   const getEntityService = () => {
@@ -531,18 +538,22 @@ export default function TicketDetailPage({ ticket, onBack, darkMode = true }) {
     }
   };
 
-  const handleRejectTicket = async () => {
-    const reason = window.prompt(t('ticketDetail.reject') + ':');
-    if (reason === null) return; // User cancelled
+  const handleRejectTicket = () => {
+    setRejectReason('');
+    setShowRejectModal(true);
+  };
+
+  const submitReject = async () => {
     const svc = getEntityService();
     if (!svc) return;
     const status = ticket?.status?.toUpperCase();
     setActionLoading(true);
+    setShowRejectModal(false);
     try {
       if (status === 'SUBMITTED') {
-        await svc.rejectL1(ticket.id, reason || 'Rejected');
+        await svc.rejectL1(ticket.id, rejectReason || 'Rejected');
       } else if (status === 'LEVEL1_APPROVED') {
-        await svc.rejectL2(ticket.id, reason || 'Rejected');
+        await svc.rejectL2(ticket.id, rejectReason || 'Rejected');
       }
       toast.success(t('ticketDetail.reject'));
       if (onBack) onBack();
@@ -857,7 +868,7 @@ export default function TicketDetailPage({ ticket, onBack, darkMode = true }) {
               <ArrowLeft size={24} />
             </button>
             <div>
-              <h1 className="text-lg font-semibold font-['Montserrat'] text-white">
+              <h1 className="text-lg font-semibold font-brand text-white">
                 {t('ticketDetail.title')}
               </h1>
               <p className="text-xs text-white/70">
@@ -920,11 +931,11 @@ export default function TicketDetailPage({ ticket, onBack, darkMode = true }) {
 
       {/* 1. Budget + Budget Season */}
         <div className="border rounded-xl shadow-sm p-5 bg-white border-[#E8E2DB]">
-          <h3 className="text-base font-semibold mb-4 font-['Montserrat'] text-[#6B5D4F]">{t('skuProposal.budget')}</h3>
+          <h3 className="text-base font-semibold mb-4 font-brand text-[#6B5D4F]">{t('skuProposal.budget')}</h3>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
             <div>
               <p className="text-sm text-[#6B5D4F]">{t('budget.fiscalYear')}</p>
-              <p className="text-base font-semibold font-['JetBrains_Mono'] text-[#2C2417]">{budgetData.fiscalYear}</p>
+              <p className="text-base font-semibold font-data text-[#2C2417]">{budgetData.fiscalYear}</p>
             </div>
             <div>
               <p className="text-sm text-[#6B5D4F]">{t('budget.groupBrand')}</p>
@@ -936,7 +947,7 @@ export default function TicketDetailPage({ ticket, onBack, darkMode = true }) {
             </div>
             <div>
               <p className="text-sm text-[#6B5D4F]">{t('budget.totalBudget')}</p>
-              <p className="text-lg font-semibold text-[#C4975A] font-['JetBrains_Mono']">{formatCurrency(budgetData.totalBudget)}</p>
+              <p className="text-lg font-semibold text-[#C4975A] font-data">{formatCurrency(budgetData.totalBudget)}</p>
             </div>
             <div>
               <p className="text-sm text-[#6B5D4F]">{t('budget.budgetName')}</p>
@@ -946,7 +957,7 @@ export default function TicketDetailPage({ ticket, onBack, darkMode = true }) {
         </div>
 
         <div className="border rounded-xl shadow-sm p-5 bg-white border-[#E8E2DB]">
-          <h3 className="text-base font-semibold mb-4 font-['Montserrat'] text-[#6B5D4F]">{t('skuProposal.season')}</h3>
+          <h3 className="text-base font-semibold mb-4 font-brand text-[#6B5D4F]">{t('skuProposal.season')}</h3>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
             <div>
               <p className="text-sm text-[#6B5D4F]">{t('skuProposal.seasonGroup')}</p>
@@ -962,15 +973,15 @@ export default function TicketDetailPage({ ticket, onBack, darkMode = true }) {
             </div>
             <div>
               <p className="text-sm text-[#6B5D4F]">REX</p>
-              <p className="text-lg font-semibold text-[#C4975A] font-['JetBrains_Mono']">{formatCurrency(rexNum)}</p>
+              <p className="text-lg font-semibold text-[#C4975A] font-data">{formatCurrency(rexNum)}</p>
             </div>
             <div>
               <p className="text-sm text-[#6B5D4F]">TTP</p>
-              <p className="text-lg font-semibold text-[#1B6B45] font-['JetBrains_Mono']">{formatCurrency(ttpNum)}</p>
+              <p className="text-lg font-semibold text-[#1B6B45] font-data">{formatCurrency(ttpNum)}</p>
             </div>
             <div>
               <p className="text-sm text-[#6B5D4F]">{t('skuProposal.total')}</p>
-              <p className="text-lg font-bold text-[#C4975A] font-['JetBrains_Mono']">{formatCurrency(totalRexTtp)}</p>
+              <p className="text-lg font-bold text-[#C4975A] font-data">{formatCurrency(totalRexTtp)}</p>
             </div>
           </div>
         </div>
@@ -1005,7 +1016,7 @@ export default function TicketDetailPage({ ticket, onBack, darkMode = true }) {
       {displaySkuData.length > 0 && (
       <div className="space-y-5">
         <div className="flex items-center justify-between">
-          <h3 className="text-lg font-semibold flex items-center gap-2 font-['Montserrat'] text-[#2C2417]">
+          <h3 className="text-lg font-semibold flex items-center gap-2 font-brand text-[#2C2417]">
             <Package size={20} className="text-[#C4975A]" />
             {t('proposal.skuCode')} ({displaySkuData.reduce((sum, b) => sum + b.items.length, 0)})
           </h3>
@@ -1060,34 +1071,39 @@ export default function TicketDetailPage({ ticket, onBack, darkMode = true }) {
                   {displaySkuData.flatMap(block => block.items.map((item, idx) => (
                     <tr key={`${item.sku}_${idx}`} className="transition-colors hover:bg-[rgba(196,151,90,0.1)]">
                       <td className="px-4 py-3">
-                        <div className="w-10 h-10 rounded-lg border flex items-center justify-center bg-[#FBF9F7] border-[#E8E2DB]">
-                          <ImageIcon size={16} className="text-[#8C8178]" />
+                        <div className="w-10 h-10 rounded-lg border flex items-center justify-center bg-[rgba(160,120,75,0.08)] border-[rgba(196,151,90,0.2)]">
+                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M6 8V19C6 19.5523 6.44772 20 7 20H17C17.5523 20 18 19.5523 18 19V8" stroke="#B8A692" strokeWidth="1.5" strokeLinecap="round"/>
+                            <path d="M4 8H20L18.5 5H5.5L4 8Z" stroke="#C4975A" strokeWidth="1.5" strokeLinejoin="round" fill="rgba(196,151,90,0.1)"/>
+                            <path d="M9 8V5.5C9 4.11929 10.1193 3 11.5 3H12.5C13.8807 3 15 4.11929 15 5.5V8" stroke="#B8A692" strokeWidth="1.5" strokeLinecap="round"/>
+                            <rect x="9" y="12" width="6" height="3" rx="1" stroke="#C4975A" strokeWidth="1.2" opacity="0.5"/>
+                          </svg>
                         </div>
                       </td>
-                      <td className="px-4 py-3 font-['JetBrains_Mono'] text-sm text-[#C4975A]">{item.sku}</td>
+                      <td className="px-4 py-3 font-data text-sm text-[#C4975A]">{item.sku}</td>
                       <td className="px-4 py-3 font-medium text-[#2C2417]">{item.name}</td>
                       <td className="px-4 py-3 text-[#6B5D4F]">{item.productType || block.productType}</td>
                       <td className="px-4 py-3 text-[#6B5D4F]">{item.color || '-'}</td>
-                      <td className="px-4 py-3 text-center font-['JetBrains_Mono'] font-medium text-[#C4975A]">{item.rex || 0}</td>
-                      <td className="px-4 py-3 text-center font-['JetBrains_Mono'] font-medium text-[#1B6B45]">{item.ttp || 0}</td>
-                      <td className="px-4 py-3 text-center font-['JetBrains_Mono'] font-bold text-[#2C2417]">{item.order || 0}</td>
-                      <td className="px-4 py-3 text-right font-['JetBrains_Mono'] font-medium text-[#2C2417]">{formatCurrency(item.ttlValue || 0)}</td>
+                      <td className="px-4 py-3 text-center font-data font-medium text-[#C4975A]">{item.rex || 0}</td>
+                      <td className="px-4 py-3 text-center font-data font-medium text-[#1B6B45]">{item.ttp || 0}</td>
+                      <td className="px-4 py-3 text-center font-data font-bold text-[#2C2417]">{item.order || 0}</td>
+                      <td className="px-4 py-3 text-right font-data font-medium text-[#2C2417]">{formatCurrency(item.ttlValue || 0)}</td>
                     </tr>
                   )))}
                 </tbody>
                 <tfoot>
                   <tr className="border-t-2 border-[#C4975A]/40 bg-[rgba(196,151,90,0.12)]">
                     <td colSpan="5" className="px-4 py-3 font-semibold text-[#8A6340]">{t('skuProposal.total')}</td>
-                    <td className="px-4 py-3 text-center font-bold font-['JetBrains_Mono'] text-[#C4975A]">
+                    <td className="px-4 py-3 text-center font-bold font-data text-[#C4975A]">
                       {displaySkuData.reduce((s, b) => s + b.items.reduce((ss, i) => ss + (i.rex || 0), 0), 0)}
                     </td>
-                    <td className="px-4 py-3 text-center font-bold font-['JetBrains_Mono'] text-[#1B6B45]">
+                    <td className="px-4 py-3 text-center font-bold font-data text-[#1B6B45]">
                       {displaySkuData.reduce((s, b) => s + b.items.reduce((ss, i) => ss + (i.ttp || 0), 0), 0)}
                     </td>
-                    <td className="px-4 py-3 text-center font-bold font-['JetBrains_Mono'] text-[#2C2417]">
+                    <td className="px-4 py-3 text-center font-bold font-data text-[#2C2417]">
                       {displaySkuData.reduce((s, b) => s + b.items.reduce((ss, i) => ss + (i.order || 0), 0), 0)}
                     </td>
-                    <td className="px-4 py-3 text-right font-bold font-['JetBrains_Mono'] text-[#2C2417]">
+                    <td className="px-4 py-3 text-right font-bold font-data text-[#2C2417]">
                       {formatCurrency(displaySkuData.reduce((s, b) => s + b.items.reduce((ss, i) => ss + (i.ttlValue || 0), 0), 0))}
                     </td>
                   </tr>
@@ -1111,25 +1127,25 @@ export default function TicketDetailPage({ ticket, onBack, darkMode = true }) {
               >
                 <ChevronDown size={18} className={`transition-transform shrink-0 ${isCollapsed ? '-rotate-90' : ''}`} />
                 <div className="text-left flex-1 min-w-0">
-                  <div className="font-semibold text-lg font-['Montserrat']">{block.subCategory}</div>
+                  <div className="font-semibold text-lg font-brand">{block.subCategory}</div>
                   <div className="text-sm mt-0.5 text-blue-200">
-                    {block.gender} • {block.productType} • <span className="font-['JetBrains_Mono']">{block.items.length}</span> SKUs
+                    {block.gender} • {block.productType} • <span className="font-data">{block.items.length}</span> SKUs
                   </div>
                 </div>
                 <div className="flex items-center gap-6 shrink-0">
                   <div className="text-right">
                     <div className="text-xs uppercase tracking-wide text-blue-200">% Buy propose</div>
-                    <div className="text-lg font-bold font-['JetBrains_Mono'] text-[#C4975A]">{block.pctBuyPropose}%</div>
+                    <div className="text-lg font-bold font-data text-[#C4975A]">{block.pctBuyPropose}%</div>
                   </div>
                   <div className="w-px h-8 bg-blue-400/30" />
                   <div className="text-right">
                     <div className="text-xs uppercase tracking-wide text-blue-200">OTB propose</div>
-                    <div className="text-lg font-bold font-['JetBrains_Mono'] text-[#C4975A]">{formatCurrency(block.otbPropose)}</div>
+                    <div className="text-lg font-bold font-data text-[#C4975A]">{formatCurrency(block.otbPropose)}</div>
                   </div>
                   <div className="w-px h-8 bg-blue-400/30" />
                   <div className="text-right">
                     <div className="text-xs uppercase tracking-wide text-blue-200">Total SRP</div>
-                    <div className="text-lg font-semibold font-['JetBrains_Mono'] text-[#C4975A]">{formatCurrency(totalSrp)}</div>
+                    <div className="text-lg font-semibold font-data text-[#C4975A]">{formatCurrency(totalSrp)}</div>
                   </div>
                 </div>
               </button>
@@ -1153,6 +1169,36 @@ export default function TicketDetailPage({ ticket, onBack, darkMode = true }) {
           );
         })}
       </div>
+      )}
+
+      {/* Reject Reason Modal */}
+      {showRejectModal && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/40" onClick={() => setShowRejectModal(false)}>
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6 mx-4" onClick={e => e.stopPropagation()}>
+            <h3 className="text-base font-semibold font-brand text-[#2C2417] mb-3">{t('ticketDetail.reject')}</h3>
+            <textarea
+              value={rejectReason}
+              onChange={e => setRejectReason(e.target.value)}
+              placeholder={t('approvals.rejectReason') || 'Reason for rejection...'}
+              className="w-full border border-[#E8E2DB] rounded-lg px-3 py-2 text-sm min-h-[80px] focus:outline-none focus:ring-2 focus:ring-[#C4975A]/40 resize-none"
+              autoFocus
+            />
+            <div className="flex justify-end gap-2 mt-4">
+              <button
+                onClick={() => setShowRejectModal(false)}
+                className="px-4 py-2 text-sm font-medium rounded-lg border border-[#E8E2DB] text-[#6B5D4F] hover:bg-[#FBF9F7] transition-colors"
+              >
+                {t('common.cancel')}
+              </button>
+              <button
+                onClick={submitReject}
+                className="px-4 py-2 text-sm font-medium rounded-lg bg-[#DC3545] text-white hover:bg-[#C82333] transition-colors"
+              >
+                {t('ticketDetail.reject')}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

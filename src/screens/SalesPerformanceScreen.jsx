@@ -1,8 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { TrendingUp, TrendingDown, DollarSign, Target, Award, Filter, RefreshCw } from 'lucide-react';
-import toast from 'react-hot-toast';
+import { TrendingUp, TrendingDown, DollarSign, Target, Award, RefreshCw } from 'lucide-react';
 import { formatCurrency } from '../utils/formatters';
 import { analyticsService } from '../services';
 import { LoadingSpinner, ErrorMessage, EmptyState } from '../components/Common';
@@ -29,20 +28,25 @@ const SalesPerformanceScreen = () => {
     setError(null);
     try {
       const params = { seasonGroup, fiscalYear, limit: 10 };
-      const [top, bottom, dims, stSummary] = await Promise.all([
+      const [topRes, bottomRes, dimsRes, stRes] = await Promise.allSettled([
         analyticsService.getTopSkus(params),
         analyticsService.getBottomSkus(params),
         analyticsService.getSalesByDimension({ ...params, dimensionType: 'category' }),
         analyticsService.getSellThroughSummary(params),
       ]);
-      setTopSkus(Array.isArray(top) ? top : []);
-      setBottomSkus(Array.isArray(bottom) ? bottom : []);
-      setSalesByDimension(Array.isArray(dims) ? dims : []);
-      setSellThroughSummary(Array.isArray(stSummary) ? stSummary : []);
+      const extract = (res) => res.status === 'fulfilled' && Array.isArray(res.value) ? res.value : [];
+      setTopSkus(extract(topRes));
+      setBottomSkus(extract(bottomRes));
+      setSalesByDimension(extract(dimsRes));
+      setSellThroughSummary(extract(stRes));
+      // Only show error if ALL endpoints failed
+      const allFailed = [topRes, bottomRes, dimsRes, stRes].every(r => r.status === 'rejected');
+      if (allFailed) {
+        setError('Analytics endpoints are not available yet');
+      }
     } catch (err) {
       console.error('Failed to fetch sales data:', err);
       setError(err.message || 'Failed to load sales analytics');
-      toast.error('Failed to load sales analytics');
     } finally {
       setLoading(false);
     }

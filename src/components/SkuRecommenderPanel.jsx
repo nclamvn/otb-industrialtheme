@@ -22,7 +22,7 @@ const ScoreBar = ({ label, value, color }) => (
         style={{ width: `${Math.min(Math.max(value || 0, 0), 100)}%` }}
       />
     </div>
-    <span className="text-[10px] font-['JetBrains_Mono'] text-[#6B5D4F] w-8 text-right">{value || 0}</span>
+    <span className="text-[10px] font-data text-[#6B5D4F] w-8 text-right">{value || 0}</span>
   </div>
 );
 
@@ -198,7 +198,7 @@ const SkuRecommenderPanel = ({
               <Sparkles size={18} className="text-indigo-600 animate-pulse" />
             </div>
             <div>
-              <h3 className="text-sm font-semibold font-['Montserrat'] text-[#2C2417]">
+              <h3 className="text-sm font-semibold font-brand text-[#2C2417]">
                 {t('ai.skuRecommendations')}
               </h3>
               <p className="text-xs text-[#8C8178]">{t('ai.analyzingOptimalSku')}</p>
@@ -220,7 +220,7 @@ const SkuRecommenderPanel = ({
       <div className="rounded-2xl border border-[#DC3545]/30 bg-[rgba(220,53,69,0.05)] p-5">
         <div className="flex items-center gap-3 mb-3">
           <XCircle size={18} className="text-[#DC3545]" />
-          <h3 className="text-sm font-semibold font-['Montserrat'] text-[#DC3545]">
+          <h3 className="text-sm font-semibold font-brand text-[#DC3545]">
             {t('ai.recommendationError')}
           </h3>
         </div>
@@ -253,13 +253,13 @@ const SkuRecommenderPanel = ({
               <ShoppingBag size={16} className="text-indigo-600" />
             </div>
             <div>
-              <h3 className="text-sm font-semibold font-['Montserrat'] text-[#2C2417] flex items-center gap-2">
+              <h3 className="text-sm font-semibold font-brand text-[#2C2417] flex items-center gap-2">
                 {t('ai.skuRecommendations')}
-                <span className="text-[10px] font-['JetBrains_Mono'] px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-600">
+                <span className="text-[10px] font-data px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-600">
                   {t('ai.skuCount', { count: recommendations.length })}
                 </span>
                 {budgetAmount > 0 && (
-                  <span className="text-[10px] font-['JetBrains_Mono'] px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-600">
+                  <span className="text-[10px] font-data px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-600">
                     {t('ai.utilized', { pct: utilizationPct })}
                   </span>
                 )}
@@ -301,13 +301,13 @@ const SkuRecommenderPanel = ({
             </div>
             <div className="flex items-center gap-3 text-xs">
               <span className="text-[#6B5D4F]">
-                <span className="font-['JetBrains_Mono'] text-indigo-600 font-semibold">
+                <span className="font-data text-indigo-600 font-semibold">
                   {selected.size}
                 </span>{' '}
                 {t('ai.selected')}
               </span>
               <span className="text-[#E8E2DB]">|</span>
-              <span className="font-['JetBrains_Mono'] text-[#2C2417] font-semibold">
+              <span className="font-data text-[#2C2417] font-semibold">
                 {formatCurrency(totalSelectedValue)}
               </span>
             </div>
@@ -347,7 +347,7 @@ const SkuRecommenderPanel = ({
                     {/* Content */}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap mb-1">
-                        <span className="text-sm font-semibold font-['JetBrains_Mono'] text-[#2C2417]">
+                        <span className="text-sm font-semibold font-data text-[#2C2417]">
                           {rec.skuCode || rec.sku || key}
                         </span>
                         <RiskBadge riskLevel={rec.riskLevel || 'moderate'} t={t} />
@@ -407,20 +407,20 @@ const SkuRecommenderPanel = ({
                     <div className="shrink-0 text-right space-y-2">
                       <div>
                         <p className="text-[10px] text-[#8C8178] uppercase tracking-wide">{t('ai.qty')}</p>
-                        <p className="text-sm font-semibold font-['JetBrains_Mono'] text-[#2C2417]">
+                        <p className="text-sm font-semibold font-data text-[#2C2417]">
                           {rec.recommendedQty || rec.quantity || 0}
                         </p>
                       </div>
                       <div>
                         <p className="text-[10px] text-[#8C8178] uppercase tracking-wide">{t('ai.value')}</p>
-                        <p className="text-xs font-semibold font-['JetBrains_Mono'] text-indigo-600">
+                        <p className="text-xs font-semibold font-data text-indigo-600">
                           {formatCurrency(rec.recommendedValue || rec.totalValue || 0)}
                         </p>
                       </div>
                       {(rec.overallScore != null || rec.score != null) && (
                         <div className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-gradient-to-r from-indigo-500/10 to-purple-500/10">
                           <Zap size={10} className="text-indigo-600" />
-                          <span className="text-xs font-bold font-['JetBrains_Mono'] text-indigo-600">
+                          <span className="text-xs font-bold font-data text-indigo-600">
                             {rec.overallScore || rec.score || 0}
                           </span>
                         </div>
@@ -437,7 +437,7 @@ const SkuRecommenderPanel = ({
             <div className="mt-4 rounded-lg border border-[#E8E2DB] bg-[#FBF9F7] p-4">
               <div className="flex items-center gap-2 mb-3">
                 <BarChart3 size={14} className="text-indigo-600" />
-                <span className="text-xs font-semibold font-['Montserrat'] text-[#2C2417]">
+                <span className="text-xs font-semibold font-brand text-[#2C2417]">
                   {t('ai.assortmentSummary')}
                 </span>
               </div>
@@ -452,7 +452,7 @@ const SkuRecommenderPanel = ({
                         className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white border border-[#E8E2DB]"
                       >
                         <span className="text-[11px] text-[#6B5D4F]">{tierName}</span>
-                        <span className="text-xs font-semibold font-['JetBrains_Mono'] text-[#2C2417]">
+                        <span className="text-xs font-semibold font-data text-[#2C2417]">
                           {tierValue}
                           {typeof tierValue === 'number' && tierValue <= 100 ? '%' : ''}
                         </span>

@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Activity, BarChart3, ArrowUpRight, ArrowDownRight, RefreshCw, Users } from 'lucide-react';
-import toast from 'react-hot-toast';
 import { analyticsService } from '../services';
 import { LoadingSpinner, ErrorMessage, EmptyState } from '../components/Common';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -34,18 +33,21 @@ const CategoryTrendsScreen = () => {
     setError(null);
     try {
       const params = { seasonGroup, fiscalYear, ...(attributeType ? { attributeType } : {}) };
-      const [trends, yoy, gender] = await Promise.all([
+      const [trendsRes, yoyRes, genderRes] = await Promise.allSettled([
         analyticsService.getTrendAttributes(params),
         analyticsService.getYoyComparison({ seasonGroup, attributeType: attributeType || 'color' }),
         analyticsService.getGenderBreakdown({ seasonGroup, fiscalYear }),
       ]);
-      setTrendAttributes(Array.isArray(trends) ? trends : []);
-      setYoyComparison(Array.isArray(yoy) ? yoy : []);
-      setGenderBreakdown(Array.isArray(gender) ? gender : []);
+      setTrendAttributes(trendsRes.status === 'fulfilled' && Array.isArray(trendsRes.value) ? trendsRes.value : []);
+      setYoyComparison(yoyRes.status === 'fulfilled' && Array.isArray(yoyRes.value) ? yoyRes.value : []);
+      setGenderBreakdown(genderRes.status === 'fulfilled' && Array.isArray(genderRes.value) ? genderRes.value : []);
+      const allFailed = [trendsRes, yoyRes, genderRes].every(r => r.status === 'rejected');
+      if (allFailed) {
+        setError('Analytics endpoints are not available yet');
+      }
     } catch (err) {
       console.error('Failed to fetch trend data:', err);
       setError(err.message || 'Failed to load category trends');
-      toast.error('Failed to load category trends');
     } finally {
       setLoading(false);
     }

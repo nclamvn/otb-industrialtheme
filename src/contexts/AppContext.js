@@ -1,5 +1,5 @@
 'use client';
-import React, { createContext, useContext, useState, useCallback } from 'react';
+import React, { createContext, useContext, useState, useCallback, useRef } from 'react';
 
 const AppContext = createContext(null);
 
@@ -18,12 +18,33 @@ export const AppProvider = ({ children }) => {
   const [otbAnalysisContext, setOtbAnalysisContext] = useState(null);
   const [skuProposalContext, setSkuProposalContext] = useState(null);
 
+  // Save handler system — screens register their save function here
+  const saveHandlerRef = useRef(null);
+  const [hasSaveHandler, setHasSaveHandler] = useState(false);
+
+  const registerSave = useCallback((handler) => {
+    saveHandlerRef.current = handler;
+    setHasSaveHandler(true);
+  }, []);
+
+  const unregisterSave = useCallback(() => {
+    saveHandlerRef.current = null;
+    setHasSaveHandler(false);
+  }, []);
+
+  const triggerSave = useCallback(async () => {
+    if (saveHandlerRef.current) {
+      await saveHandlerRef.current();
+    }
+  }, []);
+
   // KPI data for header step bar
   const [kpiData, setKpiData] = useState({
     'budget-management': { value: 5, status: 'completed' },
     'planning': { value: 3, status: 'in-progress' },
     'otb-analysis': { value: 0, status: 'pending' },
     'proposal': { value: 0, status: 'pending' },
+    'tickets': { value: 4, status: 'in-progress' },
   });
 
   const value = {
@@ -43,6 +64,10 @@ export const AppProvider = ({ children }) => {
     setSkuProposalContext,
     kpiData,
     setKpiData,
+    registerSave,
+    unregisterSave,
+    triggerSave,
+    hasSaveHandler,
   };
 
   return (

@@ -31,6 +31,10 @@ const safePatch = async (url, data) => {
   }
 };
 
+// AI alerts endpoint is optional — disabled until backend is deployed.
+// Set to true when /ai/alerts endpoint becomes available.
+let _alertsAvailable = false;
+
 export const aiService = {
   // ── Size Curve Optimizer ─────────────────────────────────────────────
 
@@ -51,21 +55,27 @@ export const aiService = {
   // ── Budget Variance Alerts ───────────────────────────────────────────
 
   async getBudgetAlerts(options = {}) {
+    if (!_alertsAvailable) return [];
     const params = {};
     if (options.budgetId) params.budgetId = options.budgetId;
     if (options.unreadOnly) params.unreadOnly = 'true';
-    return safeGet('/ai/alerts', { params }) || [];
+    const result = await safeGet('/ai/alerts', { params });
+    if (result === null) { _alertsAvailable = false; return []; }
+    return result || [];
   },
 
   async markAlertRead(alertId) {
+    if (!_alertsAvailable) return null;
     return safePatch(`/ai/alerts/${alertId}/read`);
   },
 
   async dismissAlert(alertId) {
+    if (!_alertsAvailable) return null;
     return safePatch(`/ai/alerts/${alertId}/dismiss`);
   },
 
   async triggerAlertCheck() {
+    if (!_alertsAvailable) return null;
     return safePost('/ai/alerts/check');
   },
 

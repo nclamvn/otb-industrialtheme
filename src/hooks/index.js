@@ -4,3 +4,7 @@ export { useProposal } from './useProposal';
 export { useKPIBreakdown } from './useKPIBreakdown';
 export { useDataImport } from './useDataImport';
 export { useIsMobile } from './useIsMobile';
+export { useConfirmDialog } from './useConfirmDialog';
+export { useAllocationState } from './useAllocationState';
+export { useSessionRecovery } from './useSessionRecovery';
+export { useClipboardPaste } from './useClipboardPaste';

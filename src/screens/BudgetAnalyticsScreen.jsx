@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Wallet, Percent, Bell, Zap, RefreshCw, AlertTriangle, AlertCircle, Info } from 'lucide-react';
-import toast from 'react-hot-toast';
 import { formatCurrency } from '../utils/formatters';
 import { analyticsService, masterDataService } from '../services';
 import { LoadingSpinner, ErrorMessage, EmptyState } from '../components/Common';
@@ -42,20 +41,23 @@ const BudgetAnalyticsScreen = () => {
     setError(null);
     try {
       const params = { seasonGroup, ...(groupBrandId ? { groupBrandId } : {}) };
-      const [sum, trend, alertData, eff] = await Promise.all([
+      const [sumRes, trendRes, alertRes, effRes] = await Promise.allSettled([
         analyticsService.getBudgetSummary(params),
         analyticsService.getUtilizationTrend(params),
         analyticsService.getBudgetAlerts(params),
         analyticsService.getAllocationEfficiency({ ...params, fiscalYear: 2024 }),
       ]);
-      setSummary(sum || {});
-      setUtilizationTrend(Array.isArray(trend) ? trend : []);
-      setAlerts(Array.isArray(alertData) ? alertData : []);
-      setEfficiency(Array.isArray(eff) ? eff : []);
+      setSummary(sumRes.status === 'fulfilled' && sumRes.value ? sumRes.value : {});
+      setUtilizationTrend(trendRes.status === 'fulfilled' && Array.isArray(trendRes.value) ? trendRes.value : []);
+      setAlerts(alertRes.status === 'fulfilled' && Array.isArray(alertRes.value) ? alertRes.value : []);
+      setEfficiency(effRes.status === 'fulfilled' && Array.isArray(effRes.value) ? effRes.value : []);
+      const allFailed = [sumRes, trendRes, alertRes, effRes].every(r => r.status === 'rejected');
+      if (allFailed) {
+        setError('Analytics endpoints are not available yet');
+      }
     } catch (err) {
       console.error('Failed to fetch budget analytics:', err);
       setError(err.message || 'Failed to load budget analytics');
-      toast.error('Failed to load budget analytics');
     } finally {
       setLoading(false);
     }
@@ -111,7 +113,7 @@ const BudgetAnalyticsScreen = () => {
           </select>
           <select value={groupBrandId} onChange={e => setGroupBrandId(e.target.value)}
             className={`px-3 py-2 rounded-lg border ${border} ${cardBg} ${text} text-sm`}>
-            <option value="">{t('analytics.allBrands', 'All Brands')}</option>
+            <option value="">{t('budget.brand')}</option>
             {brands.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
           </select>
           <button onClick={fetchData} className="p-2 rounded-lg border" style={{ borderColor: accent, color: accent }}>

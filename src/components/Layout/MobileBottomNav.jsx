@@ -70,7 +70,7 @@ export default function MobileBottomNav({ currentScreen }) {
               style={{ boxShadow: '0 -8px 30px rgba(44,36,23,0.12)' }}
             >
               <div className="px-4 py-3 border-b border-[#E8E2DB] flex items-center justify-between">
-                <span className="text-sm font-semibold font-['Montserrat'] text-[#2C2417]">
+                <span className="text-sm font-semibold font-brand text-[#2C2417]">
                   More
                 </span>
                 <button onClick={() => setShowMore(false)} className="p-1 rounded-lg text-[#8C8178] hover:bg-[#FBF9F7]">
@@ -96,7 +96,7 @@ export default function MobileBottomNav({ currentScreen }) {
                         strokeWidth={active ? 2.5 : 2}
                         className={active ? 'text-[#C4975A]' : 'text-[#8C8178]'}
                       />
-                      <span className={`text-[10px] font-medium font-['Montserrat'] text-center leading-tight ${
+                      <span className={`text-[10px] font-medium font-brand text-center leading-tight ${
                         active ? 'text-[#C4975A]' : 'text-[#6B5D4F]'
                       }`}>
                         {t(item.labelKey, item.labelKey.split('.').pop())}
@@ -139,7 +139,7 @@ export default function MobileBottomNav({ currentScreen }) {
                     }`}
                   />
                 </div>
-                <span className={`text-[10px] font-medium font-['Montserrat'] ${
+                <span className={`text-[10px] font-medium font-brand ${
                   active ? 'text-[#C4975A]' : 'text-[#8C8178]'
                 }`}>
                   {tab.shortLabel}
@@ -164,7 +164,7 @@ export default function MobileBottomNav({ currentScreen }) {
                 }`}
               />
             </div>
-            <span className={`text-[10px] font-medium font-['Montserrat'] ${
+            <span className={`text-[10px] font-medium font-brand ${
               showMore || isMoreActive ? 'text-[#C4975A]' : 'text-[#8C8178]'
             }`}>
               More

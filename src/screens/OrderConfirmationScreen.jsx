@@ -6,12 +6,13 @@ import {
   Search, ChevronDown, X, AlertTriangle, FileText,
   DollarSign, Truck, XCircle, Eye
 } from 'lucide-react';
-import { budgetService, proposalService } from '../services';
+import toast from 'react-hot-toast';
+import { budgetService, proposalService, orderService } from '../services';
+import api, { invalidateCache } from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useIsMobile } from '@/hooks/useIsMobile';
 import { formatCurrency } from '../utils';
-import api from '../services/api';
 import { ExpandableStatCard } from '../components/Common';
 
 /* ═══════════════════════════════════════════════
@@ -82,11 +83,14 @@ const OrderConfirmationScreen = () => {
   const handleConfirmOrder = async (order) => {
     setProcessing(true);
     try {
-      await api.patch(`/orders/${order.id}/confirm`);
+      await orderService.confirmOrder(order.id);
+      invalidateCache('/orders');
+      invalidateCache('/proposals');
+      toast.success(t('orderConfirm.orderConfirmed') || 'Order confirmed');
       fetchOrders();
     } catch (err) {
-      // Optimistic update if API not available
-      setOrders(prev => prev.map(o => o.id === order.id ? { ...o, status: 'CONFIRMED' } : o));
+      console.error('Failed to confirm order:', err);
+      toast.error(err.userMessage || err.response?.data?.message || 'Failed to confirm order');
     } finally {
       setProcessing(false);
       setConfirmModal(null);
@@ -96,10 +100,14 @@ const OrderConfirmationScreen = () => {
   const handleCancelOrder = async (order) => {
     setProcessing(true);
     try {
-      await api.patch(`/orders/${order.id}/cancel`);
+      await orderService.cancelOrder(order.id);
+      invalidateCache('/orders');
+      invalidateCache('/proposals');
+      toast.success(t('orderConfirm.orderCancelled') || 'Order cancelled');
       fetchOrders();
     } catch (err) {
-      setOrders(prev => prev.map(o => o.id === order.id ? { ...o, status: 'CANCELLED' } : o));
+      console.error('Failed to cancel order:', err);
+      toast.error(err.userMessage || err.response?.data?.message || 'Failed to cancel order');
     } finally {
       setProcessing(false);
       setConfirmModal(null);
@@ -158,17 +166,11 @@ const OrderConfirmationScreen = () => {
   return (
     <div className={`min-h-screen ${bg} p-4`}>
       {/* Compact Header + Filters */}
-      <div className={`border ${border} rounded-xl px-3 py-2 mb-3`} style={{
-        background: 'linear-gradient(135deg, #FFFFFF 0%, rgba(196,151,90,0.04) 35%, rgba(196,151,90,0.12) 100%)',
-        boxShadow: 'inset 0 -1px 0 rgba(196,151,90,0.05)',
-      }}>
+      <div className={`border ${border} rounded-xl px-3 py-2 mb-3 bg-white`}>
         <div className="flex flex-wrap items-center gap-3">
-          {/* Icon + Title */}
-          <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 bg-[rgba(196,151,90,0.15)]">
-            <ShoppingCart size={14} className="text-[#A67B3D]" />
-          </div>
+          <ShoppingCart size={14} className="text-content-muted flex-shrink-0" />
           <div className="flex-shrink-0">
-            <h1 className={`text-sm font-semibold font-['Montserrat'] ${textPrimary} leading-tight`}>
+            <h1 className={`text-sm font-semibold font-brand ${textPrimary} leading-tight`}>
               {t('screenConfig.orderConfirmation')}
             </h1>
             <p className={`text-[10px] ${textMuted} leading-tight`}>
@@ -176,16 +178,15 @@ const OrderConfirmationScreen = () => {
             </p>
           </div>
 
-          {/* Inline Filters */}
           <div className="flex flex-wrap items-center gap-2 ml-auto">
-            <div className={`flex items-center gap-1.5 px-2 py-1 rounded-lg border ${border} bg-[#FBF9F7] w-48`}>
+            <div className={`flex items-center gap-1.5 px-2 py-1 rounded-lg border ${border} bg-white w-48`}>
               <Search size={12} className={textMuted} />
               <input
                 type="text"
                 placeholder={t('orderConfirm.searchPlaceholder')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className={`bg-transparent outline-none text-xs w-full font-['Montserrat'] ${textPrimary} placeholder:${textMuted}`}
+                className={`bg-transparent outline-none text-xs w-full font-brand ${textPrimary} placeholder:${textMuted}`}
               />
               {searchTerm && (
                 <button onClick={() => setSearchTerm('')}>
@@ -198,9 +199,9 @@ const OrderConfirmationScreen = () => {
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className={`appearance-none px-2 py-1 pr-6 rounded-lg border ${border} bg-[#FBF9F7] text-xs font-['Montserrat'] ${textPrimary} outline-none cursor-pointer`}
+                className={`appearance-none px-2 py-1 pr-6 rounded-lg border ${border} bg-white text-xs font-brand ${textPrimary} outline-none cursor-pointer`}
               >
-                <option value="all">{t('orderConfirm.allStatuses')}</option>
+                <option value="all">{t('common.status')}</option>
                 <option value="PENDING">{t('orderConfirm.statusPending')}</option>
                 <option value="CONFIRMED">{t('orderConfirm.statusConfirmed')}</option>
                 <option value="SHIPPED">{t('orderConfirm.statusShipped')}</option>
@@ -211,7 +212,7 @@ const OrderConfirmationScreen = () => {
 
             <button
               onClick={fetchOrders}
-              className={`px-2.5 py-1 rounded-lg border ${border} text-xs font-medium font-['Montserrat'] transition-all text-[#A67B3D] hover:bg-[rgba(196,151,90,0.1)]`}
+              className={`px-2.5 py-1 rounded-lg border ${border} text-xs font-medium font-brand transition-all text-[#A67B3D] hover:bg-surface-secondary`}
             >
               {t('common.refresh')}
             </button>
@@ -275,14 +276,14 @@ const OrderConfirmationScreen = () => {
           <div className="flex flex-col items-center justify-center py-20">
             <AlertTriangle size={32} className="text-[#DC3545]" />
             <p className={`text-sm mt-3 ${textSecondary}`}>{error}</p>
-            <button onClick={fetchOrders} className="mt-3 px-4 py-2 rounded-xl bg-[#C4975A] text-white text-sm font-medium font-['Montserrat']">
+            <button onClick={fetchOrders} className="mt-3 px-4 py-2 rounded-xl bg-[#C4975A] text-white text-sm font-medium font-brand">
               {t('common.tryAgain')}
             </button>
           </div>
         ) : filtered.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20">
             <Package size={48} className={textMuted} />
-            <p className={`text-base font-semibold mt-4 font-['Montserrat'] ${textPrimary}`}>{t('orderConfirm.noOrders')}</p>
+            <p className={`text-base font-semibold mt-4 font-brand ${textPrimary}`}>{t('orderConfirm.noOrders')}</p>
             <p className={`text-sm mt-1 ${textSecondary}`}>{t('orderConfirm.noOrdersDesc')}</p>
           </div>
         ) : (
@@ -291,7 +292,7 @@ const OrderConfirmationScreen = () => {
               <thead>
                 <tr className={`bg-[#FBF9F7] border-b ${border}`}>
                   {[t('orderConfirm.colPO'), t('orderConfirm.colBrand'), t('orderConfirm.colSeason'), t('orderConfirm.colSKUs'), t('orderConfirm.colValue'), t('orderConfirm.colStatus'), t('orderConfirm.colDate'), t('common.actions')].map((h) => (
-                    <th key={h} className={`px-3 py-2 text-left text-[10px] font-semibold uppercase tracking-wider font-['Montserrat'] ${textMuted}`}>
+                    <th key={h} className={`px-3 py-2 text-left text-[10px] font-semibold uppercase tracking-wider font-brand ${textMuted}`}>
                       {h}
                     </th>
                   ))}
@@ -303,23 +304,23 @@ const OrderConfirmationScreen = () => {
                   return (
                     <tr key={order.id || idx} className={`border-b ${border} transition-colors hover:bg-[#FBF9F7]`}>
                       <td className="px-3 py-1.5">
-                        <span className={`text-sm font-semibold font-['JetBrains_Mono'] ${textPrimary}`}>{order.poNumber}</span>
+                        <span className={`text-sm font-semibold font-data ${textPrimary}`}>{order.poNumber}</span>
                       </td>
                       <td className="px-3 py-1.5">
-                        <span className={`text-sm font-['Montserrat'] ${textPrimary}`}>{order.brandName}</span>
+                        <span className={`text-sm font-brand ${textPrimary}`}>{order.brandName}</span>
                       </td>
                       <td className="px-3 py-1.5">
-                        <span className={`text-sm font-['Montserrat'] ${textSecondary}`}>{order.season}</span>
+                        <span className={`text-sm font-brand ${textSecondary}`}>{order.season}</span>
                       </td>
                       <td className="px-3 py-1.5">
-                        <span className={`text-sm font-['JetBrains_Mono'] ${textPrimary}`}>{order.skuCount}</span>
+                        <span className={`text-sm font-data ${textPrimary}`}>{order.skuCount}</span>
                       </td>
                       <td className="px-3 py-1.5">
-                        <span className={`text-sm font-semibold font-['JetBrains_Mono'] ${textPrimary}`}>{formatCurrency(order.totalValue)}</span>
+                        <span className={`text-sm font-semibold font-data ${textPrimary}`}>{formatCurrency(order.totalValue)}</span>
                       </td>
                       <td className="px-3 py-1.5">
                         <span
-                          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold font-['JetBrains_Mono']"
+                          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold font-data"
                           style={{ color: sc.color, backgroundColor: sc.bg }}
                         >
                           <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: sc.color }} />
@@ -327,7 +328,7 @@ const OrderConfirmationScreen = () => {
                         </span>
                       </td>
                       <td className="px-3 py-1.5">
-                        <span className={`text-xs font-['JetBrains_Mono'] ${textMuted}`}>
+                        <span className={`text-xs font-data ${textMuted}`}>
                           {order.createdAt ? new Date(order.createdAt).toLocaleDateString('vi-VN') : '-'}
                         </span>
                       </td>
@@ -336,14 +337,14 @@ const OrderConfirmationScreen = () => {
                           <div className="flex items-center gap-2">
                             <button
                               onClick={() => setConfirmModal({ order, action: 'confirm' })}
-                              className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold font-['Montserrat'] transition-all bg-[rgba(27,107,69,0.12)] text-[#1B6B45] hover:bg-[rgba(27,107,69,0.2)]"
+                              className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold font-brand transition-all bg-[rgba(27,107,69,0.12)] text-[#1B6B45] hover:bg-[rgba(27,107,69,0.2)]"
                             >
                               <CheckCircle size={13} />
                               {t('common.confirm')}
                             </button>
                             <button
                               onClick={() => setConfirmModal({ order, action: 'cancel' })}
-                              className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold font-['Montserrat'] transition-all bg-[rgba(220,53,69,0.1)] text-[#DC3545] hover:bg-[rgba(220,53,69,0.18)]"
+                              className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold font-brand transition-all bg-[rgba(220,53,69,0.1)] text-[#DC3545] hover:bg-[rgba(220,53,69,0.18)]"
                             >
                               <XCircle size={13} />
                               {t('common.cancel')}
@@ -351,7 +352,7 @@ const OrderConfirmationScreen = () => {
                           </div>
                         )}
                         {order.status === 'CONFIRMED' && (
-                          <span className={`text-xs font-['Montserrat'] ${textMuted}`}>
+                          <span className={`text-xs font-brand ${textMuted}`}>
                             <Truck size={14} className="inline mr-1" />
                             {t('orderConfirm.readyToShip')}
                           </span>
@@ -372,7 +373,7 @@ const OrderConfirmationScreen = () => {
           <div className={`w-full max-w-md mx-4 rounded-2xl border ${border} ${cardBg} shadow-2xl`}>
             <div className={`p-5 border-b ${border}`}>
               <div className="flex items-center justify-between">
-                <h3 className={`text-lg font-bold font-['Montserrat'] ${textPrimary}`}>
+                <h3 className={`text-lg font-bold font-brand ${textPrimary}`}>
                   {confirmModal.action === 'confirm' ? t('orderConfirm.confirmOrder') : t('orderConfirm.cancelOrder')}
                 </h3>
                 <button onClick={() => setConfirmModal(null)} className="p-1.5 rounded-lg hover:bg-[#F0EBE5]">
@@ -385,15 +386,15 @@ const OrderConfirmationScreen = () => {
                 <div className="space-y-2">
                   <div className="flex justify-between">
                     <span className={`text-xs ${textMuted}`}>{t('orderConfirm.colPO')}</span>
-                    <span className={`text-sm font-semibold font-['JetBrains_Mono'] ${textPrimary}`}>{confirmModal.order.poNumber}</span>
+                    <span className={`text-sm font-semibold font-data ${textPrimary}`}>{confirmModal.order.poNumber}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className={`text-xs ${textMuted}`}>{t('orderConfirm.colBrand')}</span>
-                    <span className={`text-sm font-['Montserrat'] ${textPrimary}`}>{confirmModal.order.brandName}</span>
+                    <span className={`text-sm font-brand ${textPrimary}`}>{confirmModal.order.brandName}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className={`text-xs ${textMuted}`}>{t('orderConfirm.colValue')}</span>
-                    <span className={`text-sm font-semibold font-['JetBrains_Mono'] ${textPrimary}`}>{formatCurrency(confirmModal.order.totalValue)}</span>
+                    <span className={`text-sm font-semibold font-data ${textPrimary}`}>{formatCurrency(confirmModal.order.totalValue)}</span>
                   </div>
                 </div>
               </div>
@@ -406,14 +407,14 @@ const OrderConfirmationScreen = () => {
             <div className={`p-5 border-t ${border} flex justify-end gap-3`}>
               <button
                 onClick={() => setConfirmModal(null)}
-                className={`px-4 py-2 rounded-xl border ${border} text-sm font-medium font-['Montserrat'] ${textSecondary} transition-all hover:bg-[#F0EBE5]`}
+                className={`px-4 py-2 rounded-xl border ${border} text-sm font-medium font-brand ${textSecondary} transition-all hover:bg-[#F0EBE5]`}
               >
                 {t('common.back')}
               </button>
               <button
                 onClick={() => confirmModal.action === 'confirm' ? handleConfirmOrder(confirmModal.order) : handleCancelOrder(confirmModal.order)}
                 disabled={processing}
-                className={`px-5 py-2 rounded-xl text-sm font-semibold font-['Montserrat'] transition-all disabled:opacity-50 ${
+                className={`px-5 py-2 rounded-xl text-sm font-semibold font-brand transition-all disabled:opacity-50 ${
                   confirmModal.action === 'confirm'
                     ? 'bg-[#1B6B45] text-white hover:bg-[#155a39]'
                     : 'bg-[#DC3545] text-white hover:bg-[#c82333]'

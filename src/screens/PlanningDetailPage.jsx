@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import {
-  ArrowLeft, Save, TrendingUp, Layers, Users, Tag, Info, Pencil, Filter,
+  ArrowLeft, Save, TrendingUp, Layers, Users, Tag, Info, Pencil,
   ChevronDown, Check, CheckCircle2, History, Clock, Sparkles, X,
   Calendar, User, MessageSquare, AlertCircle, CheckCircle, XCircle,
   Send, FileText, DollarSign
@@ -384,9 +384,9 @@ const PlanningDetailPage = ({
 
   // Generate filter options from categoryStructure
   const filterOptions = useMemo(() => {
-    const genders = [{ id: 'all', name: 'All Genders' }];
-    const categories = [{ id: 'all', name: 'All Categories' }];
-    const subCategories = [{ id: 'all', name: 'All Sub-Categories' }];
+    const genders = [{ id: 'all', name: t('planningDetail.gender') }];
+    const categories = [{ id: 'all', name: t('planningDetail.category') }];
+    const subCategories = [{ id: 'all', name: t('planningDetail.subCategory') || 'Sub-Category' }];
 
     categoryStructure.forEach(genderGroup => {
       genders.push({ id: genderGroup.gender.id, name: genderGroup.gender.name });
@@ -409,7 +409,7 @@ const PlanningDetailPage = ({
   const filteredCategoryOptions = useMemo(() => {
     if (genderFilter === 'all') return filterOptions.categories;
     return [
-      { id: 'all', name: 'All Categories' },
+      { id: 'all', name: t('planningDetail.category') },
       ...filterOptions.categories.filter(c => c.id !== 'all' && c.genderId === genderFilter)
     ];
   }, [genderFilter, filterOptions.categories]);
@@ -423,7 +423,7 @@ const PlanningDetailPage = ({
     if (categoryFilter !== 'all') {
       options = options.filter(sc => sc.id === 'all' || sc.categoryId === categoryFilter);
     }
-    return [{ id: 'all', name: 'All Sub-Categories' }, ...options.filter(o => o.id !== 'all')];
+    return [{ id: 'all', name: t('planningDetail.subCategory') || 'Sub-Category' }, ...options.filter(o => o.id !== 'all')];
   }, [genderFilter, categoryFilter, filterOptions.subCategories]);
 
   // Reset dependent filters when parent filter changes
@@ -760,11 +760,6 @@ const PlanningDetailPage = ({
         {/* Filter Section */}
         <div className="px-4 py-3 bg-slate-50 rounded-xl border border-slate-200 mb-4">
           <div className="flex items-center gap-6">
-            <div className="flex items-center gap-2 text-slate-600">
-              <Filter size={16} />
-              <span className="font-medium text-sm">{t('planningDetail.filters')}</span>
-            </div>
-
             {/* Gender Filter */}
             <div className="relative" ref={genderDropdownRef}>
               <button

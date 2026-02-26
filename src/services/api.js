@@ -12,7 +12,7 @@ const CACHE_TTL = 60000; // 1 minute
 // Create axios instance
 const api = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 30000, // 30 seconds
+  timeout: 60000, // 60 seconds (Render free-tier cold starts)
   headers: {
     'Content-Type': 'application/json',
   },
@@ -21,7 +21,7 @@ const api = axios.create({
 // Request interceptor - attach Bearer token + cache check
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('accessToken');
+    const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -69,7 +69,7 @@ api.interceptors.response.use(
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
-      const refreshToken = localStorage.getItem('refreshToken');
+      const refreshToken = typeof window !== 'undefined' ? localStorage.getItem('refreshToken') : null;
       if (refreshToken) {
         try {
           const response = await axios.post(`${API_BASE_URL}/auth/refresh`, {
@@ -79,18 +79,48 @@ api.interceptors.response.use(
           const { accessToken, refreshToken: newRefreshToken } = response.data.data || response.data;
 
           localStorage.setItem('accessToken', accessToken);
-          localStorage.setItem('refreshToken', newRefreshToken);
+          if (newRefreshToken) {
+            localStorage.setItem('refreshToken', newRefreshToken);
+          }
 
           originalRequest.headers.Authorization = `Bearer ${accessToken}`;
           return api(originalRequest);
         } catch (refreshError) {
-          // Refresh failed - clear tokens and redirect to login
+          // Refresh failed - clear tokens and cache, then redirect
           localStorage.removeItem('accessToken');
           localStorage.removeItem('refreshToken');
-          window.location.href = '/login';
+          cache.clear();
+          // Use soft redirect to avoid losing React state
+          if (typeof window !== 'undefined' && window.location.pathname !== '/login') {
+            window.location.replace('/login');
+          }
           return Promise.reject(refreshError);
         }
       }
+    }
+
+    // Auto-retry on network errors (GET only, max 2 retries)
+    if (
+      !error.response &&
+      (error.code === 'ERR_NETWORK' || error.code === 'ECONNABORTED') &&
+      originalRequest.method === 'get' &&
+      (originalRequest._retryCount || 0) < 2
+    ) {
+      originalRequest._retryCount = (originalRequest._retryCount || 0) + 1;
+      // Wait 1s before retry (2s on 2nd retry)
+      await new Promise(r => setTimeout(r, originalRequest._retryCount * 1000));
+      return api(originalRequest);
+    }
+
+    // Extract user-friendly error message with fallback
+    if (error.response?.data?.message) {
+      error.userMessage = error.response.data.message;
+    } else if (error.code === 'ECONNABORTED') {
+      error.userMessage = 'Request timed out. Please try again.';
+    } else if (error.code === 'ERR_NETWORK') {
+      error.userMessage = 'Network error. Please check your connection.';
+    } else {
+      error.userMessage = 'An unexpected error occurred.';
     }
 
     return Promise.reject(error);

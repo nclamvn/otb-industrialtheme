@@ -2,7 +2,7 @@
 
 import { useMemo, useState, useEffect, useCallback, useRef } from 'react';
 import {
-  Filter, ChevronDown, Package, Image as ImageIcon, Pencil, X, Plus, Trash2, Ruler,
+  ChevronDown, Package, Pencil, X, Plus, Trash2,
   Star, Layers, Check, SlidersHorizontal
 } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -12,16 +12,18 @@ import SizeCurveAdvisor from '../components/SizeCurveAdvisor';
 import SkuRecommenderPanel from '../components/SkuRecommenderPanel';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useIsMobile } from '@/hooks/useIsMobile';
-import { MobileDataCard, MobileFilterSheet } from '@/components/ui';
+import { useAppContext } from '@/contexts/AppContext';
+import { useConfirmDialog } from '@/hooks/useConfirmDialog';
+import { MobileDataCard, MobileFilterSheet, ConfirmDialog } from '@/components/ui';
 
 const SEASON_GROUPS = [
-  { id: 'all', label: 'All' },
+  { id: 'all', label: 'Season Group' },
   { id: 'SS', label: 'Spring Summer' },
   { id: 'FW', label: 'Fall Winter' }
 ];
 
 const SEASONS = [
-  { id: 'all', label: 'All' },
+  { id: 'all', label: 'Season' },
   { id: 'Pre', label: 'Pre' },
   { id: 'Main/Show', label: 'Main/Show' }
 ];
@@ -51,7 +53,11 @@ const SIZING_CHOICES = [
 const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
   const { t } = useLanguage();
   const { isMobile } = useIsMobile();
+  const { registerSave, unregisterSave } = useAppContext();
+  const { dialogProps, confirm } = useConfirmDialog();
   const [showMobileFilters, setShowMobileFilters] = useState(false);
+  const [allCollapsed, setAllCollapsed] = useState(false);
+  const [saving, setSaving] = useState(false);
   // SKU catalog and proposal data from API
   const [skuCatalog, setSkuCatalog] = useState([]);
   const [skuDataLoading, setSkuDataLoading] = useState(true);
@@ -496,14 +502,110 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
     }));
   };
 
-  const handleDeleteSkuRow = (blockKey, itemIdx) => {
-    setSkuBlocks(prev => prev.map(block => {
-      const key = `${block.gender}_${block.category}_${block.subCategory}`;
-      if (key !== blockKey) return block;
-      const items = block.items.filter((_, idx) => idx !== itemIdx);
-      return { ...block, items };
-    }));
-  };
+  const handleDeleteSkuRow = useCallback((blockKey, itemIdx, skuName) => {
+    confirm({
+      title: t('proposal.removeSku') || 'Remove SKU',
+      message: `${t('proposal.removeSkuConfirm') || 'Remove'} ${skuName || `SKU #${itemIdx + 1}`}?`,
+      confirmLabel: t('common.delete') || 'Remove',
+      variant: 'danger',
+      onConfirm: () => {
+        setSkuBlocks(prev => prev.map(block => {
+          const key = `${block.gender}_${block.category}_${block.subCategory}`;
+          if (key !== blockKey) return block;
+          const items = block.items.filter((_, idx) => idx !== itemIdx);
+          return { ...block, items };
+        }));
+      },
+    });
+  }, [confirm, t]);
+
+  // Toggle all blocks collapsed/expanded
+  const handleToggleAll = useCallback(() => {
+    setAllCollapsed(prev => {
+      const newState = !prev;
+      const keys = {};
+      filteredSkuBlocks.forEach(block => {
+        const key = `${block.gender}_${block.category}_${block.subCategory}`;
+        keys[key] = newState;
+      });
+      setCollapsed(keys);
+      return newState;
+    });
+  }, [filteredSkuBlocks]);
+
+  // Export CSV
+  const handleExportCSV = useCallback(() => {
+    const rows = [];
+    rows.push(['Gender', 'Category', 'Sub-Category', 'SKU', 'Product Name', 'Color', 'Unit Cost', 'Order', 'REX', 'TTP', 'Total Value', 'Customer Target'].join(','));
+    filteredSkuBlocks.forEach(block => {
+      block.items.forEach(item => {
+        rows.push([
+          block.gender, block.category, block.subCategory,
+          item.sku, `"${(item.name || '').replace(/"/g, '""')}"`,
+          `"${(item.color || '').replace(/"/g, '""')}"`,
+          item.unitCost, item.order, item.rex || 0, item.ttp || 0,
+          item.ttlValue, item.customerTarget || ''
+        ].join(','));
+      });
+    });
+    const BOM = '\uFEFF';
+    const blob = new Blob([BOM + rows.join('\n')], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `DAFC_SKU_Proposal_${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success(t('common.exported') || 'Exported successfully');
+  }, [filteredSkuBlocks, t]);
+
+  // Save proposal data to backend
+  const handleSaveProposal = useCallback(async () => {
+    if (skuBlocks.length === 0) return;
+    setSaving(true);
+    try {
+      // Build products from all blocks
+      const products = skuBlocks.flatMap(block =>
+        block.items.filter(item => item.sku).map(item => ({
+          skuCode: item.sku,
+          productName: item.name,
+          gender: block.gender,
+          category: block.category,
+          subCategory: block.subCategory,
+          productType: item.productType,
+          color: item.color,
+          composition: item.composition,
+          unitCost: item.unitCost,
+          orderQty: item.order || 0,
+          rex: item.rex || 0,
+          ttp: item.ttp || 0,
+          totalValue: item.ttlValue || 0,
+          customerTarget: item.customerTarget || 'New',
+        }))
+      );
+
+      const proposalData = {
+        budgetId: budgetFilter !== 'all' ? budgetFilter : undefined,
+        products,
+      };
+
+      await proposalService.create(proposalData);
+      toast.success(t('proposal.savedSuccessfully') || 'Proposal saved');
+    } catch (err) {
+      console.error('Failed to save proposal:', err);
+      toast.error(t('approval.failedToSave') || 'Failed to save');
+    } finally {
+      setSaving(false);
+    }
+  }, [skuBlocks, budgetFilter, t]);
+
+  // Register save handler with AppContext
+  useEffect(() => {
+    if (registerSave) {
+      registerSave(handleSaveProposal);
+      return () => unregisterSave?.();
+    }
+  }, [handleSaveProposal, registerSave, unregisterSave]);
 
   const filteredSkuItems = useMemo(() => {
     return filteredSkuBlocks.flatMap(block => {
@@ -524,148 +626,79 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
 
   return (
     <div className="space-y-5">
-      <div className="rounded-2xl shadow-[0_1px_4px_rgba(44,36,23,0.06)] border p-3 md:p-5 bg-white border-[rgba(196,151,90,0.3)]">
-        <div className="flex items-center justify-between mb-4">
-
-
-        </div>
-
-        {/* Mobile: Filter button + active filter chips */}
+      {/* Unified Toolbar: Filters + Version + View Toggle */}
+      <div className="rounded-xl border border-border-muted bg-white">
+        {/* Row 1: Filters */}
         {isMobile ? (
-          <div className="space-y-3">
+          <div className="px-3 py-2 space-y-2">
             <button
               onClick={() => setShowMobileFilters(true)}
-              className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl border text-sm font-semibold font-['Montserrat'] transition-colors bg-[rgba(160,120,75,0.08)] border-[rgba(196,151,90,0.2)] text-[#7D5A28] active:bg-[rgba(160,120,75,0.15)]"
+              className="w-full flex items-center justify-center gap-2 px-3 py-1.5 rounded-lg border border-border-muted text-xs font-medium font-brand transition-colors text-[#7D5A28] active:bg-surface-secondary"
             >
-              <SlidersHorizontal size={16} />
+              <SlidersHorizontal size={14} />
               <span>{t('skuProposal.filters')}</span>
               {(budgetFilter !== 'all' || seasonGroupFilter !== 'all' || seasonFilter !== 'all' || genderFilter !== 'all' || categoryFilter !== 'all' || subCategoryFilter !== 'all') && (
-                <span className="ml-1 w-5 h-5 rounded-full bg-[#C4975A] text-white text-[10px] font-bold flex items-center justify-center">
+                <span className="ml-1 w-4 h-4 rounded-full bg-dafc-gold text-white text-[9px] font-bold flex items-center justify-center">
                   {[budgetFilter, seasonGroupFilter, seasonFilter, genderFilter, categoryFilter, subCategoryFilter].filter(f => f !== 'all').length}
                 </span>
               )}
             </button>
-            {/* Active filter chips */}
             {(budgetFilter !== 'all' || genderFilter !== 'all' || categoryFilter !== 'all' || subCategoryFilter !== 'all') && (
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-1.5">
                 {budgetFilter !== 'all' && (
-                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-[rgba(160,120,75,0.12)] text-[#7D5A28]">
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-[rgba(160,120,75,0.1)] text-[#7D5A28]">
                     {budgetOptions.find(b => String(b.id) === String(budgetFilter))?.label || budgetFilter}
-                    <button onClick={() => setBudgetFilter('all')} className="ml-0.5"><X size={12} /></button>
+                    <button onClick={() => setBudgetFilter('all')} className="ml-0.5"><X size={10} /></button>
                   </span>
                 )}
                 {genderFilter !== 'all' && (
-                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-[rgba(160,120,75,0.12)] text-[#7D5A28]">
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-[rgba(160,120,75,0.1)] text-[#7D5A28]">
                     {genderFilter}
-                    <button onClick={() => setGenderFilter('all')} className="ml-0.5"><X size={12} /></button>
+                    <button onClick={() => setGenderFilter('all')} className="ml-0.5"><X size={10} /></button>
                   </span>
                 )}
                 {categoryFilter !== 'all' && (
-                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-[rgba(160,120,75,0.12)] text-[#7D5A28]">
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-[rgba(160,120,75,0.1)] text-[#7D5A28]">
                     {categoryFilter}
-                    <button onClick={() => setCategoryFilter('all')} className="ml-0.5"><X size={12} /></button>
+                    <button onClick={() => setCategoryFilter('all')} className="ml-0.5"><X size={10} /></button>
                   </span>
                 )}
                 {subCategoryFilter !== 'all' && (
-                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-[rgba(160,120,75,0.12)] text-[#7D5A28]">
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-[rgba(160,120,75,0.1)] text-[#7D5A28]">
                     {subCategoryFilter}
-                    <button onClick={() => setSubCategoryFilter('all')} className="ml-0.5"><X size={12} /></button>
+                    <button onClick={() => setSubCategoryFilter('all')} className="ml-0.5"><X size={10} /></button>
                   </span>
                 )}
               </div>
             )}
           </div>
         ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <div className="rounded-xl border p-4 bg-[rgba(160,120,75,0.08)] border-[rgba(196,151,90,0.2)]">
-            <div className="flex items-center gap-2 mb-3 text-[#7D5A28]">
-              <Filter size={14} />
-              <span className="text-sm font-semibold font-['Montserrat']">{t('skuProposal.filters')}</span>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-              <div>
-                <label className="block text-xs font-medium mb-1.5 text-[#8C8178]">{t('skuProposal.budget')}</label>
-                <select
-                  value={budgetFilter}
-                  onChange={(e) => setBudgetFilter(e.target.value)}
-                  className="w-full border rounded-lg pl-3 pr-8 py-2 text-sm focus:outline-none focus:ring-2 bg-white border-[rgba(196,151,90,0.3)] text-[#2C2417] focus:ring-[rgba(196,151,90,0.3)] focus:border-[#C4975A]"
-                >
-                  {budgetOptions.map(opt => (
-                    <option key={opt.id} value={opt.id}>{opt.label}</option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className="block text-xs font-medium mb-1.5 text-[#8C8178]">{t('skuProposal.seasonGroup')}</label>
-                <select
-                  value={seasonGroupFilter}
-                  onChange={(e) => setSeasonGroupFilter(e.target.value)}
-                  className="w-full border rounded-lg pl-3 pr-8 py-2 text-sm focus:outline-none focus:ring-2 bg-white border-[rgba(196,151,90,0.3)] text-[#2C2417] focus:ring-[rgba(196,151,90,0.3)] focus:border-[#C4975A]"
-                >
-                  {SEASON_GROUPS.map(opt => (
-                    <option key={opt.id} value={opt.id}>{opt.label}</option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className="block text-xs font-medium mb-1.5 text-[#8C8178]">{t('skuProposal.season')}</label>
-                <select
-                  value={seasonFilter}
-                  onChange={(e) => setSeasonFilter(e.target.value)}
-                  className="w-full border rounded-lg pl-3 pr-8 py-2 text-sm focus:outline-none focus:ring-2 bg-white border-[rgba(196,151,90,0.3)] text-[#2C2417] focus:ring-[rgba(196,151,90,0.3)] focus:border-[#C4975A]"
-                >
-                  {SEASONS.map(opt => (
-                    <option key={opt.id} value={opt.id}>{opt.label}</option>
-                  ))}
-                </select>
-              </div>
-            </div>
-          </div>
-
-          <div className="rounded-xl border p-4 bg-white border-[rgba(196,151,90,0.2)]">
-            <div className="flex items-center gap-2 mb-3 text-[#7D5A28]">
-              <Filter size={14} />
-              <span className="text-sm font-semibold font-['Montserrat']">{t('common.filters')}</span>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-              <div>
-                <label className="block text-xs font-medium mb-1.5 text-[#8C8178]">{t('skuProposal.gender')}</label>
-                <select
-                  value={genderFilter}
-                  onChange={(e) => setGenderFilter(e.target.value)}
-                  className="w-full border rounded-lg pl-3 pr-8 py-2 text-sm focus:outline-none focus:ring-2 bg-white border-[rgba(196,151,90,0.3)] text-[#2C2417] focus:ring-[rgba(196,151,90,0.3)] focus:border-[#C4975A]"
-                >
-                  {genderOptions.map(g => (
-                    <option key={g} value={g}>{g === 'all' ? 'All' : g}</option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className="block text-xs font-medium mb-1.5 text-[#8C8178]">{t('skuProposal.category')}</label>
-                <select
-                  value={categoryFilter}
-                  onChange={(e) => setCategoryFilter(e.target.value)}
-                  className="w-full border rounded-lg pl-3 pr-8 py-2 text-sm focus:outline-none focus:ring-2 bg-white border-[rgba(196,151,90,0.3)] text-[#2C2417] focus:ring-[rgba(196,151,90,0.3)] focus:border-[#C4975A]"
-                >
-                  {categoryOptions.map(c => (
-                    <option key={c} value={c}>{c === 'all' ? 'All' : c}</option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className="block text-xs font-medium mb-1.5 text-[#8C8178]">{t('skuProposal.subCategory')}</label>
-                <select
-                  value={subCategoryFilter}
-                  onChange={(e) => setSubCategoryFilter(e.target.value)}
-                  className="w-full border rounded-lg pl-3 pr-8 py-2 text-sm focus:outline-none focus:ring-2 bg-white border-[rgba(196,151,90,0.3)] text-[#2C2417] focus:ring-[rgba(196,151,90,0.3)] focus:border-[#C4975A]"
-                >
-                  {subCategoryOptions.map(s => (
-                    <option key={s} value={s}>{s === 'all' ? 'All' : s}</option>
-                  ))}
-                </select>
-              </div>
-            </div>
-          </div>
+        <div className="flex items-center gap-1.5 px-3 py-1.5 overflow-x-auto scrollbar-hide">
+          <select value={budgetFilter} onChange={(e) => setBudgetFilter(e.target.value)}
+            className="shrink-0 border rounded pl-1.5 pr-4 py-1 text-[11px] bg-white border-border-muted text-content focus:outline-none focus:ring-1 focus:ring-dafc-gold/30">
+            {budgetOptions.map(opt => (<option key={opt.id} value={opt.id}>{opt.label}</option>))}
+          </select>
+          <select value={seasonGroupFilter} onChange={(e) => setSeasonGroupFilter(e.target.value)}
+            className="shrink-0 border rounded pl-1.5 pr-4 py-1 text-[11px] bg-white border-border-muted text-content focus:outline-none focus:ring-1 focus:ring-dafc-gold/30">
+            {SEASON_GROUPS.map(opt => (<option key={opt.id} value={opt.id}>{opt.label}</option>))}
+          </select>
+          <select value={seasonFilter} onChange={(e) => setSeasonFilter(e.target.value)}
+            className="shrink-0 border rounded pl-1.5 pr-4 py-1 text-[11px] bg-white border-border-muted text-content focus:outline-none focus:ring-1 focus:ring-dafc-gold/30">
+            {SEASONS.map(opt => (<option key={opt.id} value={opt.id}>{opt.label}</option>))}
+          </select>
+          <div className="h-4 w-px shrink-0 bg-border-muted" />
+          <select value={genderFilter} onChange={(e) => setGenderFilter(e.target.value)}
+            className="shrink-0 border rounded pl-1.5 pr-4 py-1 text-[11px] bg-white border-border-muted text-content focus:outline-none focus:ring-1 focus:ring-dafc-gold/30">
+            {genderOptions.map(g => (<option key={g} value={g}>{g === 'all' ? t('skuProposal.gender') : g}</option>))}
+          </select>
+          <select value={categoryFilter} onChange={(e) => setCategoryFilter(e.target.value)}
+            className="shrink-0 border rounded pl-1.5 pr-4 py-1 text-[11px] bg-white border-border-muted text-content focus:outline-none focus:ring-1 focus:ring-dafc-gold/30">
+            {categoryOptions.map(c => (<option key={c} value={c}>{c === 'all' ? t('skuProposal.category') : c}</option>))}
+          </select>
+          <select value={subCategoryFilter} onChange={(e) => setSubCategoryFilter(e.target.value)}
+            className="shrink-0 border rounded pl-1.5 pr-4 py-1 text-[11px] bg-white border-border-muted text-content focus:outline-none focus:ring-1 focus:ring-dafc-gold/30">
+            {subCategoryOptions.map(s => (<option key={s} value={s}>{s === 'all' ? t('skuProposal.subCategory') : s}</option>))}
+          </select>
         </div>
         )}
 
@@ -680,9 +713,9 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
               { key: 'budget', label: t('skuProposal.budget'), type: 'select', options: budgetOptions.map(b => ({ value: String(b.id), label: b.label })), defaultValue: 'all' },
               { key: 'seasonGroup', label: t('skuProposal.seasonGroup'), type: 'select', options: SEASON_GROUPS.map(s => ({ value: s.id, label: s.label })), defaultValue: 'all' },
               { key: 'season', label: t('skuProposal.season'), type: 'select', options: SEASONS.map(s => ({ value: s.id, label: s.label })), defaultValue: 'all' },
-              { key: 'gender', label: t('skuProposal.gender'), type: 'select', options: genderOptions.map(g => ({ value: g, label: g === 'all' ? 'All' : g })), defaultValue: 'all' },
-              { key: 'category', label: t('skuProposal.category'), type: 'select', options: categoryOptions.map(c => ({ value: c, label: c === 'all' ? 'All' : c })), defaultValue: 'all' },
-              { key: 'subCategory', label: t('skuProposal.subCategory'), type: 'select', options: subCategoryOptions.map(s => ({ value: s, label: s === 'all' ? 'All' : s })), defaultValue: 'all' },
+              { key: 'gender', label: t('skuProposal.gender'), type: 'select', options: genderOptions.map(g => ({ value: g, label: g === 'all' ? t('skuProposal.gender') : g })), defaultValue: 'all' },
+              { key: 'category', label: t('skuProposal.category'), type: 'select', options: categoryOptions.map(c => ({ value: c, label: c === 'all' ? t('skuProposal.category') : c })), defaultValue: 'all' },
+              { key: 'subCategory', label: t('skuProposal.subCategory'), type: 'select', options: subCategoryOptions.map(s => ({ value: s, label: s === 'all' ? t('skuProposal.subCategory') : s })), defaultValue: 'all' },
             ]}
             values={{
               budget: String(budgetFilter),
@@ -711,166 +744,155 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
           />
         )}
 
-        {/* Versions Section */}
-        <div className="mt-4 rounded-xl border p-4 bg-[rgba(160,120,75,0.08)] border-[rgba(196,151,90,0.2)]">
-          <div className="flex items-center gap-2 mb-3 text-[#7D5A28]">
-            <Package size={14} />
-            <span className="text-sm font-semibold font-['Montserrat']">{t('skuProposal.version')}</span>
-          </div>
-          <div className="flex flex-col md:flex-row md:flex-wrap md:items-center gap-4 md:gap-6">
-            {/* SKU Version Dropdown */}
-            <div className="flex items-center gap-3">
-              <span className="text-sm font-medium whitespace-nowrap text-[#8C8178]">{t('skuProposal.version')}</span>
-              <div className="relative" ref={skuVersionDropdownRef}>
-                <button
-                  type="button"
-                  onClick={() => setIsSkuVersionOpen(!isSkuVersionOpen)}
-                  className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all border bg-[rgba(160,120,75,0.12)] border-[rgba(196,151,90,0.4)] text-[#2C2417] hover:bg-[rgba(160,120,75,0.18)]"
-                >
-                  {selectedSkuVersion?.isFinal && <Star size={14} className="text-[#C4975A] fill-[#C4975A]" />}
-                  <span>{selectedSkuVersion?.name || t('common.version')}</span>
-                  {selectedSkuVersion?.isFinal && (
-                    <span className="px-1.5 py-0.5 text-[10px] font-bold rounded bg-[#C4975A] text-white">FINAL</span>
-                  )}
-                  <ChevronDown size={14} className={`transition-transform ${isSkuVersionOpen ? 'rotate-180' : ''}`} />
-                </button>
+        {/* Row 2: Version + Sizing + View Toggle — single compact row */}
+        <div className="flex flex-wrap items-center gap-2 px-3 py-1.5 border-t border-border-muted">
+          <span className="text-[10px] font-semibold uppercase tracking-wider text-content-muted shrink-0">{t('skuProposal.version')}</span>
+          <div className="relative" ref={skuVersionDropdownRef}>
+            <button
+              type="button"
+              onClick={() => setIsSkuVersionOpen(!isSkuVersionOpen)}
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-medium transition-all border border-border-muted text-content hover:bg-surface-secondary"
+            >
+              {selectedSkuVersion?.isFinal && <Star size={11} className="text-dafc-gold fill-dafc-gold" />}
+              <span>{selectedSkuVersion?.name || t('common.version')}</span>
+              {selectedSkuVersion?.isFinal && (
+                <span className="px-1 py-px text-[8px] font-bold rounded bg-dafc-gold text-white leading-none">FINAL</span>
+              )}
+              <ChevronDown size={11} className={`transition-transform text-content-muted ${isSkuVersionOpen ? 'rotate-180' : ''}`} />
+            </button>
 
-                {isSkuVersionOpen && (
-                  <div className="absolute top-full left-0 mt-1 w-72 rounded-xl shadow-[0_4px_24px_rgba(44,36,23,0.12)] border z-50 overflow-hidden bg-white border-[rgba(196,151,90,0.3)]">
-                    <div className="px-3 py-2 border-b bg-[rgba(160,120,75,0.08)] border-[rgba(196,151,90,0.2)]">
-                      <span className="text-xs font-semibold uppercase tracking-wide font-['Montserrat'] text-[#8C8178]">{t('common.version')}</span>
+            {isSkuVersionOpen && (
+              <div className="absolute top-full left-0 mt-1 w-64 rounded-lg shadow-md border z-50 overflow-hidden bg-white border-border-muted">
+                <div className="px-3 py-1.5 border-b border-border-muted bg-surface-secondary">
+                  <span className="text-[10px] font-semibold uppercase tracking-wider font-brand text-content-muted">{t('common.version')}</span>
+                </div>
+                {skuVersions.map(version => (
+                  <button
+                    key={version.id}
+                    type="button"
+                    onClick={() => { setSkuVersion(version.id); setIsSkuVersionOpen(false); }}
+                    className={`w-full px-3 py-2 flex items-center justify-between transition-colors text-xs ${
+                      version.id === skuVersion ? 'bg-surface-secondary' : 'hover:bg-surface-secondary/50'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2">
+                      {version.isFinal
+                        ? <Star size={12} className="text-dafc-gold fill-dafc-gold" />
+                        : <Layers size={12} className="text-content-muted" />
+                      }
+                      <span className="font-medium text-content">{version.name}</span>
+                      {version.isFinal && (
+                        <span className="text-[9px] font-bold px-1 py-px rounded bg-[rgba(27,107,69,0.15)] text-[#1B6B45] leading-none">FINAL</span>
+                      )}
                     </div>
-                    {skuVersions.map(version => (
-                      <button
-                        key={version.id}
-                        type="button"
-                        onClick={() => { setSkuVersion(version.id); setIsSkuVersionOpen(false); }}
-                        className={`w-full px-3 py-3 flex items-center justify-between transition-colors ${
-                          version.id === skuVersion
-                            ? 'bg-[rgba(160,120,75,0.12)]'
-                            : 'hover:bg-[rgba(160,120,75,0.08)]'
-                        }`}
-                      >
-                        <div className="flex items-center gap-2">
-                          {version.isFinal
-                            ? <Star size={14} className="text-[#C4975A] fill-[#C4975A]" />
-                            : <Layers size={14} className="text-[#8C8178]" />
-                          }
-                          <div className="text-left">
-                            <div className="flex items-center gap-2">
-                              <span className="text-sm font-medium text-[#2C2417]">{version.name}</span>
-                              {version.isFinal && (
-                                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-[rgba(27,107,69,0.15)] text-[#1B6B45]">FINAL</span>
-                              )}
-                            </div>
-                            <span className="text-xs text-[#8C8178]">Created: {version.createdAt}</span>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          {!version.isFinal && (
-                            <span
-                              role="button"
-                              tabIndex={0}
-                              onClick={(e) => handleSetFinalVersion(version.id, e)}
-                              onKeyDown={(e) => { if (e.key === 'Enter') handleSetFinalVersion(version.id, e); }}
-                              className="text-xs px-2 py-1 rounded transition-colors cursor-pointer text-[#7D5A28] hover:bg-[rgba(160,120,75,0.12)]"
-                            >
-                              {t('planning.latestVersion')}
-                            </span>
-                          )}
-                          {version.id === skuVersion && <Check size={16} className="text-[#1B6B45]" />}
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Divider */}
-            <div className="h-8 w-px hidden sm:block bg-[rgba(196,151,90,0.3)]" />
-
-            {/* Sizing Choice Dropdown */}
-            <div className="flex items-center gap-3">
-              <span className="text-sm font-medium text-[#8C8178]">{t('skuProposal.sizingChoice')}</span>
-              <div className="relative" ref={sizingVersionDropdownRef}>
-                <button
-                  type="button"
-                  onClick={() => setIsSizingVersionOpen(!isSizingVersionOpen)}
-                  className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all border bg-[rgba(160,120,75,0.12)] border-[rgba(196,151,90,0.4)] text-[#2C2417] hover:bg-[rgba(160,120,75,0.18)]"
-                >
-                  {selectedSizingChoice?.isFinal && <Star size={14} className="text-[#C4975A] fill-[#C4975A]" />}
-                  <span>{selectedSizingChoice?.name || t('skuProposal.sizing')}</span>
-                  {selectedSizingChoice?.isFinal && (
-                    <span className="px-1.5 py-0.5 text-[10px] font-bold rounded bg-[#C4975A] text-white">FINAL</span>
-                  )}
-                  <ChevronDown size={14} className={`transition-transform ${isSizingVersionOpen ? 'rotate-180' : ''}`} />
-                </button>
-
-                {isSizingVersionOpen && (
-                  <div className="absolute top-full left-0 mt-1 w-64 rounded-xl shadow-[0_4px_24px_rgba(44,36,23,0.12)] border z-50 overflow-hidden bg-white border-[rgba(196,151,90,0.3)]">
-                    <div className="px-3 py-2 border-b bg-[rgba(160,120,75,0.08)] border-[rgba(196,151,90,0.2)]">
-                      <span className="text-xs font-semibold uppercase tracking-wide font-['Montserrat'] text-[#8C8178]">{t('skuProposal.sizing')}</span>
+                    <div className="flex items-center gap-2">
+                      {!version.isFinal && (
+                        <span
+                          role="button"
+                          tabIndex={0}
+                          onClick={(e) => handleSetFinalVersion(version.id, e)}
+                          onKeyDown={(e) => { if (e.key === 'Enter') handleSetFinalVersion(version.id, e); }}
+                          className="text-[10px] px-1.5 py-0.5 rounded transition-colors cursor-pointer text-dafc-gold hover:bg-surface-secondary"
+                        >
+                          {t('planning.latestVersion')}
+                        </span>
+                      )}
+                      {version.id === skuVersion && <Check size={13} className="text-[#1B6B45]" />}
                     </div>
-                    {sizingChoices.map(choice => (
-                      <button
-                        key={choice.id}
-                        type="button"
-                        onClick={() => { setSizingVersion(choice.id); setIsSizingVersionOpen(false); }}
-                        className={`w-full px-3 py-3 flex items-center justify-between transition-colors ${
-                          choice.id === sizingVersion
-                            ? 'bg-[rgba(160,120,75,0.12)]'
-                            : 'hover:bg-[rgba(160,120,75,0.08)]'
-                        }`}
-                      >
-                        <div className="flex items-center gap-2">
-                          {choice.isFinal
-                            ? <Star size={14} className="text-[#C4975A] fill-[#C4975A]" />
-                            : <Layers size={14} className="text-[#8C8178]" />
-                          }
-                          <div className="flex items-center gap-2">
-                            <span className="text-sm font-medium text-[#2C2417]">{choice.name}</span>
-                            {choice.isFinal && (
-                              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-[rgba(27,107,69,0.15)] text-[#1B6B45]">FINAL</span>
-                            )}
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          {!choice.isFinal && (
-                            <span
-                              role="button"
-                              tabIndex={0}
-                              onClick={(e) => handleSetFinalSizing(choice.id, e)}
-                              onKeyDown={(e) => { if (e.key === 'Enter') handleSetFinalSizing(choice.id, e); }}
-                              className="text-xs px-2 py-1 rounded transition-colors cursor-pointer text-[#7D5A28] hover:bg-[rgba(160,120,75,0.12)]"
-                            >
-                              {t('planning.latestVersion')}
-                            </span>
-                          )}
-                          {choice.id === sizingVersion && <Check size={16} className="text-[#1B6B45]" />}
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                )}
+                  </button>
+                ))}
               </div>
-            </div>
+            )}
           </div>
-        </div>
 
-        {/* View Mode Toggle */}
-        <div className="flex flex-wrap items-center gap-3 justify-between mt-4">
-          <div className="text-xs text-[#8C8178]">
-            {canShowCardView ? `${filteredSkuItems.length} SKUs found${!isMobile ? '. Card view available.' : '.'}` : 'No SKU data. Add SKUs to enable card view.'}
+          <div className="h-4 w-px shrink-0 bg-border-muted" />
+
+          <span className="text-[10px] font-semibold uppercase tracking-wider text-content-muted shrink-0">{t('skuProposal.sizingChoice')}</span>
+          <div className="relative" ref={sizingVersionDropdownRef}>
+            <button
+              type="button"
+              onClick={() => setIsSizingVersionOpen(!isSizingVersionOpen)}
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-medium transition-all border border-border-muted text-content hover:bg-surface-secondary"
+            >
+              {selectedSizingChoice?.isFinal && <Star size={11} className="text-dafc-gold fill-dafc-gold" />}
+              <span>{selectedSizingChoice?.name || t('skuProposal.sizing')}</span>
+              {selectedSizingChoice?.isFinal && (
+                <span className="px-1 py-px text-[8px] font-bold rounded bg-dafc-gold text-white leading-none">FINAL</span>
+              )}
+              <ChevronDown size={11} className={`transition-transform text-content-muted ${isSizingVersionOpen ? 'rotate-180' : ''}`} />
+            </button>
+
+            {isSizingVersionOpen && (
+              <div className="absolute top-full left-0 mt-1 w-56 rounded-lg shadow-md border z-50 overflow-hidden bg-white border-border-muted">
+                <div className="px-3 py-1.5 border-b border-border-muted bg-surface-secondary">
+                  <span className="text-[10px] font-semibold uppercase tracking-wider font-brand text-content-muted">{t('skuProposal.sizing')}</span>
+                </div>
+                {sizingChoices.map(choice => (
+                  <button
+                    key={choice.id}
+                    type="button"
+                    onClick={() => { setSizingVersion(choice.id); setIsSizingVersionOpen(false); }}
+                    className={`w-full px-3 py-2 flex items-center justify-between transition-colors text-xs ${
+                      choice.id === sizingVersion ? 'bg-surface-secondary' : 'hover:bg-surface-secondary/50'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2">
+                      {choice.isFinal
+                        ? <Star size={12} className="text-dafc-gold fill-dafc-gold" />
+                        : <Layers size={12} className="text-content-muted" />
+                      }
+                      <span className="font-medium text-content">{choice.name}</span>
+                      {choice.isFinal && (
+                        <span className="text-[9px] font-bold px-1 py-px rounded bg-[rgba(27,107,69,0.15)] text-[#1B6B45] leading-none">FINAL</span>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {!choice.isFinal && (
+                        <span
+                          role="button"
+                          tabIndex={0}
+                          onClick={(e) => handleSetFinalSizing(choice.id, e)}
+                          onKeyDown={(e) => { if (e.key === 'Enter') handleSetFinalSizing(choice.id, e); }}
+                          className="text-[10px] px-1.5 py-0.5 rounded transition-colors cursor-pointer text-dafc-gold hover:bg-surface-secondary"
+                        >
+                          {t('planning.latestVersion')}
+                        </span>
+                      )}
+                      {choice.id === sizingVersion && <Check size={13} className="text-[#1B6B45]" />}
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
-          <div className="hidden md:flex items-center gap-1 rounded-lg p-1 bg-[rgba(160,120,75,0.12)]">
+
+          {/* Spacer + Actions + SKU count + View Toggle */}
+          <div className="flex-1" />
+          <button
+            type="button"
+            onClick={handleToggleAll}
+            className="px-2 py-1 rounded-md text-[10px] font-medium font-brand transition-colors text-content-muted hover:text-content hover:bg-surface-secondary"
+          >
+            {allCollapsed ? (t('skuProposal.expandAll') || 'Expand All') : (t('skuProposal.collapseAll') || 'Collapse All')}
+          </button>
+          <button
+            type="button"
+            onClick={handleExportCSV}
+            className="px-2 py-1 rounded-md text-[10px] font-medium font-brand transition-colors text-content-muted hover:text-content hover:bg-surface-secondary"
+          >
+            {t('common.export') || 'Export CSV'}
+          </button>
+          <span className="text-[10px] text-content-muted font-data shrink-0">
+            {filteredSkuItems.length} SKUs
+          </span>
+          <div className="hidden md:flex items-center gap-0.5 rounded-md p-0.5 bg-surface-secondary">
             <button
               type="button"
               onClick={() => setViewMode('table')}
-              className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+              className={`px-2 py-1 rounded text-[11px] font-medium transition-colors ${
                 viewMode === 'table'
-                  ? 'bg-white text-[#7D5A28] shadow-sm'
-                  : 'text-[#8C8178] hover:text-[#7D5A28]'
+                  ? 'bg-white text-content shadow-sm'
+                  : 'text-content-muted hover:text-content'
               }`}
             >
               Table
@@ -879,12 +901,11 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
               type="button"
               onClick={() => canShowCardView && setViewMode('card')}
               disabled={!canShowCardView}
-              title={!canShowCardView ? 'Add SKUs to enable card view' : 'View SKUs as cards'}
-              className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+              className={`px-2 py-1 rounded text-[11px] font-medium transition-colors ${
                 viewMode === 'card'
-                  ? 'bg-white text-[#7D5A28] shadow-sm'
-                  : 'text-[#8C8178] hover:text-[#7D5A28]'
-              } ${!canShowCardView ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  ? 'bg-white text-content shadow-sm'
+                  : 'text-content-muted hover:text-content'
+              } ${!canShowCardView ? 'opacity-40 cursor-not-allowed' : ''}`}
             >
               Card
             </button>
@@ -959,7 +980,7 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
       {filteredSkuBlocks.length === 0 ? (
         <div className="rounded-xl border p-10 text-center bg-white border-[rgba(196,151,90,0.2)]">
           <Package size={36} className="mx-auto mb-3 text-[rgba(196,151,90,0.5)]" />
-          <p className="font-medium font-['Montserrat'] text-[#2C2417]">{t('skuProposal.noSkuData')}</p>
+          <p className="font-medium font-brand text-[#2C2417]">{t('skuProposal.noSkuData')}</p>
           <p className="text-sm mt-1 text-[#8C8178]">Try adjusting the filters above</p>
         </div>
       ) : viewMode === 'card' ? (
@@ -971,12 +992,35 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
               <div key={key} className={`rounded-2xl border p-4 ${getCardBgClass(cardIdx)}`}>
                 <div className="flex flex-wrap items-center gap-3 justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-xl border flex items-center justify-center bg-[rgba(160,120,75,0.12)] border-[rgba(196,151,90,0.25)]">
-                      <ImageIcon size={18} className="text-[#8C8178]" />
+                    <div className="w-12 h-12 rounded-xl border flex items-center justify-center bg-[rgba(160,120,75,0.08)] border-[rgba(196,151,90,0.2)]">
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M6 8V19C6 19.5523 6.44772 20 7 20H17C17.5523 20 18 19.5523 18 19V8" stroke="#B8A692" strokeWidth="1.5" strokeLinecap="round"/>
+                        <path d="M4 8H20L18.5 5H5.5L4 8Z" stroke="#C4975A" strokeWidth="1.5" strokeLinejoin="round" fill="rgba(196,151,90,0.1)"/>
+                        <path d="M9 8V5.5C9 4.11929 10.1193 3 11.5 3H12.5C13.8807 3 15 4.11929 15 5.5V8" stroke="#B8A692" strokeWidth="1.5" strokeLinecap="round"/>
+                        <rect x="9" y="12" width="6" height="3" rx="1" stroke="#C4975A" strokeWidth="1.2" opacity="0.5"/>
+                      </svg>
                     </div>
-                    <div>
-                      <div className="text-sm font-semibold text-[#2C2417]">
-                        <span className="font-['JetBrains_Mono']">{item.sku || 'New SKU'}</span> <span className="text-[#8C8178]">&bull;</span> {item.name || 'Select SKU'}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-1.5 text-sm font-semibold text-[#2C2417]">
+                        <span className="font-data">{item.sku || 'New SKU'}</span>
+                        <span className="text-[#8C8178]">&bull;</span>
+                        <span className="truncate">{item.name || 'Select SKU'}</span>
+                        <button
+                          type="button"
+                          onClick={() => handleOpenSizing(key, idx, item)}
+                          className="p-1 rounded transition-colors relative text-[#8C8178] hover:text-[#7D5A28] hover:bg-[rgba(160,120,75,0.18)] shrink-0"
+                          title={t('skuProposal.sizing')}
+                        >
+                          <Pencil size={12} />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteSkuRow(blockKey, idx, item.name || item.sku)}
+                          className="p-1 rounded transition-colors text-[#8C8178] hover:text-[#DC3545] hover:bg-[rgba(220,53,69,0.1)] shrink-0"
+                          title={t('proposal.deleteSku')}
+                        >
+                          <Trash2 size={12} />
+                        </button>
                       </div>
                       <div className="text-xs text-[#8C8178]">
                         {block.gender} &bull; {block.category} &bull; {block.subCategory}
@@ -1005,14 +1049,6 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
                     >
                       {sizingOpen ? t('skuProposal.hideSizing') : t('skuProposal.sizing')}
                     </button>
-                    <button
-                      type="button"
-                      onClick={() => handleDeleteSkuRow(blockKey, idx)}
-                      className="p-2 rounded-lg transition-colors text-[#8C8178] hover:text-[#DC3545] hover:bg-[rgba(220,53,69,0.1)]"
-                      title={t('proposal.deleteSku')}
-                    >
-                      <Trash2 size={16} />
-                    </button>
                   </div>
                 </div>
 
@@ -1021,7 +1057,7 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
                     <select
                       value={item.sku}
                       onChange={(e) => handleSkuSelect(blockKey, idx, e.target.value)}
-                      className="w-full px-3 py-2 rounded-lg border-2 text-sm focus:outline-none focus:ring-2 font-['JetBrains_Mono'] border-[#1B6B45] bg-white text-[#2C2417] focus:ring-[rgba(27,107,69,0.3)]"
+                      className="w-full px-3 py-2 rounded-lg border-2 text-sm focus:outline-none focus:ring-2 font-data border-[#1B6B45] bg-white text-[#2C2417] focus:ring-[rgba(27,107,69,0.3)]"
                     >
                       <option value="">{t('proposal.selectSku')}</option>
                       {skuCatalog.map(sku => (
@@ -1040,7 +1076,7 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
                       type="number"
                       value={item.rex}
                       onChange={(e) => handleNumberChange(blockKey, idx, 'rex', e.target.value)}
-                      className="mt-1 w-full px-3 py-2 rounded-lg border text-sm font-['JetBrains_Mono'] focus:outline-none bg-white border-[rgba(196,151,90,0.4)] text-[#2C2417] focus:ring-2 focus:ring-[rgba(196,151,90,0.3)] focus:border-[#C4975A]"
+                      className="mt-1 w-full px-3 py-2 rounded-lg border text-sm font-data focus:outline-none bg-white border-[rgba(196,151,90,0.4)] text-[#2C2417] focus:ring-2 focus:ring-[rgba(196,151,90,0.3)] focus:border-[#C4975A]"
                     />
                   </div>
                   <div className="rounded-xl border p-3 bg-[rgba(160,120,75,0.08)] border-[rgba(196,151,90,0.2)]">
@@ -1049,16 +1085,16 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
                       type="number"
                       value={item.ttp}
                       onChange={(e) => handleNumberChange(blockKey, idx, 'ttp', e.target.value)}
-                      className="mt-1 w-full px-3 py-2 rounded-lg border text-sm font-['JetBrains_Mono'] focus:outline-none bg-white border-[rgba(196,151,90,0.4)] text-[#2C2417] focus:ring-2 focus:ring-[rgba(196,151,90,0.3)] focus:border-[#C4975A]"
+                      className="mt-1 w-full px-3 py-2 rounded-lg border text-sm font-data focus:outline-none bg-white border-[rgba(196,151,90,0.4)] text-[#2C2417] focus:ring-2 focus:ring-[rgba(196,151,90,0.3)] focus:border-[#C4975A]"
                     />
                   </div>
                   <div className="rounded-xl border p-3 bg-[rgba(160,120,75,0.08)] border-[rgba(196,151,90,0.2)]">
                     <p className="text-xs text-[#8C8178]">{t('skuProposal.order')}</p>
-                    <div className="mt-1 text-sm font-semibold font-['JetBrains_Mono'] text-[#2C2417]">{item.order}</div>
+                    <div className="mt-1 text-sm font-semibold font-data text-[#2C2417]">{item.order}</div>
                   </div>
                   <div className="rounded-xl border p-3 bg-[rgba(160,120,75,0.08)] border-[rgba(196,151,90,0.2)]">
                     <p className="text-xs text-[#8C8178]">{t('skuProposal.totalValue')}</p>
-                    <div className="mt-1 text-sm font-semibold font-['JetBrains_Mono'] text-[#1B6B45]">{formatCurrency(item.ttlValue)}</div>
+                    <div className="mt-1 text-sm font-semibold font-data text-[#1B6B45]">{formatCurrency(item.ttlValue)}</div>
                   </div>
                 </div>
 
@@ -1083,11 +1119,11 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
                       </div>
                       <div>
                         <span className="text-xs text-[#8C8178]">Unit cost</span>
-                        <div className="font-medium font-['JetBrains_Mono'] text-[#2C2417]">{formatCurrency(item.unitCost)}</div>
+                        <div className="font-medium font-data text-[#2C2417]">{formatCurrency(item.unitCost)}</div>
                       </div>
                       <div>
                         <span className="text-xs text-[#8C8178]">SRP</span>
-                        <div className="font-medium font-['JetBrains_Mono'] text-[#1B6B45]">{formatCurrency(item.srp)}</div>
+                        <div className="font-medium font-data text-[#1B6B45]">{formatCurrency(item.srp)}</div>
                       </div>
                       <div>
                         <span className="text-xs text-[#8C8178]">Customer target</span>
@@ -1106,7 +1142,7 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
 
                 {cardStoreOrderOpen[key] && (
                   <div className="mt-4 rounded-xl border overflow-hidden bg-white border-[rgba(196,151,90,0.2)]">
-                    <div className="px-4 py-2 text-xs font-semibold font-['Montserrat'] text-[#7D5A28] bg-[rgba(160,120,75,0.12)]">
+                    <div className="px-4 py-2 text-xs font-semibold font-brand text-[#7D5A28] bg-[rgba(160,120,75,0.12)]">
                       Store Order
                     </div>
                     <div className="overflow-x-auto">
@@ -1114,8 +1150,8 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
                         <thead>
                           <tr className="bg-[rgba(160,120,75,0.12)] text-[#8C8178]">
                             <th className="px-3 py-2 text-left">Store</th>
-                            <th className="px-3 py-2 text-center font-['JetBrains_Mono']">ORDER</th>
-                            <th className="px-3 py-2 text-right font-['JetBrains_Mono']">TTL VALUE</th>
+                            <th className="px-3 py-2 text-center font-data">ORDER</th>
+                            <th className="px-3 py-2 text-right font-data">TTL VALUE</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -1123,20 +1159,20 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
                             <td className="px-3 py-2 text-[#6B5D4F]">
                               <span className="inline-flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-[#C4975A]" />REX</span>
                             </td>
-                            <td className="px-3 py-2 text-center font-['JetBrains_Mono'] text-[#2C2417]">{item.rex || Math.floor((item.order || 0) / 2)}</td>
-                            <td className="px-3 py-2 text-right font-['JetBrains_Mono'] text-[#2C2417]">{formatCurrency((item.rex || Math.floor((item.order || 0) / 2)) * (item.srp || 0))}</td>
+                            <td className="px-3 py-2 text-center font-data text-[#2C2417]">{item.rex || Math.floor((item.order || 0) / 2)}</td>
+                            <td className="px-3 py-2 text-right font-data text-[#2C2417]">{formatCurrency((item.rex || Math.floor((item.order || 0) / 2)) * (item.srp || 0))}</td>
                           </tr>
                           <tr className="border-t border-[#E8E2DB]">
                             <td className="px-3 py-2 text-[#6B5D4F]">
                               <span className="inline-flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-[#1B6B45]" />TTP</span>
                             </td>
-                            <td className="px-3 py-2 text-center font-['JetBrains_Mono'] text-[#2C2417]">{item.ttp || Math.ceil((item.order || 0) / 2)}</td>
-                            <td className="px-3 py-2 text-right font-['JetBrains_Mono'] text-[#2C2417]">{formatCurrency((item.ttp || Math.ceil((item.order || 0) / 2)) * (item.srp || 0))}</td>
+                            <td className="px-3 py-2 text-center font-data text-[#2C2417]">{item.ttp || Math.ceil((item.order || 0) / 2)}</td>
+                            <td className="px-3 py-2 text-right font-data text-[#2C2417]">{formatCurrency((item.ttp || Math.ceil((item.order || 0) / 2)) * (item.srp || 0))}</td>
                           </tr>
                           <tr className="border-t-2 border-[#C4975A]/40 bg-[rgba(160,120,75,0.12)]">
                             <td className="px-3 py-2 font-semibold text-[#7D5A28]">{t('skuProposal.total')}</td>
-                            <td className="px-3 py-2 text-center font-bold font-['JetBrains_Mono'] text-[#2C2417]">{item.order || 0}</td>
-                            <td className="px-3 py-2 text-right font-bold font-['JetBrains_Mono'] text-[#2C2417]">{formatCurrency(item.ttlValue || (item.order || 0) * (item.srp || 0))}</td>
+                            <td className="px-3 py-2 text-center font-bold font-data text-[#2C2417]">{item.order || 0}</td>
+                            <td className="px-3 py-2 text-right font-bold font-data text-[#2C2417]">{formatCurrency(item.ttlValue || (item.order || 0) * (item.srp || 0))}</td>
                           </tr>
                         </tbody>
                       </table>
@@ -1146,37 +1182,37 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
 
                 {sizingOpen && (
                   <div className="mt-4 rounded-xl border overflow-hidden bg-white border-[rgba(196,151,90,0.2)]">
-                    <div className="px-4 py-2 text-xs font-semibold font-['Montserrat'] text-[#7D5A28] bg-[rgba(160,120,75,0.12)]">
+                    <div className="px-4 py-2 text-xs font-semibold font-brand text-[#7D5A28] bg-[rgba(160,120,75,0.12)]">
                       Sizing
                     </div>
                     <div className="overflow-x-auto">
                       <table className="w-full text-xs">
                         <thead>
                           <tr className="bg-[rgba(160,120,75,0.12)] text-[#7D5A28]">
-                            <th className="px-3 py-2 text-left font-['Montserrat']">{item.productType}</th>
-                            <th className="px-3 py-2 text-center font-['JetBrains_Mono']">0002</th>
-                            <th className="px-3 py-2 text-center font-['JetBrains_Mono']">0004</th>
-                            <th className="px-3 py-2 text-center font-['JetBrains_Mono']">0006</th>
-                            <th className="px-3 py-2 text-center font-['JetBrains_Mono']">0008</th>
-                            <th className="px-3 py-2 text-center font-['Montserrat']">Sum</th>
+                            <th className="px-3 py-2 text-left font-brand">{item.productType}</th>
+                            <th className="px-3 py-2 text-center font-data">0002</th>
+                            <th className="px-3 py-2 text-center font-data">0004</th>
+                            <th className="px-3 py-2 text-center font-data">0006</th>
+                            <th className="px-3 py-2 text-center font-data">0008</th>
+                            <th className="px-3 py-2 text-center font-brand">Sum</th>
                           </tr>
                         </thead>
                         <tbody className="text-[#2C2417]">
                           <tr className="border-t border-[rgba(196,151,90,0.2)]">
                             <td className="px-3 py-2">% Sales mix</td>
-                            <td className="px-3 py-2 text-center font-['JetBrains_Mono']">6%</td>
-                            <td className="px-3 py-2 text-center font-['JetBrains_Mono']">33%</td>
-                            <td className="px-3 py-2 text-center font-['JetBrains_Mono']">33%</td>
-                            <td className="px-3 py-2 text-center font-['JetBrains_Mono']">28%</td>
-                            <td className="px-3 py-2 text-center font-semibold font-['JetBrains_Mono']">100%</td>
+                            <td className="px-3 py-2 text-center font-data">6%</td>
+                            <td className="px-3 py-2 text-center font-data">33%</td>
+                            <td className="px-3 py-2 text-center font-data">33%</td>
+                            <td className="px-3 py-2 text-center font-data">28%</td>
+                            <td className="px-3 py-2 text-center font-semibold font-data">100%</td>
                           </tr>
                           <tr className="border-t border-[rgba(196,151,90,0.2)]">
                             <td className="px-3 py-2">% ST</td>
-                            <td className="px-3 py-2 text-center font-['JetBrains_Mono']">50%</td>
-                            <td className="px-3 py-2 text-center font-['JetBrains_Mono']">43%</td>
-                            <td className="px-3 py-2 text-center font-['JetBrains_Mono']">30%</td>
-                            <td className="px-3 py-2 text-center font-['JetBrains_Mono']">63%</td>
-                            <td className="px-3 py-2 text-center font-['JetBrains_Mono']">-</td>
+                            <td className="px-3 py-2 text-center font-data">50%</td>
+                            <td className="px-3 py-2 text-center font-data">43%</td>
+                            <td className="px-3 py-2 text-center font-data">30%</td>
+                            <td className="px-3 py-2 text-center font-data">63%</td>
+                            <td className="px-3 py-2 text-center font-data">-</td>
                           </tr>
                           <tr className="border-t border-[rgba(196,151,90,0.2)] bg-[rgba(160,120,75,0.08)]">
                             <td className="px-3 py-2 font-semibold text-[#7D5A28]">Choice A</td>
@@ -1187,11 +1223,11 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
                                   min="0"
                                   value={getSizing(blockKey, idx).choiceA[size]}
                                   onChange={(e) => updateSizing(blockKey, idx, 'choiceA', size, e.target.value)}
-                                  className="w-10 text-center font-['JetBrains_Mono'] text-xs rounded border py-1 focus:outline-none focus:ring-2 focus:ring-[rgba(196,151,90,0.4)] bg-emerald-50 border-emerald-200 text-[#7D5A28]"
+                                  className="w-10 text-center font-data text-xs rounded border py-1 focus:outline-none focus:ring-2 focus:ring-[rgba(196,151,90,0.4)] bg-emerald-50 border-emerald-200 text-[#7D5A28]"
                                 />
                               </td>
                             ))}
-                            <td className="px-3 py-2 text-center font-semibold font-['JetBrains_Mono'] text-[#7D5A28]">{calculateSum(getSizing(blockKey, idx).choiceA)}</td>
+                            <td className="px-3 py-2 text-center font-semibold font-data text-[#7D5A28]">{calculateSum(getSizing(blockKey, idx).choiceA)}</td>
                           </tr>
                           <tr className="border-t border-[rgba(196,151,90,0.2)] bg-[rgba(27,107,69,0.03)]">
                             <td className="px-3 py-2 font-semibold text-[#1B6B45]">Choice B</td>
@@ -1202,11 +1238,11 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
                                   min="0"
                                   value={getSizing(blockKey, idx).choiceB[size]}
                                   onChange={(e) => updateSizing(blockKey, idx, 'choiceB', size, e.target.value)}
-                                  className="w-10 text-center font-['JetBrains_Mono'] text-xs rounded border py-1 focus:outline-none focus:ring-2 focus:ring-[rgba(196,151,90,0.4)] bg-emerald-50 border-emerald-200 text-[#1B6B45]"
+                                  className="w-10 text-center font-data text-xs rounded border py-1 focus:outline-none focus:ring-2 focus:ring-[rgba(196,151,90,0.4)] bg-emerald-50 border-emerald-200 text-[#1B6B45]"
                                 />
                               </td>
                             ))}
-                            <td className="px-3 py-2 text-center font-semibold font-['JetBrains_Mono'] text-[#1B6B45]">{calculateSum(getSizing(blockKey, idx).choiceB)}</td>
+                            <td className="px-3 py-2 text-center font-semibold font-data text-[#1B6B45]">{calculateSum(getSizing(blockKey, idx).choiceB)}</td>
                           </tr>
                           <tr className="border-t border-[rgba(196,151,90,0.2)] bg-[rgba(27,107,69,0.02)]">
                             <td className="px-3 py-2 font-semibold text-[#1B6B45]">Choice C</td>
@@ -1217,11 +1253,11 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
                                   min="0"
                                   value={getSizing(blockKey, idx).choiceC[size]}
                                   onChange={(e) => updateSizing(blockKey, idx, 'choiceC', size, e.target.value)}
-                                  className="w-10 text-center font-['JetBrains_Mono'] text-xs rounded border py-1 focus:outline-none focus:ring-2 focus:ring-[rgba(196,151,90,0.4)] bg-emerald-50 border-emerald-200 text-[#1B6B45]"
+                                  className="w-10 text-center font-data text-xs rounded border py-1 focus:outline-none focus:ring-2 focus:ring-[rgba(196,151,90,0.4)] bg-emerald-50 border-emerald-200 text-[#1B6B45]"
                                 />
                               </td>
                             ))}
-                            <td className="px-3 py-2 text-center font-semibold font-['JetBrains_Mono'] text-[#1B6B45]">{calculateSum(getSizing(blockKey, idx).choiceC)}</td>
+                            <td className="px-3 py-2 text-center font-semibold font-data text-[#1B6B45]">{calculateSum(getSizing(blockKey, idx).choiceC)}</td>
                           </tr>
                         </tbody>
                       </table>
@@ -1245,7 +1281,7 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
               <div className="w-12 h-12 rounded-full flex items-center justify-center bg-[rgba(196,151,90,0.2)]">
                 <Plus size={24} className="text-[#7D5A28]" />
               </div>
-              <span className="text-sm font-semibold font-['Montserrat'] text-[#7D5A28]">
+              <span className="text-sm font-semibold font-brand text-[#7D5A28]">
                 Add New SKU
               </span>
               <span className="text-xs text-[#8C8178]">
@@ -1300,7 +1336,7 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
                         ]}
                         actions={[
                           { label: 'Sizing', onClick: () => handleOpenSizing(key, idx, item) },
-                          { label: 'Delete', onClick: () => handleDeleteSkuRow(key, idx) },
+                          { label: 'Delete', onClick: () => handleDeleteSkuRow(key, idx, item.name || item.sku) },
                         ]}
                       />
                     ))}
@@ -1348,20 +1384,20 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
                     <table className="w-full text-sm">
                       <thead>
                         <tr className="bg-[rgba(160,120,75,0.12)] border-b border-[rgba(196,151,90,0.2)]">
-                          <th className="px-3 py-2 text-left text-xs font-semibold font-['Montserrat'] text-[#7D5A28]">Image</th>
-                          <th className="px-3 py-2 text-left text-xs font-semibold font-['Montserrat'] text-[#7D5A28]">SKU</th>
-                          <th className="px-3 py-2 text-left text-xs font-semibold font-['Montserrat'] text-[#7D5A28]">Name</th>
-                          <th className="px-3 py-2 text-left text-xs font-semibold font-['Montserrat'] text-[#7D5A28]">Product type (L3)</th>
-                          <th className="px-3 py-2 text-left text-xs font-semibold font-['Montserrat'] text-[#7D5A28]">Theme</th>
-                          <th className="px-3 py-2 text-left text-xs font-semibold font-['Montserrat'] text-[#7D5A28]">Color</th>
-                          <th className="px-3 py-2 text-left text-xs font-semibold font-['Montserrat'] text-[#7D5A28]">Composition</th>
-                          <th className="px-3 py-2 text-right text-xs font-semibold font-['Montserrat'] text-[#7D5A28]">Unit cost</th>
-                          <th className="px-3 py-2 text-right text-xs font-semibold font-['Montserrat'] text-[#7D5A28]">SRP</th>
-                          <th className="px-3 py-2 text-center text-xs font-semibold font-['Montserrat'] text-[#7D5A28]">Order</th>
-                          <th className="px-3 py-2 text-center text-xs font-semibold font-['Montserrat'] text-[#7D5A28]">Rex</th>
-                          <th className="px-3 py-2 text-center text-xs font-semibold font-['Montserrat'] text-[#7D5A28]">TTP</th>
-                          <th className="px-3 py-2 text-right text-xs font-semibold font-['Montserrat'] text-[#7D5A28]">TTL value</th>
-                          <th className="px-3 py-2 text-center text-xs font-semibold font-['Montserrat'] text-[#7D5A28]">Customer target</th>
+                          <th className="px-3 py-2 text-left text-xs font-semibold font-brand text-[#7D5A28]">Image</th>
+                          <th className="px-3 py-2 text-left text-xs font-semibold font-brand text-[#7D5A28]">SKU</th>
+                          <th className="px-3 py-2 text-left text-xs font-semibold font-brand text-[#7D5A28]">Name</th>
+                          <th className="px-3 py-2 text-left text-xs font-semibold font-brand text-[#7D5A28]">Product type (L3)</th>
+                          <th className="px-3 py-2 text-left text-xs font-semibold font-brand text-[#7D5A28]">Theme</th>
+                          <th className="px-3 py-2 text-left text-xs font-semibold font-brand text-[#7D5A28]">Color</th>
+                          <th className="px-3 py-2 text-left text-xs font-semibold font-brand text-[#7D5A28]">Composition</th>
+                          <th className="px-3 py-2 text-right text-xs font-semibold font-brand text-[#7D5A28]">Unit cost</th>
+                          <th className="px-3 py-2 text-right text-xs font-semibold font-brand text-[#7D5A28]">SRP</th>
+                          <th className="px-3 py-2 text-center text-xs font-semibold font-brand text-[#7D5A28]">Order</th>
+                          <th className="px-3 py-2 text-center text-xs font-semibold font-brand text-[#7D5A28]">Rex</th>
+                          <th className="px-3 py-2 text-center text-xs font-semibold font-brand text-[#7D5A28]">TTP</th>
+                          <th className="px-3 py-2 text-right text-xs font-semibold font-brand text-[#7D5A28]">TTL value</th>
+                          <th className="px-3 py-2 text-center text-xs font-semibold font-brand text-[#7D5A28]">Customer target</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -1373,34 +1409,13 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
                           return (
                           <tr key={`${item.sku}_${idx}`} className={`border-b border-[rgba(196,151,90,0.15)] ${item.isNew ? 'bg-[rgba(27,107,69,0.05)]' : ''}`}>
                             <td className="px-3 py-2">
-                              <div className="relative mx-auto w-fit">
-                                <div className="w-10 h-10 rounded-md border flex items-center justify-center bg-[rgba(160,120,75,0.12)] border-[rgba(196,151,90,0.25)]">
-                                  <ImageIcon size={16} className="text-[#8C8178]" />
-                                </div>
-                                {/* Action icons -- top-right corner of image */}
-                                <div className="absolute -top-1 -right-6 flex flex-col gap-0.5">
-                                  <button
-                                    type="button"
-                                    onClick={() => handleOpenSizing(key, idx, item)}
-                                    className="p-0.5 rounded transition-colors relative text-[#8C8178] hover:text-[#7D5A28] hover:bg-[rgba(160,120,75,0.18)]"
-                                    title="Sizing"
-                                  >
-                                    <Ruler size={12} />
-                                    {isSizingComplete(key, idx) && (
-                                      <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-[#1B6B45] rounded-full flex items-center justify-center">
-                                        <Check size={6} className="text-white" />
-                                      </span>
-                                    )}
-                                  </button>
-                                  <button
-                                    type="button"
-                                    onClick={() => handleDeleteSkuRow(key, idx)}
-                                    className="p-0.5 rounded transition-colors text-[#8C8178] hover:text-[#DC3545] hover:bg-[rgba(220,53,69,0.1)]"
-                                    title={t('proposal.deleteSku')}
-                                  >
-                                    <Trash2 size={12} />
-                                  </button>
-                                </div>
+                              <div className="w-10 h-10 rounded-md border flex items-center justify-center mx-auto bg-[rgba(160,120,75,0.08)] border-[rgba(196,151,90,0.2)]">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                  <path d="M6 8V19C6 19.5523 6.44772 20 7 20H17C17.5523 20 18 19.5523 18 19V8" stroke="#B8A692" strokeWidth="1.5" strokeLinecap="round"/>
+                                  <path d="M4 8H20L18.5 5H5.5L4 8Z" stroke="#C4975A" strokeWidth="1.5" strokeLinejoin="round" fill="rgba(196,151,90,0.1)"/>
+                                  <path d="M9 8V5.5C9 4.11929 10.1193 3 11.5 3H12.5C13.8807 3 15 4.11929 15 5.5V8" stroke="#B8A692" strokeWidth="1.5" strokeLinecap="round"/>
+                                  <rect x="9" y="12" width="6" height="3" rx="1" stroke="#C4975A" strokeWidth="1.2" opacity="0.5"/>
+                                </svg>
                               </div>
                             </td>
                             {item.isNew ? (
@@ -1409,7 +1424,7 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
                                   <select
                                     value={item.sku}
                                     onChange={(e) => handleSkuSelect(key, idx, e.target.value)}
-                                    className="w-full px-3 py-2 rounded-lg border-2 text-sm focus:outline-none focus:ring-2 font-['JetBrains_Mono'] border-[#1B6B45] bg-white text-[#2C2417] focus:ring-[rgba(27,107,69,0.3)]"
+                                    className="w-full px-3 py-2 rounded-lg border-2 text-sm focus:outline-none focus:ring-2 font-data border-[#1B6B45] bg-white text-[#2C2417] focus:ring-[rgba(27,107,69,0.3)]"
                                   >
                                     <option value="">{t('proposal.selectSku')}</option>
                                     {skuCatalog.map(sku => (
@@ -1422,7 +1437,32 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
                               </>
                             ) : (
                               <>
-                                <td className="px-3 py-2 font-semibold font-['JetBrains_Mono'] text-[#2C2417]">{item.sku}</td>
+                                <td className="px-3 py-2">
+                                  <div className="flex items-center gap-1">
+                                    <span className="font-semibold font-data text-[#2C2417]">{item.sku}</span>
+                                    <button
+                                      type="button"
+                                      onClick={() => handleOpenSizing(key, idx, item)}
+                                      className="p-0.5 rounded transition-colors relative text-[#8C8178] hover:text-[#7D5A28] hover:bg-[rgba(160,120,75,0.18)]"
+                                      title={t('skuProposal.sizing')}
+                                    >
+                                      <Pencil size={11} />
+                                      {isSizingComplete(key, idx) && (
+                                        <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-[#1B6B45] rounded-full flex items-center justify-center">
+                                          <Check size={6} className="text-white" />
+                                        </span>
+                                      )}
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() => handleDeleteSkuRow(key, idx, item.name || item.sku)}
+                                      className="p-0.5 rounded transition-colors text-[#8C8178] hover:text-[#DC3545] hover:bg-[rgba(220,53,69,0.1)]"
+                                      title={t('proposal.deleteSku')}
+                                    >
+                                      <Trash2 size={11} />
+                                    </button>
+                                  </div>
+                                </td>
                                 <td className="px-3 py-2 text-[#2C2417]">{item.name}</td>
                               </>
                             )}
@@ -1430,10 +1470,10 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
                             <td className="px-3 py-2 text-[#8C8178]">{item.theme}</td>
                             <td className="px-3 py-2 text-[#8C8178]">{item.color}</td>
                             <td className="px-3 py-2 text-[#8C8178]">{item.composition}</td>
-                            <td className="px-3 py-2 text-right font-['JetBrains_Mono'] text-[#8C8178]">{formatCurrency(item.unitCost)}</td>
-                            <td className="px-3 py-2 text-right font-medium font-['JetBrains_Mono'] text-[#1B6B45]">{formatCurrency(item.srp)}</td>
+                            <td className="px-3 py-2 text-right font-data text-[#8C8178]">{formatCurrency(item.unitCost)}</td>
+                            <td className="px-3 py-2 text-right font-medium font-data text-[#1B6B45]">{formatCurrency(item.srp)}</td>
                             <td className="px-3 py-2 text-center">
-                              <div className="px-2.5 py-1.5 rounded-md font-semibold font-['JetBrains_Mono'] inline-block bg-[rgba(160,120,75,0.18)] text-[#7D5A28]">
+                              <div className="px-2.5 py-1.5 rounded-md font-semibold font-data inline-block bg-[rgba(160,120,75,0.18)] text-[#7D5A28]">
                                 {item.order}
                               </div>
                             </td>
@@ -1445,14 +1485,14 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
                                   onChange={(e) => setEditValue(e.target.value)}
                                   onBlur={() => handleSaveEdit(rexKey)}
                                   onKeyDown={(e) => handleKeyDown(e, rexKey)}
-                                  className="w-20 px-2 py-1.5 text-center border-2 rounded-md focus:outline-none focus:ring-2 text-sm font-semibold font-['JetBrains_Mono'] border-[#C4975A] bg-white text-[#2C2417] focus:ring-[rgba(196,151,90,0.3)]"
+                                  className="w-20 px-2 py-1.5 text-center border-2 rounded-md focus:outline-none focus:ring-2 text-sm font-semibold font-data border-[#C4975A] bg-white text-[#2C2417] focus:ring-[rgba(196,151,90,0.3)]"
                                   autoFocus
                                 />
                               ) : (
                                 <button
                                   type="button"
                                   onClick={() => handleStartEdit(rexKey, item.rex)}
-                                  className="px-2.5 py-1.5 rounded-md inline-flex items-center gap-1 font-['JetBrains_Mono'] transition-colors bg-[rgba(160,120,75,0.18)] text-[#7D5A28] hover:bg-[rgba(196,151,90,0.25)]"
+                                  className="px-2.5 py-1.5 rounded-md inline-flex items-center gap-1 font-data transition-colors bg-[rgba(160,120,75,0.18)] text-[#7D5A28] hover:bg-[rgba(196,151,90,0.25)]"
                                   title="Edit Rex"
                                 >
                                   {item.rex}
@@ -1468,14 +1508,14 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
                                   onChange={(e) => setEditValue(e.target.value)}
                                   onBlur={() => handleSaveEdit(ttpKey)}
                                   onKeyDown={(e) => handleKeyDown(e, ttpKey)}
-                                  className="w-20 px-2 py-1.5 text-center border-2 rounded-md focus:outline-none focus:ring-2 text-sm font-semibold font-['JetBrains_Mono'] border-[#C4975A] bg-white text-[#2C2417] focus:ring-[rgba(196,151,90,0.3)]"
+                                  className="w-20 px-2 py-1.5 text-center border-2 rounded-md focus:outline-none focus:ring-2 text-sm font-semibold font-data border-[#C4975A] bg-white text-[#2C2417] focus:ring-[rgba(196,151,90,0.3)]"
                                   autoFocus
                                 />
                               ) : (
                                 <button
                                   type="button"
                                   onClick={() => handleStartEdit(ttpKey, item.ttp)}
-                                  className="px-2.5 py-1.5 rounded-md inline-flex items-center gap-1 font-['JetBrains_Mono'] transition-colors bg-[rgba(160,120,75,0.18)] text-[#7D5A28] hover:bg-[rgba(196,151,90,0.25)]"
+                                  className="px-2.5 py-1.5 rounded-md inline-flex items-center gap-1 font-data transition-colors bg-[rgba(160,120,75,0.18)] text-[#7D5A28] hover:bg-[rgba(196,151,90,0.25)]"
                                   title="Edit TTP"
                                 >
                                   {item.ttp}
@@ -1483,7 +1523,7 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
                                 </button>
                               )}
                             </td>
-                            <td className="px-3 py-2 text-right font-['JetBrains_Mono'] text-[#1B6B45]">{formatCurrency(item.ttlValue)}</td>
+                            <td className="px-3 py-2 text-right font-data text-[#1B6B45]">{formatCurrency(item.ttlValue)}</td>
                             <td className="px-3 py-2 text-center">
                               <select
                                 value={item.customerTarget}
@@ -1527,9 +1567,9 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
             {/* Header */}
             <div className="px-6 py-4 flex items-center justify-between bg-[rgba(160,120,75,0.18)] border-b border-[rgba(196,151,90,0.3)]">
               <div>
-                <h3 className="text-lg font-bold font-['Montserrat'] text-[#7D5A28]">{sizingPopup.item.productType}</h3>
+                <h3 className="text-lg font-bold font-brand text-[#7D5A28]">{sizingPopup.item.productType}</h3>
                 <p className="text-sm text-[#6B5D4F]">
-                  <span className="font-['JetBrains_Mono']">{sizingPopup.item.sku}</span> - {sizingPopup.item.name}
+                  <span className="font-data">{sizingPopup.item.sku}</span> - {sizingPopup.item.name}
                 </p>
               </div>
               <button
@@ -1546,30 +1586,30 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="bg-[rgba(196,151,90,0.2)] text-[#7D5A28]">
-                      <th className="px-4 py-3 text-left font-semibold font-['Montserrat']">{sizingPopup.item.productType}</th>
-                      <th className="px-4 py-3 text-center font-semibold font-['JetBrains_Mono']">0002</th>
-                      <th className="px-4 py-3 text-center font-semibold font-['JetBrains_Mono']">0004</th>
-                      <th className="px-4 py-3 text-center font-semibold font-['JetBrains_Mono']">0006</th>
-                      <th className="px-4 py-3 text-center font-semibold font-['JetBrains_Mono']">0008</th>
-                      <th className="px-4 py-3 text-center font-semibold font-['Montserrat'] bg-[rgba(196,151,90,0.25)]">Sum</th>
+                      <th className="px-4 py-3 text-left font-semibold font-brand">{sizingPopup.item.productType}</th>
+                      <th className="px-4 py-3 text-center font-semibold font-data">0002</th>
+                      <th className="px-4 py-3 text-center font-semibold font-data">0004</th>
+                      <th className="px-4 py-3 text-center font-semibold font-data">0006</th>
+                      <th className="px-4 py-3 text-center font-semibold font-data">0008</th>
+                      <th className="px-4 py-3 text-center font-semibold font-brand bg-[rgba(196,151,90,0.25)]">Sum</th>
                     </tr>
                   </thead>
                   <tbody className="text-[#2C2417]">
                     <tr className="border-b border-[rgba(196,151,90,0.2)] bg-[rgba(160,120,75,0.08)]">
                       <td className="px-4 py-2.5 font-medium text-[#2C2417]">% Sales mix</td>
-                      <td className="px-4 py-2.5 text-center font-['JetBrains_Mono']">6%</td>
-                      <td className="px-4 py-2.5 text-center font-['JetBrains_Mono']">33%</td>
-                      <td className="px-4 py-2.5 text-center font-['JetBrains_Mono']">33%</td>
-                      <td className="px-4 py-2.5 text-center font-['JetBrains_Mono']">28%</td>
-                      <td className="px-4 py-2.5 text-center font-semibold font-['JetBrains_Mono'] bg-[rgba(160,120,75,0.12)]">100%</td>
+                      <td className="px-4 py-2.5 text-center font-data">6%</td>
+                      <td className="px-4 py-2.5 text-center font-data">33%</td>
+                      <td className="px-4 py-2.5 text-center font-data">33%</td>
+                      <td className="px-4 py-2.5 text-center font-data">28%</td>
+                      <td className="px-4 py-2.5 text-center font-semibold font-data bg-[rgba(160,120,75,0.12)]">100%</td>
                     </tr>
                     <tr className="border-b border-[rgba(196,151,90,0.2)]">
                       <td className="px-4 py-2.5 font-medium text-[#2C2417]">% ST</td>
-                      <td className="px-4 py-2.5 text-center font-['JetBrains_Mono']">50%</td>
-                      <td className="px-4 py-2.5 text-center font-['JetBrains_Mono']">43%</td>
-                      <td className="px-4 py-2.5 text-center font-['JetBrains_Mono']">30%</td>
-                      <td className="px-4 py-2.5 text-center font-['JetBrains_Mono']">63%</td>
-                      <td className="px-4 py-2.5 text-center font-['JetBrains_Mono'] text-[#8C8178] bg-[rgba(160,120,75,0.12)]">-</td>
+                      <td className="px-4 py-2.5 text-center font-data">50%</td>
+                      <td className="px-4 py-2.5 text-center font-data">43%</td>
+                      <td className="px-4 py-2.5 text-center font-data">30%</td>
+                      <td className="px-4 py-2.5 text-center font-data">63%</td>
+                      <td className="px-4 py-2.5 text-center font-data text-[#8C8178] bg-[rgba(160,120,75,0.12)]">-</td>
                     </tr>
                     <tr className="border-b border-[rgba(196,151,90,0.2)] bg-[rgba(160,120,75,0.12)]">
                       <td className="px-4 py-2.5 font-medium text-[#7D5A28]">Choice A:</td>
@@ -1580,11 +1620,11 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
                             min="0"
                             value={getSizing(sizingPopup.blockKey, sizingPopup.itemIdx).choiceA[size]}
                             onChange={(e) => updateSizing(sizingPopup.blockKey, sizingPopup.itemIdx, 'choiceA', size, e.target.value)}
-                            className="w-14 text-center font-['JetBrains_Mono'] text-sm rounded border py-1 focus:outline-none focus:ring-2 focus:ring-[rgba(196,151,90,0.4)] bg-emerald-50 border-emerald-200 text-[#7D5A28]"
+                            className="w-14 text-center font-data text-sm rounded border py-1 focus:outline-none focus:ring-2 focus:ring-[rgba(196,151,90,0.4)] bg-emerald-50 border-emerald-200 text-[#7D5A28]"
                           />
                         </td>
                       ))}
-                      <td className="px-4 py-2.5 text-center font-semibold font-['JetBrains_Mono'] text-[#7D5A28] bg-[rgba(196,151,90,0.2)]">{calculateSum(getSizing(sizingPopup.blockKey, sizingPopup.itemIdx).choiceA)}</td>
+                      <td className="px-4 py-2.5 text-center font-semibold font-data text-[#7D5A28] bg-[rgba(196,151,90,0.2)]">{calculateSum(getSizing(sizingPopup.blockKey, sizingPopup.itemIdx).choiceA)}</td>
                     </tr>
                     <tr className="border-b border-[rgba(196,151,90,0.2)] bg-[rgba(27,107,69,0.05)]">
                       <td className="px-4 py-2.5 font-medium text-[#1B6B45]">Choice B:</td>
@@ -1595,11 +1635,11 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
                             min="0"
                             value={getSizing(sizingPopup.blockKey, sizingPopup.itemIdx).choiceB[size]}
                             onChange={(e) => updateSizing(sizingPopup.blockKey, sizingPopup.itemIdx, 'choiceB', size, e.target.value)}
-                            className="w-14 text-center font-['JetBrains_Mono'] text-sm rounded border py-1 focus:outline-none focus:ring-2 focus:ring-[rgba(196,151,90,0.4)] bg-emerald-50 border-emerald-200 text-[#1B6B45]"
+                            className="w-14 text-center font-data text-sm rounded border py-1 focus:outline-none focus:ring-2 focus:ring-[rgba(196,151,90,0.4)] bg-emerald-50 border-emerald-200 text-[#1B6B45]"
                           />
                         </td>
                       ))}
-                      <td className="px-4 py-2.5 text-center font-semibold font-['JetBrains_Mono'] text-[#1B6B45] bg-[rgba(27,107,69,0.1)]">{calculateSum(getSizing(sizingPopup.blockKey, sizingPopup.itemIdx).choiceB)}</td>
+                      <td className="px-4 py-2.5 text-center font-semibold font-data text-[#1B6B45] bg-[rgba(27,107,69,0.1)]">{calculateSum(getSizing(sizingPopup.blockKey, sizingPopup.itemIdx).choiceB)}</td>
                     </tr>
                     <tr className="bg-[rgba(27,107,69,0.03)]">
                       <td className="px-4 py-2.5 font-medium text-[#1B6B45]">Choice C:</td>
@@ -1610,11 +1650,11 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
                             min="0"
                             value={getSizing(sizingPopup.blockKey, sizingPopup.itemIdx).choiceC[size]}
                             onChange={(e) => updateSizing(sizingPopup.blockKey, sizingPopup.itemIdx, 'choiceC', size, e.target.value)}
-                            className="w-14 text-center font-['JetBrains_Mono'] text-sm rounded border py-1 focus:outline-none focus:ring-2 focus:ring-[rgba(196,151,90,0.4)] bg-emerald-50 border-emerald-200 text-[#1B6B45]"
+                            className="w-14 text-center font-data text-sm rounded border py-1 focus:outline-none focus:ring-2 focus:ring-[rgba(196,151,90,0.4)] bg-emerald-50 border-emerald-200 text-[#1B6B45]"
                           />
                         </td>
                       ))}
-                      <td className="px-4 py-2.5 text-center font-semibold font-['JetBrains_Mono'] text-[#1B6B45] bg-[rgba(27,107,69,0.08)]">{calculateSum(getSizing(sizingPopup.blockKey, sizingPopup.itemIdx).choiceC)}</td>
+                      <td className="px-4 py-2.5 text-center font-semibold font-data text-[#1B6B45] bg-[rgba(27,107,69,0.08)]">{calculateSum(getSizing(sizingPopup.blockKey, sizingPopup.itemIdx).choiceC)}</td>
                     </tr>
                   </tbody>
                 </table>
@@ -1659,6 +1699,8 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, darkMode = false }) => {
           </div>
         </div>
       )}
+
+      <ConfirmDialog {...dialogProps} />
     </div>
   );
 };

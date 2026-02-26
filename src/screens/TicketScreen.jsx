@@ -226,49 +226,49 @@ const TicketScreen = ({ onOpenTicketDetail }) => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-3 md:space-y-4">
       {/* ===== PAGE TITLE ===== */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
         <div>
-          <h1 className="text-lg font-semibold font-['Montserrat'] text-[#2C2417]">
+          <h1 className="text-sm font-semibold font-brand text-content">
             {t('ticket.title')}
           </h1>
-          <p className="text-xs text-[#6B5D4F]">
+          <p className="text-[11px] text-content-muted">
             {t('ticket.subtitle')}
           </p>
         </div>
-        <div className="flex items-center gap-3 flex-wrap">
+        <div className="flex items-center gap-1.5">
           {/* View Toggle */}
-          <div className="flex items-center gap-1 p-1 rounded-lg bg-[#FBF9F7] border border-[#E8E2DB]">
+          <div className="flex items-center rounded-md p-0.5 bg-surface-secondary border border-border-muted">
             <button
               onClick={() => setViewMode('table')}
-              className={`p-2 rounded-md transition-all duration-150 ${
+              className={`p-1.5 rounded transition-all duration-150 ${
                 viewMode === 'table'
-                  ? 'bg-white text-[#A67B3D] shadow-sm'
-                  : 'text-[#8C8178] hover:text-[#6B5D4F]'
+                  ? 'bg-white text-dafc-gold shadow-sm'
+                  : 'text-content-muted hover:text-content'
               }`}
               title={t('ticket.tableView')}
             >
-              <LayoutList size={16} />
+              <LayoutList size={14} />
             </button>
             <button
               onClick={() => setViewMode('kanban')}
-              className={`p-2 rounded-md transition-all duration-150 ${
+              className={`p-1.5 rounded transition-all duration-150 ${
                 viewMode === 'kanban'
-                  ? 'bg-white text-[#A67B3D] shadow-sm'
-                  : 'text-[#8C8178] hover:text-[#6B5D4F]'
+                  ? 'bg-white text-dafc-gold shadow-sm'
+                  : 'text-content-muted hover:text-content'
               }`}
               title={t('ticket.kanbanView')}
             >
-              <LayoutGrid size={16} />
+              <LayoutGrid size={14} />
             </button>
           </div>
 
           <button
             onClick={() => setShowCreatePopup(true)}
-            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-lg transition-all duration-150 bg-[#C4975A] text-white hover:bg-[#A67B3D]"
+            className="inline-flex items-center gap-1 px-2.5 py-1 text-[11px] font-medium rounded-md transition-all duration-150 bg-dafc-gold text-white hover:bg-[#A67B3D]"
           >
-            <Plus size={18} />
+            <Plus size={12} />
             {t('ticket.createTicket')}
           </button>
         </div>
@@ -309,12 +309,12 @@ const TicketScreen = ({ onOpenTicketDetail }) => {
 
       {/* ===== TICKET CONTENT ===== */}
       {loading ? (
-        <div className="border rounded-lg p-12 flex flex-col items-center justify-center bg-white border-[#E8E2DB] text-[#8C8178]">
-          <Loader2 size={32} className="animate-spin mb-3" />
-          <span className="text-sm">{t('ticket.loadingTickets')}</span>
+        <div className="border rounded-lg p-8 flex flex-col items-center justify-center bg-white border-border-muted text-content-muted">
+          <Loader2 size={24} className="animate-spin mb-2" />
+          <span className="text-xs">{t('ticket.loadingTickets')}</span>
         </div>
       ) : error ? (
-        <div className="border rounded-lg p-6 text-center text-sm bg-white border-[#E8E2DB] text-[#DC3545]">
+        <div className="border rounded-lg p-4 text-center text-xs bg-white border-border-muted text-[#DC3545]">
           {t('ticket.failedToLoadTickets')}: {error}
         </div>
       ) : viewMode === 'kanban' ? (
@@ -359,14 +359,14 @@ const TicketScreen = ({ onOpenTicketDetail }) => {
               )}
             </div>
           ) : (
-            <div className="border rounded-lg overflow-hidden bg-white border-[#E8E2DB]">
-              <table className="w-full text-sm">
-                <thead className="bg-[#FBF9F7]">
+            <div className="border rounded-lg overflow-hidden bg-white border-border-muted">
+              <table className="w-full text-xs">
+                <thead className="bg-surface-secondary">
                   <tr>
                     {[t('common.name'), t('approval.brand'), t('ticket.seasonLabel'), t('budget.createdBy'), t('budget.createdOn'), t('common.status'), t('common.actions')].map((header, idx) => (
                       <th
                         key={header}
-                        className={`px-4 py-3 text-left font-medium text-xs uppercase tracking-wider text-[#6B5D4F] ${idx === 6 ? 'text-center' : ''}`}
+                        className={`px-3 py-2 text-left font-medium text-[10px] uppercase tracking-wider text-content-muted ${idx === 6 ? 'text-center' : ''}`}
                       >
                         {header}
                       </th>
@@ -374,38 +374,38 @@ const TicketScreen = ({ onOpenTicketDetail }) => {
                   </tr>
                 </thead>
 
-                <tbody className="divide-y divide-[#F0EBE5]">
+                <tbody className="divide-y divide-border-muted">
                   {tickets.map((ticket) => (
                     <tr
                       key={`${ticket.entityType}-${ticket.id}`}
-                      className="transition-all duration-150 border-l-2 border-transparent hover:bg-[rgba(196,151,90,0.08)] hover:border-l-[#C4975A]"
+                      className="transition-all duration-150 border-l-2 border-transparent hover:bg-dafc-gold/5 hover:border-l-dafc-gold"
                     >
-                      <td className="px-4 py-3 font-medium text-[#2C2417]">
+                      <td className="px-3 py-2 font-medium text-content">
                         {ticket.name}
                       </td>
-                      <td className="px-4 py-3 text-[#6B5D4F]">
+                      <td className="px-3 py-2 text-content-muted">
                         {ticket.brand}
                       </td>
-                      <td className="px-4 py-3 font-['JetBrains_Mono'] text-[#6B5D4F]">
+                      <td className="px-3 py-2 font-data text-content-muted">
                         {ticket.seasonGroup} {ticket.season}
                       </td>
-                      <td className="px-4 py-3 text-[#6B5D4F]">
+                      <td className="px-3 py-2 text-content-muted">
                         {ticket.createdBy}
                       </td>
-                      <td className="px-4 py-3 font-['JetBrains_Mono'] text-[#8C8178]">
+                      <td className="px-3 py-2 font-data text-content-muted">
                         {ticket.createdOn}
                       </td>
-                      <td className="px-4 py-3">
-                        <span className={`px-2 py-1 rounded text-xs font-semibold ${getStatusStyle(ticket.status)}`}>
+                      <td className="px-3 py-2">
+                        <span className={`px-1.5 py-0.5 rounded text-[10px] font-semibold ${getStatusStyle(ticket.status)}`}>
                           {getDisplayStatus(ticket.status, t)}
                         </span>
                       </td>
-                      <td className="px-4 py-3 text-center">
+                      <td className="px-3 py-2 text-center">
                         <button
                           onClick={() => onOpenTicketDetail(ticket)}
-                          className="inline-flex items-center gap-2 px-3 py-1.5 text-xs font-semibold border rounded-lg transition-all duration-150 text-[#A67B3D] border-[rgba(196,151,90,0.4)] hover:bg-[rgba(196,151,90,0.1)]"
+                          className="inline-flex items-center gap-1 px-2 py-1 text-[10px] font-medium border rounded-md transition-all duration-150 text-dafc-gold border-dafc-gold/40 hover:bg-dafc-gold/5"
                         >
-                          <Eye size={14} />
+                          <Eye size={11} />
                           {t('common.view')}
                         </button>
                       </td>
@@ -415,7 +415,7 @@ const TicketScreen = ({ onOpenTicketDetail }) => {
               </table>
 
               {tickets.length === 0 && (
-                <div className="p-6 text-center text-sm text-[#8C8178]">
+                <div className="p-4 text-center text-xs text-content-muted">
                   {t('ticket.noTicketsFound')}
                 </div>
               )}
@@ -426,30 +426,27 @@ const TicketScreen = ({ onOpenTicketDetail }) => {
 
       {/* ===== CREATE TICKET POPUP ===== */}
       {showCreatePopup && (
-        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-          <div className="rounded-2xl shadow-2xl w-full max-w-md mx-4 overflow-hidden bg-white">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="rounded-xl shadow-2xl w-full max-w-sm mx-4 overflow-hidden bg-white">
             {/* Header */}
-            <div className="px-6 py-4 flex items-center justify-between border-b border-[#E8E2DB]" style={{
-              background: 'linear-gradient(135deg, #ffffff 0%, rgba(196,151,90,0.08) 35%, rgba(196,151,90,0.18) 100%)',
-              boxShadow: 'inset 0 -1px 0 rgba(196,151,90,0.08)',
-            }}>
-              <h3 className="text-lg font-bold font-['Montserrat'] text-[#A67B3D]">{t('ticket.createNewTicket')}</h3>
+            <div className="px-4 py-3 flex items-center justify-between border-b border-border-muted bg-white">
+              <h3 className="text-sm font-semibold font-brand text-content">{t('ticket.createNewTicket')}</h3>
               <button
                 onClick={() => setShowCreatePopup(false)}
-                className="p-2 rounded-lg transition-colors hover:bg-[rgba(196,151,90,0.1)]"
+                className="p-1 rounded-md transition-colors hover:bg-surface-secondary"
               >
-                <X size={20} className="text-[#A67B3D]" />
+                <X size={16} className="text-content-muted" />
               </button>
             </div>
 
             {/* Form */}
-            <div className="p-6 space-y-4">
+            <div className="p-4 space-y-3">
               <div>
-                <label className="block text-sm font-medium mb-2 text-[#6B5D4F]">{t('ticket.budgetNameLabel')}</label>
+                <label className="block text-[11px] font-medium mb-1 text-content-muted">{t('ticket.budgetNameLabel')}</label>
                 <select
                   value={newTicket.budgetName}
                   onChange={(e) => setNewTicket(prev => ({ ...prev, budgetName: e.target.value }))}
-                  className="w-full border rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 bg-white border-[#E8E2DB] text-[#2C2417] focus:ring-[rgba(196,151,90,0.3)] focus:border-[#C4975A]"
+                  className="w-full border rounded-md px-2.5 py-1.5 text-xs focus:outline-none focus:ring-1 bg-white border-border-muted text-content focus:ring-dafc-gold focus:border-dafc-gold"
                 >
                   <option value="">{t('ticket.selectBudgetPlaceholder')}</option>
                   {tickets.filter(t => t.entityType === 'budget').map(b => (
@@ -459,11 +456,11 @@ const TicketScreen = ({ onOpenTicketDetail }) => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2 text-[#6B5D4F]">{t('ticket.seasonGroupLabel')}</label>
+                <label className="block text-[11px] font-medium mb-1 text-content-muted">{t('ticket.seasonGroupLabel')}</label>
                 <select
                   value={newTicket.seasonGroup}
                   onChange={(e) => setNewTicket(prev => ({ ...prev, seasonGroup: e.target.value }))}
-                  className="w-full border rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 bg-white border-[#E8E2DB] text-[#2C2417] focus:ring-[rgba(196,151,90,0.3)] focus:border-[#C4975A]"
+                  className="w-full border rounded-md px-2.5 py-1.5 text-xs focus:outline-none focus:ring-1 bg-white border-border-muted text-content focus:ring-dafc-gold focus:border-dafc-gold"
                 >
                   <option value="">{t('ticket.selectSeasonGroup')}</option>
                   {SEASON_GROUPS.map(sg => (
@@ -473,11 +470,11 @@ const TicketScreen = ({ onOpenTicketDetail }) => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2 text-[#6B5D4F]">{t('ticket.seasonLabel')}</label>
+                <label className="block text-[11px] font-medium mb-1 text-content-muted">{t('ticket.seasonLabel')}</label>
                 <select
                   value={newTicket.season}
                   onChange={(e) => setNewTicket(prev => ({ ...prev, season: e.target.value }))}
-                  className="w-full border rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 bg-white border-[#E8E2DB] text-[#2C2417] focus:ring-[rgba(196,151,90,0.3)] focus:border-[#C4975A]"
+                  className="w-full border rounded-md px-2.5 py-1.5 text-xs focus:outline-none focus:ring-1 bg-white border-border-muted text-content focus:ring-dafc-gold focus:border-dafc-gold"
                 >
                   <option value="">{t('ticket.selectSeason')}</option>
                   {SEASONS.map(s => (
@@ -487,10 +484,10 @@ const TicketScreen = ({ onOpenTicketDetail }) => {
               </div>
 
               {/* Actions */}
-              <div className="flex justify-end gap-3 pt-4">
+              <div className="flex justify-end gap-2 pt-2">
                 <button
                   onClick={() => setShowCreatePopup(false)}
-                  className="px-4 py-2 text-sm font-medium rounded-lg transition-colors text-[#6B5D4F] hover:bg-[#FBF9F7]"
+                  className="px-2.5 py-1 text-[11px] font-medium rounded-md transition-colors text-content-muted hover:bg-surface-secondary"
                 >
                   {t('common.cancel')}
                 </button>
@@ -502,10 +499,10 @@ const TicketScreen = ({ onOpenTicketDetail }) => {
                     setNewTicket({ budgetName: '', seasonGroup: '', season: '' });
                   }}
                   disabled={!newTicket.budgetName || !newTicket.seasonGroup || !newTicket.season}
-                  className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors shadow-sm ${
+                  className={`px-2.5 py-1 text-[11px] font-medium rounded-md transition-colors ${
                     !newTicket.budgetName || !newTicket.seasonGroup || !newTicket.season
-                      ? 'bg-[#E8E2DB] text-[#8C8178] cursor-not-allowed'
-                      : 'bg-[#C4975A] text-white hover:bg-[#A67B3D]'
+                      ? 'bg-border-muted text-content-muted cursor-not-allowed'
+                      : 'bg-dafc-gold text-white hover:bg-[#A67B3D]'
                   }`}
                 >
                   {t('ticket.createTicket')}

@@ -70,7 +70,7 @@ const ImportDataScreen = () => {
     <div className="space-y-4">
       {/* Target & Config Row */}
       <div className={`rounded-xl border p-4 ${cardBg}`}>
-        <h3 className={`text-sm font-semibold mb-3 font-['Montserrat'] ${textPrimary}`}>
+        <h3 className={`text-sm font-semibold mb-3 font-brand ${textPrimary}`}>
           {t('import.importConfig', 'Import Configuration')}
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
@@ -288,7 +288,7 @@ const ImportDataScreen = () => {
             ].map(item => (
               <div key={item.label} className="rounded-lg p-3 bg-[#FBF9F7]">
                 <div className={`text-xs ${textSecondary}`}>{item.label}</div>
-                <div className={`text-lg font-bold font-['Montserrat'] ${item.color}`}>{item.value}</div>
+                <div className={`text-lg font-bold font-brand ${item.color}`}>{item.value}</div>
               </div>
             ))}
           </div>
@@ -493,7 +493,7 @@ const ImportDataScreen = () => {
           return (
             <div key={stat.target} className={`rounded-xl border p-4 ${cardBg}`}>
               <div className="flex items-center justify-between mb-3">
-                <h4 className={`text-sm font-semibold font-['Montserrat'] ${textPrimary}`}>{targetLabel}</h4>
+                <h4 className={`text-sm font-semibold font-brand ${textPrimary}`}>{targetLabel}</h4>
                 {stat.totalRecords > 0 && (
                   <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-green-100 text-[#1B6B45]">
                     {stat.totalRecords} records
@@ -593,7 +593,7 @@ const ImportDataScreen = () => {
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h1 className={`text-lg font-bold font-['Montserrat'] ${textPrimary}`}>
+          <h1 className={`text-lg font-bold font-brand ${textPrimary}`}>
             {t('import.title', 'Import Data')}
           </h1>
           <p className={`text-xs mt-0.5 ${textSecondary}`}>

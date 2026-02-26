@@ -2,19 +2,21 @@
 
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import {
-  ChevronDown, Plus, Search, Table, PieChart, X, Filter, Eye, Split,
-  Wallet, CircleCheckBig, Hourglass
+  ChevronDown, Plus, Search, Table, PieChart, X, Eye, Split,
+  Wallet, CircleCheckBig, Hourglass, Trash2, Send, Copy, Clock, Archive,
+  ArrowUpDown, ArrowUp, ArrowDown
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { formatCurrency } from '../utils/formatters';
 import { budgetService, masterDataService } from '../services';
+import { invalidateCache } from '../services/api';
 import { LoadingSpinner, ErrorMessage, EmptyState, ExpandableStatCard } from '../components/Common';
 import BudgetAlertsBanner from '../components/BudgetAlertsBanner';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useIsMobile } from '@/hooks/useIsMobile';
 import { MobileFilterSheet, MobileDataCard } from '@/components/ui';
 
-const YEARS = [2023, 2024, 2025, 2026];
+const YEARS = Array.from({ length: 4 }, (_, i) => new Date().getFullYear() - 2 + i);
 
 const CARD_ACCENTS = {
   total:     { color: '#C4975A', grad: 'rgba(180,140,95,0.10)', icon: 'rgba(160,120,75,0.08)' },
@@ -41,6 +43,10 @@ const BudgetManagementScreen = ({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [creating, setCreating] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [duplicating, setDuplicating] = useState(false);
+  const [submittingId, setSubmittingId] = useState(null);
+  const [archiving, setArchiving] = useState(false);
 
   // Master data for create form
   const [apiBrands, setApiBrands] = useState([]);
@@ -97,14 +103,6 @@ const BudgetManagementScreen = ({
     }
   }, [selectedYear, selectedBrand]);
 
-  // Initial fetch
-  useEffect(() => {
-    fetchBudgets();
-    // Fetch master data for create form
-    masterDataService.getBrands().then(b => setApiBrands(Array.isArray(b) ? b : [])).catch(() => {});
-    masterDataService.getStores().then(s => setApiStores(Array.isArray(s) ? s : [])).catch(() => {});
-  }, [fetchBudgets]);
-
   // Local State
   const [searchQuery, setSearchQuery] = useState('');
   const [viewMode, setViewMode] = useState('table');
@@ -118,6 +116,41 @@ const BudgetManagementScreen = ({
 
   const [showViewModal, setShowViewModal] = useState(false);
   const [selectedBudget, setSelectedBudget] = useState(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showArchiveConfirm, setShowArchiveConfirm] = useState(false);
+  const [approvalHistory, setApprovalHistory] = useState([]);
+  const [loadingApprovals, setLoadingApprovals] = useState(false);
+
+  // Column sorting
+  const [sortColumn, setSortColumn] = useState('');
+  const [sortDir, setSortDir] = useState('desc');
+  const toggleSort = (col) => {
+    if (sortColumn === col) setSortDir(d => d === 'asc' ? 'desc' : 'asc');
+    else { setSortColumn(col); setSortDir('desc'); }
+  };
+
+  // Initial fetch
+  useEffect(() => {
+    fetchBudgets();
+    // Fetch master data for create form
+    masterDataService.getBrands().then(b => setApiBrands(Array.isArray(b) ? b : [])).catch(() => {});
+    masterDataService.getStores().then(s => setApiStores(Array.isArray(s) ? s : [])).catch(() => {});
+  }, [fetchBudgets]);
+
+  // Fetch approval history when view modal opens
+  useEffect(() => {
+    if (showViewModal && selectedBudget?.id) {
+      setLoadingApprovals(true);
+      setApprovalHistory([]);
+      budgetService.getOne(selectedBudget.id).then((detail) => {
+        setApprovalHistory(Array.isArray(detail?.approvals) ? detail.approvals : []);
+      }).catch(() => {
+        setApprovalHistory([]);
+      }).finally(() => {
+        setLoadingApprovals(false);
+      });
+    }
+  }, [showViewModal, selectedBudget?.id]);
 
   // Form state for create budget
   const [newBudgetForm, setNewBudgetForm] = useState({
@@ -131,16 +164,27 @@ const BudgetManagementScreen = ({
     description: ''
   });
 
-  // Filter budgets
+  // Filter + sort budgets
   const filteredBudgets = useMemo(() => {
-    return budgetData.filter(budget => {
+    let list = budgetData.filter(budget => {
       if (selectedYear && budget.fiscalYear !== selectedYear) return false;
       if (selectedGroupBrand && budget.groupBrand !== selectedGroupBrand) return false;
       if (selectedBrand && budget.brandId !== selectedBrand) return false;
       if (searchQuery && !budget.budgetName.toLowerCase().includes(searchQuery.toLowerCase())) return false;
       return true;
     });
-  }, [budgetData, selectedYear, selectedGroupBrand, selectedBrand, searchQuery]);
+    if (sortColumn) {
+      list = [...list].sort((a, b) => {
+        let va = a[sortColumn], vb = b[sortColumn];
+        if (typeof va === 'string') va = va.toLowerCase();
+        if (typeof vb === 'string') vb = vb.toLowerCase();
+        if (va < vb) return sortDir === 'asc' ? -1 : 1;
+        if (va > vb) return sortDir === 'asc' ? 1 : -1;
+        return 0;
+      });
+    }
+    return list;
+  }, [budgetData, selectedYear, selectedGroupBrand, selectedBrand, searchQuery, sortColumn, sortDir]);
 
   // Calculate summary stats
   const summaryStats = useMemo(() => {
@@ -188,6 +232,93 @@ const BudgetManagementScreen = ({
     setSelectedGroupBrand(null);
     setSelectedBrand(null);
     setSearchQuery('');
+  };
+
+  // Delete budget handler
+  const handleDeleteBudget = async () => {
+    if (!selectedBudget?.id || deleting) return;
+    setDeleting(true);
+    try {
+      await budgetService.delete(selectedBudget.id);
+      invalidateCache('/budgets');
+      toast.success(t('budget.deleteSuccess') || 'Budget deleted successfully');
+      setShowDeleteConfirm(false);
+      setShowViewModal(false);
+      setSelectedBudget(null);
+      await fetchBudgets();
+    } catch (err) {
+      console.error('Failed to delete budget:', err);
+      toast.error(t('budget.deleteFailed') || 'Failed to delete budget');
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  // Duplicate budget handler
+  const handleDuplicateBudget = async () => {
+    if (!selectedBudget || duplicating || apiStores.length === 0) return;
+    setDuplicating(true);
+    try {
+      const totalAmount = Number(selectedBudget.totalBudget) || 0;
+      const stores = apiStores;
+      const perStore = Math.floor(totalAmount / stores.length);
+      const details = stores.map((store, idx) => ({
+        storeId: store.id,
+        budgetAmount: idx === 0 ? totalAmount - perStore * (stores.length - 1) : perStore,
+      }));
+      await budgetService.create({
+        budgetCode: `${selectedBudget.budgetName} (Copy)`,
+        fiscalYear: selectedBudget.fiscalYear,
+        details,
+      });
+      invalidateCache('/budgets');
+      toast.success(t('budget.duplicateSuccess') || 'Budget duplicated successfully');
+      setShowViewModal(false);
+      setSelectedBudget(null);
+      await fetchBudgets();
+    } catch (err) {
+      console.error('Failed to duplicate budget:', err);
+      toast.error(err?.response?.data?.message || t('budget.duplicateFailed') || 'Failed to duplicate budget');
+    } finally {
+      setDuplicating(false);
+    }
+  };
+
+  // Quick submit for approval
+  const handleQuickSubmit = async (budgetId) => {
+    if (submittingId) return;
+    setSubmittingId(budgetId);
+    try {
+      await budgetService.submit(budgetId);
+      invalidateCache('/budgets');
+      toast.success(t('budget.submitSuccess') || 'Budget submitted for approval');
+      await fetchBudgets();
+    } catch (err) {
+      console.error('Failed to submit budget:', err);
+      toast.error(err?.response?.data?.message || t('budget.submitFailed') || 'Failed to submit budget');
+    } finally {
+      setSubmittingId(null);
+    }
+  };
+
+  // Archive budget handler
+  const handleArchiveBudget = async () => {
+    if (!selectedBudget?.id || archiving) return;
+    setArchiving(true);
+    try {
+      await budgetService.archive(selectedBudget.id);
+      invalidateCache('/budgets');
+      toast.success(t('budget.archiveSuccess') || 'Budget archived successfully');
+      setShowArchiveConfirm(false);
+      setShowViewModal(false);
+      setSelectedBudget(null);
+      await fetchBudgets();
+    } catch (err) {
+      console.error('Failed to archive budget:', err);
+      toast.error(err?.response?.data?.message || t('budget.archiveFailed') || 'Failed to archive budget');
+    } finally {
+      setArchiving(false);
+    }
   };
 
   const DetailRow = ({ label, value, strong }) => (
@@ -250,30 +381,25 @@ const BudgetManagementScreen = ({
       )}
 
       {/* Filters Section */}
-      <div className="rounded-lg shadow-sm border px-3 py-2 bg-white border-[#E8E2DB]">
-        <div className="flex flex-wrap items-center gap-2">
+      <div className="rounded-lg border px-3 py-1.5 bg-white border-border-muted">
+        <div className="flex flex-wrap items-center gap-1.5">
           {isMobile ? (
             <>
               <button
                 onClick={() => setShowMobileFilters(true)}
-                className={`flex items-center gap-1.5 px-3 py-1.5 border rounded-lg text-xs font-medium ${
+                className={`flex items-center gap-1.5 px-2.5 py-1 border rounded-md text-[11px] font-medium ${
                   hasActiveFilters
-                    ? 'border-[rgba(196,151,90,0.4)] bg-[rgba(196,151,90,0.1)] text-[#8A6340]'
-                    : 'border-[#E8E2DB] text-[#8C8178]'
+                    ? 'border-dafc-gold/40 bg-dafc-gold/10 text-[#8A6340]'
+                    : 'border-border-muted text-content-muted'
                 }`}
               >
-                <Filter size={14} />
-                {t('budget.filters')}
+                <ChevronDown size={12} />
                 {hasActiveFilters && <span className="w-1.5 h-1.5 rounded-full bg-dafc-gold" />}
               </button>
               <div className="flex-1" />
             </>
           ) : (
-            <>
-              <Filter size={14} className="shrink-0 text-[#8C8178]" />
-              <span className="text-xs font-medium font-['Montserrat'] shrink-0 text-[#8C8178]">{t('budget.filters')}</span>
-              <div className="h-5 w-px shrink-0 bg-[#E8E2DB]"></div>
-            </>
+            <></>
           )}
           {/* Desktop filters - hidden on mobile */}
           {!isMobile && <><div className="relative">
@@ -283,13 +409,13 @@ const BudgetManagementScreen = ({
                 setGroupBrandDropdownOpen(false);
                 setBrandDropdownOpen(false);
               }}
-              className={`flex items-center justify-between gap-2 px-3 py-1.5 border rounded-lg transition-colors min-w-[110px] ${selectedYear
-                ? 'bg-[rgba(160,120,75,0.18)] border-[rgba(196,151,90,0.4)] text-[#8A6340]'
-                : 'bg-white border-[#E8E2DB] text-[#2C2417] hover:bg-[rgba(160,120,75,0.18)] hover:border-[rgba(196,151,90,0.4)]'
+              className={`flex items-center gap-1.5 px-2.5 py-1 border rounded-md text-[11px] font-medium transition-colors ${selectedYear
+                ? 'bg-dafc-gold/10 border-dafc-gold/40 text-[#8A6340]'
+                : 'bg-white border-border-muted text-content hover:bg-surface-secondary'
                 }`}
             >
-              <span className="text-sm font-medium">{selectedYear ? `FY${selectedYear}` : t('budget.allYears')}</span>
-              <ChevronDown size={16} className="opacity-50 shrink-0" />
+              <span>{selectedYear ? `FY${selectedYear}` : t('budget.fiscalYear')}</span>
+              <ChevronDown size={11} className="opacity-50 shrink-0" />
             </button>
             {yearDropdownOpen && (
               <div className="absolute top-full left-0 mt-1 rounded-lg shadow-lg border py-1 z-20 min-w-[140px] bg-white border-[#E8E2DB]">
@@ -320,17 +446,17 @@ const BudgetManagementScreen = ({
                 setYearDropdownOpen(false);
                 setBrandDropdownOpen(false);
               }}
-              className={`flex items-center justify-between gap-2 px-3 py-1.5 border rounded-lg transition-colors min-w-[130px] ${selectedGroupBrand
-                ? 'bg-[rgba(160,120,75,0.18)] border-[rgba(196,151,90,0.4)] text-[#8A6340]'
-                : 'bg-white border-[#E8E2DB] text-[#2C2417] hover:bg-[rgba(160,120,75,0.18)] hover:border-[rgba(196,151,90,0.4)]'
+              className={`flex items-center gap-1.5 px-2.5 py-1 border rounded-md text-[11px] font-medium transition-colors ${selectedGroupBrand
+                ? 'bg-dafc-gold/10 border-dafc-gold/40 text-[#8A6340]'
+                : 'bg-white border-border-muted text-content hover:bg-surface-secondary'
                 }`}
             >
-              <span className="text-sm font-medium">
+              <span>
                 {selectedGroupBrand
                   ? groupBrandCategories.find(g => g.id === selectedGroupBrand)?.name
-                  : t('budget.allGroupBrands')}
+                  : t('budget.groupBrand')}
               </span>
-              <ChevronDown size={16} className="opacity-50 shrink-0" />
+              <ChevronDown size={11} className="opacity-50 shrink-0" />
             </button>
             {groupBrandDropdownOpen && (
               <div className="absolute top-full left-0 mt-1 rounded-lg shadow-lg border py-1 z-20 min-w-[150px] bg-white border-[#E8E2DB]">
@@ -361,15 +487,15 @@ const BudgetManagementScreen = ({
                 setYearDropdownOpen(false);
                 setGroupBrandDropdownOpen(false);
               }}
-              className={`flex items-center justify-between gap-2 px-3 py-1.5 border rounded-lg transition-colors min-w-[110px] ${selectedBrand
-                ? 'bg-[rgba(160,120,75,0.18)] border-[rgba(196,151,90,0.4)] text-[#8A6340]'
-                : 'bg-white border-[#E8E2DB] text-[#2C2417] hover:bg-[rgba(160,120,75,0.18)] hover:border-[rgba(196,151,90,0.4)]'
+              className={`flex items-center gap-1.5 px-2.5 py-1 border rounded-md text-[11px] font-medium transition-colors ${selectedBrand
+                ? 'bg-dafc-gold/10 border-dafc-gold/40 text-[#8A6340]'
+                : 'bg-white border-border-muted text-content hover:bg-surface-secondary'
                 }`}
             >
-              <span className="text-sm font-medium">
-                {selectedBrand ? brandList.find(b => b.id === selectedBrand)?.name : t('budget.allBrands')}
+              <span>
+                {selectedBrand ? brandList.find(b => b.id === selectedBrand)?.name : t('budget.brand')}
               </span>
-              <ChevronDown size={16} className="opacity-50 shrink-0" />
+              <ChevronDown size={11} className="opacity-50 shrink-0" />
             </button>
             {brandDropdownOpen && (
               <div className="absolute top-full left-0 mt-1 rounded-lg shadow-lg border py-1 z-20 min-w-[140px] bg-white border-[#E8E2DB]">
@@ -393,35 +519,35 @@ const BudgetManagementScreen = ({
           </div>
 
           {/* Search */}
-          <div className="relative flex-1 min-w-[160px]">
-            <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[#6B5D4F]" />
+          <div className="relative flex-1 min-w-[120px]">
+            <Search size={12} className="absolute left-2 top-1/2 -translate-y-1/2 text-content-muted" />
             <input
               type="text"
               placeholder={t('budget.searchBudgets')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-8 pr-3 py-1.5 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#C4975A] focus:border-transparent bg-white border-[#E8E2DB] text-[#2C2417] placeholder-[#6B5D4F]"
+              className="w-full pl-7 pr-2.5 py-1 border rounded-md text-[11px] focus:outline-none focus:ring-1 focus:ring-dafc-gold focus:border-transparent bg-white border-border-muted text-content placeholder-content-muted"
             />
           </div></>}
 
           {/* Currency Toggle */}
-          <div className="flex items-center rounded-lg p-1 bg-[#FBF9F7]">
+          <div className="flex items-center rounded-md p-0.5 bg-surface-secondary">
             <button
               onClick={() => setCurrency('VND')}
-              className={`px-3 py-1.5 rounded-md text-xs font-semibold font-['JetBrains_Mono'] transition-all ${
+              className={`px-2 py-1 rounded text-[10px] font-semibold font-data transition-all ${
                 currency === 'VND'
-                  ? 'bg-[#C4975A] text-white shadow-sm'
-                  : 'text-[#6B5D4F] hover:text-[#2C2417]'
+                  ? 'bg-dafc-gold text-white shadow-sm'
+                  : 'text-content-muted hover:text-content'
               }`}
             >
               VND
             </button>
             <button
               onClick={() => setCurrency('USD')}
-              className={`px-3 py-1.5 rounded-md text-xs font-semibold font-['JetBrains_Mono'] transition-all ${
+              className={`px-2 py-1 rounded text-[10px] font-semibold font-data transition-all ${
                 currency === 'USD'
                   ? 'bg-[#1B6B45] text-white shadow-sm'
-                  : 'text-[#6B5D4F] hover:text-[#2C2417]'
+                  : 'text-content-muted hover:text-content'
               }`}
             >
               USD
@@ -466,9 +592,9 @@ const BudgetManagementScreen = ({
 
           <button
             onClick={() => setShowCreateModal(true)}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-[#1B6B45] text-white rounded-lg hover:bg-[#1B6B45]/90 transition-colors shadow-sm text-xs font-medium font-['Montserrat'] shrink-0"
+            className="flex items-center gap-1 px-2.5 py-1 bg-[#1B6B45] text-white rounded-md hover:bg-[#1B6B45]/90 transition-colors text-[11px] font-medium font-brand shrink-0"
           >
-            <Plus size={14} />
+            <Plus size={12} />
             {t('budget.createBudget')}
           </button>
         </div>
@@ -560,24 +686,31 @@ const BudgetManagementScreen = ({
       {viewMode === 'table' && !isMobile && (
         <div className="rounded-xl shadow-sm border overflow-hidden bg-white border-[#E8E2DB]">
           <table className="w-full">
-            <thead className="bg-[rgba(160,120,75,0.18)]">
+            <thead className="bg-[rgba(160,120,75,0.18)] sticky top-0 z-10">
               <tr>
-                <th className="text-left px-3 py-2 text-xs font-semibold tracking-wider font-['Montserrat'] text-[#6B5D4F]">
-                  {t('budget.fiscalYear')}
-                </th>
-                <th className="text-left px-3 py-2 text-xs font-semibold tracking-wider font-['Montserrat'] text-[#6B5D4F]">
-                  {t('budget.groupBrand')}
-                </th>
-                <th className="text-left px-3 py-2 text-xs font-semibold tracking-wider font-['Montserrat'] text-[#6B5D4F]">
-                  {t('budget.brand')}
-                </th>
-                <th className="text-left px-3 py-2 text-xs font-semibold tracking-wider font-['Montserrat'] text-[#6B5D4F]">
-                  {t('budget.budgetName')}
-                </th>
-                <th className="text-left px-3 py-2 text-xs font-semibold tracking-wider font-['Montserrat'] text-[#6B5D4F]">
-                  {t('budget.amount')}
-                </th>
-                <th className="text-right px-3 py-2 text-xs font-semibold tracking-wider font-['Montserrat'] text-[#6B5D4F]">
+                {[
+                  { key: 'fiscalYear', label: t('budget.fiscalYear'), align: 'left' },
+                  { key: 'groupBrand', label: t('budget.groupBrand'), align: 'left' },
+                  { key: 'brandName', label: t('budget.brand'), align: 'left' },
+                  { key: 'budgetName', label: t('budget.budgetName'), align: 'left' },
+                  { key: 'totalBudget', label: t('budget.amount'), align: 'left' },
+                ].map(col => (
+                  <th
+                    key={col.key}
+                    onClick={() => toggleSort(col.key)}
+                    className={`text-${col.align} px-3 py-2 text-xs font-semibold tracking-wider font-brand text-[#6B5D4F] cursor-pointer select-none hover:text-[#2C2417] transition-colors`}
+                  >
+                    <span className="inline-flex items-center gap-1">
+                      {col.label}
+                      {sortColumn === col.key ? (
+                        sortDir === 'asc' ? <ArrowUp size={10} /> : <ArrowDown size={10} />
+                      ) : (
+                        <ArrowUpDown size={10} className="opacity-30" />
+                      )}
+                    </span>
+                  </th>
+                ))}
+                <th className="text-right px-3 py-2 text-xs font-semibold tracking-wider font-brand text-[#6B5D4F]">
                   {t('common.actions')}
                 </th>
               </tr>
@@ -605,7 +738,7 @@ const BudgetManagementScreen = ({
                     </span>
                   </td>
                   <td className="px-3 py-2">
-                    <span className="text-sm font-semibold font-['JetBrains_Mono'] text-[#2C2417]">{formatCurrency(budget.totalBudget, { currency })}</span>
+                    <span className="text-sm font-semibold font-data text-[#2C2417]">{formatCurrency(budget.totalBudget, { currency })}</span>
                   </td>
                   <td className="px-3 py-2">
                     <div className="flex items-center justify-end gap-2">
@@ -615,11 +748,37 @@ const BudgetManagementScreen = ({
                           setSelectedBudget(budget);
                           setShowViewModal(true);
                         }}
-                        className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded-md transition text-[#8C8178] hover:text-[#2C2417] hover:bg-[#FBF9F7]"
+                        className="inline-flex items-center justify-center w-7 h-7 rounded-md transition text-content-muted hover:text-content hover:bg-surface-secondary"
+                        title={t('budget.view')}
                       >
                         <Eye size={14} />
-                        {t('budget.view')}
                       </button>
+
+                      {/* Quick Submit for DRAFT */}
+                      {budget.status === 'draft' && (
+                        <button
+                          onClick={() => handleQuickSubmit(budget.id)}
+                          disabled={submittingId === budget.id}
+                          className={`inline-flex items-center justify-center w-7 h-7 rounded-md transition ${submittingId === budget.id ? 'opacity-50 cursor-not-allowed' : ''} text-blue-600 hover:bg-blue-50`}
+                          title={t('budget.submit') || 'Submit for Approval'}
+                        >
+                          <Send size={14} />
+                        </button>
+                      )}
+
+                      {/* Archive for APPROVED */}
+                      {budget.status === 'approved' && (
+                        <button
+                          onClick={() => {
+                            setSelectedBudget(budget);
+                            setShowArchiveConfirm(true);
+                          }}
+                          className="inline-flex items-center justify-center w-7 h-7 rounded-md transition text-[#9A7B2E] hover:bg-[rgba(227,179,65,0.1)]"
+                          title={t('budget.archive') || 'Archive'}
+                        >
+                          <Archive size={14} />
+                        </button>
+                      )}
 
                       {/* Allocate */}
                       <button
@@ -635,10 +794,10 @@ const BudgetManagementScreen = ({
                             budgetName: budget.budgetName,
                           })
                         }
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-md transition bg-[rgba(160,120,75,0.18)] text-[#8A6340] hover:bg-[rgba(196,151,90,0.25)] border border-[rgba(196,151,90,0.4)]"
+                        className="inline-flex items-center justify-center w-7 h-7 rounded-md transition bg-dafc-gold/10 text-[#8A6340] hover:bg-dafc-gold/20 border border-dafc-gold/40"
+                        title={t('budget.allocate')}
                       >
                         <Split size={14} />
-                        {t('budget.allocate')}
                       </button>
                     </div>
                   </td>
@@ -691,7 +850,7 @@ const BudgetManagementScreen = ({
               <div
                 className="flex items-center justify-between px-6 py-4 border-b border-[#E8E2DB]"
               >
-                <h3 className="text-lg font-semibold font-['Montserrat']">{t('budget.budgetDetail')}</h3>
+                <h3 className="text-lg font-semibold font-brand">{t('budget.budgetDetail')}</h3>
                 <button
                   onClick={() => setShowViewModal(false)}
                   className="p-2 rounded-lg transition-colors hover:bg-[#FBF9F7]"
@@ -706,20 +865,105 @@ const BudgetManagementScreen = ({
                 <DetailRow label={t('budget.groupBrand')} value={selectedBudget.groupBrand} />
                 <DetailRow label={t('budget.brand')} value={selectedBudget.brandName} />
                 <DetailRow label={t('budget.budgetName')} value={selectedBudget.budgetName} />
-                <DetailRow label={t('budget.createdBy')} value="TC Admin" />
-                <DetailRow label={t('budget.createdOn')} value="02/02/2025" />
+                <DetailRow label={t('budget.createdBy')} value={selectedBudget.createdBy || 'N/A'} />
+                <DetailRow label={t('budget.createdOn')} value={selectedBudget.createdAt ? new Date(selectedBudget.createdAt).toLocaleDateString('vi-VN') : 'N/A'} />
 
                 <DetailRow
                   label={t('budget.totalBudget')}
                   value={formatCurrency(selectedBudget.totalBudget, { currency })}
                   strong
                 />
+
+                {/* Approval History Timeline */}
+                <div className="pt-3 border-t border-[#E8E2DB]/60">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Clock size={14} className="text-[#6B4D30]" />
+                    <span className="text-[10px] font-semibold uppercase tracking-wide font-brand text-[#8C8178]">
+                      {t('budget.approvalHistory') || 'Approval History'}
+                    </span>
+                  </div>
+                  {loadingApprovals ? (
+                    <div className="text-xs text-[#8C8178]">{t('common.loading') || 'Loading...'}</div>
+                  ) : approvalHistory.length === 0 ? (
+                    <div className="text-xs italic text-[#8C8178]">{t('budget.noApprovalRecords') || 'No approval records yet'}</div>
+                  ) : (
+                    <div className="relative pl-4 space-y-3">
+                      <div className="absolute left-[5px] top-1 bottom-1 w-px bg-[#E8E2DB]" />
+                      {approvalHistory.map((approval, idx) => {
+                        const isApprove = (approval.action || '').toLowerCase().includes('approve');
+                        const isReject = (approval.action || '').toLowerCase().includes('reject');
+                        const dotColor = isApprove ? 'bg-[#1B6B45]' : isReject ? 'bg-[#DC3545]' : 'bg-[#D97706]';
+                        return (
+                          <div key={idx} className="relative flex items-start gap-3">
+                            <div className={`absolute left-[-12px] top-1 w-2.5 h-2.5 rounded-full ring-2 ring-white ${dotColor}`} />
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <span className="text-xs font-semibold text-[#2C2417]">
+                                  {approval.deciderName || approval.decidedBy || t('common.unknown')}
+                                </span>
+                                <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
+                                  isApprove ? 'bg-[rgba(27,107,69,0.15)] text-[#1B6B45]'
+                                    : isReject ? 'bg-[rgba(220,53,69,0.15)] text-[#DC3545]'
+                                    : 'bg-[rgba(217,119,6,0.15)] text-[#D97706]'
+                                }`}>
+                                  {(approval.action || 'submitted').toUpperCase()}
+                                </span>
+                                {approval.level && (
+                                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#FBF9F7] text-[#8C8178]">
+                                    L{approval.level}
+                                  </span>
+                                )}
+                              </div>
+                              {approval.comment && (
+                                <p className="text-xs mt-0.5 text-[#8C8178]">{approval.comment}</p>
+                              )}
+                              <span className="text-[10px] text-[#8C8178]">
+                                {approval.decidedAt || approval.createdAt
+                                  ? new Date(approval.decidedAt || approval.createdAt).toLocaleString('vi-VN')
+                                  : ''}
+                              </span>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* Footer */}
-              <div
-                className="flex justify-end px-6 py-4 border-t border-[#E8E2DB]"
-              >
+              <div className="flex items-center justify-between px-6 py-4 border-t border-[#E8E2DB]">
+                <div className="flex items-center gap-2">
+                  {/* Delete (draft only) */}
+                  {selectedBudget.status === 'draft' && (
+                    <button
+                      onClick={() => setShowDeleteConfirm(true)}
+                      className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors text-red-500 hover:bg-red-500/10"
+                    >
+                      <Trash2 size={14} />
+                      {t('common.delete') || 'Delete'}
+                    </button>
+                  )}
+                  {/* Duplicate */}
+                  <button
+                    onClick={handleDuplicateBudget}
+                    disabled={duplicating}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${duplicating ? 'opacity-50 cursor-not-allowed' : ''} text-[#6B4D30] hover:bg-[rgba(160,120,75,0.12)]`}
+                  >
+                    <Copy size={14} />
+                    {duplicating ? (t('budget.duplicating') || 'Duplicating...') : (t('budget.duplicate') || 'Duplicate')}
+                  </button>
+                  {/* Archive (approved only) */}
+                  {selectedBudget.status === 'approved' && (
+                    <button
+                      onClick={() => setShowArchiveConfirm(true)}
+                      className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors text-[#9A7B2E] hover:bg-[rgba(227,179,65,0.12)]"
+                    >
+                      <Archive size={14} />
+                      {t('budget.archive') || 'Archive'}
+                    </button>
+                  )}
+                </div>
                 <button
                   onClick={() => setShowViewModal(false)}
                   className="px-4 py-2 text-sm font-medium rounded-lg transition-colors bg-[#FBF9F7] hover:bg-[#E8E2DB] text-[#2C2417]"
@@ -748,7 +992,7 @@ const BudgetManagementScreen = ({
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="rounded-2xl shadow-xl w-full max-w-lg max-h-[calc(100vh-2rem)] overflow-hidden bg-white">
             <div className="flex items-center justify-between p-6 border-b border-[#E8E2DB]">
-              <h3 className="text-lg font-semibold font-['Montserrat'] text-[#2C2417]">{t('budget.createNewBudget')}</h3>
+              <h3 className="text-lg font-semibold font-brand text-[#2C2417]">{t('budget.createNewBudget')}</h3>
               <button
                 onClick={() => setShowCreateModal(false)}
                 className="p-2 rounded-lg transition-colors text-[#6B5D4F] hover:text-[#2C2417] hover:bg-[#FBF9F7]"
@@ -761,7 +1005,7 @@ const BudgetManagementScreen = ({
               <div className="grid grid-cols-3 gap-4">
                 {/* Fiscal Year */}
                 <div>
-                  <label className="block text-sm font-medium mb-2 font-['Montserrat'] text-[#2C2417]">
+                  <label className="block text-sm font-medium mb-2 font-brand text-[#2C2417]">
                     {t('budget.fiscalYear')} <span className="text-[#DC3545]">{t('common.required')}</span>
                   </label>
                   <select
@@ -784,7 +1028,7 @@ const BudgetManagementScreen = ({
 
                 {/* Group Brand */}
                 <div>
-                  <label className="block text-sm font-medium mb-2 font-['Montserrat'] text-[#2C2417]">
+                  <label className="block text-sm font-medium mb-2 font-brand text-[#2C2417]">
                     {t('budget.groupBrand')} <span className="text-[#DC3545]">{t('common.required')}</span>
                   </label>
                   <select
@@ -804,7 +1048,7 @@ const BudgetManagementScreen = ({
 
                 {/* Brand */}
                 <div>
-                  <label className="block text-sm font-medium mb-2 font-['Montserrat'] text-[#2C2417]">
+                  <label className="block text-sm font-medium mb-2 font-brand text-[#2C2417]">
                     {t('budget.brand')} <span className="text-[#DC3545]">{t('common.required')}</span>
                   </label>
                   <select
@@ -827,7 +1071,7 @@ const BudgetManagementScreen = ({
               {/* Season Group & Season Type */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium mb-2 font-['Montserrat'] text-[#2C2417]">
+                  <label className="block text-sm font-medium mb-2 font-brand text-[#2C2417]">
                     {t('otbAnalysis.seasonGroup')} <span className="text-[#DC3545]">{t('common.required')}</span>
                   </label>
                   <select
@@ -840,7 +1084,7 @@ const BudgetManagementScreen = ({
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-2 font-['Montserrat'] text-[#2C2417]">
+                  <label className="block text-sm font-medium mb-2 font-brand text-[#2C2417]">
                     {t('otbAnalysis.season')} <span className="text-[#DC3545]">{t('common.required')}</span>
                   </label>
                   <select
@@ -856,7 +1100,7 @@ const BudgetManagementScreen = ({
 
               {/* Budget Name */}
               <div>
-                <label className="block text-sm font-medium mb-2 font-['Montserrat'] text-[#2C2417]">
+                <label className="block text-sm font-medium mb-2 font-brand text-[#2C2417]">
                   {t('budget.budgetName')} <span className="text-[#DC3545]">{t('common.required')}</span>
                 </label>
                 <input
@@ -870,7 +1114,7 @@ const BudgetManagementScreen = ({
 
               {/* Total Budget */}
               <div>
-                <label className="block text-sm font-medium mb-2 font-['Montserrat'] text-[#2C2417]">
+                <label className="block text-sm font-medium mb-2 font-brand text-[#2C2417]">
                   {t('budget.amountVND')} <span className="text-[#DC3545]">{t('common.required')}</span>
                 </label>
                 <input
@@ -884,7 +1128,7 @@ const BudgetManagementScreen = ({
                   className="w-full px-4 py-2.5 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#C4975A] focus:border-[#C4975A] bg-white border-[#E8E2DB] text-[#2C2417] placeholder-[#6B5D4F]"
                 />
                 {newBudgetForm.totalBudget && (
-                  <p className="text-xs mt-1 font-['JetBrains_Mono'] text-[#6B5D4F]">
+                  <p className="text-xs mt-1 font-data text-[#6B5D4F]">
                     {formatCurrency(parseInt(newBudgetForm.totalBudget) || 0, { currency })}
                   </p>
                 )}
@@ -894,7 +1138,7 @@ const BudgetManagementScreen = ({
 
               {/* Description */}
               <div>
-                <label className="block text-sm font-medium mb-2 font-['Montserrat'] text-[#2C2417]">
+                <label className="block text-sm font-medium mb-2 font-brand text-[#2C2417]">
                   {t('common.description')}
                 </label>
                 <textarea
@@ -943,10 +1187,10 @@ const BudgetManagementScreen = ({
                       comment: newBudgetForm.description || undefined,
                       details,
                     });
+                    invalidateCache('/budgets');
                     toast.success(t('budget.budgetCreatedSuccess'));
                     setShowCreateModal(false);
                     setNewBudgetForm({ fiscalYear: 2026, groupBrand: 'A', brandId: apiBrands[0]?.id || '', seasonGroup: 'SS', seasonType: 'pre', name: '', totalBudget: '', description: '' });
-                    // Refresh the list
                     fetchBudgets();
                   } catch (err) {
                     console.error('Failed to create budget:', err);
@@ -965,6 +1209,76 @@ const BudgetManagementScreen = ({
                 {creating && <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />}
                 {creating ? t('budget.creating') : t('budget.createBudget')}
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Dialog */}
+      {showDeleteConfirm && selectedBudget && (
+        <div className="fixed inset-0 z-[10000]">
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setShowDeleteConfirm(false)} />
+          <div className="relative flex min-h-screen items-center justify-center p-4">
+            <div className="w-full max-w-sm rounded-2xl shadow-xl overflow-hidden bg-white text-[#2C2417]">
+              <div className="px-6 py-5 space-y-3">
+                <h3 className="text-lg font-semibold font-brand">{t('budget.confirmDelete') || 'Confirm Delete'}</h3>
+                <p className="text-sm text-[#8C8178]">
+                  {t('budget.deleteWarning') || 'Are you sure you want to delete this budget? This action cannot be undone.'}
+                </p>
+                <p className="text-sm font-medium">{selectedBudget.budgetName}</p>
+              </div>
+              <div className="flex justify-end gap-3 px-6 py-4 border-t border-[#E8E2DB]">
+                <button
+                  onClick={() => setShowDeleteConfirm(false)}
+                  className="px-4 py-1.5 text-sm font-medium rounded-lg transition-colors bg-[#FBF9F7] hover:bg-[#E8E2DB] text-[#2C2417]"
+                >
+                  {t('common.cancel') || 'Cancel'}
+                </button>
+                <button
+                  onClick={handleDeleteBudget}
+                  disabled={deleting}
+                  className={`px-4 py-1.5 text-sm font-medium rounded-lg transition-colors bg-red-600 hover:bg-red-700 text-white ${deleting ? 'opacity-50 cursor-not-allowed' : ''}`}
+                >
+                  {deleting ? (t('common.deleting') || 'Deleting...') : (t('common.delete') || 'Delete')}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Archive Confirmation Dialog */}
+      {showArchiveConfirm && selectedBudget && (
+        <div className="fixed inset-0 z-[10000]">
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setShowArchiveConfirm(false)} />
+          <div className="relative flex min-h-screen items-center justify-center p-4">
+            <div className="w-full max-w-sm rounded-2xl shadow-xl overflow-hidden bg-white text-[#2C2417]">
+              <div className="px-6 py-5 space-y-3">
+                <div className="flex items-center gap-2">
+                  <Archive size={18} className="text-[#9A7B2E]" />
+                  <h3 className="text-lg font-semibold font-brand">{t('budget.confirmArchive') || 'Confirm Archive'}</h3>
+                </div>
+                <p className="text-sm text-[#8C8178]">
+                  {t('budget.archiveWarning') || 'Are you sure you want to archive this budget? Archived budgets will no longer appear in active views.'}
+                </p>
+                <p className="text-sm font-medium">{selectedBudget.budgetName}</p>
+              </div>
+              <div className="flex justify-end gap-3 px-6 py-4 border-t border-[#E8E2DB]">
+                <button
+                  onClick={() => setShowArchiveConfirm(false)}
+                  className="px-4 py-1.5 text-sm font-medium rounded-lg transition-colors bg-[#FBF9F7] hover:bg-[#E8E2DB] text-[#2C2417]"
+                >
+                  {t('common.cancel') || 'Cancel'}
+                </button>
+                <button
+                  onClick={handleArchiveBudget}
+                  disabled={archiving}
+                  className={`flex items-center gap-1.5 px-4 py-1.5 text-sm font-medium rounded-lg transition-colors ${archiving ? 'opacity-50 cursor-not-allowed' : ''} bg-[#D97706] hover:bg-[#B45309] text-white`}
+                >
+                  <Archive size={14} />
+                  {archiving ? (t('budget.archiving') || 'Archiving...') : (t('budget.archive') || 'Archive')}
+                </button>
+              </div>
             </div>
           </div>
         </div>

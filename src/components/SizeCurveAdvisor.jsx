@@ -75,7 +75,7 @@ const SizeCurveAdvisor = ({
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
           <Sparkles className="w-5 h-5 text-purple-600" />
-          <span className="font-semibold font-['Montserrat'] text-purple-900">
+          <span className="font-semibold font-brand text-purple-900">
             {t('ai.sizeAdvisor')}
           </span>
         </div>

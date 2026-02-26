@@ -109,11 +109,11 @@ const TicketKanbanBoard = ({ tickets = [], onTicketClick, darkMode = true }) => 
             <div className={`${colors.header} px-4 py-3 flex items-center justify-between`}>
               <div className="flex items-center gap-2">
                 <Icon size={16} className={colors.icon} />
-                <span className={`font-semibold text-sm font-['Montserrat'] ${colors.icon}`}>
+                <span className={`font-semibold text-sm font-brand ${colors.icon}`}>
                   {t(column.labelKey)}
                 </span>
               </div>
-              <span className={`${colors.count} text-xs font-bold font-['JetBrains_Mono'] px-2 py-0.5 rounded-full`}>
+              <span className={`${colors.count} text-xs font-bold font-data px-2 py-0.5 rounded-full`}>
                 {columnTickets.length}
               </span>
             </div>
@@ -121,7 +121,7 @@ const TicketKanbanBoard = ({ tickets = [], onTicketClick, darkMode = true }) => 
             {/* Cards Container */}
             <div className="p-3 space-y-3 max-h-[calc(100vh-340px)] overflow-y-auto">
               {columnTickets.length === 0 ? (
-                <div className="text-center py-8 text-sm font-['Montserrat'] text-[#8C8178]">
+                <div className="text-center py-8 text-sm font-brand text-[#8C8178]">
                   {t('kanban.noTickets')}
                 </div>
               ) : (
@@ -142,13 +142,13 @@ const TicketKanbanBoard = ({ tickets = [], onTicketClick, darkMode = true }) => 
                       }`}>
                         {ticket.entityType}
                       </span>
-                      <span className="text-[10px] font-['JetBrains_Mono'] text-[#8C8178]">
+                      <span className="text-[10px] font-data text-[#8C8178]">
                         {ticket.createdOn}
                       </span>
                     </div>
 
                     {/* Ticket Name */}
-                    <h4 className="font-medium text-sm font-['Montserrat'] mb-2 line-clamp-2 text-[#2C2417]">
+                    <h4 className="font-medium text-sm font-brand mb-2 line-clamp-2 text-[#2C2417]">
                       {ticket.name}
                     </h4>
 
@@ -161,7 +161,7 @@ const TicketKanbanBoard = ({ tickets = [], onTicketClick, darkMode = true }) => 
                         </span>
                       )}
                       {ticket.seasonGroup && ticket.seasonGroup !== '-' && (
-                        <span className="px-1.5 py-0.5 rounded font-['JetBrains_Mono'] bg-[#FBF9F7] text-[#6B5D4F]">
+                        <span className="px-1.5 py-0.5 rounded font-data bg-[#FBF9F7] text-[#6B5D4F]">
                           {ticket.seasonGroup} {ticket.season !== '-' ? ticket.season : ''}
                         </span>
                       )}
@@ -170,7 +170,7 @@ const TicketKanbanBoard = ({ tickets = [], onTicketClick, darkMode = true }) => 
                     {/* Budget Amount */}
                     {ticket.totalBudget > 0 && (
                       <div className="mt-2 pt-2 border-t border-[#E8E2DB]">
-                        <span className="text-xs font-['JetBrains_Mono'] text-[#6B4D30]">
+                        <span className="text-xs font-data text-[#6B4D30]">
                           {formatCurrency(ticket.totalBudget)}
                         </span>
                       </div>

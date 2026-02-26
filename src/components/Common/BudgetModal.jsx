@@ -34,7 +34,7 @@ const BudgetModal = ({
         {/* Header */}
         <div className="bg-[#C4975A] px-8 py-6 flex items-center justify-between relative overflow-hidden rounded-t-3xl">
           <div className="relative z-10 animate-in slide-in-from-left duration-500">
-            <h2 className="text-2xl font-bold text-white flex items-center gap-3 font-['Montserrat']">
+            <h2 className="text-2xl font-bold text-white flex items-center gap-3 font-brand">
               <Sparkles size={24} className="animate-spin" style={{ animationDuration: '3s' }} />
               {selectedCell.existingBudget ? t('components.editBudgetTitle') : t('components.createBudgetTitle')}
             </h2>
@@ -54,7 +54,7 @@ const BudgetModal = ({
         <div className="flex-1 overflow-y-auto p-8 max-h-[60vh] bg-white">
           {/* Budget Comment */}
           <div className="mb-6">
-            <label className="block text-sm font-bold text-[#2C2417] mb-3 flex items-center gap-2 font-['Montserrat']">
+            <label className="block text-sm font-bold text-[#2C2417] mb-3 flex items-center gap-2 font-brand">
               <FileText size={16} className="text-[#C4975A]" />
               {t('components.budgetComment')}
             </label>
@@ -69,7 +69,7 @@ const BudgetModal = ({
 
           {/* Store Budget Allocation */}
           <div>
-            <label className="block text-sm font-bold text-[#2C2417] mb-4 flex items-center gap-2 animate-in fade-in slide-in-from-left duration-300 font-['Montserrat']" style={{ animationDelay: '100ms' }}>
+            <label className="block text-sm font-bold text-[#2C2417] mb-4 flex items-center gap-2 animate-in fade-in slide-in-from-left duration-300 font-brand" style={{ animationDelay: '100ms' }}>
               <DollarSign size={16} className="text-[#C4975A]" />
               {t('components.storeBudgetAllocation')}
             </label>
@@ -91,7 +91,7 @@ const BudgetModal = ({
                       value={sa.budgetAmount || ''}
                       onChange={(e) => handleStoreAllocationChange(sa.storeId, e.target.value)}
                       placeholder="0"
-                      className="w-44 px-5 py-3 bg-white border-2 border-[#E8E2DB] rounded-xl text-right font-bold text-[#2C2417] placeholder-[#8C8178] focus:ring-2 focus:ring-[#C4975A] focus:border-transparent transition-all duration-300 hover:border-[rgba(196,151,90,0.35)] focus:scale-105 font-['JetBrains_Mono']"
+                      className="w-44 px-5 py-3 bg-white border-2 border-[#E8E2DB] rounded-xl text-right font-bold text-[#2C2417] placeholder-[#8C8178] focus:ring-2 focus:ring-[#C4975A] focus:border-transparent transition-all duration-300 hover:border-[rgba(196,151,90,0.35)] focus:scale-105 font-data"
                     />
                   </div>
                 </div>
@@ -102,11 +102,11 @@ const BudgetModal = ({
           {/* Total Budget Summary */}
           <div className="mt-8 p-6 bg-[#FBF9F7] rounded-2xl border-2 border-[#C4975A]/30 relative overflow-hidden group hover:border-[#C4975A]/50 transition-all duration-500 animate-in fade-in slide-in-from-bottom duration-500" style={{ animationDelay: '400ms' }}>
             <div className="flex items-center justify-between relative z-10">
-              <span className="text-lg font-bold text-[#2C2417] flex items-center gap-2 font-['Montserrat']">
+              <span className="text-lg font-bold text-[#2C2417] flex items-center gap-2 font-brand">
                 <TrendingUp size={20} className="text-[#C4975A] animate-bounce" style={{ animationDuration: '2s' }} />
                 {t('components.totalBudget')}
               </span>
-              <span className="text-3xl font-black text-[#C4975A] transition-all duration-300 group-hover:scale-110 font-['JetBrains_Mono']">
+              <span className="text-3xl font-black text-[#C4975A] transition-all duration-300 group-hover:scale-110 font-data">
                 {formatCurrency(calculateTotalBudget())}
               </span>
             </div>
@@ -126,7 +126,7 @@ const BudgetModal = ({
             className="px-6 py-3 bg-[#C4975A] text-white rounded-xl font-semibold hover:bg-[#D4B082] hover:scale-105 active:scale-95 transition-all duration-300 flex items-center gap-2 shadow-lg shadow-[#C4975A]/20 hover:shadow-xl hover:shadow-[#C4975A]/30 relative overflow-hidden group"
           >
             <Save size={18} className="relative z-10 group-hover:rotate-12 transition-transform duration-300" />
-            <span className="relative z-10 font-['Montserrat']">{t('components.saveBudget')}</span>
+            <span className="relative z-10 font-brand">{t('components.saveBudget')}</span>
           </button>
         </div>
       </div>

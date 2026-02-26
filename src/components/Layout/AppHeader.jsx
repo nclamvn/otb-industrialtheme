@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { aiService } from '../../services/aiService';
 import { ROUTE_MAP } from '@/utils/routeMap';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useAppContext } from '@/contexts/AppContext';
 import {
   Wallet,
   DollarSign,
@@ -181,23 +182,14 @@ const PLANNING_STEPS = [
 const getAlertIcon = (severity) => {
   switch (severity) {
     case 'critical':
-      return <XCircle size={14} className="text-[#DC3545]" />;
+      return <XCircle size={14} className="text-status-critical" />;
     case 'warning':
-      return <Clock size={14} className="text-[#D97706]" />;
+      return <Clock size={14} className="text-status-warning" />;
     case 'info':
-      return <CheckCircle size={14} className="text-[#1B6B45]" />;
+      return <CheckCircle size={14} className="text-status-success" />;
     default:
-      return <Bell size={14} className="text-[#C4975A]" />;
+      return <Bell size={14} className="text-dafc-gold" />;
   }
-};
-
-const getAlertBg = (severity) => {
-  const styles = {
-    critical: 'bg-red-50',
-    warning: 'bg-amber-50',
-    info: 'bg-green-50',
-  };
-  return styles[severity] || '';
 };
 
 const AppHeader = ({
@@ -211,6 +203,7 @@ const AppHeader = ({
 }) => {
   const router = useRouter();
   const { t, language, setLanguage } = useLanguage();
+  const { triggerSave, hasSaveHandler } = useAppContext();
   const SCREEN_CONFIG = useMemo(() => getScreenConfig(t), [t]);
   const onNavigate = (screenId) => {
     const route = ROUTE_MAP[screenId];
@@ -258,7 +251,7 @@ const AppHeader = ({
 
   useEffect(() => {
     fetchBudgetAlerts();
-    const interval = setInterval(fetchBudgetAlerts, 5 * 60 * 1000); // refresh every 5 min
+    const interval = setInterval(fetchBudgetAlerts, 5 * 60 * 1000);
     return () => clearInterval(interval);
   }, [fetchBudgetAlerts]);
 
@@ -303,53 +296,23 @@ const AppHeader = ({
   }, []);
 
   return (
-    <div className="sticky top-0 z-40" style={{
-      background: 'linear-gradient(180deg, #FFFFFF 0%, #FBF9F7 100%)',
-    }}>
-      {/* Main Header */}
-      <div className={`h-11 ${isMobile ? 'px-3' : 'px-4'} flex items-center justify-between`} style={{
-        borderBottom: '1px solid #E8E2DB',
-        background: 'linear-gradient(135deg, #FFFFFF 0%, rgba(196,151,90,0.04) 100%)',
-      }}>
-        {/* Left - Page Title */}
+    <div className="sticky top-0 z-40 bg-canvas">
+      {/* Main Header — blends with page bg, no bottom border */}
+      <div className={`${isMobile ? 'px-3' : 'px-5'} py-2.5 flex items-center justify-between`}>
+        {/* Left - Page Title — bare icon, larger text */}
         <div className="flex items-center gap-2.5">
-          {/* Icon with gradient background */}
-          <div className="relative">
-            <div
-              className="w-7 h-7 rounded-lg flex items-center justify-center transition-all duration-300"
-              style={{
-                background: 'linear-gradient(135deg, rgba(196,151,90,0.12) 0%, rgba(196,151,90,0.22) 100%)',
-                border: '1px solid rgba(196,151,90,0.25)',
-              }}
-            >
-              <CurrentIcon size={14} strokeWidth={2} className="text-[#C4975A]" />
-            </div>
-            <div
-              className="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full bg-[#1B6B45]"
-              style={{
-                border: '1.5px solid #FFFFFF',
-                boxShadow: '0 0 4px rgba(27,107,69,0.5)',
-              }}
-            />
-          </div>
+          <CurrentIcon size={16} strokeWidth={2} className="text-dafc-gold" />
 
           {/* Title & Breadcrumb */}
           <div>
-            <div className="flex items-center gap-1.5">
-              <h1 className="text-sm font-semibold font-['Montserrat'] tracking-tight text-[#2C2417]">
-                {currentConfig.label || 'Dashboard'}
-              </h1>
-              {currentConfig.step && (
-                <span className="px-1.5 py-px rounded text-[9px] font-medium font-['JetBrains_Mono'] uppercase tracking-wider bg-[rgba(196,151,90,0.15)] text-[#7D5A28] border border-[rgba(196,151,90,0.25)]">
-                  {t('common.step')} {currentConfig.step}
-                </span>
-              )}
-            </div>
+            <h1 className="text-sm font-semibold font-brand tracking-tight text-content">
+              {currentConfig.label || 'Dashboard'}
+            </h1>
             {currentConfig.step && (
               <div className="flex items-center gap-1">
-                <span className="text-[10px] text-[#8C8178]">{t('header.planningBreadcrumb')}</span>
-                <ChevronRight size={10} className="text-[#E8E2DB]" />
-                <span className="text-[10px] font-medium text-[#6B5D4F]">
+                <span className="text-[10px] text-content-muted">{t('header.planningBreadcrumb')}</span>
+                <ChevronRight size={10} className="text-border" />
+                <span className="text-[10px] font-medium text-content-secondary">
                   {currentConfig.shortLabel}
                 </span>
               </div>
@@ -357,31 +320,26 @@ const AppHeader = ({
           </div>
         </div>
 
-        {/* Right - Actions */}
-        <div className="flex items-center gap-0.5">
-          {/* Search Button */}
+        {/* Right - Ghost Actions */}
+        <div className="flex items-center gap-1">
+          {/* Search — ghost, icon + Cmd+K hint */}
           <div className="relative" ref={searchRef}>
             <button
               onClick={() => setShowSearch(!showSearch)}
-              className="flex items-center gap-1.5 px-2.5 py-1 rounded-md border transition-all duration-200 border-[#E8E2DB] hover:border-[rgba(196,151,90,0.4)] hover:bg-[rgba(196,151,90,0.06)]"
+              className="flex items-center gap-1.5 px-2 py-1.5 rounded-lg transition-all duration-200 text-content-muted hover:text-content-secondary"
             >
-              <Search size={13} className="text-[#8C8178]" />
-              <span className="text-[11px] hidden sm:block text-[#8C8178]">
-                {t('header.searchPlaceholder')}
-              </span>
-              <kbd className="hidden sm:flex items-center gap-0.5 px-1 py-px rounded text-[9px] font-['JetBrains_Mono'] bg-[#FBF9F7] text-[#8C8178] border border-[#E8E2DB]">
+              <Search size={15} />
+              <kbd className="hidden sm:flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[9px] font-data bg-surface-secondary text-content-muted">
                 <Command size={8} />K
               </kbd>
             </button>
 
             {/* Search Modal */}
             {showSearch && (
-              <div className="absolute right-0 top-full mt-2 w-[calc(100vw-24px)] sm:w-96 rounded-xl shadow-2xl border overflow-hidden z-[9999] bg-white border-[#E8E2DB]"
-                style={{ boxShadow: '0 8px 32px rgba(44,36,23,0.06)' }}
-              >
-                <div className="p-3 border-b border-[#E8E2DB]">
+              <div className="absolute right-0 top-full mt-2 w-[calc(100vw-24px)] sm:w-96 rounded-2xl shadow-lg border overflow-hidden z-[9999] bg-white border-border-muted">
+                <div className="p-3 border-b border-border-muted">
                   <div className="flex items-center gap-3">
-                    <Search size={18} className="text-[#6B5D4F]" />
+                    <Search size={18} className="text-content-secondary" />
                     <input
                       type="text"
                       placeholder={t('header.searchScreens')}
@@ -395,10 +353,10 @@ const AppHeader = ({
                           setSearchQuery('');
                         }
                       }}
-                      className="flex-1 bg-transparent text-sm outline-none text-[#2C2417] placeholder:text-[#8C8178]"
+                      className="flex-1 bg-transparent text-sm outline-none text-content placeholder:text-content-muted"
                     />
                     {searchQuery && (
-                      <button onClick={() => setSearchQuery('')} className="p-0.5 rounded text-[#8C8178] hover:text-[#6B5D4F]">
+                      <button onClick={() => setSearchQuery('')} className="p-0.5 rounded text-content-muted hover:text-content-secondary">
                         <span className="text-xs">{t('common.clearAll') || 'Clear'}</span>
                       </button>
                     )}
@@ -417,131 +375,101 @@ const AppHeader = ({
                             setShowSearch(false);
                             setSearchQuery('');
                           }}
-                          className="w-full flex items-center gap-3 px-4 py-2.5 transition-colors hover:bg-[#FBF9F7] text-[#2C2417]"
+                          className="w-full flex items-center gap-3 px-4 py-2.5 transition-colors hover:bg-surface-secondary text-content"
                         >
-                          <ResultIcon size={16} className="text-[#C4975A]" />
+                          <ResultIcon size={16} className="text-dafc-gold" />
                           <div className="flex-1 text-left">
-                            <div className="text-sm font-medium font-['Montserrat']">{result.label}</div>
+                            <div className="text-sm font-medium font-brand">{result.label}</div>
                             {result.step && (
-                              <div className="text-xs text-[#8C8178]">Step {result.step}</div>
+                              <div className="text-xs text-content-muted">Step {result.step}</div>
                             )}
                           </div>
-                          <ChevronRight size={14} className="text-[#E8E2DB]" />
+                          <ChevronRight size={14} className="text-border" />
                         </button>
                       );
                     })}
                   </div>
                 ) : searchQuery.trim() ? (
-                  <div className="px-4 py-6 text-center text-sm text-[#8C8178]">
+                  <div className="px-4 py-6 text-center text-sm text-content-muted">
                     {t('common.noResults') || 'No results found'}
                   </div>
                 ) : (
-                  <div className="p-2 text-center text-xs text-[#6B5D4F]">
-                    {t('header.typeToSearch')} <kbd className="px-1 py-0.5 rounded bg-[#FBF9F7] text-[#6B5D4F] border border-[#E8E2DB]">ESC</kbd> {t('header.toClose')}
+                  <div className="p-2 text-center text-xs text-content-secondary">
+                    {t('header.typeToSearch')} <kbd className="px-1 py-0.5 rounded bg-surface-secondary text-content-secondary border border-border-muted">ESC</kbd> {t('header.toClose')}
                   </div>
                 )}
               </div>
             )}
           </div>
 
-          {/* Divider */}
-          <div className="w-px h-4 mx-1" style={{
-            background: 'linear-gradient(180deg, transparent 0%, rgba(196,151,90,0.25) 50%, transparent 100%)',
-          }} />
-
-          {/* Language Toggle */}
+          {/* Language Toggle — plain text ghost */}
           <button
             onClick={() => setLanguage(language === 'en' ? 'vi' : 'en')}
-            className="relative p-1.5 rounded-md transition-all duration-200 group hover:bg-[rgba(196,151,90,0.08)]"
+            className="p-1.5 rounded-lg transition-all duration-200 text-content-muted hover:text-dafc-gold-darker"
             title={language === 'en' ? 'Chuyển sang Tiếng Việt' : 'Switch to English'}
           >
-            <span className="text-[11px] font-bold font-['JetBrains_Mono'] text-[#7D5A28]">
+            <span className="text-[11px] font-bold font-data">
               {language === 'en' ? 'EN' : 'VN'}
             </span>
           </button>
 
-          {/* Notification Bell */}
+          {/* Notification Bell — ghost, small dot instead of numbered badge */}
           <div className="relative" ref={notificationRef}>
             <button
               onClick={() => setShowNotifications(!showNotifications)}
-              className={`relative p-1.5 rounded-md transition-all duration-200 ${
+              className={`relative p-1.5 rounded-lg transition-all duration-200 ${
                 showNotifications
-                  ? 'bg-[rgba(196,151,90,0.12)]'
-                  : 'hover:bg-[rgba(196,151,90,0.08)]'
+                  ? 'text-dafc-gold'
+                  : 'text-content-muted hover:text-content-secondary'
               }`}
             >
-              <Bell size={15} strokeWidth={2} className={
-                showNotifications
-                  ? 'text-[#C4975A]'
-                  : 'text-[#6B5D4F]'
-              } style={showNotifications ? { filter: 'drop-shadow(0 0 3px rgba(196,151,90,0.4))' } : undefined} />
-
-              {/* Badge */}
+              <Bell size={16} strokeWidth={2} />
+              {/* Small dot indicator */}
               {budgetAlerts.length > 0 && (
-                <span className={`absolute -top-1 -right-1 min-w-[14px] h-[14px] px-0.5 rounded-full text-white text-[8px] flex items-center justify-center font-['JetBrains_Mono'] font-bold shadow-lg ${
-                  hasCritical
-                    ? 'bg-gradient-to-r from-[#DC3545] to-[#E85D6B] shadow-[rgba(220,53,69,0.3)] animate-pulse'
-                    : 'bg-gradient-to-r from-[#C4975A] to-[#A67B3D] shadow-[rgba(196,151,90,0.3)]'
-                }`}>
-                  {budgetAlerts.length > 9 ? '9+' : budgetAlerts.length}
-                </span>
+                <span className={`absolute top-1 right-1 w-2 h-2 rounded-full ${
+                  hasCritical ? 'bg-status-critical' : 'bg-dafc-gold'
+                }`} />
               )}
             </button>
 
             {/* Notification Dropdown */}
             {showNotifications && (
-              <div className="absolute right-0 top-full mt-2 w-80 rounded-xl border overflow-hidden z-50 bg-white border-[#E8E2DB]"
-                style={{ boxShadow: '0 8px 32px rgba(44,36,23,0.06)' }}
-              >
+              <div className="absolute right-0 top-full mt-2 w-80 rounded-2xl border overflow-hidden z-50 bg-white border-border-muted shadow-lg">
+
                 {/* Header */}
-                <div className="px-4 py-3 border-b flex items-center justify-between border-[#E8E2DB] bg-[#FBF9F7]">
+                <div className="px-4 py-3 border-b flex items-center justify-between border-border-muted bg-surface-secondary">
                   <div className="flex items-center gap-2">
-                    <Sparkles size={14} className="text-[#C4975A]" />
-                    <h3 className="text-sm font-semibold font-['Montserrat'] text-[#2C2417]">
+                    <Sparkles size={14} className="text-dafc-gold" />
+                    <h3 className="text-sm font-semibold font-brand text-content">
                       {t('header.budgetAlerts')}
                     </h3>
                   </div>
-                  {budgetAlerts.length > 0 && (
-                    <span className={`text-xs font-['JetBrains_Mono'] px-2 py-0.5 rounded-full ${
-                      hasCritical
-                        ? 'bg-red-100 text-[#DC3545]'
-                        : 'bg-amber-100 text-[#D97706]'
-                    }`}>
-                      {budgetAlerts.length} {budgetAlerts.length !== 1 ? t('header.alerts') : t('header.alert')}
-                    </span>
-                  )}
                 </div>
 
                 {/* Alert List */}
                 <div className="max-h-80 overflow-y-auto">
                   {budgetAlerts.length === 0 ? (
-                    <div className="px-4 py-8 text-center text-sm text-[#8C8178]">
+                    <div className="px-4 py-8 text-center text-sm text-content-muted">
                       {t('header.noAlerts')}
                     </div>
                   ) : (
                     budgetAlerts.slice(0, 8).map((alert, idx) => (
                       <div
                         key={alert.id}
-                        className={`px-4 py-3 flex gap-3 cursor-pointer transition-all duration-200 border-l-2 hover:bg-[rgba(196,151,90,0.08)] border-transparent hover:border-[#C4975A] ${getAlertBg(alert.severity)} ${idx !== Math.min(budgetAlerts.length, 8) - 1 ? 'border-b border-b-[#F0EBE5]' : ''}`}
+                        className={`px-4 py-3 flex gap-3 cursor-pointer transition-all duration-200 border-l-2 hover:bg-surface-secondary border-transparent hover:border-dafc-gold ${idx !== Math.min(budgetAlerts.length, 8) - 1 ? 'border-b border-b-border-muted' : ''}`}
                       >
-                        <div className={`mt-0.5 p-1.5 rounded-lg ${
-                          alert.severity === 'critical'
-                            ? 'bg-[rgba(220,53,69,0.10)]'
-                            : alert.severity === 'warning'
-                              ? 'bg-[rgba(217,119,6,0.10)]'
-                              : 'bg-[rgba(27,107,69,0.10)]'
-                        }`}>
+                        <div className="mt-0.5">
                           {getAlertIcon(alert.severity)}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <div className="text-sm font-medium truncate text-[#2C2417]">
+                          <div className="text-sm font-medium truncate text-content">
                             {alert.title}
                           </div>
-                          <div className="text-xs mt-0.5 line-clamp-2 text-[#6B5D4F]">
+                          <div className="text-xs mt-0.5 line-clamp-2 text-content-secondary">
                             {alert.message}
                           </div>
                           {alert.budget && (
-                            <div className="text-[10px] font-['JetBrains_Mono'] mt-1.5 text-[#8C8178]">
+                            <div className="text-[10px] font-data mt-1.5 text-content-muted">
                               {alert.budget.groupBrand?.name} — {alert.budget.budgetCode}
                             </div>
                           )}
@@ -552,8 +480,8 @@ const AppHeader = ({
                 </div>
 
                 {/* Footer */}
-                <div className="px-4 py-2.5 border-t border-[#E8E2DB] bg-[#FBF9F7]">
-                  <button className="w-full text-center text-xs font-semibold font-['Montserrat'] text-[#C4975A] hover:text-[#A67B3D] transition-colors py-1">
+                <div className="px-4 py-2.5 border-t border-border-muted bg-surface-secondary">
+                  <button className="w-full text-center text-xs font-semibold font-brand text-dafc-gold hover:text-dafc-gold-dark transition-colors py-1">
                     {t('header.viewAllAlerts')}
                   </button>
                 </div>
@@ -561,25 +489,28 @@ const AppHeader = ({
             )}
           </div>
 
-          {/* Print + Save — moved to header row, hidden on Tickets pages */}
+          {/* Print + Save — planning workflow only */}
           {isInPlanningWorkflow && currentScreen !== 'tickets' && currentScreen !== 'ticket-detail' && (
           <>
-            <div className="w-px h-4 mx-1" style={{
-              background: 'linear-gradient(180deg, transparent 0%, rgba(196,151,90,0.25) 50%, transparent 100%)',
-            }} />
+            <div className="w-px h-4 mx-1 bg-border-muted" />
             <div className="flex items-center gap-2 shrink-0">
               <button
                 onClick={() => window.print()}
-                className="no-print px-1.5 py-1 rounded-lg transition-colors text-[#8C8178] hover:bg-[rgba(196,151,90,0.12)] hover:text-[#7D5A28]"
+                className="no-print p-1.5 rounded-lg transition-colors text-content-muted hover:text-content-secondary"
                 title={t('common.print')}
               >
                 <Printer size={14} />
               </button>
               <div className="relative" ref={saveButtonRef}>
-                <div className="inline-flex items-stretch rounded-lg border border-[rgba(196,151,90,0.3)] overflow-hidden">
+                <div className="inline-flex items-stretch rounded-xl overflow-hidden">
                   <button
-                    onClick={() => console.log('Save')}
-                    className="flex items-center px-2 py-1 transition-colors bg-[#C4975A] text-white hover:bg-[#A67B3D]"
+                    onClick={async () => {
+                      if (hasSaveHandler) {
+                        await triggerSave();
+                      }
+                    }}
+                    disabled={!hasSaveHandler}
+                    className={`flex items-center px-3 py-1.5 transition-colors ${hasSaveHandler ? 'bg-dafc-gold text-white hover:bg-dafc-gold-dark' : 'bg-dafc-gold/50 text-white/70 cursor-not-allowed'}`}
                     title={t('header.save')}
                   >
                     <Save size={14} />
@@ -592,7 +523,7 @@ const AppHeader = ({
                       }
                       setOpenSaveMenu(!openSaveMenu);
                     }}
-                    className="flex items-center px-1 py-1 border-l border-[rgba(255,255,255,0.2)] transition-colors bg-[#C4975A] text-white hover:bg-[#A67B3D]"
+                    className="flex items-center px-1.5 py-1.5 border-l border-white/20 transition-colors bg-dafc-gold text-white hover:bg-dafc-gold-dark"
                   >
                     <ChevronDown size={12} className={`transition-transform ${openSaveMenu ? 'rotate-180' : ''}`} />
                   </button>
@@ -604,99 +535,72 @@ const AppHeader = ({
         </div>
       </div>
 
-      {/* KPI Tracking Bar - Only show for Planning workflow, hidden on mobile */}
+      {/* KPI Dot Stepper — only for Planning workflow, hidden on mobile */}
       {!isMobile && currentScreen !== 'budget-management' && isInPlanningWorkflow && (
-        <div className="px-4 py-1.5" style={{
-          borderBottom: '1px solid #E8E2DB',
-          background: 'linear-gradient(90deg, #FAF8F5 0%, #FFFFFF 50%, #FAF8F5 100%)',
-        }}>
-          <div className="flex items-center gap-3">
-            {/* Step Progress */}
-            <div className="flex items-center gap-1">
-              {PLANNING_STEPS.map((step, index) => {
-                const config = SCREEN_CONFIG[step.id];
-                const Icon = config.icon;
-                const isCompleted = index < currentStepIndex;
-                const isCurrent = index === currentStepIndex;
-                const kpi = kpiData[step.id] || { value: 0, status: 'pending' };
+        <div className="px-5 pb-2.5">
+          <div className="flex items-center gap-1">
+            {PLANNING_STEPS.map((step, index) => {
+              const config = SCREEN_CONFIG[step.id];
+              const isCompleted = index < currentStepIndex;
+              const isCurrent = index === currentStepIndex;
 
-                return (
-                  <React.Fragment key={step.id}>
-                    {index > 0 && (
-                      <div className="w-4 h-[1.5px] rounded-full transition-all duration-300" style={{
-                        background: isCompleted
-                          ? 'linear-gradient(90deg, #1B6B45, #1B6B45)'
-                          : '#E8E2DB',
-                      }} />
-                    )}
-                    <button
-                      onClick={() => onNavigate(step.id)}
-                      className="flex items-center gap-1.5 px-2 py-1 rounded-md transition-all duration-200"
-                      style={{
-                        background: isCurrent
-                          ? 'linear-gradient(135deg, rgba(196,151,90,0.08) 0%, rgba(196,151,90,0.16) 100%)'
-                          : isCompleted
-                            ? 'linear-gradient(135deg, rgba(27,107,69,0.06) 0%, rgba(27,107,69,0.12) 100%)'
-                            : 'transparent',
-                        border: `1px solid ${
-                          isCurrent ? 'rgba(196,151,90,0.2)' : isCompleted ? 'rgba(27,107,69,0.2)' : 'transparent'
-                        }`,
-                      }}
-                    >
-                      <div className={`p-0.5 rounded ${
-                        isCurrent ? 'bg-[#C4975A]' : isCompleted ? 'bg-[#1B6B45]' : 'bg-[#E8E2DB]'
-                      }`}>
-                        {isCompleted ? (
-                          <CheckCircle size={10} className="text-white" strokeWidth={2.5} />
-                        ) : (
-                          <Icon size={10} className={isCurrent ? 'text-white' : 'text-[#8C8178]'} strokeWidth={2.5} />
-                        )}
-                      </div>
-                      <div className="text-left">
-                        <div className={`text-[11px] font-semibold font-['Montserrat'] leading-tight ${
-                          isCurrent ? 'text-[#C4975A]' : isCompleted ? 'text-[#1B6B45]' : 'text-[#8C8178]'
-                        }`}>
-                          {config.shortLabel}
-                        </div>
-                        <div className="flex items-center gap-0.5">
-                          {kpi.status === 'completed' ? (
-                            <CheckCircle size={7} className="text-[#1B6B45]" />
-                          ) : kpi.status === 'in-progress' ? (
-                            <Clock size={7} className="text-[#D97706]" />
-                          ) : (
-                            <Target size={7} className="text-[#E8E2DB]" />
-                          )}
-                          <span className="text-[8px] font-['JetBrains_Mono'] text-[#8C8178]">
-                            {kpi.value} {config.kpiLabel}
-                          </span>
-                        </div>
-                      </div>
-                    </button>
-                  </React.Fragment>
-                );
-              })}
-            </div>
+              return (
+                <React.Fragment key={step.id}>
+                  {index > 0 && (
+                    <div className={`h-px flex-1 transition-all duration-300 ${
+                      isCompleted ? 'bg-dafc-gold' : 'bg-border-muted'
+                    }`} />
+                  )}
+                  <button
+                    onClick={() => onNavigate(step.id)}
+                    className="group flex flex-col items-center gap-1"
+                    title={config.shortLabel}
+                  >
+                    <div className={`rounded-full transition-all duration-200 ${
+                      isCompleted
+                        ? 'w-3 h-3 bg-dafc-gold'
+                        : isCurrent
+                          ? 'w-3 h-3 border-2 border-dafc-gold bg-transparent'
+                          : 'w-2 h-2 bg-border'
+                    }`} />
+                    <span className={`text-[9px] font-brand font-medium ${
+                      isCurrent ? 'text-dafc-gold' : isCompleted ? 'text-content-secondary' : 'text-content-muted'
+                    }`}>
+                      {config.shortLabel}
+                    </span>
+                  </button>
+                </React.Fragment>
+              );
+            })}
           </div>
+          {/* Mobile fallback */}
+          {isMobile && (
+            <div className="text-[10px] font-data text-content-muted">
+              Step {currentStepIndex + 1}/{PLANNING_STEPS.length}
+            </div>
+          )}
         </div>
       )}
 
       {/* Save Dropdown Menu - Portal to body */}
       {openSaveMenu && createPortal(
         <div
-          className="fixed w-56 border rounded-xl overflow-hidden bg-white border-[#E8E2DB]"
+          className="fixed w-56 border rounded-2xl overflow-hidden bg-white border-border-muted shadow-lg"
           style={{
             top: saveMenuPosition.top,
             right: saveMenuPosition.right,
             zIndex: 99999,
-            boxShadow: '0 8px 32px rgba(44,36,23,0.06)',
           }}
         >
           <button
-            onClick={() => {
-              console.log('Save');
+            onClick={async () => {
+              if (hasSaveHandler) {
+                await triggerSave();
+              }
               setOpenSaveMenu(false);
             }}
-            className="w-full px-4 py-3 flex items-center gap-3 text-left text-sm font-medium transition-colors hover:bg-[rgba(196,151,90,0.08)] text-[#2C2417]"
+            disabled={!hasSaveHandler}
+            className={`w-full px-4 py-3 flex items-center gap-3 text-left text-sm font-medium transition-colors ${hasSaveHandler ? 'hover:bg-surface-secondary text-content' : 'text-content-muted cursor-not-allowed'}`}
           >
             <Save size={14} className="shrink-0" />
             {t('header.save')}
@@ -706,7 +610,7 @@ const AppHeader = ({
               console.log('Save As New Version');
               setOpenSaveMenu(false);
             }}
-            className="w-full px-4 py-3 flex items-center gap-3 text-left text-sm font-medium border-t transition-colors border-[#E8E2DB] hover:bg-[rgba(196,151,90,0.08)] text-[#2C2417]"
+            className="w-full px-4 py-3 flex items-center gap-3 text-left text-sm font-medium border-t transition-colors border-border-muted hover:bg-surface-secondary text-content"
           >
             <Layers size={14} className="shrink-0" />
             {t('header.saveAsNewVersion')}
