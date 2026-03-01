@@ -7,7 +7,7 @@
 
 ---
 
-## Cap nhat lan cuoi: 10/02/2026 (Session 11 - QA Bug Fixes)
+## Cap nhat lan cuoi: 01/03/2026 (Session 12 - Codebase Cleanup & Performance)
 
 ---
 
@@ -631,6 +631,78 @@ npm run dev
 
 ---
 
+## SESSION 01/03/2026 - Session 12
+
+### Thay doi chinh: Codebase Cleanup & Performance Optimization
+
+Audit toan bo codebase (32,882 lines, 127 files). Xoa dead code, memoize filter options, compress logo, fix React keys.
+
+1. **Phase 1: Delete Dead Code (-901 lines)**
+   - Xoa 4 unused component files: `AddSKUModal.jsx`, `AllocationSidePanel.jsx`, `ProposalTicketReview.jsx`, `VersionCompareModal.jsx`
+   - Xoa 2 unused UI components: `CreatableSelect.jsx`, `PrintButton.jsx` + remove barrel exports tu `ui/index.js`
+   - Xoa 8 unused methods tu `aiService.js`: `calculateSizeCurve`, `markAlertRead`, `triggerAlertCheck`, `generateAllocation`, `getAllocationRecommendations`, `applyAllocationRecommendations`, `compareAllocation`, `getSkuRecommendations`
+
+2. **Phase 2: Remove Debug console.log (4 cho)**
+   - `TicketScreen.jsx:500` — `console.log('Creating ticket:', newTicket)`
+   - `proposal/[id]/page.jsx:27` — `console.log('Saving proposal:', data)`
+   - `proposal/page.jsx:31` — `console.log('Saving proposal:', data)`
+   - `AppHeader.jsx:615` — `console.log('Save As New Version')`
+   - Giu lai: tat ca `console.error` trong catch blocks
+
+3. **Phase 3: Memoize Filter Options (IMPACT CAO NHAT)**
+   - `SKUProposalScreen.jsx`: 8 `useMemo` wrappers cho FilterSelect option arrays (fyOptions, budgetOptions, seasonGroup, season, brand, gender, category, subCategory)
+   - `BudgetManagementScreen.jsx`: 3 `useMemo` wrappers (YEARS, groupBrandCategories, apiBrands)
+   - `OTBAnalysisScreen.jsx`: Extract inline onClick → `useCallback` (`handleOpenSkuProposal`)
+
+4. **Phase 4: Compress Logo (93% reduction)**
+   - `public/dafc-logo.png`: 2000x1068 (386KB) → 400x214 (28KB)
+   - Logo chi dung o h-9 (36px), 400px width du cho retina
+
+5. **Phase 5: Fix Index-based Keys (16 instances)**
+   - `BudgetAnalyticsScreen.jsx`: 4 cho → `key={kpi.label}`, `key={a.title}`, `key={row.dimensionValue}`, `key={skeleton-${i}}`
+   - `CategoryTrendsScreen.jsx`: 4 cho → `key={kpi.label}`, `key={attr.attributeValue}`, `key={row.attributeValue}`, `key={g.gender}`
+   - `HomeScreen.jsx`: 4 cho → `key={seg.label}`, `key={cx-cy}`, `key={s.label}`, `key={alert.title}`
+   - `SalesPerformanceScreen.jsx`: 5 cho → `key={kpi.label}`, `key={sku.skuCode}` (x2), `key={dim.dimensionValue}`, `key={row.productType}`
+
+6. **Bonus Fixes (phat hien khi test)**
+   - `BudgetManagementScreen.jsx`: Fix crash "Objects are not valid as React child" — `createdBy` object `{id, name, email}` render truc tiep → extract `.name`
+   - `locales/en.js` + `vi.js`: Them missing i18n key `skuProposal.allBudgets`
+
+### Build Verification
+- 22 static + dynamic routes, compiled 4.7s, 0 errors
+- Net change: **+84 / -985 lines** (901 lines removed)
+
+### Files da thay doi (24 files)
+```
+# Deleted files (6)
+src/components/AddSKUModal.jsx              # Unused component
+src/components/AllocationSidePanel.jsx      # Unused component
+src/components/ProposalTicketReview.jsx     # Unused component
+src/components/VersionCompareModal.jsx      # Unused component
+src/components/ui/CreatableSelect.jsx       # Unused UI component
+src/components/ui/PrintButton.jsx           # Unused UI component
+
+# Modified files (18)
+src/services/aiService.js                   # -8 unused methods
+src/components/ui/index.js                  # Remove 2 barrel exports
+src/screens/SKUProposalScreen.jsx           # +8 useMemo filter options
+src/screens/BudgetManagementScreen.jsx      # +3 useMemo + fix createdBy crash
+src/screens/OTBAnalysisScreen.jsx           # +1 useCallback
+src/screens/BudgetAnalyticsScreen.jsx       # Fix 4 index keys
+src/screens/CategoryTrendsScreen.jsx        # Fix 4 index keys
+src/screens/HomeScreen.jsx                  # Fix 4 index keys
+src/screens/SalesPerformanceScreen.jsx      # Fix 5 index keys
+src/screens/TicketScreen.jsx                # Remove console.log
+src/components/Layout/AppHeader.jsx         # Remove console.log
+src/app/(dashboard)/proposal/[id]/page.jsx  # Remove console.log
+src/app/(dashboard)/proposal/page.jsx       # Remove console.log
+src/locales/en.js                           # +allBudgets key
+src/locales/vi.js                           # +allBudgets key
+public/dafc-logo.png                        # 386KB → 28KB
+```
+
+---
+
 ## SESSION 10/02/2026 - Session 11
 
 ### Thay doi chinh: QA Bug Fixes (6 bugs tu customer feedback)
@@ -903,7 +975,7 @@ src/locales/vi.js                             # 105+ new keys
 - [ ] TicketScreen.jsx: TODO - Implement create ticket API call (line 546)
 - [ ] Azure Portal manual config (Node 22 LTS, `node .next/standalone/server.js` / `node dist/src/main.js`, env vars)
 - [ ] E2E testing (test suite co san, chua chay)
-- [ ] Performance tuning
+- [x] ~~Performance tuning~~ → Done Session 12 (memoize filters, compress logo, fix keys, delete dead code)
 - [ ] Mobile responsive testing
 - [ ] Hardcoded years (2025) o nhieu noi can dynamic
 
