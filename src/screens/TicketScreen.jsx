@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { Eye, Loader2, Plus, X, LayoutList, LayoutGrid, Ticket, CircleCheckBig, DollarSign } from 'lucide-react';
 import TicketKanbanBoard from '../components/TicketKanbanBoard';
 import { ExpandableStatCard } from '../components/Common';
@@ -8,7 +8,8 @@ import { budgetService, planningService, proposalService } from '../services';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useIsMobile } from '@/hooks/useIsMobile';
-import { MobileDataCard } from '@/components/ui';
+import { MobileDataCard, TableSkeleton } from '@/components/ui';
+import FloatingActionButton from '@/components/mobile/FloatingActionButton';
 import { formatCurrency, formatDate } from '../utils';
 
 /* =========================
@@ -77,88 +78,81 @@ const TicketScreen = ({ onOpenTicketDetail }) => {
   }, [showCreatePopup]);
 
   // Fetch all tickets (budgets, plannings, proposals)
-  useEffect(() => {
+  const fetchTickets = useCallback(async () => {
     if (!isAuthenticated) return;
+    setLoading(true);
+    setError(null);
+    try {
+      const [budgetsRes, planningsRes, proposalsRes] = await Promise.all([
+        budgetService.getAll().catch(() => ({ data: [] })),
+        planningService.getAll().catch(() => ({ data: [] })),
+        proposalService.getAll().catch(() => ({ data: [] }))
+      ]);
 
-    const fetchTickets = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        // Fetch all entities from different sources
-        const [budgetsRes, planningsRes, proposalsRes] = await Promise.all([
-          budgetService.getAll().catch(() => ({ data: [] })),
-          planningService.getAll().catch(() => ({ data: [] })),
-          proposalService.getAll().catch(() => ({ data: [] }))
-        ]);
+      const allTickets = [];
 
-        const allTickets = [];
-
-        // Transform budgets to tickets
-        (budgetsRes.data || budgetsRes || []).forEach(b => {
-          allTickets.push({
-            id: b.id,
-            entityType: 'budget',
-            name: `${b.groupBrand?.name || 'Budget'} - ${b.seasonGroupId || ''} ${b.seasonType || ''}`,
-            brand: b.groupBrand?.name || '-',
-            seasonGroup: b.seasonGroupId || '-',
-            season: b.seasonType || '-',
-            createdBy: b.createdBy?.name || 'System',
-            createdOn: b.createdAt ? formatDate(b.createdAt) : '-',
-            status: b.status,
-            totalBudget: Number(b.totalBudget) || 0,
-            data: b
-          });
+      (budgetsRes.data || budgetsRes || []).forEach(b => {
+        allTickets.push({
+          id: b.id,
+          entityType: 'budget',
+          name: `${b.groupBrand?.name || 'Budget'} - ${b.seasonGroupId || ''} ${b.seasonType || ''}`,
+          brand: b.groupBrand?.name || '-',
+          seasonGroup: b.seasonGroupId || '-',
+          season: b.seasonType || '-',
+          createdBy: b.createdBy?.name || 'System',
+          createdOn: b.createdAt ? formatDate(b.createdAt) : '-',
+          status: b.status,
+          totalBudget: Number(b.totalBudget) || 0,
+          data: b
         });
+      });
 
-        // Transform plannings to tickets
-        (planningsRes.data || planningsRes || []).forEach(p => {
-          allTickets.push({
-            id: p.id,
-            entityType: 'planning',
-            name: p.planningCode || `Planning ${p.versionName || ''}`,
-            brand: p.budgetDetail?.budget?.groupBrand?.name || '-',
-            seasonGroup: p.budgetDetail?.budget?.seasonGroupId || '-',
-            season: p.budgetDetail?.budget?.seasonType || '-',
-            createdBy: p.createdBy?.name || 'System',
-            createdOn: formatDate(p.createdAt) !== '—' ? formatDate(p.createdAt) : '-',
-            status: p.status,
-            totalBudget: Number(p.budgetDetail?.budgetAmount) || 0,
-            data: p
-          });
+      (planningsRes.data || planningsRes || []).forEach(p => {
+        allTickets.push({
+          id: p.id,
+          entityType: 'planning',
+          name: p.planningCode || `Planning ${p.versionName || ''}`,
+          brand: p.budgetDetail?.budget?.groupBrand?.name || '-',
+          seasonGroup: p.budgetDetail?.budget?.seasonGroupId || '-',
+          season: p.budgetDetail?.budget?.seasonType || '-',
+          createdBy: p.createdBy?.name || 'System',
+          createdOn: formatDate(p.createdAt) !== '—' ? formatDate(p.createdAt) : '-',
+          status: p.status,
+          totalBudget: Number(p.budgetDetail?.budgetAmount) || 0,
+          data: p
         });
+      });
 
-        // Transform proposals to tickets
-        (proposalsRes.data || proposalsRes || []).forEach(pr => {
-          allTickets.push({
-            id: pr.id,
-            entityType: 'proposal',
-            name: pr.proposalCode || `Proposal ${pr.versionName || ''}`,
-            brand: pr.planning?.budgetDetail?.budget?.groupBrand?.name || '-',
-            seasonGroup: pr.planning?.budgetDetail?.budget?.seasonGroupId || '-',
-            season: pr.planning?.budgetDetail?.budget?.seasonType || '-',
-            createdBy: pr.createdBy?.name || 'System',
-            createdOn: formatDate(pr.createdAt) !== '—' ? formatDate(pr.createdAt) : '-',
-            status: pr.status,
-            totalBudget: 0,
-            data: pr
-          });
+      (proposalsRes.data || proposalsRes || []).forEach(pr => {
+        allTickets.push({
+          id: pr.id,
+          entityType: 'proposal',
+          name: pr.proposalCode || `Proposal ${pr.versionName || ''}`,
+          brand: pr.planning?.budgetDetail?.budget?.groupBrand?.name || '-',
+          seasonGroup: pr.planning?.budgetDetail?.budget?.seasonGroupId || '-',
+          season: pr.planning?.budgetDetail?.budget?.seasonType || '-',
+          createdBy: pr.createdBy?.name || 'System',
+          createdOn: formatDate(pr.createdAt) !== '—' ? formatDate(pr.createdAt) : '-',
+          status: pr.status,
+          totalBudget: 0,
+          data: pr
         });
+      });
 
-        // Sort by created date descending
-        allTickets.sort((a, b) => new Date(b.createdOn) - new Date(a.createdOn));
+      allTickets.sort((a, b) => new Date(b.createdOn) - new Date(a.createdOn));
+      setTickets(allTickets);
+    } catch (err) {
+      console.error('Failed to fetch tickets:', err);
+      setError(t('ticket.failedToLoadTickets'));
+      setTickets([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [isAuthenticated, t]);
 
-        setTickets(allTickets);
-      } catch (err) {
-        console.error('Failed to fetch tickets:', err);
-        setError(t('ticket.failedToLoadTickets'));
-        setTickets([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
+  useEffect(() => {
     fetchTickets();
-  }, [isAuthenticated]);
+  }, [fetchTickets]);
 
   // Calculate stats
   const ticketStats = useMemo(() => {
@@ -272,13 +266,15 @@ const TicketScreen = ({ onOpenTicketDetail }) => {
             </button>
           </div>
 
-          <button
-            onClick={() => setShowCreatePopup(true)}
-            className="inline-flex items-center gap-1 px-2.5 py-1 text-[11px] font-medium rounded-md transition-all duration-150 bg-dafc-gold text-white hover:bg-[#A67B3D]"
-          >
-            <Plus size={12} />
-            {t('ticket.createTicket')}
-          </button>
+          {!isMobile && (
+            <button
+              onClick={() => setShowCreatePopup(true)}
+              className="inline-flex items-center gap-1 px-2.5 py-1 text-[11px] font-medium rounded-md transition-all duration-150 bg-dafc-gold text-white hover:bg-[#A67B3D]"
+            >
+              <Plus size={12} />
+              {t('ticket.createTicket')}
+            </button>
+          )}
         </div>
       </div>
 
@@ -317,13 +313,13 @@ const TicketScreen = ({ onOpenTicketDetail }) => {
 
       {/* ===== TICKET CONTENT ===== */}
       {loading ? (
-        <div className="border rounded-lg p-8 flex flex-col items-center justify-center bg-white border-border-muted text-content-muted">
-          <Loader2 size={24} className="animate-spin mb-2" />
-          <span className="text-xs">{t('ticket.loadingTickets')}</span>
-        </div>
+        <TableSkeleton rows={8} columns={6} />
       ) : error ? (
-        <div className="border rounded-lg p-4 text-center text-xs bg-white border-border-muted text-[#DC3545]">
-          {t('ticket.failedToLoadTickets')}: {error}
+        <div className="border rounded-lg p-4 text-center bg-white border-border-muted">
+          <p className="text-xs text-[#DC3545] mb-3">{t('ticket.failedToLoadTickets')}: {error}</p>
+          <button onClick={fetchTickets} className="px-4 py-2 rounded-xl bg-[#C4975A] text-white text-xs font-medium font-brand">
+            {t('common.retry')}
+          </button>
         </div>
       ) : viewMode === 'kanban' ? (
         <TicketKanbanBoard
@@ -520,6 +516,15 @@ const TicketScreen = ({ onOpenTicketDetail }) => {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Mobile FAB */}
+      {isMobile && (
+        <FloatingActionButton
+          actions={[
+            { label: t('ticket.createTicket'), icon: Plus, onClick: () => setShowCreatePopup(true), color: '#C4975A' },
+          ]}
+        />
       )}
     </div>
   );

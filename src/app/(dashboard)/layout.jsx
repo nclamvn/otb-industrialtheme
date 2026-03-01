@@ -1,4 +1,5 @@
 'use client';
+import { useState, useEffect, useCallback } from 'react';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAppContext } from '@/contexts/AppContext';
@@ -9,6 +10,8 @@ import { Sidebar } from '@/components/Layout';
 import AppHeader from '@/components/Layout/AppHeader';
 import MobileBottomNav from '@/components/Layout/MobileBottomNav';
 import { BudgetModal } from '@/components/Common';
+import NetworkStatusBanner from '@/components/ui/NetworkStatusBanner';
+import KeyboardShortcutsModal from '@/components/ui/KeyboardShortcutsModal';
 
 export default function DashboardLayout({ children }) {
   const pathname = usePathname();
@@ -17,6 +20,20 @@ export default function DashboardLayout({ children }) {
   const { isMobile } = useIsMobile();
 
   const currentScreen = getScreenIdFromPathname(pathname);
+  const [showKeyboardHelp, setShowKeyboardHelp] = useState(false);
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      // Don't trigger if typing in an input
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
+      if (e.key === '?') {
+        e.preventDefault();
+        setShowKeyboardHelp(true);
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   const {
     selectedYear,
@@ -57,6 +74,7 @@ export default function DashboardLayout({ children }) {
             />
           </div>
 
+          <NetworkStatusBanner />
           <div className={`flex-1 overflow-y-auto ${isMobile ? 'p-3 pb-[80px]' : 'px-5 pt-2 pb-5'}`}>
             {children}
           </div>
@@ -69,6 +87,8 @@ export default function DashboardLayout({ children }) {
             darkMode={darkMode}
           />
         )}
+
+        <KeyboardShortcutsModal isOpen={showKeyboardHelp} onClose={() => setShowKeyboardHelp(false)} />
 
         {showBudgetForm && selectedCell && (
           <BudgetModal

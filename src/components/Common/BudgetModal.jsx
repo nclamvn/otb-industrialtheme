@@ -1,8 +1,9 @@
 'use client';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { X, Save, Sparkles, FileText, DollarSign, TrendingUp } from 'lucide-react';
 import { formatCurrency } from '../../utils';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useFocusTrap } from '@/hooks/useFocusTrap';
 
 const BudgetModal = ({
   selectedCell,
@@ -15,6 +16,25 @@ const BudgetModal = ({
   handleStoreAllocationChange
 }) => {
   const { t } = useLanguage();
+  const [errors, setErrors] = useState({});
+  const modalRef = useRef(null);
+  useFocusTrap(modalRef);
+
+  const validate = useCallback(() => {
+    const newErrors = {};
+    const total = calculateTotalBudget();
+    if (total <= 0) {
+      newErrors.total = t('validation.minValue', { field: t('components.totalBudget'), min: '0' }) || 'Total must be greater than 0';
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  }, [calculateTotalBudget, t]);
+
+  const handleSave = () => {
+    if (validate()) {
+      onSave();
+    }
+  };
 
   useEffect(() => {
     document.body.style.overflow = 'hidden';
@@ -26,11 +46,20 @@ const BudgetModal = ({
     };
   }, []);
 
+  // ESC key to close modal
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') onClose();
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
+
   if (!selectedCell) return null;
 
   return (
     <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-in fade-in duration-300 overflow-y-auto" style={{ pointerEvents: 'auto' }}>
-      <div className="bg-white rounded-3xl shadow-2xl max-w-4xl w-full my-8 flex flex-col transform animate-in zoom-in-95 duration-300 border border-[#E8E2DB]" style={{ pointerEvents: 'auto', boxShadow: '0 16px 48px rgba(44,36,23,0.12)' }}>
+      <div ref={modalRef} className="bg-white rounded-3xl shadow-2xl max-w-4xl w-full my-8 flex flex-col transform animate-in zoom-in-95 duration-300 border border-[#E8E2DB]" style={{ pointerEvents: 'auto', boxShadow: '0 16px 48px rgba(44,36,23,0.12)' }}>
         {/* Header */}
         <div className="bg-[#C4975A] px-8 py-6 flex items-center justify-between relative overflow-hidden rounded-t-3xl">
           <div className="relative z-10 animate-in slide-in-from-left duration-500">
@@ -100,7 +129,7 @@ const BudgetModal = ({
           </div>
 
           {/* Total Budget Summary */}
-          <div className="mt-8 p-6 bg-[#FBF9F7] rounded-2xl border-2 border-[#C4975A]/30 relative overflow-hidden group hover:border-[#C4975A]/50 transition-all duration-500 animate-in fade-in slide-in-from-bottom duration-500" style={{ animationDelay: '400ms' }}>
+          <div className={`mt-8 p-6 bg-[#FBF9F7] rounded-2xl border-2 ${errors.total ? 'border-[#DC3545]/50' : 'border-[#C4975A]/30'} relative overflow-hidden group hover:border-[#C4975A]/50 transition-all duration-500 animate-in fade-in slide-in-from-bottom duration-500`} style={{ animationDelay: '400ms' }}>
             <div className="flex items-center justify-between relative z-10">
               <span className="text-lg font-bold text-[#2C2417] flex items-center gap-2 font-brand">
                 <TrendingUp size={20} className="text-[#C4975A] animate-bounce" style={{ animationDuration: '2s' }} />
@@ -110,6 +139,9 @@ const BudgetModal = ({
                 {formatCurrency(calculateTotalBudget())}
               </span>
             </div>
+            {errors.total && (
+              <p className="text-red-500 text-xs mt-2">{errors.total}</p>
+            )}
           </div>
         </div>
 
@@ -122,7 +154,7 @@ const BudgetModal = ({
             {t('common.cancel')}
           </button>
           <button
-            onClick={onSave}
+            onClick={handleSave}
             className="px-6 py-3 bg-[#C4975A] text-white rounded-xl font-semibold hover:bg-[#D4B082] hover:scale-105 active:scale-95 transition-all duration-300 flex items-center gap-2 shadow-lg shadow-[#C4975A]/20 hover:shadow-xl hover:shadow-[#C4975A]/30 relative overflow-hidden group"
           >
             <Save size={18} className="relative z-10 group-hover:rotate-12 transition-transform duration-300" />

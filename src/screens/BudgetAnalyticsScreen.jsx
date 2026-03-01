@@ -95,7 +95,23 @@ const BudgetAnalyticsScreen = () => {
   const subtext = 'text-[#6B5D4F]';
   const accent = '#C4975A';
 
-  if (loading) return <div className={`flex-1 ${bg} flex items-center justify-center`}><LoadingSpinner /></div>;
+  if (loading) return (
+    <div className={`flex-1 ${bg} p-6`}>
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <div key={i} className="bg-white rounded-xl border border-[#E8E2DB] p-4 animate-pulse">
+            <div className="h-3 w-20 bg-[#E8E2DB] rounded mb-3" />
+            <div className="h-6 w-28 bg-[#E8E2DB] rounded mb-2" />
+            <div className="h-3 w-16 bg-[#E8E2DB] rounded" />
+          </div>
+        ))}
+      </div>
+      <div className="bg-white rounded-xl border border-[#E8E2DB] p-6 animate-pulse">
+        <div className="h-4 w-40 bg-[#E8E2DB] rounded mb-4" />
+        <div className="h-48 bg-[#E8E2DB] rounded" />
+      </div>
+    </div>
+  );
   if (error) return <div className={`flex-1 ${bg} p-6`}><ErrorMessage message={error} onRetry={fetchData} /></div>;
 
   return (

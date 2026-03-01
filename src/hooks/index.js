@@ -12,3 +12,5 @@ export { useNetworkStatus } from './useNetworkStatus';
 export { useUnsavedChanges } from './useUnsavedChanges';
 export { useSmartScrollState } from './useSmartScrollState';
 export { useSwipe, useBottomSheet, useScrollLock, usePullToRefresh, useHaptic } from './useMobile';
+export { useURLFilters } from './useURLFilters';
+export { useFocusTrap } from './useFocusTrap';

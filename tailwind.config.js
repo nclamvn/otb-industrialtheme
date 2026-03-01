@@ -119,8 +119,8 @@ module.exports = {
       },
 
       fontSize: {
-        'xs': ['12px', { lineHeight: '16px' }],
-        'sm': ['13px', { lineHeight: '18px' }],
+        'xs': ['12px', { lineHeight: '18px' }],
+        'sm': ['13px', { lineHeight: '20px' }],
         'base': ['14px', { lineHeight: '20px' }],
         'md': ['16px', { lineHeight: '22px' }],
         'lg': ['18px', { lineHeight: '26px' }],

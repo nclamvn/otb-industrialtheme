@@ -426,11 +426,13 @@ const AppHeader = ({
               }`}
             >
               <Bell size={16} strokeWidth={2} />
-              {/* Small dot indicator */}
+              {/* Notification count badge */}
               {budgetAlerts.length > 0 && (
-                <span className={`absolute top-1 right-1 w-2 h-2 rounded-full ${
-                  hasCritical ? 'bg-status-critical' : 'bg-dafc-gold'
-                }`} />
+                <span className={`absolute -top-1 -right-1 ${
+                  hasCritical ? 'bg-status-critical' : 'bg-red-500'
+                } text-white text-[10px] font-data font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center leading-none`}>
+                  {budgetAlerts.length > 99 ? '99+' : budgetAlerts.length}
+                </span>
               )}
             </button>
 

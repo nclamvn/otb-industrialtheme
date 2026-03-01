@@ -63,6 +63,24 @@ const en = {
     saved: 'Saved successfully',
     saveFailed: 'Failed to save',
     saving: 'Saving...',
+    submitted: 'Submitted successfully',
+    approved: 'Approved successfully',
+    rejected: 'Rejected successfully',
+    deleted: 'Deleted successfully',
+    offline: 'You are offline',
+    backOnline: 'Back online',
+    keyboardHelp: 'Keyboard Shortcuts',
+    allItemsReviewed: 'All items reviewed',
+  },
+
+  // ──────────────────────────────────────────────
+  // Validation
+  // ──────────────────────────────────────────────
+  validation: {
+    required: '{{field}} is required',
+    minValue: '{{field}} must be at least {{min}}',
+    maxValue: '{{field}} must be at most {{max}}',
+    invalidNumber: '{{field}} must be a valid number',
   },
 
   // ──────────────────────────────────────────────

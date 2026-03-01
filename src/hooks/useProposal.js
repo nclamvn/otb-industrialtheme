@@ -1,5 +1,6 @@
 'use client';
 import { useState, useCallback } from 'react';
+import toast from 'react-hot-toast';
 import { proposalService, masterDataService } from '../services';
 
 export const useProposal = () => {
@@ -158,8 +159,10 @@ export const useProposal = () => {
       setLoading(true);
       await proposalService.submit(proposalId);
       await fetchProposals();
+      toast.success('Submitted successfully');
     } catch (err) {
       console.error('Failed to submit proposal:', err);
+      toast.error('Failed to submit proposal');
       setError(err.message);
       throw err;
     } finally {
@@ -178,8 +181,11 @@ export const useProposal = () => {
         await (isReject ? proposalService.rejectL2(proposalId, comment) : proposalService.approveL2(proposalId, comment));
       }
       await fetchProposals();
+      const isRejectAction = action === 'REJECTED' || action === 'reject';
+      toast.success(isRejectAction ? 'Rejected successfully' : 'Approved successfully');
     } catch (err) {
       console.error('Failed to approve proposal:', err);
+      toast.error('Action failed');
       setError(err.message);
       throw err;
     } finally {
@@ -193,8 +199,10 @@ export const useProposal = () => {
       setLoading(true);
       await proposalService.delete(proposalId);
       await fetchProposals();
+      toast.success('Deleted successfully');
     } catch (err) {
       console.error('Failed to delete proposal:', err);
+      toast.error('Failed to delete proposal');
       setError(err.message);
       throw err;
     } finally {

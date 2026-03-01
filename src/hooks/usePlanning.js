@@ -226,8 +226,10 @@ export const usePlanning = () => {
       setLoading(true);
       await planningService.submit(planningId);
       await fetchPlannings();
+      toast.success('Submitted successfully');
     } catch (err) {
       console.error('Failed to submit planning:', err);
+      toast.error('Failed to submit planning');
       setError(err.message);
     } finally {
       setLoading(false);
@@ -251,8 +253,10 @@ export const usePlanning = () => {
         }
       }
       await fetchPlannings();
+      toast.success(action === 'APPROVED' ? 'Approved successfully' : 'Rejected successfully');
     } catch (err) {
       console.error('Failed to approve planning:', err);
+      toast.error('Action failed');
       setError(err.message);
     } finally {
       setLoading(false);
@@ -264,8 +268,10 @@ export const usePlanning = () => {
       setLoading(true);
       await planningService.finalize(planningId);
       await fetchPlannings();
+      toast.success('Marked as final');
     } catch (err) {
       console.error('Failed to mark planning as final:', err);
+      toast.error('Failed to finalize');
       setError(err.message);
     } finally {
       setLoading(false);
@@ -277,8 +283,10 @@ export const usePlanning = () => {
       setLoading(true);
       await planningService.copy(planningId);
       await fetchPlannings();
+      toast.success('Copied successfully');
     } catch (err) {
       console.error('Failed to copy planning:', err);
+      toast.error('Failed to copy planning');
       setError(err.message);
     } finally {
       setLoading(false);

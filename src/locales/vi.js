@@ -63,6 +63,24 @@ const vi = {
     saved: 'Đã lưu thành công',
     saveFailed: 'Lưu thất bại',
     saving: 'Đang lưu...',
+    submitted: 'Đã gửi thành công',
+    approved: 'Đã phê duyệt thành công',
+    rejected: 'Đã từ chối thành công',
+    deleted: 'Đã xóa thành công',
+    offline: 'Bạn đang ngoại tuyến',
+    backOnline: 'Đã kết nối lại',
+    keyboardHelp: 'Phím tắt',
+    allItemsReviewed: 'Đã xem xét tất cả',
+  },
+
+  // ──────────────────────────────────────────────
+  // Validation
+  // ──────────────────────────────────────────────
+  validation: {
+    required: '{{field}} là bắt buộc',
+    minValue: '{{field}} phải ít nhất {{min}}',
+    maxValue: '{{field}} phải nhiều nhất {{max}}',
+    invalidNumber: '{{field}} phải là số hợp lệ',
   },
 
   // ──────────────────────────────────────────────

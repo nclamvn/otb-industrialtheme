@@ -16,7 +16,7 @@ import { formatCurrency } from '../utils';
 import { includes as viIncludes } from '../utils/normalizeVietnamese';
 import { ExpandableStatCard } from '../components/Common';
 import { useIsMobile } from '@/hooks/useIsMobile';
-import { SwipeAction, MobileDataCard, MobileFilterSheet } from '@/components/ui';
+import { SwipeAction, MobileDataCard, MobileFilterSheet, TableSkeleton } from '@/components/ui';
 
 /* ═══════════════════════════════════════════════
    STATUS CONFIG
@@ -98,11 +98,24 @@ const ApprovalsScreen = () => {
       } else {
         await approvalService.reject(item.entityType, item.entityId, item.level, comment);
       }
+      toast.success(action === 'approve' ? t('common.approved') : t('common.rejected'));
+
+      // Auto-advance: find next item in filtered list
+      const currentIdx = filtered.findIndex(
+        fi => fi.entityType === item.entityType && fi.entityId === item.entityId
+      );
+      const nextItem = filtered[currentIdx + 1] || filtered[currentIdx - 1];
+
       setActionModal(null);
       setComment('');
-      fetchPendingApprovals();
+      await fetchPendingApprovals();
+
+      if (!nextItem) {
+        toast(t('common.allItemsReviewed'), { icon: '🎉' });
+      }
     } catch (err) {
       console.error('Action failed:', err);
+      toast.error(t('common.error'));
     } finally {
       setProcessing(false);
     }
@@ -385,16 +398,15 @@ const ApprovalsScreen = () => {
       {/* Table */}
       <div className={`border ${border} rounded-xl overflow-hidden bg-white`}>
         {loading ? (
-          <div className="flex flex-col items-center justify-center py-20">
-            <Loader2 size={32} className="animate-spin text-[#A67B3D]" />
-            <p className={`text-sm mt-3 ${textSecondary}`}>{t('approvals.loadingApprovals')}</p>
+          <div className="p-4">
+            <TableSkeleton rows={6} columns={5} />
           </div>
         ) : error ? (
           <div className="flex flex-col items-center justify-center py-20">
             <AlertTriangle size={32} className="text-[#DC3545]" />
             <p className={`text-sm mt-3 ${textSecondary}`}>{error}</p>
             <button onClick={fetchPendingApprovals} className="mt-3 px-4 py-2 rounded-xl bg-[#C4975A] text-white text-sm font-medium font-brand">
-              {t('common.tryAgain')}
+              {t('common.retry')}
             </button>
           </div>
         ) : filtered.length === 0 ? (

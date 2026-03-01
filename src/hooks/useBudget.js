@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect, useMemo, useCallback } from 'react';
+import toast from 'react-hot-toast';
 import { STORES, CURRENT_YEAR, CURRENT_SEASON_GROUP } from '../utils/constants';
 import { generateSeasonsMultiple } from '../utils/formatters';
 import { masterDataService, budgetService } from '../services';
@@ -188,10 +189,12 @@ export const useBudget = () => {
       // Refresh budgets
       await fetchBudgets();
 
+      toast.success('Saved successfully');
       setShowBudgetForm(false);
       setSelectedCell(null);
     } catch (err) {
       console.error('Failed to save budget:', err);
+      toast.error('Failed to save budget');
       setError(err.message);
     } finally {
       setLoading(false);
@@ -203,8 +206,10 @@ export const useBudget = () => {
       setLoading(true);
       await budgetService.submit(budgetId);
       await fetchBudgets();
+      toast.success('Submitted successfully');
     } catch (err) {
       console.error('Failed to submit budget:', err);
+      toast.error('Failed to submit budget');
       setError(err.message);
     } finally {
       setLoading(false);
@@ -228,8 +233,10 @@ export const useBudget = () => {
         }
       }
       await fetchBudgets();
+      toast.success(action === 'APPROVED' ? 'Approved successfully' : 'Rejected successfully');
     } catch (err) {
       console.error('Failed to approve budget:', err);
+      toast.error('Action failed');
       setError(err.message);
     } finally {
       setLoading(false);
