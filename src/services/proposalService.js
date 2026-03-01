@@ -105,6 +105,38 @@ export const proposalService = {
   async delete(id) {
     const response = await api.delete(`/proposals/${id}`);
     return response.data;
+  },
+
+  // Atomic save: replace all products in proposal
+  async saveFullProposal(id, data) {
+    const response = await api.put(`/proposals/${id}/save-full`, data);
+    return response.data?.data ?? response.data;
+  },
+
+  // Copy proposal to a new draft
+  async copyProposal(id) {
+    const response = await api.post(`/proposals/${id}/copy`);
+    return response.data?.data ?? response.data;
+  },
+
+  // Get historical proposal for comparison/template
+  async getHistorical({ fiscalYear, seasonGroupId, seasonType, brandId }) {
+    const response = await api.get('/proposals/historical', {
+      params: { fiscalYear, seasonGroupId, seasonType, brandId }
+    });
+    return response.data?.data ?? response.data;
+  },
+
+  // Get sizings by product
+  async getSizingsByProduct(productId) {
+    const response = await api.get(`/proposals/products/${productId}/sizings`);
+    return response.data?.data ?? response.data;
+  },
+
+  // Save sizings for a product
+  async saveSizings(productId, data) {
+    const response = await api.put(`/proposals/products/${productId}/sizings`, data);
+    return response.data?.data ?? response.data;
   }
 };
 

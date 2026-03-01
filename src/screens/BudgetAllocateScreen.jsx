@@ -4,7 +4,7 @@ import { useState, useRef, useEffect, useMemo, useCallback, Fragment } from 'rea
 import {
   DollarSign, Sparkles, Clock, ChevronDown, Check, ChevronRight, ArrowLeft,
   TrendingUp, Sun, Snowflake, BarChart3,
-  Star, Layers, Tag, FileText, X, Edit, Download, Undo2, Redo2
+  Star, Layers, Tag, FileText, X, Edit, Download, Undo2, Redo2, Copy
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { formatCurrency } from '../utils';
@@ -197,6 +197,7 @@ const BudgetAllocateScreen = ({
   const [versions, setVersions] = useState([]);
   const [selectedVersionId, setSelectedVersionId] = useState(null);
   const [loadingVersions, setLoadingVersions] = useState(false);
+  const [copyingVersion, setCopyingVersion] = useState(false);
 
   // Sync versionId to allocation hook
   useEffect(() => {
@@ -1069,6 +1070,48 @@ const BudgetAllocateScreen = ({
                             </div>
                           </div>
                         ))}
+                      </div>
+                      <div className="p-2 border-t border-[#E8E2DB]">
+                        <button
+                          onClick={async (e) => {
+                            e.stopPropagation();
+                            if (!selectedVersionId || copyingVersion) return;
+                            setCopyingVersion(true);
+                            try {
+                              await planningService.copy(selectedVersionId);
+                              toast.success('Version copied successfully');
+                              // Reload versions for the current budget
+                              const response = await planningService.getAll({ budgetId: selectedBudgetId });
+                              const list = Array.isArray(response) ? response : (response?.data || []);
+                              const mappedVersions = list.map(v => ({
+                                id: v.id,
+                                name: v.name || v.versionName || `Version ${v.versionNumber || v.id}`,
+                                status: v.status || 'DRAFT',
+                                isFinal: v.isFinal || v.status === 'FINAL' || false,
+                                versionNumber: v.versionNumber
+                              }));
+                              setVersions(mappedVersions);
+                              // Auto-select the newest version (last in list)
+                              if (mappedVersions.length > 0) {
+                                setSelectedVersionId(mappedVersions[mappedVersions.length - 1].id);
+                              }
+                              setIsVersionDropdownOpen(false);
+                            } catch (err) {
+                              toast.error('Failed to copy version');
+                            } finally {
+                              setCopyingVersion(false);
+                            }
+                          }}
+                          disabled={!selectedVersionId || copyingVersion}
+                          className="w-full px-3 py-2 text-xs font-medium font-brand rounded-lg transition-all bg-gradient-to-r from-[#C4975A] to-[#B8894E] hover:from-[#B8894E] hover:to-[#A07B4B] text-white disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                        >
+                          {copyingVersion ? (
+                            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                          ) : (
+                            <Copy size={12} />
+                          )}
+                          Save As New Version
+                        </button>
                       </div>
                     </div>
                   )}

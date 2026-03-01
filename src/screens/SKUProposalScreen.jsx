@@ -3,7 +3,7 @@
 import { useMemo, useState, useEffect, useCallback, useRef } from 'react';
 import {
   ChevronDown, ChevronRight, Package, Pencil, X, Plus, Trash2,
-  Star, Layers, Check, SlidersHorizontal, BarChart3, Ticket, ArrowLeft
+  Star, Layers, Check, SlidersHorizontal, BarChart3, Ticket, ArrowLeft, Clock
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { formatCurrency } from '../utils';
@@ -52,6 +52,10 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, onNavigateBack, onNaviga
   const [showMobileFilters, setShowMobileFilters] = useState(false);
   const [allCollapsed, setAllCollapsed] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [existingProposalId, setExistingProposalId] = useState(null);
+  const [historicalProposal, setHistoricalProposal] = useState(null);
+  const [loadingHistorical, setLoadingHistorical] = useState(false);
+  const [showHistoricalBanner, setShowHistoricalBanner] = useState(false);
   // SKU catalog and proposal data from API
   const [skuCatalog, setSkuCatalog] = useState([]);
   const [skuDataLoading, setSkuDataLoading] = useState(true);
@@ -105,8 +109,13 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, onNavigateBack, onNaviga
         // Transform proposals into SKU blocks grouped by gender/category
         const proposals = Array.isArray(proposalsRes) ? proposalsRes : (proposalsRes?.data || []);
         const blocks = [];
+        // Track proposal IDs by budgetId for existingProposalId resolution
+        const proposalIdsByBudget = {};
         proposals.forEach(p => {
           const proposalBudgetId = p.budgetId || null;
+          if (p.id && proposalBudgetId) {
+            proposalIdsByBudget[proposalBudgetId] = p.id;
+          }
           (p.products || []).forEach(prod => {
             const gender = (prod.gender || '').toLowerCase();
             const category = prod.category || '';
@@ -137,6 +146,12 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, onNavigateBack, onNaviga
         if (blocks.length > 0) {
           setSkuBlocks(blocks);
         }
+        // If a budget is selected and a proposal exists for it, set existingProposalId
+        if (budgetFilter !== 'all' && proposalIdsByBudget[budgetFilter]) {
+          setExistingProposalId(proposalIdsByBudget[budgetFilter]);
+        }
+        // Also store the mapping for later budget filter changes
+        proposalIdsByBudgetRef.current = proposalIdsByBudget;
       } catch (err) {
         console.error('Failed to fetch SKU data:', err);
       } finally {
@@ -179,6 +194,8 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, onNavigateBack, onNaviga
     fetchBudgets();
   }, [fetchBudgets]);
 
+  const [fyFilter, setFyFilter] = useState('all');
+  const [brandFilter, setBrandFilter] = useState('all');
   const [budgetFilter, setBudgetFilter] = useState('all');
   const [seasonGroupFilter, setSeasonGroupFilter] = useState('all');
   const [seasonFilter, setSeasonFilter] = useState('all');
@@ -201,6 +218,7 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, onNavigateBack, onNaviga
   const [isSizingVersionOpen, setIsSizingVersionOpen] = useState(false);
   const skuVersionDropdownRef = useRef(null);
   const sizingVersionDropdownRef = useRef(null);
+  const proposalIdsByBudgetRef = useRef({});
 
   // Close version dropdowns on outside click
   useEffect(() => {
@@ -244,6 +262,88 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, onNavigateBack, onNaviga
     };
     fetchVersions();
   }, [budgetFilter]);
+
+  // Update existingProposalId when budget filter changes
+  useEffect(() => {
+    if (budgetFilter !== 'all' && proposalIdsByBudgetRef.current[budgetFilter]) {
+      setExistingProposalId(proposalIdsByBudgetRef.current[budgetFilter]);
+    } else {
+      setExistingProposalId(null);
+    }
+  }, [budgetFilter]);
+
+  // SP-3 + SP-7: Fetch historical/previous year template when budget selected and no existing proposal
+  useEffect(() => {
+    if (budgetFilter === 'all' || existingProposalId) {
+      setShowHistoricalBanner(false);
+      setHistoricalProposal(null);
+      return;
+    }
+    const selectedBudget = apiBudgets.find(b => String(b.id) === String(budgetFilter));
+    if (!selectedBudget) return;
+
+    const fetchHistorical = async () => {
+      setLoadingHistorical(true);
+      try {
+        const result = await proposalService.getHistorical({
+          fiscalYear: selectedBudget.fiscalYear,
+          seasonGroupId: seasonGroupFilter !== 'all' ? seasonGroupFilter : undefined,
+          seasonType: seasonFilter !== 'all' ? seasonFilter : undefined,
+          brandId: selectedBudget.brandId,
+        });
+        if (result && (result.products?.length > 0 || result.id)) {
+          setHistoricalProposal(result);
+          setShowHistoricalBanner(true);
+        } else {
+          setHistoricalProposal(null);
+          setShowHistoricalBanner(false);
+        }
+      } catch (err) {
+        console.error('Failed to fetch historical proposal:', err);
+        setHistoricalProposal(null);
+        setShowHistoricalBanner(false);
+      } finally {
+        setLoadingHistorical(false);
+      }
+    };
+    fetchHistorical();
+  }, [budgetFilter, existingProposalId, apiBudgets, seasonGroupFilter, seasonFilter]);
+
+  // Handle "Use as Template" - copy historical proposal data into current skuBlocks
+  const handleUseAsTemplate = useCallback(() => {
+    if (!historicalProposal?.products?.length) return;
+    const blocks = [];
+    historicalProposal.products.forEach(prod => {
+      const gender = (prod.gender || '').toLowerCase();
+      const category = prod.category || '';
+      const subCategory = prod.subCategory || '';
+      const blockBudgetId = budgetFilter !== 'all' ? budgetFilter : null;
+      let block = blocks.find(b => b.gender === gender && b.category === category && b.subCategory === subCategory);
+      if (!block) {
+        block = { gender, category, subCategory, budgetId: blockBudgetId, items: [] };
+        blocks.push(block);
+      }
+      block.items.push({
+        sku: prod.skuCode || prod.sku || '',
+        name: prod.productName || prod.name || '',
+        productType: prod.productType || prod.subCategory || '',
+        theme: prod.theme || '',
+        color: prod.color || '',
+        composition: prod.composition || '',
+        unitCost: Number(prod.unitCost) || 0,
+        srp: Number(prod.srp) || 0,
+        order: prod.orderQty || 0,
+        rex: prod.rex || 0,
+        ttp: prod.ttp || 0,
+        ttlValue: Number(prod.totalValue) || 0,
+        customerTarget: prod.customerTarget || 'New',
+        imageUrl: prod.imageUrl || prod.image || prod.thumbnailUrl || null,
+      });
+    });
+    setSkuBlocks(blocks);
+    setShowHistoricalBanner(false);
+    toast.success(t('proposal.templateApplied') || 'Previous year template applied');
+  }, [historicalProposal, budgetFilter, t]);
 
   const handleSetFinalVersion = (versionId, e) => {
     e.stopPropagation();
@@ -366,11 +466,32 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, onNavigateBack, onNaviga
     setSizingPopup({ open: false, blockKey: null, itemIdx: null, item: null });
   };
 
+  const fyOptions = useMemo(() => {
+    const years = [...new Set(apiBudgets.map(b => b.fiscalYear))].sort();
+    return [{ id: 'all', label: 'FY' }, ...years.map(y => ({ id: String(y), label: `FY${y}` }))];
+  }, [apiBudgets]);
+
+  const brandOptions = useMemo(() => {
+    const brands = [];
+    const seen = new Set();
+    apiBudgets.forEach(b => {
+      const key = b.brandId || b.brandName;
+      if (key && !seen.has(key)) {
+        seen.add(key);
+        brands.push({ id: key, label: b.brandName || key });
+      }
+    });
+    return [{ id: 'all', label: 'Brand' }, ...brands];
+  }, [apiBudgets]);
+
   const budgetOptions = useMemo(() => {
     const options = [{ id: 'all', label: 'All Budgets' }];
-    apiBudgets.forEach(b => options.push({ id: b.id, label: b.budgetName }));
+    apiBudgets
+      .filter(b => fyFilter === 'all' || String(b.fiscalYear) === String(fyFilter))
+      .filter(b => brandFilter === 'all' || b.brandId === brandFilter || b.brandName === brandFilter)
+      .forEach(b => options.push({ id: b.id, label: b.budgetName }));
     return options;
-  }, [apiBudgets]);
+  }, [apiBudgets, fyFilter, brandFilter]);
 
   const genderOptions = useMemo(() => {
     const fromBlocks = skuBlocks.map(s => s.gender).filter(Boolean);
@@ -586,7 +707,7 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, onNavigateBack, onNaviga
     toast.success(t('common.exported') || 'Exported successfully');
   }, [filteredSkuBlocks, t]);
 
-  // Save proposal data to backend
+  // Save proposal data to backend (SP-1: atomic save via saveFullProposal for existing proposals)
   const handleSaveProposal = useCallback(async () => {
     if (skuBlocks.length === 0) return;
     setSaving(true);
@@ -611,12 +732,24 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, onNavigateBack, onNaviga
         }))
       );
 
-      const proposalData = {
-        budgetId: budgetFilter !== 'all' ? budgetFilter : undefined,
-        products,
-      };
-
-      await proposalService.create(proposalData);
+      if (existingProposalId) {
+        // Atomic save: replace all products in existing proposal
+        await proposalService.saveFullProposal(existingProposalId, { products });
+      } else {
+        // Create new proposal
+        const proposalData = {
+          budgetId: budgetFilter !== 'all' ? budgetFilter : undefined,
+          products,
+        };
+        const created = await proposalService.create(proposalData);
+        // Track the newly created proposal ID for subsequent saves
+        if (created?.id) {
+          setExistingProposalId(created.id);
+          if (budgetFilter !== 'all') {
+            proposalIdsByBudgetRef.current[budgetFilter] = created.id;
+          }
+        }
+      }
       toast.success(t('proposal.savedSuccessfully') || 'Proposal saved');
     } catch (err) {
       console.error('Failed to save proposal:', err);
@@ -624,7 +757,7 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, onNavigateBack, onNaviga
     } finally {
       setSaving(false);
     }
-  }, [skuBlocks, budgetFilter, t]);
+  }, [skuBlocks, budgetFilter, existingProposalId, t]);
 
   // Register save handler with AppContext
   useEffect(() => {
@@ -664,18 +797,30 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, onNavigateBack, onNaviga
             >
               <SlidersHorizontal size={14} />
               <span>{t('skuProposal.filters')}</span>
-              {(budgetFilter !== 'all' || seasonGroupFilter !== 'all' || seasonFilter !== 'all' || genderFilter !== 'all' || categoryFilter !== 'all' || subCategoryFilter !== 'all') && (
+              {(fyFilter !== 'all' || budgetFilter !== 'all' || seasonGroupFilter !== 'all' || seasonFilter !== 'all' || brandFilter !== 'all' || genderFilter !== 'all' || categoryFilter !== 'all' || subCategoryFilter !== 'all') && (
                 <span className="ml-1 w-4 h-4 rounded-full bg-dafc-gold text-white text-[9px] font-bold flex items-center justify-center">
-                  {[budgetFilter, seasonGroupFilter, seasonFilter, genderFilter, categoryFilter, subCategoryFilter].filter(f => f !== 'all').length}
+                  {[fyFilter, budgetFilter, seasonGroupFilter, seasonFilter, brandFilter, genderFilter, categoryFilter, subCategoryFilter].filter(f => f !== 'all').length}
                 </span>
               )}
             </button>
-            {(budgetFilter !== 'all' || genderFilter !== 'all' || categoryFilter !== 'all' || subCategoryFilter !== 'all') && (
+            {(fyFilter !== 'all' || budgetFilter !== 'all' || brandFilter !== 'all' || genderFilter !== 'all' || categoryFilter !== 'all' || subCategoryFilter !== 'all') && (
               <div className="flex flex-wrap gap-1.5">
+                {fyFilter !== 'all' && (
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-[rgba(160,120,75,0.1)] text-[#7D5A28]">
+                    {fyOptions.find(o => String(o.id) === String(fyFilter))?.label || fyFilter}
+                    <button onClick={() => setFyFilter('all')} className="ml-0.5"><X size={10} /></button>
+                  </span>
+                )}
                 {budgetFilter !== 'all' && (
                   <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-[rgba(160,120,75,0.1)] text-[#7D5A28]">
                     {budgetOptions.find(b => String(b.id) === String(budgetFilter))?.label || budgetFilter}
                     <button onClick={() => setBudgetFilter('all')} className="ml-0.5"><X size={10} /></button>
+                  </span>
+                )}
+                {brandFilter !== 'all' && (
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-[rgba(160,120,75,0.1)] text-[#7D5A28]">
+                    {brandOptions.find(o => String(o.id) === String(brandFilter))?.label || brandFilter}
+                    <button onClick={() => setBrandFilter('all')} className="ml-0.5"><X size={10} /></button>
                   </span>
                 )}
                 {genderFilter !== 'all' && (
@@ -701,6 +846,10 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, onNavigateBack, onNaviga
           </div>
         ) : (
         <div className="flex items-center gap-1.5 px-3 py-1.5 overflow-x-auto scrollbar-hide">
+          <select value={fyFilter} onChange={(e) => setFyFilter(e.target.value)}
+            className="shrink-0 border rounded pl-1.5 pr-6 py-1 text-[11px] appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2210%22%20height%3D%2210%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%238C8178%22%20stroke-width%3D%222.5%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22m6%209%206%206%206-6%22%2F%3E%3C%2Fsvg%3E')] bg-[length:10px] bg-[right_0.4rem_center] bg-no-repeat bg-white border-border-muted text-content focus:outline-none focus:ring-1 focus:ring-dafc-gold/30">
+            {fyOptions.map(opt => (<option key={opt.id} value={opt.id}>{opt.label}</option>))}
+          </select>
           <select value={budgetFilter} onChange={(e) => setBudgetFilter(e.target.value)}
             className="shrink-0 border rounded pl-1.5 pr-6 py-1 text-[11px] appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2210%22%20height%3D%2210%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%238C8178%22%20stroke-width%3D%222.5%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22m6%209%206%206%206-6%22%2F%3E%3C%2Fsvg%3E')] bg-[length:10px] bg-[right_0.4rem_center] bg-no-repeat bg-white border-border-muted text-content focus:outline-none focus:ring-1 focus:ring-dafc-gold/30">
             {budgetOptions.map(opt => (<option key={opt.id} value={opt.id}>{opt.label}</option>))}
@@ -712,6 +861,10 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, onNavigateBack, onNaviga
           <select value={seasonFilter} onChange={(e) => setSeasonFilter(e.target.value)}
             className="shrink-0 border rounded pl-1.5 pr-6 py-1 text-[11px] appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2210%22%20height%3D%2210%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%238C8178%22%20stroke-width%3D%222.5%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22m6%209%206%206%206-6%22%2F%3E%3C%2Fsvg%3E')] bg-[length:10px] bg-[right_0.4rem_center] bg-no-repeat bg-white border-border-muted text-content focus:outline-none focus:ring-1 focus:ring-dafc-gold/30">
             {SEASONS.map(opt => (<option key={opt.id} value={opt.id}>{opt.label}</option>))}
+          </select>
+          <select value={brandFilter} onChange={(e) => setBrandFilter(e.target.value)}
+            className="shrink-0 border rounded pl-1.5 pr-6 py-1 text-[11px] appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2210%22%20height%3D%2210%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%238C8178%22%20stroke-width%3D%222.5%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22m6%209%206%206%206-6%22%2F%3E%3C%2Fsvg%3E')] bg-[length:10px] bg-[right_0.4rem_center] bg-no-repeat bg-white border-border-muted text-content focus:outline-none focus:ring-1 focus:ring-dafc-gold/30">
+            {brandOptions.map(opt => (<option key={opt.id} value={opt.id}>{opt.label}</option>))}
           </select>
           <div className="h-4 w-px shrink-0 bg-border-muted" />
           <select value={genderFilter} onChange={(e) => setGenderFilter(e.target.value)}
@@ -737,33 +890,41 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, onNavigateBack, onNaviga
             darkMode={darkMode}
             title={t('skuProposal.filters')}
             filters={[
+              { key: 'fy', label: 'Fiscal Year', type: 'select', options: fyOptions.map(o => ({ value: String(o.id), label: o.label })), defaultValue: 'all' },
               { key: 'budget', label: t('skuProposal.budget'), type: 'select', options: budgetOptions.map(b => ({ value: String(b.id), label: b.label })), defaultValue: 'all' },
               { key: 'seasonGroup', label: t('skuProposal.seasonGroup'), type: 'select', options: SEASON_GROUPS.map(s => ({ value: s.id, label: s.label })), defaultValue: 'all' },
               { key: 'season', label: t('skuProposal.season'), type: 'select', options: SEASONS.map(s => ({ value: s.id, label: s.label })), defaultValue: 'all' },
+              { key: 'brand', label: 'Brand', type: 'select', options: brandOptions.map(o => ({ value: String(o.id), label: o.label })), defaultValue: 'all' },
               { key: 'gender', label: t('skuProposal.gender'), type: 'select', options: genderOptions.map(g => ({ value: g, label: g === 'all' ? t('skuProposal.gender') : g })), defaultValue: 'all' },
               { key: 'category', label: t('skuProposal.category'), type: 'select', options: categoryOptions.map(c => ({ value: c, label: c === 'all' ? t('skuProposal.category') : c })), defaultValue: 'all' },
               { key: 'subCategory', label: t('skuProposal.subCategory'), type: 'select', options: subCategoryOptions.map(s => ({ value: s, label: s === 'all' ? t('skuProposal.subCategory') : s })), defaultValue: 'all' },
             ]}
             values={{
+              fy: String(fyFilter),
               budget: String(budgetFilter),
               seasonGroup: seasonGroupFilter,
               season: seasonFilter,
+              brand: String(brandFilter),
               gender: genderFilter,
               category: categoryFilter,
               subCategory: subCategoryFilter,
             }}
             onApply={(v) => {
+              setFyFilter(v.fy || 'all');
               setBudgetFilter(v.budget || 'all');
               setSeasonGroupFilter(v.seasonGroup || 'all');
               setSeasonFilter(v.season || 'all');
+              setBrandFilter(v.brand || 'all');
               setGenderFilter(v.gender || 'all');
               setCategoryFilter(v.category || 'all');
               setSubCategoryFilter(v.subCategory || 'all');
             }}
             onReset={() => {
+              setFyFilter('all');
               setBudgetFilter('all');
               setSeasonGroupFilter('all');
               setSeasonFilter('all');
+              setBrandFilter('all');
               setGenderFilter('all');
               setCategoryFilter('all');
               setSubCategoryFilter('all');
@@ -1002,6 +1163,85 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, onNavigateBack, onNaviga
           }}
           darkMode={darkMode}
         />
+      )}
+
+      {/* SP-3 + SP-7: Historical / Previous Year Template Banner */}
+      {showHistoricalBanner && historicalProposal && (
+        <div className="rounded-xl border overflow-hidden bg-[rgba(217,119,6,0.08)] border-[#D97706]/30">
+          {/* Banner Header */}
+          <div className="flex items-center justify-between px-4 py-3 border-b border-[#D97706]/20">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-lg bg-[rgba(217,119,6,0.15)] flex items-center justify-center">
+                <Clock size={16} className="text-[#D97706]" />
+              </div>
+              <div>
+                <h3 className="text-sm font-semibold font-brand text-[#92400E]">
+                  Previous Year Template {historicalProposal.fiscalYear ? `- FY${historicalProposal.fiscalYear - 1}` : ''}
+                </h3>
+                <p className="text-[11px] text-[#B45309]">
+                  {historicalProposal.products?.length || 0} SKUs from previous season available as a starting point
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={handleUseAsTemplate}
+                className="flex items-center gap-1.5 px-4 py-1.5 text-xs font-semibold font-brand rounded-lg transition-all bg-gradient-to-r from-[#D97706] to-[#B45309] hover:from-[#B45309] hover:to-[#92400E] text-white shadow-sm hover:shadow-md"
+              >
+                Use as Template
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowHistoricalBanner(false)}
+                className="p-1.5 rounded-lg transition-colors text-[#B45309] hover:bg-[rgba(217,119,6,0.15)]"
+              >
+                <X size={14} />
+              </button>
+            </div>
+          </div>
+
+          {/* Historical Products Preview (read-only) */}
+          {historicalProposal.products?.length > 0 && (
+            <div className="px-4 py-3 opacity-60 pointer-events-none">
+              <div className="overflow-x-auto">
+                <table className="w-full text-xs">
+                  <thead>
+                    <tr className="bg-[rgba(217,119,6,0.08)] border-b border-[#D97706]/20">
+                      <th className="px-2 py-1.5 text-left font-semibold font-brand text-[#92400E] whitespace-nowrap">SKU</th>
+                      <th className="px-2 py-1.5 text-left font-semibold font-brand text-[#92400E]">Name</th>
+                      <th className="px-2 py-1.5 text-left font-semibold font-brand text-[#92400E]">Gender</th>
+                      <th className="px-2 py-1.5 text-left font-semibold font-brand text-[#92400E]">Category</th>
+                      <th className="px-2 py-1.5 text-right font-semibold font-brand text-[#92400E]">SRP</th>
+                      <th className="px-2 py-1.5 text-center font-semibold font-brand text-[#92400E]">Qty</th>
+                      <th className="px-2 py-1.5 text-right font-semibold font-brand text-[#92400E]">Value</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {historicalProposal.products.slice(0, 8).map((prod, pIdx) => (
+                      <tr key={`hist-${pIdx}`} className="border-b border-[#D97706]/10">
+                        <td className="px-2 py-1.5 font-data text-[#92400E] whitespace-nowrap">{prod.skuCode || prod.sku || '-'}</td>
+                        <td className="px-2 py-1.5 text-[#78350F]">{prod.productName || prod.name || '-'}</td>
+                        <td className="px-2 py-1.5 text-[#B45309] capitalize">{prod.gender || '-'}</td>
+                        <td className="px-2 py-1.5 text-[#B45309]">{prod.subCategory || prod.category || '-'}</td>
+                        <td className="px-2 py-1.5 text-right font-data text-[#92400E]">{formatCurrency(Number(prod.srp) || 0)}</td>
+                        <td className="px-2 py-1.5 text-center font-data text-[#92400E]">{prod.orderQty || 0}</td>
+                        <td className="px-2 py-1.5 text-right font-data text-[#92400E]">{formatCurrency(Number(prod.totalValue) || 0)}</td>
+                      </tr>
+                    ))}
+                    {historicalProposal.products.length > 8 && (
+                      <tr>
+                        <td colSpan={7} className="px-2 py-1.5 text-center text-[11px] text-[#B45309] italic">
+                          ...and {historicalProposal.products.length - 8} more SKUs
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+        </div>
       )}
 
       {filteredSkuBlocks.length === 0 ? (

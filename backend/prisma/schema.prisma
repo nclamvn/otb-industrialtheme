@@ -25,9 +25,12 @@ model User {
   roleId       String   @map("role_id")
   storeAccess  String[] @map("store_access") // store IDs user can access
   brandAccess  String[] @map("brand_access") // brand IDs user can access
-  isActive     Boolean  @default(true) @map("is_active")
-  createdAt    DateTime @default(now()) @map("created_at")
-  updatedAt    DateTime @updatedAt @map("updated_at")
+  phone        String?
+  department   String?
+  isActive     Boolean   @default(true) @map("is_active")
+  erasedAt     DateTime? @map("erased_at")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
 
   // Relations
   role              Role               @relation(fields: [roleId], references: [id])
@@ -142,9 +145,10 @@ model SkuCatalog {
   theme         String? // AUGUST (08), SEPTEMBER (09)
   color         String?
   composition   String?
-  srp           Decimal @db.Decimal(18, 2) // Suggested Retail Price (VND)
-  brandId       String? @map("brand_id")
-  seasonGroupId String? @map("season_group_id")
+  srp           Decimal  @db.Decimal(18, 2) // Suggested Retail Price (VND)
+  costPrice     Decimal? @map("cost_price") @db.Decimal(18, 2)
+  brandId       String?  @map("brand_id")
+  seasonGroupId String?  @map("season_group_id")
   imageUrl      String? @map("image_url")
   isActive      Boolean @default(true) @map("is_active")
 
@@ -167,6 +171,7 @@ enum BudgetStatus {
   LEVEL1_APPROVED
   APPROVED
   REJECTED
+  ARCHIVED
 }
 
 model Budget {
@@ -180,6 +185,8 @@ model Budget {
   status        BudgetStatus @default(DRAFT)
   comment       String?
   createdById   String       @map("created_by_id")
+  version       Int          @default(1)
+  deletedAt     DateTime?    @map("deleted_at")
   createdAt     DateTime     @default(now()) @map("created_at")
   updatedAt     DateTime     @updatedAt @map("updated_at")
 
@@ -195,6 +202,7 @@ model Budget {
   @@unique([groupBrandId, seasonGroupId, seasonType, fiscalYear])
   @@index([fiscalYear])
   @@index([status])
+  @@index([deletedAt])
   @@map("budgets")
 }
 
@@ -236,6 +244,7 @@ model PlanningVersion {
   status         PlanningStatus @default(DRAFT)
   isFinal        Boolean        @default(false) @map("is_final")
   snapshotData   Json?          @map("snapshot_data") // frozen data on submit
+  version        Int            @default(1)
   createdById    String         @map("created_by_id")
   createdAt      DateTime       @default(now()) @map("created_at")
   updatedAt      DateTime       @updatedAt @map("updated_at")
@@ -299,6 +308,7 @@ model Proposal {
   totalSkuCount     Int            @default(0) @map("total_sku_count")
   totalOrderQty     Int            @default(0) @map("total_order_qty")
   totalValue        Decimal        @default(0) @map("total_value") @db.Decimal(18, 2)
+  version           Int            @default(1)
   createdById       String         @map("created_by_id")
   createdAt         DateTime       @default(now()) @map("created_at")
   updatedAt         DateTime       @updatedAt @map("updated_at")
@@ -315,7 +325,7 @@ model Proposal {
 model ProposalProduct {
   id             String  @id @default(cuid())
   proposalId     String  @map("proposal_id")
-  skuId          String  @map("sku_id")
+  skuId          String? @map("sku_id")
   skuCode        String  @map("sku_code")
   productName    String  @map("product_name")
   collection     String?
@@ -335,8 +345,9 @@ model ProposalProduct {
 
   // Relations
   proposal    Proposal            @relation(fields: [proposalId], references: [id], onDelete: Cascade)
-  sku         SkuCatalog          @relation(fields: [skuId], references: [id])
+  sku         SkuCatalog?         @relation(fields: [skuId], references: [id])
   allocations ProductAllocation[]
+  sizings     ProposalSizing[]
 
   @@map("proposal_products")
 }
@@ -353,6 +364,21 @@ model ProductAllocation {
 
   @@unique([proposalProductId, storeId])
   @@map("product_allocations")
+}
+
+model ProposalSizing {
+  id                String  @id @default(cuid())
+  proposalProductId String  @map("proposal_product_id")
+  choiceVersion     Int     @map("choice_version") // 1=A, 2=B, 3=C
+  isFinal           Boolean @default(false) @map("is_final")
+  sizeCode          String  @map("size_code") // s0002, s0004, s0006, s0008
+  quantity          Int     @default(0)
+
+  // Relations
+  proposalProduct ProposalProduct @relation(fields: [proposalProductId], references: [id], onDelete: Cascade)
+
+  @@unique([proposalProductId, choiceVersion, sizeCode])
+  @@map("proposal_sizings")
 }
 
 // ============================================================================

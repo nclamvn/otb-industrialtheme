@@ -470,4 +470,67 @@ export class PlanningService {
 
     return this.prisma.planningVersion.delete({ where: { id } });
   }
+
+  // ─── HISTORICAL ───────────────────────────────────────────────────────
+
+  async findHistorical(params: {
+    fiscalYear: number;
+    seasonGroupId: string;
+    seasonName?: string;
+    brandId?: string;
+  }) {
+    const { fiscalYear, seasonGroupId, seasonName, brandId } = params;
+
+    // Find budgets from the previous year matching brand + season
+    const budgetWhere: Prisma.BudgetWhereInput = {
+      fiscalYear: fiscalYear - 1,
+      seasonGroupId,
+    };
+    if (brandId) budgetWhere.groupBrandId = brandId;
+    if (seasonName) budgetWhere.seasonType = seasonName;
+
+    const budgets = await this.prisma.budget.findMany({
+      where: budgetWhere,
+      select: { id: true, details: { select: { id: true } } },
+    });
+
+    if (budgets.length === 0) return null;
+
+    const budgetDetailIds = budgets.flatMap(b => b.details.map(d => d.id));
+
+    // Find planning versions, prioritize: isFinal > APPROVED > newest
+    const plannings = await this.prisma.planningVersion.findMany({
+      where: {
+        budgetDetailId: { in: budgetDetailIds },
+      },
+      include: {
+        details: {
+          include: {
+            collection: true,
+            gender: true,
+            category: true,
+            subCategory: true,
+          },
+        },
+        budgetDetail: {
+          include: {
+            store: true,
+            budget: { include: { groupBrand: true } },
+          },
+        },
+      },
+      orderBy: [
+        { isFinal: 'desc' },
+        { versionNumber: 'desc' },
+      ],
+    });
+
+    if (plannings.length === 0) return null;
+
+    // Prefer isFinal, then APPROVED, then most recent
+    const finalPlanning = plannings.find(p => p.isFinal);
+    const approvedPlanning = plannings.find(p => p.status === PlanningStatus.APPROVED);
+
+    return finalPlanning || approvedPlanning || plannings[0];
+  }
 }

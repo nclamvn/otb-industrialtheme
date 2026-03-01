@@ -468,6 +468,188 @@ export class ProposalService {
     };
   }
 
+  // ─── SAVE FULL (atomic replace) ────────────────────────────────────────
+
+  async saveFullProposal(id: string, body: { products: any[] }, userId: string) {
+    const proposal = await this.prisma.proposal.findUnique({ where: { id } });
+    if (!proposal) throw new NotFoundException('Proposal not found');
+
+    if (proposal.status !== ProposalStatus.DRAFT) {
+      throw new ForbiddenException('Only draft proposals can be saved');
+    }
+
+    return this.prisma.$transaction(async (tx) => {
+      // Delete all existing products (cascades to allocations)
+      await tx.proposalProduct.deleteMany({ where: { proposalId: id } });
+
+      // Re-create products from payload
+      let sortOrder = 0;
+      for (const p of body.products) {
+        sortOrder++;
+        const unitCost = Number(p.unitCost || p.srp) || 0;
+        const orderQty = Number(p.orderQty || p.order) || 0;
+        const totalValue = unitCost * orderQty;
+
+        await tx.proposalProduct.create({
+          data: {
+            proposalId: id,
+            skuId: p.skuId || null,
+            skuCode: p.skuCode || p.sku || '',
+            productName: p.productName || p.name || '',
+            collection: p.collection || null,
+            gender: p.gender || null,
+            category: p.category || null,
+            subCategory: p.subCategory || null,
+            theme: p.theme || null,
+            color: p.color || null,
+            composition: p.composition || null,
+            unitCost,
+            srp: Number(p.srp) || unitCost,
+            orderQty,
+            totalValue,
+            customerTarget: p.customerTarget || 'New',
+            imageUrl: p.imageUrl || null,
+            sortOrder,
+          },
+        });
+      }
+
+      // Update totals
+      const products = await tx.proposalProduct.findMany({ where: { proposalId: id } });
+      const totalSkuCount = products.length;
+      const totalOrderQty = products.reduce((sum, pr) => sum + pr.orderQty, 0);
+      const totalVal = products.reduce((sum, pr) => sum + Number(pr.totalValue), 0);
+
+      return tx.proposal.update({
+        where: { id },
+        data: { totalSkuCount, totalOrderQty, totalValue: totalVal },
+        include: {
+          budget: { include: { groupBrand: true } },
+          products: { orderBy: { sortOrder: 'asc' } },
+        },
+      });
+    });
+  }
+
+  // ─── COPY ─────────────────────────────────────────────────────────────
+
+  async copyProposal(id: string, userId: string) {
+    const source = await this.prisma.proposal.findUnique({
+      where: { id },
+      include: { products: { include: { allocations: true } } },
+    });
+
+    if (!source) throw new NotFoundException('Proposal not found');
+
+    return this.prisma.$transaction(async (tx) => {
+      // Create new proposal as DRAFT
+      const newProposal = await tx.proposal.create({
+        data: {
+          ticketName: `${source.ticketName || 'Proposal'} (copy)`,
+          budgetId: source.budgetId,
+          planningVersionId: source.planningVersionId,
+          createdById: userId,
+          totalSkuCount: source.totalSkuCount,
+          totalOrderQty: source.totalOrderQty,
+          totalValue: source.totalValue,
+        },
+      });
+
+      // Clone products
+      for (const prod of source.products) {
+        const newProduct = await tx.proposalProduct.create({
+          data: {
+            proposalId: newProposal.id,
+            skuId: prod.skuId,
+            skuCode: prod.skuCode,
+            productName: prod.productName,
+            collection: prod.collection,
+            gender: prod.gender,
+            category: prod.category,
+            subCategory: prod.subCategory,
+            theme: prod.theme,
+            color: prod.color,
+            composition: prod.composition,
+            unitCost: prod.unitCost,
+            srp: prod.srp,
+            orderQty: prod.orderQty,
+            totalValue: prod.totalValue,
+            customerTarget: prod.customerTarget,
+            imageUrl: prod.imageUrl,
+            sortOrder: prod.sortOrder,
+          },
+        });
+
+        // Clone allocations
+        for (const alloc of prod.allocations) {
+          await tx.productAllocation.create({
+            data: {
+              proposalProductId: newProduct.id,
+              storeId: alloc.storeId,
+              quantity: alloc.quantity,
+            },
+          });
+        }
+      }
+
+      return tx.proposal.findUnique({
+        where: { id: newProposal.id },
+        include: {
+          budget: { include: { groupBrand: true } },
+          products: { orderBy: { sortOrder: 'asc' } },
+        },
+      });
+    });
+  }
+
+  // ─── HISTORICAL ───────────────────────────────────────────────────────
+
+  async findHistorical(params: {
+    fiscalYear: number;
+    seasonGroupId: string;
+    seasonType?: string;
+    brandId?: string;
+  }) {
+    const { fiscalYear, seasonGroupId, seasonType, brandId } = params;
+
+    // Find budgets from the previous year matching brand + season
+    const budgetWhere: Prisma.BudgetWhereInput = {
+      fiscalYear: fiscalYear - 1,
+      seasonGroupId,
+    };
+    if (brandId) budgetWhere.groupBrandId = brandId;
+    if (seasonType) budgetWhere.seasonType = seasonType;
+
+    const budgets = await this.prisma.budget.findMany({
+      where: budgetWhere,
+      select: { id: true },
+    });
+
+    if (budgets.length === 0) return null;
+
+    const budgetIds = budgets.map(b => b.id);
+
+    // Find proposals matching these budgets, prefer APPROVED > DRAFT, newest
+    const proposal = await this.prisma.proposal.findFirst({
+      where: {
+        budgetId: { in: budgetIds },
+      },
+      include: {
+        budget: { include: { groupBrand: true } },
+        products: {
+          include: { allocations: true },
+          orderBy: { sortOrder: 'asc' },
+        },
+      },
+      orderBy: [
+        { status: 'asc' }, // APPROVED sorts before DRAFT alphabetically
+        { createdAt: 'desc' },
+      ],
+    });
+
+    return proposal;
+  }
+
   // ─── HELPER: Update Proposal Totals ──────────────────────────────────────
 
   private async updateProposalTotals(proposalId: string) {
@@ -482,6 +664,54 @@ export class ProposalService {
     await this.prisma.proposal.update({
       where: { id: proposalId },
       data: { totalSkuCount, totalOrderQty, totalValue },
+    });
+  }
+
+  // ─── SIZING: LIST ──────────────────────────────────────────────────────
+
+  async getSizingsByProduct(productId: string) {
+    const product = await this.prisma.proposalProduct.findUnique({
+      where: { id: productId },
+    });
+    if (!product) throw new NotFoundException('Product not found');
+
+    return this.prisma.proposalSizing.findMany({
+      where: { proposalProductId: productId },
+      orderBy: [{ choiceVersion: 'asc' }, { sizeCode: 'asc' }],
+    });
+  }
+
+  // ─── SIZING: SAVE (overwrite) ─────────────────────────────────────────
+
+  async saveSizings(productId: string, sizings: any[]) {
+    const product = await this.prisma.proposalProduct.findUnique({
+      where: { id: productId },
+    });
+    if (!product) throw new NotFoundException('Product not found');
+
+    return this.prisma.$transaction(async (tx) => {
+      // Delete all existing sizings
+      await tx.proposalSizing.deleteMany({
+        where: { proposalProductId: productId },
+      });
+
+      // Re-create from payload
+      if (sizings && sizings.length > 0) {
+        await tx.proposalSizing.createMany({
+          data: sizings.map(s => ({
+            proposalProductId: productId,
+            choiceVersion: s.choiceVersion,
+            isFinal: s.isFinal || false,
+            sizeCode: s.sizeCode,
+            quantity: s.quantity || 0,
+          })),
+        });
+      }
+
+      return tx.proposalSizing.findMany({
+        where: { proposalProductId: productId },
+        orderBy: [{ choiceVersion: 'asc' }, { sizeCode: 'asc' }],
+      });
     });
   }
 

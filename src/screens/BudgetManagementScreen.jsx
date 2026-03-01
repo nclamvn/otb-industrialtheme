@@ -11,11 +11,14 @@ import { formatCurrency } from '../utils/formatters';
 import { includes as viIncludes } from '../utils/normalizeVietnamese';
 import { budgetService, masterDataService } from '../services';
 import { invalidateCache } from '../services/api';
-import { LoadingSpinner, ErrorMessage, EmptyState, ExpandableStatCard } from '../components/Common';
+import { ErrorMessage, EmptyState, ExpandableStatCard } from '../components/Common';
+import { TableSkeleton } from '@/components/ui';
 import BudgetAlertsBanner from '../components/BudgetAlertsBanner';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useIsMobile } from '@/hooks/useIsMobile';
 import { MobileFilterSheet, MobileDataCard } from '@/components/ui';
+import FloatingActionButton from '@/components/mobile/FloatingActionButton';
+import PullToRefresh from '@/components/mobile/PullToRefresh';
 
 const YEARS = Array.from({ length: 4 }, (_, i) => new Date().getFullYear() - 2 + i);
 
@@ -337,8 +340,8 @@ const BudgetManagementScreen = ({
   // Loading state
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <LoadingSpinner darkMode={darkMode} size="lg" message={t('budget.loadingBudgets')} />
+      <div className="min-h-[400px]">
+        <TableSkeleton rows={8} columns={6} />
       </div>
     );
   }
@@ -591,13 +594,15 @@ const BudgetManagementScreen = ({
             </button>
           )}
 
-          <button
-            onClick={() => setShowCreateModal(true)}
-            className="flex items-center gap-1 px-2.5 py-1 bg-[#1B6B45] text-white rounded-md hover:bg-[#1B6B45]/90 transition-colors text-[11px] font-medium font-brand shrink-0"
-          >
-            <Plus size={12} />
-            {t('budget.createBudget')}
-          </button>
+          {!isMobile && (
+            <button
+              onClick={() => setShowCreateModal(true)}
+              className="flex items-center gap-1 px-2.5 py-1 bg-[#1B6B45] text-white rounded-md hover:bg-[#1B6B45]/90 transition-colors text-[11px] font-medium font-brand shrink-0"
+            >
+              <Plus size={12} />
+              {t('budget.createBudget')}
+            </button>
+          )}
         </div>
       </div>
 
@@ -650,6 +655,7 @@ const BudgetManagementScreen = ({
 
       {/* Data Table / Mobile Cards */}
       {viewMode === 'table' && isMobile && (
+        <PullToRefresh onRefresh={fetchBudgets}>
         <div className="space-y-3">
           {filteredBudgets.length === 0 ? (
             <div className="py-8">
@@ -682,6 +688,7 @@ const BudgetManagementScreen = ({
             ))
           )}
         </div>
+        </PullToRefresh>
       )}
 
       {viewMode === 'table' && !isMobile && (
@@ -1285,6 +1292,15 @@ const BudgetManagementScreen = ({
             </div>
           </div>
         </div>
+      )}
+
+      {/* Mobile FAB */}
+      {isMobile && (
+        <FloatingActionButton
+          actions={[
+            { label: t('budget.createBudget'), icon: Plus, onClick: () => setShowCreateModal(true), color: '#1B6B45' },
+          ]}
+        />
       )}
 
     </div>

@@ -35,6 +35,30 @@ export class PlanningController {
     return { success: true, ...result };
   }
 
+  // ─── HISTORICAL ─────────────────────────────────────────────────────────
+
+  @Get('historical')
+  @RequirePermissions('planning:read')
+  @ApiOperation({ summary: 'Find historical planning data for comparison' })
+  @ApiQuery({ name: 'fiscalYear', required: true, type: Number })
+  @ApiQuery({ name: 'seasonGroupId', required: true })
+  @ApiQuery({ name: 'seasonName', required: false })
+  @ApiQuery({ name: 'brandId', required: false })
+  async findHistorical(
+    @Query('fiscalYear') fiscalYear: number,
+    @Query('seasonGroupId') seasonGroupId: string,
+    @Query('seasonName') seasonName?: string,
+    @Query('brandId') brandId?: string,
+  ) {
+    const data = await this.planningService.findHistorical({
+      fiscalYear: Number(fiscalYear),
+      seasonGroupId,
+      seasonName,
+      brandId,
+    });
+    return { success: true, data };
+  }
+
   // ─── GET ONE ─────────────────────────────────────────────────────────────
 
   @Get(':id')

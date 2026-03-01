@@ -92,6 +92,14 @@ export const planningService = {
   async delete(id) {
     const response = await api.delete(`/planning/${id}`);
     return response.data;
+  },
+
+  // Get historical planning data for comparison
+  async getHistorical({ fiscalYear, seasonGroupId, seasonName, brandId }) {
+    const response = await api.get('/planning/historical', {
+      params: { fiscalYear, seasonGroupId, seasonName, brandId }
+    });
+    return response.data?.data ?? response.data;
   }
 };
 

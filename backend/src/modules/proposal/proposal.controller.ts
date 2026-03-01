@@ -52,6 +52,30 @@ export class ProposalController {
     return { success: true, data: await this.proposalService.getStatistics(budgetId) };
   }
 
+  // ─── HISTORICAL ─────────────────────────────────────────────────────────
+
+  @Get('historical')
+  @RequirePermissions('proposal:read')
+  @ApiOperation({ summary: 'Find historical proposal for comparison or template' })
+  @ApiQuery({ name: 'fiscalYear', required: true, type: Number })
+  @ApiQuery({ name: 'seasonGroupId', required: true })
+  @ApiQuery({ name: 'seasonType', required: false })
+  @ApiQuery({ name: 'brandId', required: false })
+  async findHistorical(
+    @Query('fiscalYear') fiscalYear: number,
+    @Query('seasonGroupId') seasonGroupId: string,
+    @Query('seasonType') seasonType?: string,
+    @Query('brandId') brandId?: string,
+  ) {
+    const data = await this.proposalService.findHistorical({
+      fiscalYear: Number(fiscalYear),
+      seasonGroupId,
+      seasonType,
+      brandId,
+    });
+    return { success: true, data };
+  }
+
   // ─── GET ONE ─────────────────────────────────────────────────────────────
 
   @Get(':id')
@@ -79,6 +103,28 @@ export class ProposalController {
   @ApiBody({ type: UpdateProposalDto })
   async update(@Param('id') id: string, @Body() dto: UpdateProposalDto, @Request() req: any) {
     return { success: true, data: await this.proposalService.update(id, dto, req.user.sub) };
+  }
+
+  // ─── SAVE FULL (atomic replace all products) ─────────────────────────────
+
+  @Put(':id/save-full')
+  @RequirePermissions('proposal:write')
+  @ApiOperation({ summary: 'Atomic save: replace all products in proposal' })
+  async saveFullProposal(
+    @Param('id') id: string,
+    @Body() body: { products: any[] },
+    @Request() req: any,
+  ) {
+    return { success: true, data: await this.proposalService.saveFullProposal(id, body, req.user.sub) };
+  }
+
+  // ─── COPY ──────────────────────────────────────────────────────────────
+
+  @Post(':id/copy')
+  @RequirePermissions('proposal:write')
+  @ApiOperation({ summary: 'Copy proposal to a new draft' })
+  async copyProposal(@Param('id') id: string, @Request() req: any) {
+    return { success: true, data: await this.proposalService.copyProposal(id, req.user.sub) };
   }
 
   // ─── ADD PRODUCT ─────────────────────────────────────────────────────────
@@ -172,6 +218,27 @@ export class ProposalController {
     @Request() req: any,
   ) {
     return { success: true, data: await this.proposalService.approveLevel2(id, dto, req.user.sub) };
+  }
+
+  // ─── SIZING: LIST ───────────────────────────────────────────────────────
+
+  @Get('products/:productId/sizings')
+  @RequirePermissions('proposal:read')
+  @ApiOperation({ summary: 'Get sizings for a proposal product' })
+  async getSizingsByProduct(@Param('productId') productId: string) {
+    return { success: true, data: await this.proposalService.getSizingsByProduct(productId) };
+  }
+
+  // ─── SIZING: SAVE ─────────────────────────────────────────────────────
+
+  @Put('products/:productId/sizings')
+  @RequirePermissions('proposal:write')
+  @ApiOperation({ summary: 'Save (overwrite) sizings for a proposal product' })
+  async saveSizings(
+    @Param('productId') productId: string,
+    @Body() body: { sizings: any[] },
+  ) {
+    return { success: true, data: await this.proposalService.saveSizings(productId, body.sizings) };
   }
 
   // ─── DELETE ──────────────────────────────────────────────────────────────

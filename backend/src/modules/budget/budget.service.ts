@@ -296,6 +296,26 @@ export class BudgetService {
     });
   }
 
+  // ─── ARCHIVE ──────────────────────────────────────────────────────────
+
+  async archive(id: string) {
+    const budget = await this.prisma.budget.findUnique({ where: { id } });
+    if (!budget) throw new NotFoundException('Budget not found');
+
+    if (budget.status !== BudgetStatus.APPROVED) {
+      throw new BadRequestException(`Only approved budgets can be archived. Current status: ${budget.status}`);
+    }
+
+    return this.prisma.budget.update({
+      where: { id },
+      data: { status: BudgetStatus.ARCHIVED },
+      include: {
+        groupBrand: true,
+        details: { include: { store: true } },
+      },
+    });
+  }
+
   // ─── STATISTICS ─────────────────────────────────────────────────────────
 
   async getStatistics(fiscalYear?: number) {

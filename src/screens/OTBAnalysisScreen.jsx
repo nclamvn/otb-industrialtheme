@@ -4,7 +4,7 @@ import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react'
 import {
   BarChart3, ChevronDown, Check, ChevronRight, ArrowLeft,
   Calendar, Tag, Layers, Users, Info, Pencil, X, Star,
-  Sparkles, FileText, Clock, Package
+  Sparkles, FileText, Clock, Package, SlidersHorizontal, GitCompare
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { formatCurrency } from '../utils';
@@ -14,6 +14,7 @@ import { budgetService, masterDataService, planningService } from '../services';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useIsMobile } from '@/hooks/useIsMobile';
 import { useAppContext } from '@/contexts/AppContext';
+import { MobileFilterSheet } from '@/components/ui';
 
 // Constants
 const SEASON_GROUPS = [
@@ -131,13 +132,70 @@ const OTBAnalysisScreen = ({ otbContext, onOpenSkuProposal, darkMode = false }) 
     fetchBudgets();
   }, [fetchBudgets]);
 
-  // Filter states
+  // OA-8: Load persisted filters from sessionStorage on mount
+  const filtersLoadedRef = useRef(false);
+
+  // Filter states — defaults may be overridden by sessionStorage below
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [selectedBudgetId, setSelectedBudgetId] = useState('all');
   const [selectedSeasonGroup, setSelectedSeasonGroup] = useState('');
   const [selectedSeason, setSelectedSeason] = useState('');
+  const [comparisonType, setComparisonType] = useState('same');
+  const [seasonCount, setSeasonCount] = useState(1);
+  const [selectedBrandIds, setSelectedBrandIds] = useState([]);
   const [budgetContext, setBudgetContext] = useState(null); // Budget info from Planning Screen
+  // Mobile filter state
+  const [showMobileFilters, setShowMobileFilters] = useState(false);
+
+  // OA-5: Historical comparison states
+  const [historicalData, setHistoricalData] = useState(null);
+  const [baselineData, setBaselineData] = useState(null);
+  const [loadingHistorical, setLoadingHistorical] = useState(false);
+
+  // OA-6: Budget comparison mode states
+  const [comparisonBudgetIds, setComparisonBudgetIds] = useState([]);
+  const [compareModeActive, setCompareModeActive] = useState(false);
+
   // Dropdown states
   const [openDropdown, setOpenDropdown] = useState(null);
+
+  // OA-8: Load persisted filters from sessionStorage on mount
+  useEffect(() => {
+    if (filtersLoadedRef.current) return;
+    filtersLoadedRef.current = true;
+    try {
+      const saved = sessionStorage.getItem('otb_analysis_filters');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed.selectedYear != null) setSelectedYear(parsed.selectedYear);
+        if (parsed.selectedBudgetId != null) setSelectedBudgetId(parsed.selectedBudgetId);
+        if (parsed.selectedSeasonGroup != null) setSelectedSeasonGroup(parsed.selectedSeasonGroup);
+        if (parsed.selectedSeason != null) setSelectedSeason(parsed.selectedSeason);
+        if (Array.isArray(parsed.selectedBrandIds)) setSelectedBrandIds(parsed.selectedBrandIds);
+        if (parsed.comparisonType != null) setComparisonType(parsed.comparisonType);
+        if (parsed.seasonCount != null) setSeasonCount(parsed.seasonCount);
+      }
+    } catch (e) {
+      console.warn('Failed to load persisted OTB filters:', e);
+    }
+  }, []);
+
+  // OA-8: Save filters to sessionStorage whenever they change
+  useEffect(() => {
+    try {
+      sessionStorage.setItem('otb_analysis_filters', JSON.stringify({
+        selectedYear,
+        selectedBudgetId,
+        selectedSeasonGroup,
+        selectedSeason,
+        selectedBrandIds,
+        comparisonType,
+        seasonCount,
+      }));
+    } catch (e) {
+      // sessionStorage may be unavailable
+    }
+  }, [selectedYear, selectedBudgetId, selectedSeasonGroup, selectedSeason, selectedBrandIds, comparisonType, seasonCount]);
 
   // Fetch planning versions when budget is selected
   useEffect(() => {
@@ -463,16 +521,115 @@ const OTBAnalysisScreen = ({ otbContext, onOpenSkuProposal, darkMode = false }) 
     }
   }, [selectedVersionId, handleSaveAllocations, registerSave, unregisterSave]);
 
+  // OA-5: Fetch historical planning data for comparison
+  const fetchHistorical = useCallback(async () => {
+    if (!selectedBudget || selectedBudgetId === 'all') return;
+    const fiscalYear = selectedBudget.fiscalYear;
+    const brandId = selectedBudget.brandId;
+    if (!fiscalYear || !selectedSeasonGroup || !selectedSeason) return;
+    setLoadingHistorical(true);
+    try {
+      const result = await planningService.getHistorical({
+        fiscalYear,
+        seasonGroupId: selectedSeasonGroup,
+        seasonName: selectedSeason,
+        brandId
+      });
+      setHistoricalData(result);
+      setBaselineData(result);
+    } catch (err) {
+      console.error('Failed to fetch historical data:', err);
+      setHistoricalData(null);
+      setBaselineData(null);
+    } finally {
+      setLoadingHistorical(false);
+    }
+  }, [selectedBudget, selectedBudgetId, selectedSeasonGroup, selectedSeason]);
+
+  // OA-5: Trigger historical fetch when budget + season are selected
+  useEffect(() => {
+    if (selectedBudgetId && selectedBudgetId !== 'all' && selectedSeasonGroup && selectedSeason) {
+      fetchHistorical();
+    } else {
+      setHistoricalData(null);
+      setBaselineData(null);
+    }
+  }, [fetchHistorical]);
+
+  // OA-5: Build a keyed lookup map from historical planning details
+  const buildHistoricalLookup = useCallback((data, dimensionKey = 'name') => {
+    if (!data?.details || !Array.isArray(data.details)) return {};
+    const lookup = {};
+    data.details.forEach(detail => {
+      const key = (detail[dimensionKey] || detail.collection || detail.gender || detail.category || detail.name || '').toLowerCase().trim();
+      if (key) {
+        lookup[key] = {
+          buyPct: detail.buyPct ?? detail.percentBuy ?? 0,
+          salesPct: detail.salesPct ?? detail.percentSales ?? 0,
+          stPct: detail.stPct ?? detail.percentST ?? detail.sellThrough ?? 0,
+        };
+      }
+    });
+    return lookup;
+  }, []);
+
+  // OA-5: Memoized historical lookups for each tab dimension
+  const historicalLookup = useMemo(() => {
+    if (!historicalData) return { collection: {}, gender: {}, category: {} };
+    return {
+      collection: buildHistoricalLookup(historicalData, 'collection'),
+      gender: buildHistoricalLookup(historicalData, 'gender'),
+      category: buildHistoricalLookup(historicalData, 'category'),
+    };
+  }, [historicalData, buildHistoricalLookup]);
+
+  // OA-1: Year list (±2 years from current)
+  const yearOptions = useMemo(() => Array.from({ length: 5 }, (_, i) => new Date().getFullYear() - 2 + i), []);
+
+  // OA-1: Filter budgets by selected fiscal year
+  const yearFilteredBudgets = useMemo(() => {
+    return apiBudgets.filter(b => b.fiscalYear === selectedYear);
+  }, [apiBudgets, selectedYear]);
+
+  // OA-4: Derive unique brand list from all budgets (not year-filtered, so user can see available brands)
+  const availableBrands = useMemo(() => {
+    const brandMap = new Map();
+    apiBudgets.forEach(b => {
+      if (b.brandId && !brandMap.has(b.brandId)) {
+        brandMap.set(b.brandId, { id: b.brandId, name: b.brandName || 'Unknown' });
+      }
+    });
+    return [...brandMap.values()];
+  }, [apiBudgets]);
+
+  // OA-4 + OA-1: Final filtered budgets for the budget dropdown (year + brand filters)
+  const filteredBudgetsForDropdown = useMemo(() => {
+    let list = yearFilteredBudgets;
+    if (selectedBrandIds.length > 0) {
+      list = list.filter(b => selectedBrandIds.includes(b.brandId));
+    }
+    return list;
+  }, [yearFilteredBudgets, selectedBrandIds]);
+
   // Clear all filters
   const clearFilters = () => {
+    setSelectedYear(new Date().getFullYear());
     setSelectedBudgetId('all');
     setSelectedSeasonGroup('');
     setSelectedSeason('');
     setSelectedVersionId(null);
     setVersions([]);
+    setComparisonType('same');
+    setSeasonCount(1);
+    setSelectedBrandIds([]);
+    // OA-5 + OA-6: Reset historical and comparison states
+    setHistoricalData(null);
+    setBaselineData(null);
+    setComparisonBudgetIds([]);
+    setCompareModeActive(false);
   };
 
-  const hasActiveFilters = selectedBudgetId !== 'all' || (selectedSeasonGroup && selectedSeasonGroup !== 'all') || (selectedSeason && selectedSeason !== 'all') || selectedVersionId;
+  const hasActiveFilters = selectedBudgetId !== 'all' || (selectedSeasonGroup && selectedSeasonGroup !== 'all') || (selectedSeason && selectedSeason !== 'all') || selectedVersionId || selectedBrandIds.length > 0 || comparisonType !== 'same' || seasonCount !== 1;
   const selectedBudget = selectedBudgetId === 'all'
     ? null
     : apiBudgets.find(b => b.id === selectedBudgetId);
@@ -573,6 +730,7 @@ const OTBAnalysisScreen = ({ otbContext, onOpenSkuProposal, darkMode = false }) 
   const headerGoldCell = 'bg-[rgba(215,183,151,0.3)] text-[#8A6340]';
   const headerBrownCell = 'bg-[rgba(139,115,85,0.2)] text-[#5C4033]';
   const headerDarkBrownCell = 'bg-[rgba(92,64,51,0.2)] text-[#5C4033]';
+  const headerHistCell = 'bg-[rgba(180,160,140,0.15)] text-[#8C7A68]'; // OA-5: lighter shade for historical columns
   const groupRowClass = "bg-gradient-to-r from-[rgba(215,183,151,0.15)] to-[rgba(215,183,151,0.08)] border-l-4 border-[#C4975A]";
   const sumRowClass = "bg-gradient-to-r from-[rgba(215,183,151,0.25)] to-[rgba(215,183,151,0.2)] text-[#5C4A32] font-semibold";
 
@@ -587,6 +745,9 @@ const OTBAnalysisScreen = ({ otbContext, onOpenSkuProposal, darkMode = false }) 
               <th className={`${headerCellClass} ${headerDarkCell}`}>{t('otbAnalysis.pctBuy')}</th>
               <th className={`${headerCellClass} ${headerDarkCell}`}>{t('otbAnalysis.pctSales')}</th>
               <th className={`${headerCellClass} ${headerDarkCell}`}>{t('otbAnalysis.pctST')}</th>
+              <th className={`${headerCellClass} ${headerHistCell}`}>Hist %Buy</th>
+              <th className={`${headerCellClass} ${headerHistCell}`}>Hist %Sales</th>
+              <th className={`${headerCellClass} ${headerHistCell}`}>Hist %ST</th>
               <th className={`${headerCellClass} ${headerDarkCell}`}>MOC</th>
               <th className={`${headerCellClass} ${headerGoldCell}`}>{t('otbAnalysis.pctProposed')}</th>
               <th className={`${headerCellClass} ${headerBrownCell}`}>{t('otbAnalysis.dollarOTB')}</th>
@@ -597,7 +758,7 @@ const OTBAnalysisScreen = ({ otbContext, onOpenSkuProposal, darkMode = false }) 
             {collectionSections.map((section) => (
               <React.Fragment key={`col-${section.id}`}>
                 <tr className={groupRowClass}>
-                  <td className="px-4 py-3" colSpan={8}>
+                  <td className="px-4 py-3" colSpan={11}>
                     <div className="flex items-center gap-2">
                       <span className="font-bold font-brand text-[#8A6340]">{section.name}</span>
                       <Info size={14} className="text-[#6B5D4F]" />
@@ -623,6 +784,18 @@ const OTBAnalysisScreen = ({ otbContext, onOpenSkuProposal, darkMode = false }) 
                       <td className="px-4 py-3 text-center font-data text-[#8C8178]">{(cellData.buyPct || 0).toFixed(1)}%</td>
                       <td className="px-4 py-3 text-center font-data text-[#8C8178]">{(cellData.salesPct || 0).toFixed(0)}%</td>
                       <td className="px-4 py-3 text-center font-data text-[#8C8178]">{(cellData.stPct || 0).toFixed(0)}%</td>
+                      {/* OA-5: Historical columns */}
+                      {(() => {
+                        const histKey = (section.name || section.id || '').toLowerCase().trim();
+                        const hist = historicalLookup.collection[histKey];
+                        return (
+                          <>
+                            <td className="px-4 py-3 text-center font-data text-[#A89888]">{hist ? `${hist.buyPct.toFixed(1)}%` : '-'}</td>
+                            <td className="px-4 py-3 text-center font-data text-[#A89888]">{hist ? `${hist.salesPct.toFixed(0)}%` : '-'}</td>
+                            <td className="px-4 py-3 text-center font-data text-[#A89888]">{hist ? `${hist.stPct.toFixed(0)}%` : '-'}</td>
+                          </>
+                        );
+                      })()}
                       <td className="px-4 py-3 text-center font-data text-[#8C8178]">{cellData.moc || 0}</td>
                       <td className="px-4 py-3 bg-[rgba(160,120,75,0.12)]">
                         <EditableCell
@@ -655,6 +828,8 @@ const OTBAnalysisScreen = ({ otbContext, onOpenSkuProposal, darkMode = false }) 
               <td className="px-4 py-4 text-center font-data">100%</td>
               <td className="px-4 py-4 text-center font-data">-</td>
               <td className="px-4 py-4 text-center font-data">-</td>
+              <td className="px-4 py-4 text-center font-data">-</td>
+              <td className="px-4 py-4 text-center font-data">-</td>
               <td className="px-4 py-4 text-center font-data">100%</td>
               <td className="px-4 py-4 text-center font-data">{formatCurrency(grandTotals.otbValue)}</td>
               <td className="px-4 py-4 text-center font-data">-</td>
@@ -676,6 +851,9 @@ const OTBAnalysisScreen = ({ otbContext, onOpenSkuProposal, darkMode = false }) 
               <th className={`${headerCellClass} ${headerDarkCell}`}>{t('otbAnalysis.pctBuy')}</th>
               <th className={`${headerCellClass} ${headerDarkCell}`}>{t('otbAnalysis.pctSales')}</th>
               <th className={`${headerCellClass} ${headerDarkCell}`}>{t('otbAnalysis.pctST')}</th>
+              <th className={`${headerCellClass} ${headerHistCell}`}>Hist %Buy</th>
+              <th className={`${headerCellClass} ${headerHistCell}`}>Hist %Sales</th>
+              <th className={`${headerCellClass} ${headerHistCell}`}>Hist %ST</th>
               <th className={`${headerCellClass} ${headerGoldCell}`}>{t('otbAnalysis.pctProposed')}</th>
               <th className={`${headerCellClass} ${headerBrownCell}`}>{t('otbAnalysis.dollarOTB')}</th>
               <th className={`${headerCellClass} ${headerDarkBrownCell}`}>{t('otbAnalysis.variance')}</th>
@@ -685,7 +863,7 @@ const OTBAnalysisScreen = ({ otbContext, onOpenSkuProposal, darkMode = false }) 
             {GENDERS.map((gen) => (
               <React.Fragment key={`gen-${gen.id}`}>
                 <tr className={groupRowClass}>
-                  <td className="px-4 py-3" colSpan={7}>
+                  <td className="px-4 py-3" colSpan={10}>
                     <div className="flex items-center gap-2">
                       <span className="font-bold font-brand text-[#8A6340]">{gen.name}</span>
                       <Info size={14} className="text-[#6B5D4F]" />
@@ -711,6 +889,18 @@ const OTBAnalysisScreen = ({ otbContext, onOpenSkuProposal, darkMode = false }) 
                       <td className="px-4 py-3 text-center font-data text-[#8C8178]">{(cellData.buyPct || 0).toFixed(1)}%</td>
                       <td className="px-4 py-3 text-center font-data text-[#8C8178]">{(cellData.salesPct || 0).toFixed(0)}%</td>
                       <td className="px-4 py-3 text-center font-data text-[#8C8178]">{(cellData.stPct || 0).toFixed(0)}%</td>
+                      {/* OA-5: Historical columns */}
+                      {(() => {
+                        const histKey = (gen.name || gen.id || '').toLowerCase().trim();
+                        const hist = historicalLookup.gender[histKey];
+                        return (
+                          <>
+                            <td className="px-4 py-3 text-center font-data text-[#A89888]">{hist ? `${hist.buyPct.toFixed(1)}%` : '-'}</td>
+                            <td className="px-4 py-3 text-center font-data text-[#A89888]">{hist ? `${hist.salesPct.toFixed(0)}%` : '-'}</td>
+                            <td className="px-4 py-3 text-center font-data text-[#A89888]">{hist ? `${hist.stPct.toFixed(0)}%` : '-'}</td>
+                          </>
+                        );
+                      })()}
                       <td className="px-4 py-3 bg-[rgba(160,120,75,0.12)]">
                         <EditableCell
                           cellKey={cellKey}
@@ -740,6 +930,9 @@ const OTBAnalysisScreen = ({ otbContext, onOpenSkuProposal, darkMode = false }) 
               <td className="px-4 py-4 font-bold font-brand">{t('otbAnalysis.total')}</td>
               <td className="px-4 py-4 text-center font-data">100%</td>
               <td className="px-4 py-4 text-center font-data">100%</td>
+              <td className="px-4 py-4 text-center font-data">-</td>
+              <td className="px-4 py-4 text-center font-data">-</td>
+              <td className="px-4 py-4 text-center font-data">-</td>
               <td className="px-4 py-4 text-center font-data">-</td>
               <td className="px-4 py-4 text-center font-data">100%</td>
               <td className="px-4 py-4 text-center font-data">{formatCurrency(grandTotals.otbValue)}</td>
@@ -888,6 +1081,9 @@ const OTBAnalysisScreen = ({ otbContext, onOpenSkuProposal, darkMode = false }) 
                                   <th className={`px-3 py-2 text-center text-xs font-semibold font-brand ${headerDarkCell}`}>{t('otbAnalysis.pctBuy')}</th>
                                   <th className={`px-3 py-2 text-center text-xs font-semibold font-brand ${headerDarkCell}`}>{t('otbAnalysis.pctSales')}</th>
                                   <th className={`px-3 py-2 text-center text-xs font-semibold font-brand ${headerDarkCell}`}>{t('otbAnalysis.pctST')}</th>
+                                  <th className={`px-3 py-2 text-center text-xs font-semibold font-brand ${headerHistCell}`}>Hist %Buy</th>
+                                  <th className={`px-3 py-2 text-center text-xs font-semibold font-brand ${headerHistCell}`}>Hist %Sales</th>
+                                  <th className={`px-3 py-2 text-center text-xs font-semibold font-brand ${headerHistCell}`}>Hist %ST</th>
                                   <th className={`px-3 py-2 text-center text-xs font-semibold font-brand ${headerGoldCell}`}>{t('otbAnalysis.pctProposed')}</th>
                                   <th className={`px-3 py-2 text-center text-xs font-semibold font-brand ${headerBrownCell}`}>{t('otbAnalysis.dollarOTB')}</th>
                                   <th className={`px-3 py-2 text-center text-xs font-semibold font-brand ${headerDarkBrownCell}`}>{t('otbAnalysis.variance')}</th>
@@ -916,6 +1112,18 @@ const OTBAnalysisScreen = ({ otbContext, onOpenSkuProposal, darkMode = false }) 
                                       <td className="px-3 py-2.5 text-center font-data text-[#8C8178]">{rowData.buyPct || 0}%</td>
                                       <td className="px-3 py-2.5 text-center font-data text-[#8C8178]">{rowData.salesPct || 0}%</td>
                                       <td className="px-3 py-2.5 text-center font-data text-[#8C8178]">{rowData.stPct || 0}%</td>
+                                      {/* OA-5: Historical columns */}
+                                      {(() => {
+                                        const histKey = (cat.name || cat.id || '').toLowerCase().trim();
+                                        const hist = historicalLookup.category[histKey];
+                                        return (
+                                          <>
+                                            <td className="px-3 py-2.5 text-center font-data text-[#A89888]">{hist ? `${hist.buyPct.toFixed(1)}%` : '-'}</td>
+                                            <td className="px-3 py-2.5 text-center font-data text-[#A89888]">{hist ? `${hist.salesPct.toFixed(0)}%` : '-'}</td>
+                                            <td className="px-3 py-2.5 text-center font-data text-[#A89888]">{hist ? `${hist.stPct.toFixed(0)}%` : '-'}</td>
+                                          </>
+                                        );
+                                      })()}
                                       <td className="px-3 py-2.5 bg-[rgba(160,120,75,0.12)]">
                                         <EditableCell
                                           cellKey={cellKey}
@@ -978,6 +1186,9 @@ const OTBAnalysisScreen = ({ otbContext, onOpenSkuProposal, darkMode = false }) 
                                   <td className="px-3 py-2 text-center font-data text-[#5C4A32]">{catTotals.buyPct}%</td>
                                   <td className="px-3 py-2 text-center font-data text-[#5C4A32]">{catTotals.salesPct}%</td>
                                   <td className="px-3 py-2 text-center font-data text-[#5C4A32]">{catTotals.stPct}%</td>
+                                  <td className="px-3 py-2 text-center font-data text-[#A89888]">-</td>
+                                  <td className="px-3 py-2 text-center font-data text-[#A89888]">-</td>
+                                  <td className="px-3 py-2 text-center font-data text-[#A89888]">-</td>
                                   <td className="px-3 py-2 text-center bg-[rgba(160,120,75,0.18)] font-bold font-data text-[#8A6340]">{catTotals.buyProposed}%</td>
                                   <td className="px-3 py-2 text-center font-bold font-data text-[#5C4A32]">{catTotals.otbProposed.toLocaleString()}</td>
                                   <td className={`px-3 py-2 text-center font-bold font-data ${
@@ -1024,6 +1235,135 @@ const OTBAnalysisScreen = ({ otbContext, onOpenSkuProposal, darkMode = false }) 
     );
   };
 
+  // OA-6: Get the comparison budgets data
+  const comparisonBudgets = useMemo(() => {
+    if (comparisonBudgetIds.length < 2) return [];
+    return comparisonBudgetIds.map(id => apiBudgets.find(b => b.id === id)).filter(Boolean);
+  }, [comparisonBudgetIds, apiBudgets]);
+
+  // OA-6: Toggle a budget into/out of comparison selection
+  const toggleComparisonBudget = (budgetId) => {
+    setComparisonBudgetIds(prev => {
+      if (prev.includes(budgetId)) {
+        return prev.filter(id => id !== budgetId);
+      }
+      if (prev.length >= 3) return prev; // max 3
+      return [...prev, budgetId];
+    });
+  };
+
+  // OA-6: Render Budget Comparison View
+  const renderBudgetComparison = () => {
+    if (comparisonBudgets.length < 2) return null;
+
+    return (
+      <div className="overflow-x-auto">
+        <div className="px-4 py-3 border-b border-[#E8E2DB] bg-[rgba(215,183,151,0.08)]">
+          <div className="flex items-center gap-2">
+            <GitCompare size={16} className="text-[#8A6340]" />
+            <span className="font-bold font-brand text-[#5C4A3A]">Budget Comparison</span>
+            <span className="text-xs text-[#8C8178] ml-2">Comparing {comparisonBudgets.length} budgets</span>
+          </div>
+        </div>
+        <table className="w-full text-sm">
+          <thead>
+            <tr>
+              <th className={`${headerCellClass} ${headerDarkCell} text-left min-w-[200px]`}>Dimension</th>
+              {comparisonBudgets.map(budget => (
+                <React.Fragment key={budget.id}>
+                  <th className={`${headerCellClass} ${headerGoldCell}`} colSpan={3}>
+                    <div className="flex flex-col items-center">
+                      <span className="truncate max-w-[140px]">{budget.budgetName}</span>
+                      <span className="text-[10px] font-normal opacity-70">FY{budget.fiscalYear} · {budget.brandName}</span>
+                    </div>
+                  </th>
+                </React.Fragment>
+              ))}
+            </tr>
+            <tr>
+              <th className={`${headerCellClass} ${headerDarkCell} text-left`}></th>
+              {comparisonBudgets.map(budget => (
+                <React.Fragment key={`sub-${budget.id}`}>
+                  <th className={`${headerCellClass} ${headerDarkCell}`}>%Buy</th>
+                  <th className={`${headerCellClass} ${headerDarkCell}`}>%Sales</th>
+                  <th className={`${headerCellClass} ${headerDarkCell}`}>%ST</th>
+                </React.Fragment>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {/* Render hierarchy: Gender > Category > SubCategory */}
+            {categoryStructure.map(genderGroup => (
+              <React.Fragment key={`cmp-g-${genderGroup.gender.id}`}>
+                <tr className={groupRowClass}>
+                  <td className="px-4 py-3 font-bold font-brand text-[#8A6340]" colSpan={1 + comparisonBudgets.length * 3}>
+                    {genderGroup.gender.name}
+                  </td>
+                </tr>
+                {genderGroup.categories.map(cat => (
+                  <React.Fragment key={`cmp-c-${cat.id}`}>
+                    <tr className="bg-[rgba(160,120,75,0.06)]">
+                      <td className="px-4 py-2 pl-8 font-semibold font-brand text-[#6B5D4F]">{cat.name}</td>
+                      {comparisonBudgets.map(budget => {
+                        // Aggregate subcategory data for this budget
+                        let totalBuy = 0, totalSales = 0;
+                        cat.subCategories.forEach(subCat => {
+                          const key = `${genderGroup.gender.id}_${cat.id}_${subCat.id}`;
+                          const data = localData[key] || {};
+                          totalBuy += data.buyPct || 0;
+                          totalSales += data.salesPct || 0;
+                        });
+                        return (
+                          <React.Fragment key={`cmp-cd-${budget.id}-${cat.id}`}>
+                            <td className="px-3 py-2 text-center font-data text-[#8C8178]">{totalBuy.toFixed(1)}%</td>
+                            <td className="px-3 py-2 text-center font-data text-[#8C8178]">{totalSales.toFixed(0)}%</td>
+                            <td className="px-3 py-2 text-center font-data text-[#8C8178]">-</td>
+                          </React.Fragment>
+                        );
+                      })}
+                    </tr>
+                    {cat.subCategories.map(subCat => (
+                      <tr key={`cmp-s-${subCat.id}`} className="border-b border-[#E8E2DB] hover:bg-[rgba(160,120,75,0.08)]">
+                        <td className="px-4 py-2 pl-12">
+                          <div className="flex items-center gap-2">
+                            <div className="w-1.5 h-1.5 rounded-full bg-[#C4B5A5]"></div>
+                            <span className="text-[#8C8178]">{subCat.name}</span>
+                          </div>
+                        </td>
+                        {comparisonBudgets.map(budget => {
+                          const key = `${genderGroup.gender.id}_${cat.id}_${subCat.id}`;
+                          const data = localData[key] || {};
+                          return (
+                            <React.Fragment key={`cmp-sd-${budget.id}-${subCat.id}`}>
+                              <td className="px-3 py-2 text-center font-data text-[#8C8178]">{(data.buyPct || 0).toFixed(1)}%</td>
+                              <td className="px-3 py-2 text-center font-data text-[#8C8178]">{(data.salesPct || 0).toFixed(0)}%</td>
+                              <td className="px-3 py-2 text-center font-data text-[#8C8178]">{(data.stPct || 0).toFixed(0)}%</td>
+                            </React.Fragment>
+                          );
+                        })}
+                      </tr>
+                    ))}
+                  </React.Fragment>
+                ))}
+              </React.Fragment>
+            ))}
+            {/* Grand Total */}
+            <tr className={sumRowClass}>
+              <td className="px-4 py-4 font-bold font-brand">{t('otbAnalysis.total')}</td>
+              {comparisonBudgets.map(budget => (
+                <React.Fragment key={`cmp-tot-${budget.id}`}>
+                  <td className="px-3 py-4 text-center font-data font-bold">100%</td>
+                  <td className="px-3 py-4 text-center font-data font-bold">100%</td>
+                  <td className="px-3 py-4 text-center font-data font-bold">-</td>
+                </React.Fragment>
+              ))}
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    );
+  };
+
   return (
     <div className="space-y-0">
       {/* Unified Header: Filters + Budget Context + Tabs */}
@@ -1032,7 +1372,47 @@ const OTBAnalysisScreen = ({ otbContext, onOpenSkuProposal, darkMode = false }) 
         <div className="px-3 py-1.5 relative z-[100] border-b border-[#E8E2DB]/60">
           <div className="flex items-center justify-between gap-2">
             {/* Left: Filter Controls */}
-            <div className="flex flex-wrap items-center gap-1.5 min-w-0">
+            <div className={`flex flex-wrap items-center gap-1.5 min-w-0 ${isMobile ? 'hidden' : ''}`}>
+              {/* OA-1: Fiscal Year Dropdown */}
+              <div className="relative" ref={setDropdownRef('year')}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setOpenDropdown((prev) => (prev === 'year' ? null : 'year'));
+                    setOpenCategoryDropdown(null);
+                  }}
+                  className={`px-2.5 py-1 border rounded-md cursor-pointer flex items-center gap-1.5 text-[11px] font-medium transition-all ${
+                    selectedYear !== new Date().getFullYear()
+                      ? 'bg-dafc-gold/10 border-dafc-gold/40 text-[#8A6340]'
+                      : 'bg-white border-border-muted text-content hover:bg-surface-secondary'
+                  }`}
+                >
+                  <Calendar size={12} className={selectedYear !== new Date().getFullYear() ? 'text-dafc-gold' : 'text-content-muted'} />
+                  <span>FY {selectedYear}</span>
+                  <ChevronDown size={11} className={`shrink-0 transition-transform duration-200 ${openDropdown === 'year' ? 'rotate-180' : ''}`} />
+                </button>
+                {openDropdown === 'year' && (
+                  <div className="absolute top-full left-0 right-0 mt-1 border rounded-lg shadow-lg z-[9999] overflow-hidden bg-white border-[#E8E2DB]">
+                    {yearOptions.map((year) => (
+                      <div
+                        key={year}
+                        onClick={() => { setSelectedYear(year); setOpenDropdown(null); }}
+                        className={`px-3 py-2.5 flex items-center justify-between cursor-pointer text-sm transition-colors ${
+                          selectedYear === year
+                            ? 'bg-[rgba(160,120,75,0.18)] text-[#8A6340]'
+                            : 'hover:bg-[#FBF9F7] text-[#2C2417]'
+                        }`}
+                      >
+                        <span className="font-medium">FY {year}</span>
+                        {selectedYear === year && <Check size={14} className="text-[#C4975A]" />}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <div className="h-4 w-px hidden sm:block bg-border-muted"></div>
+
               {/* Budget Name Dropdown */}
               <div className="relative" ref={setDropdownRef('budget')}>
                 <button
@@ -1063,12 +1443,12 @@ const OTBAnalysisScreen = ({ otbContext, onOpenSkuProposal, darkMode = false }) 
                           <span className="ml-2 text-sm text-[#8C8178]">{t('common.loading')}...</span>
                         </div>
                       )}
-                      {!loadingBudgets && apiBudgets.length === 0 && (
+                      {!loadingBudgets && filteredBudgetsForDropdown.length === 0 && (
                         <div className="px-4 py-6 text-center text-sm text-[#8C8178]">
                           {t('budget.noMatchingBudgets')}
                         </div>
                       )}
-                      {!loadingBudgets && apiBudgets.length > 0 && (
+                      {!loadingBudgets && filteredBudgetsForDropdown.length > 0 && (
                       <div
                         onClick={() => { setSelectedBudgetId('all'); setOpenDropdown(null); }}
                         className={`px-4 py-2.5 flex items-center justify-between cursor-pointer text-sm transition-colors ${
@@ -1081,7 +1461,7 @@ const OTBAnalysisScreen = ({ otbContext, onOpenSkuProposal, darkMode = false }) 
                         {selectedBudgetId === 'all' && <Check size={14} className="text-[#C4975A]" />}
                       </div>
                       )}
-                      {!loadingBudgets && apiBudgets.map((budget) => (
+                      {!loadingBudgets && filteredBudgetsForDropdown.map((budget) => (
                         <div
                           key={budget.id}
                           onClick={() => {
@@ -1200,6 +1580,251 @@ const OTBAnalysisScreen = ({ otbContext, onOpenSkuProposal, darkMode = false }) 
                 )}
               </div>
 
+              {/* OA-2: Comparison Type Dropdown */}
+              <div className="relative" ref={setDropdownRef('comparison')}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setOpenDropdown((prev) => (prev === 'comparison' ? null : 'comparison'));
+                    setOpenCategoryDropdown(null);
+                  }}
+                  className={`px-2.5 py-1 border rounded-md cursor-pointer flex items-center gap-1.5 text-[11px] font-medium transition-all ${
+                    comparisonType !== 'same'
+                      ? 'bg-dafc-gold/10 border-dafc-gold/40 text-[#8A6340]'
+                      : 'bg-white border-border-muted text-content hover:bg-surface-secondary'
+                  }`}
+                >
+                  <BarChart3 size={12} className={comparisonType !== 'same' ? 'text-dafc-gold' : 'text-content-muted'} />
+                  <span>{comparisonType === 'same' ? 'Same Season' : 'Different Season'}</span>
+                  <ChevronDown size={11} className={`shrink-0 transition-transform duration-200 ${openDropdown === 'comparison' ? 'rotate-180' : ''}`} />
+                </button>
+                {openDropdown === 'comparison' && (
+                  <div className="absolute top-full left-0 right-0 mt-1 border rounded-lg shadow-lg z-[9999] overflow-hidden bg-white border-[#E8E2DB] min-w-[160px]">
+                    {[
+                      { id: 'same', label: 'Same Season' },
+                      { id: 'different', label: 'Different Season' },
+                    ].map((opt) => (
+                      <div
+                        key={opt.id}
+                        onClick={() => { setComparisonType(opt.id); setOpenDropdown(null); }}
+                        className={`px-3 py-2.5 flex items-center justify-between cursor-pointer text-sm transition-colors ${
+                          comparisonType === opt.id
+                            ? 'bg-[rgba(160,120,75,0.18)] text-[#8A6340]'
+                            : 'hover:bg-[#FBF9F7] text-[#2C2417]'
+                        }`}
+                      >
+                        <span className="font-medium">{opt.label}</span>
+                        {comparisonType === opt.id && <Check size={14} className="text-[#C4975A]" />}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* OA-3: Season Count / Periods Dropdown */}
+              <div className="relative" ref={setDropdownRef('seasonCount')}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setOpenDropdown((prev) => (prev === 'seasonCount' ? null : 'seasonCount'));
+                    setOpenCategoryDropdown(null);
+                  }}
+                  className={`px-2.5 py-1 border rounded-md cursor-pointer flex items-center gap-1.5 text-[11px] font-medium transition-all ${
+                    seasonCount !== 1
+                      ? 'bg-dafc-gold/10 border-dafc-gold/40 text-[#8A6340]'
+                      : 'bg-white border-border-muted text-content hover:bg-surface-secondary'
+                  }`}
+                >
+                  <SlidersHorizontal size={12} className={seasonCount !== 1 ? 'text-dafc-gold' : 'text-content-muted'} />
+                  <span>{seasonCount} Period{seasonCount > 1 ? 's' : ''}</span>
+                  <ChevronDown size={11} className={`shrink-0 transition-transform duration-200 ${openDropdown === 'seasonCount' ? 'rotate-180' : ''}`} />
+                </button>
+                {openDropdown === 'seasonCount' && (
+                  <div className="absolute top-full left-0 right-0 mt-1 border rounded-lg shadow-lg z-[9999] overflow-hidden bg-white border-[#E8E2DB]">
+                    {[1, 2, 3].map((count) => (
+                      <div
+                        key={count}
+                        onClick={() => { setSeasonCount(count); setOpenDropdown(null); }}
+                        className={`px-3 py-2.5 flex items-center justify-between cursor-pointer text-sm transition-colors ${
+                          seasonCount === count
+                            ? 'bg-[rgba(160,120,75,0.18)] text-[#8A6340]'
+                            : 'hover:bg-[#FBF9F7] text-[#2C2417]'
+                        }`}
+                      >
+                        <span className="font-medium">{count} Period{count > 1 ? 's' : ''}</span>
+                        {seasonCount === count && <Check size={14} className="text-[#C4975A]" />}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* OA-4: Brand Multi-Select Dropdown */}
+              <div className="relative" ref={setDropdownRef('brand')}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setOpenDropdown((prev) => (prev === 'brand' ? null : 'brand'));
+                    setOpenCategoryDropdown(null);
+                  }}
+                  className={`px-2.5 py-1 border rounded-md cursor-pointer flex items-center gap-1.5 text-[11px] font-medium transition-all ${
+                    selectedBrandIds.length > 0
+                      ? 'bg-dafc-gold/10 border-dafc-gold/40 text-[#8A6340]'
+                      : 'bg-white border-border-muted text-content hover:bg-surface-secondary'
+                  }`}
+                >
+                  <Tag size={12} className={selectedBrandIds.length > 0 ? 'text-dafc-gold' : 'text-content-muted'} />
+                  <span className="truncate max-w-[120px]">
+                    {selectedBrandIds.length === 0
+                      ? 'Brand'
+                      : selectedBrandIds.length === 1
+                        ? (availableBrands.find(b => b.id === selectedBrandIds[0])?.name || 'Brand')
+                        : `${selectedBrandIds.length} Brands`}
+                  </span>
+                  <ChevronDown size={11} className={`shrink-0 transition-transform duration-200 ${openDropdown === 'brand' ? 'rotate-180' : ''}`} />
+                </button>
+                {openDropdown === 'brand' && (
+                  <div className="absolute top-full left-0 mt-1 border rounded-xl shadow-xl z-[9999] overflow-hidden min-w-[220px] bg-white border-[#E8E2DB]">
+                    <div className="p-2 border-b bg-[#FBF9F7] border-[#E8E2DB] flex items-center justify-between">
+                      <span className="text-xs font-semibold uppercase tracking-wide font-brand text-[#6B5D4F]">Brand</span>
+                      {selectedBrandIds.length > 0 && (
+                        <button
+                          onClick={(e) => { e.stopPropagation(); setSelectedBrandIds([]); }}
+                          className="text-[10px] text-[#8C8178] hover:text-[#2C2417] font-medium"
+                        >
+                          Clear
+                        </button>
+                      )}
+                    </div>
+                    <div className="max-h-60 overflow-y-auto py-1">
+                      {availableBrands.length === 0 && (
+                        <div className="px-4 py-4 text-center text-sm text-[#8C8178]">No brands available</div>
+                      )}
+                      {availableBrands.map((brand) => {
+                        const isSelected = selectedBrandIds.includes(brand.id);
+                        return (
+                          <div
+                            key={brand.id}
+                            onClick={() => {
+                              setSelectedBrandIds(prev =>
+                                isSelected
+                                  ? prev.filter(id => id !== brand.id)
+                                  : [...prev, brand.id]
+                              );
+                            }}
+                            className={`px-4 py-2.5 flex items-center gap-3 cursor-pointer text-sm transition-colors ${
+                              isSelected
+                                ? 'bg-[rgba(160,120,75,0.18)] text-[#8A6340]'
+                                : 'hover:bg-[#FBF9F7] text-[#2C2417]'
+                            }`}
+                          >
+                            <div className={`w-4 h-4 rounded border-2 flex items-center justify-center transition-colors ${
+                              isSelected
+                                ? 'bg-[#C4975A] border-[#C4975A]'
+                                : 'border-[#C4B5A5] bg-white'
+                            }`}>
+                              {isSelected && <Check size={10} className="text-white" strokeWidth={3} />}
+                            </div>
+                            <span className="font-medium">{brand.name}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* OA-6: Compare Budgets Toggle */}
+              <div className="h-4 w-px hidden sm:block bg-border-muted"></div>
+              <button
+                type="button"
+                onClick={() => {
+                  setCompareModeActive(prev => {
+                    if (prev) {
+                      setComparisonBudgetIds([]);
+                    }
+                    return !prev;
+                  });
+                }}
+                className={`px-2.5 py-1 border rounded-md cursor-pointer flex items-center gap-1.5 text-[11px] font-medium transition-all ${
+                  compareModeActive
+                    ? 'bg-[rgba(196,151,90,0.2)] border-[#C4975A] text-[#8A6340]'
+                    : 'bg-white border-border-muted text-content hover:bg-surface-secondary'
+                }`}
+              >
+                <GitCompare size={12} className={compareModeActive ? 'text-[#C4975A]' : 'text-content-muted'} />
+                <span>Compare Budgets</span>
+                {comparisonBudgetIds.length > 0 && (
+                  <span className="px-1.5 py-0.5 text-[9px] font-bold bg-[#C4975A] text-white rounded-full leading-none">{comparisonBudgetIds.length}</span>
+                )}
+              </button>
+
+              {/* OA-6: Budget comparison multi-select dropdown */}
+              {compareModeActive && (
+                <div className="relative" ref={setDropdownRef('compareBudgets')}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setOpenDropdown((prev) => (prev === 'compareBudgets' ? null : 'compareBudgets'));
+                      setOpenCategoryDropdown(null);
+                    }}
+                    className={`px-2.5 py-1 border rounded-md cursor-pointer flex items-center gap-1.5 text-[11px] font-medium transition-all ${
+                      comparisonBudgetIds.length >= 2
+                        ? 'bg-dafc-gold/10 border-dafc-gold/40 text-[#8A6340]'
+                        : 'bg-white border-border-muted text-content hover:bg-surface-secondary'
+                    }`}
+                  >
+                    <span>Select Budgets ({comparisonBudgetIds.length}/3)</span>
+                    <ChevronDown size={11} className={`shrink-0 transition-transform duration-200 ${openDropdown === 'compareBudgets' ? 'rotate-180' : ''}`} />
+                  </button>
+                  {openDropdown === 'compareBudgets' && (
+                    <div className="absolute top-full left-0 mt-1 border rounded-xl shadow-xl z-[9999] overflow-hidden min-w-[300px] bg-white border-[#E8E2DB]">
+                      <div className="p-2 border-b bg-[#FBF9F7] border-[#E8E2DB] flex items-center justify-between">
+                        <span className="text-xs font-semibold uppercase tracking-wide font-brand text-[#6B5D4F]">Select 2-3 Budgets</span>
+                        {comparisonBudgetIds.length > 0 && (
+                          <button
+                            onClick={(e) => { e.stopPropagation(); setComparisonBudgetIds([]); }}
+                            className="text-[10px] text-[#8C8178] hover:text-[#2C2417] font-medium"
+                          >
+                            Clear
+                          </button>
+                        )}
+                      </div>
+                      <div className="max-h-60 overflow-y-auto py-1">
+                        {filteredBudgetsForDropdown.map((budget) => {
+                          const isSelected = comparisonBudgetIds.includes(budget.id);
+                          const isDisabled = !isSelected && comparisonBudgetIds.length >= 3;
+                          return (
+                            <div
+                              key={`cmp-sel-${budget.id}`}
+                              onClick={() => !isDisabled && toggleComparisonBudget(budget.id)}
+                              className={`px-4 py-2.5 flex items-center gap-3 cursor-pointer text-sm transition-colors ${
+                                isDisabled ? 'opacity-40 cursor-not-allowed' :
+                                isSelected
+                                  ? 'bg-[rgba(160,120,75,0.18)] text-[#8A6340]'
+                                  : 'hover:bg-[#FBF9F7] text-[#2C2417]'
+                              }`}
+                            >
+                              <div className={`w-4 h-4 rounded border-2 flex items-center justify-center transition-colors ${
+                                isSelected
+                                  ? 'bg-[#C4975A] border-[#C4975A]'
+                                  : 'border-[#C4B5A5] bg-white'
+                              }`}>
+                                {isSelected && <Check size={10} className="text-white" strokeWidth={3} />}
+                              </div>
+                              <div className="min-w-0 flex-1">
+                                <div className="font-semibold text-sm">{budget.budgetName}</div>
+                                <div className="text-xs text-[#6B5D4F]">FY{budget.fiscalYear} · {budget.brandName} · {formatCurrency(budget.totalBudget)}</div>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
               {/* Version Filter */}
               {selectedBudgetId && selectedBudgetId !== 'all' && (
               <>
@@ -1299,6 +1924,21 @@ const OTBAnalysisScreen = ({ otbContext, onOpenSkuProposal, darkMode = false }) 
               )}
             </div>
 
+            {/* OA-7: Mobile Filter Trigger Button */}
+            {isMobile && (
+              <button
+                type="button"
+                onClick={() => setShowMobileFilters(true)}
+                className="px-2.5 py-1 border rounded-md flex items-center gap-1.5 text-[11px] font-medium transition-all bg-white border-border-muted text-content hover:bg-surface-secondary"
+              >
+                <SlidersHorizontal size={12} className="text-content-muted" />
+                <span>Filters</span>
+                {hasActiveFilters && (
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#C4975A]" />
+                )}
+              </button>
+            )}
+
             {/* Right: Budget Summary (inline) */}
             {((selectedBudget && selectedSeasonGroup && selectedSeason) || budgetContext) && (
               <div className="hidden sm:flex items-center gap-2 pl-3 border-l border-[#E8E2DB]/60 flex-shrink-0">
@@ -1322,10 +1962,102 @@ const OTBAnalysisScreen = ({ otbContext, onOpenSkuProposal, darkMode = false }) 
           </div>
         </div>
 
+        {/* OA-7: Mobile Filter Sheet */}
+        {isMobile && (
+          <MobileFilterSheet
+            isOpen={showMobileFilters}
+            onClose={() => setShowMobileFilters(false)}
+            title="OTB Analysis Filters"
+            filters={[
+              {
+                key: 'selectedYear',
+                label: 'Fiscal Year',
+                type: 'select',
+                options: yearOptions.map(y => ({ value: String(y), label: `FY ${y}` })),
+                defaultValue: String(new Date().getFullYear()),
+              },
+              {
+                key: 'selectedBudgetId',
+                label: 'Budget',
+                type: 'select',
+                options: filteredBudgetsForDropdown.map(b => ({ value: String(b.id), label: b.budgetName })),
+                defaultValue: 'all',
+              },
+              {
+                key: 'selectedSeasonGroup',
+                label: 'Season Group',
+                type: 'select',
+                options: SEASON_GROUPS.map(s => ({ value: s.id, label: s.label })),
+                defaultValue: '',
+              },
+              {
+                key: 'selectedSeason',
+                label: 'Season',
+                type: 'select',
+                options: SEASONS.map(s => ({ value: s.id, label: s.label })),
+                defaultValue: '',
+              },
+              {
+                key: 'comparisonType',
+                label: 'Comparison',
+                type: 'select',
+                options: [
+                  { value: 'same', label: 'Same Season' },
+                  { value: 'different', label: 'Different Season' },
+                ],
+                defaultValue: 'same',
+              },
+              {
+                key: 'seasonCount',
+                label: 'Periods',
+                type: 'select',
+                options: [
+                  { value: '1', label: '1 Period' },
+                  { value: '2', label: '2 Periods' },
+                  { value: '3', label: '3 Periods' },
+                ],
+                defaultValue: '1',
+              },
+              {
+                key: 'brand',
+                label: 'Brand',
+                type: 'select',
+                options: availableBrands.map(b => ({ value: String(b.id), label: b.name })),
+                defaultValue: '',
+              },
+            ]}
+            values={{
+              selectedYear: String(selectedYear),
+              selectedBudgetId: String(selectedBudgetId),
+              selectedSeasonGroup,
+              selectedSeason,
+              comparisonType,
+              seasonCount: String(seasonCount),
+              brand: selectedBrandIds.length === 1 ? String(selectedBrandIds[0]) : '',
+            }}
+            onApply={(v) => {
+              if (v.selectedYear) setSelectedYear(Number(v.selectedYear));
+              if (v.selectedBudgetId) setSelectedBudgetId(v.selectedBudgetId);
+              if (v.selectedSeasonGroup != null) setSelectedSeasonGroup(v.selectedSeasonGroup);
+              if (v.selectedSeason != null) setSelectedSeason(v.selectedSeason);
+              if (v.comparisonType) setComparisonType(v.comparisonType);
+              if (v.seasonCount) setSeasonCount(Number(v.seasonCount));
+              if (v.brand) {
+                setSelectedBrandIds([v.brand]);
+              } else {
+                setSelectedBrandIds([]);
+              }
+            }}
+            onReset={() => {
+              clearFilters();
+            }}
+          />
+        )}
+
         {/* Row 2: Tabs + Category Filters (inline) + Edit Hint */}
         {selectedBudget && selectedSeason && selectedSeasonGroup && (
           <div className="flex items-center px-3 border-b border-[#E8E2DB]/60 bg-[#FBF9F7]/50">
-            <div className="flex gap-0.5 shrink-0">
+            <div className={`flex gap-0.5 shrink-0 ${isMobile ? 'overflow-x-auto scrollbar-hide' : ''}`}>
               {TABS.map(tab => {
                 const Icon = tab.icon;
                 const isActive = activeTab === tab.id;
@@ -1399,10 +2131,25 @@ const OTBAnalysisScreen = ({ otbContext, onOpenSkuProposal, darkMode = false }) 
 
         {/* Tab Content */}
         {selectedBudget && selectedSeason && selectedSeasonGroup && (
-          <div className="max-h-[calc(100vh-280px)] overflow-y-auto">
-            {activeTab === 'collection' && renderCollectionTab()}
-            {activeTab === 'gender' && renderGenderTab()}
-            {activeTab === 'category' && renderCategoryTab()}
+          <div className="max-h-[calc(100vh-280px)] overflow-y-auto overflow-x-auto">
+            {/* OA-6: Show comparison view when 2+ budgets selected */}
+            {compareModeActive && comparisonBudgetIds.length >= 2 ? (
+              renderBudgetComparison()
+            ) : (
+              <>
+                {activeTab === 'collection' && renderCollectionTab()}
+                {activeTab === 'gender' && renderGenderTab()}
+                {activeTab === 'category' && renderCategoryTab()}
+              </>
+            )}
+          </div>
+        )}
+
+        {/* OA-5: Historical data loading indicator */}
+        {loadingHistorical && (
+          <div className="px-4 py-2 border-t border-[#E8E2DB] bg-[rgba(215,183,151,0.08)] flex items-center gap-2">
+            <div className="w-3 h-3 border-2 border-[#C4975A]/30 border-t-[#C4975A] rounded-full animate-spin" />
+            <span className="text-xs text-[#8C8178]">Loading historical data...</span>
           </div>
         )}
       </div>

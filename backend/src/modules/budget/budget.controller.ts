@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Delete, Param, Query, Body, UseGuards, Request } from '@nestjs/common';
+import { Controller, Get, Post, Put, Patch, Delete, Param, Query, Body, UseGuards, Request } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiOperation, ApiQuery, ApiBody } from '@nestjs/swagger';
 import { BudgetService } from './budget.service';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
@@ -119,6 +119,15 @@ export class BudgetController {
     @Request() req: any,
   ) {
     return { success: true, data: await this.budgetService.approveLevel2(id, dto, req.user.sub) };
+  }
+
+  // ─── ARCHIVE ─────────────────────────────────────────────────────────────
+
+  @Patch(':id/archive')
+  @RequirePermissions('budget:write')
+  @ApiOperation({ summary: 'Archive an approved budget (APPROVED → ARCHIVED)' })
+  async archive(@Param('id') id: string) {
+    return { success: true, data: await this.budgetService.archive(id) };
   }
 
   // ─── DELETE ──────────────────────────────────────────────────────────────
