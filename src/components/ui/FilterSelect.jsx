@@ -10,6 +10,7 @@ export default function FilterSelect({
   searchable = true,
   label,
   disabled = false,
+  compact = false,
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState('');
@@ -85,49 +86,54 @@ export default function FilterSelect({
         type="button"
         disabled={disabled}
         onClick={() => !disabled && setIsOpen(!isOpen)}
-        className={`w-full flex items-center justify-between gap-2 px-3 py-2 rounded-lg border text-sm transition-colors
+        className={`w-full flex items-center justify-between transition-colors
           ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:border-[#C4975A]'}
           ${isOpen ? 'border-[#C4975A] ring-1 ring-[#C4975A]/20' : 'border-[#E8E2DB]'}
-          bg-white text-[#2C2417]`}
+          bg-white text-[#2C2417]
+          ${compact
+            ? 'gap-1.5 px-2.5 py-1 rounded-md border text-[11px] font-medium'
+            : 'gap-2 px-3 py-2 rounded-lg border text-sm'
+          }`}
       >
-        <span className={selectedOption ? 'text-[#2C2417]' : 'text-[#8C8178]'}>
+        <span className={`truncate ${selectedOption ? 'text-[#2C2417]' : 'text-[#8C8178]'}`}>
           {selectedOption?.label || placeholder}
         </span>
-        <ChevronDown size={14} className={`text-[#8C8178] transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+        <ChevronDown size={compact ? 11 : 14} className={`shrink-0 text-[#8C8178] transition-transform ${isOpen ? 'rotate-180' : ''}`} />
       </button>
 
       {isOpen && (
-        <div className="absolute z-50 mt-1 w-full rounded-lg border border-[#E8E2DB] bg-white shadow-lg overflow-hidden">
+        <div className={`absolute z-50 mt-1 w-full border border-[#E8E2DB] bg-white shadow-lg overflow-hidden ${compact ? 'rounded-md min-w-[160px]' : 'rounded-lg'}`}>
           {searchable && (
             <div className="p-2 border-b border-[#F0EBE5]">
-              <div className="flex items-center gap-2 px-2 py-1.5 rounded-md bg-[#FAF8F5]">
-                <Search size={14} className="text-[#8C8178]" />
+              <div className={`flex items-center gap-2 rounded-md bg-[#FAF8F5] ${compact ? 'px-2 py-1' : 'px-2 py-1.5'}`}>
+                <Search size={compact ? 12 : 14} className="text-[#8C8178]" />
                 <input
                   ref={searchRef}
                   type="text"
                   value={search}
                   onChange={(e) => { setSearch(e.target.value); setFocusIndex(-1); }}
                   placeholder="Search..."
-                  className="flex-1 bg-transparent text-sm outline-none text-[#2C2417] placeholder:text-[#B0A89F]"
+                  className={`flex-1 bg-transparent outline-none text-[#2C2417] placeholder:text-[#B0A89F] ${compact ? 'text-xs' : 'text-sm'}`}
                 />
               </div>
             </div>
           )}
           <div className="max-h-48 overflow-y-auto">
             {filtered.length === 0 ? (
-              <div className="px-3 py-2 text-sm text-[#8C8178]">No options found</div>
+              <div className={`px-3 py-2 text-[#8C8178] ${compact ? 'text-xs' : 'text-sm'}`}>No options found</div>
             ) : (
               filtered.map((opt, i) => (
                 <button
                   key={opt.value}
                   type="button"
                   onClick={() => handleSelect(opt)}
-                  className={`w-full flex items-center gap-2 px-3 py-2 text-sm text-left transition-colors
+                  className={`w-full flex items-center gap-2 text-left transition-colors
                     ${i === focusIndex ? 'bg-[#FAF8F5]' : 'hover:bg-[#FAF8F5]'}
-                    ${opt.value === value ? 'text-[#C4975A] font-medium' : 'text-[#2C2417]'}`}
+                    ${opt.value === value ? 'text-[#C4975A] font-medium' : 'text-[#2C2417]'}
+                    ${compact ? 'px-3 py-1.5 text-xs' : 'px-3 py-2 text-sm'}`}
                 >
-                  <span className="flex-1">{opt.label || opt.value}</span>
-                  {opt.value === value && <Check size={14} className="text-[#C4975A]" />}
+                  <span className="flex-1 truncate">{opt.label || opt.value}</span>
+                  {opt.value === value && <Check size={compact ? 12 : 14} className="text-[#C4975A] shrink-0" />}
                 </button>
               ))
             )}

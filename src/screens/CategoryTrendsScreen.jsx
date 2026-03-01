@@ -5,6 +5,7 @@ import { Activity, BarChart3, ArrowUpRight, ArrowDownRight, RefreshCw, Users } f
 import { analyticsService } from '../services';
 import { LoadingSpinner, ErrorMessage, EmptyState } from '../components/Common';
 import { useLanguage } from '@/contexts/LanguageContext';
+import FilterSelect from '@/components/ui/FilterSelect';
 
 const SEASONS = ['SS', 'FW'];
 const YEARS = [2024, 2025];
@@ -90,18 +91,33 @@ const CategoryTrendsScreen = () => {
           <p className={subtext}>{t('analytics.trendsDesc', 'Attribute trends, YoY comparison, and gender breakdown')}</p>
         </div>
         <div className="flex items-center gap-3">
-          <select value={seasonGroup} onChange={e => setSeasonGroup(e.target.value)}
-            className={`px-3 py-2 rounded-lg border ${border} ${cardBg} ${text} text-sm`}>
-            {SEASONS.map(s => <option key={s} value={s}>{s}</option>)}
-          </select>
-          <select value={fiscalYear} onChange={e => setFiscalYear(Number(e.target.value))}
-            className={`px-3 py-2 rounded-lg border ${border} ${cardBg} ${text} text-sm`}>
-            {YEARS.map(y => <option key={y} value={y}>{y}</option>)}
-          </select>
-          <select value={attributeType} onChange={e => setAttributeType(e.target.value)}
-            className={`px-3 py-2 rounded-lg border ${border} ${cardBg} ${text} text-sm`}>
-            {ATTR_TYPES.map(at => <option key={at.value} value={at.value}>{at.label}</option>)}
-          </select>
+          <div className="shrink-0 w-[100px]">
+            <FilterSelect
+              options={SEASONS.map(s => ({ value: s, label: s }))}
+              value={seasonGroup}
+              onChange={(v) => setSeasonGroup(v)}
+              searchable={false}
+              compact
+            />
+          </div>
+          <div className="shrink-0 w-[100px]">
+            <FilterSelect
+              options={YEARS.map(y => ({ value: String(y), label: String(y) }))}
+              value={String(fiscalYear)}
+              onChange={(v) => setFiscalYear(Number(v))}
+              searchable={false}
+              compact
+            />
+          </div>
+          <div className="shrink-0 w-[160px]">
+            <FilterSelect
+              options={ATTR_TYPES.map(at => ({ value: at.value, label: at.label }))}
+              value={attributeType}
+              onChange={(v) => setAttributeType(v)}
+              searchable={false}
+              compact
+            />
+          </div>
           <button onClick={fetchData} className="p-2 rounded-lg border" style={{ borderColor: accent, color: accent }}>
             <RefreshCw size={16} />
           </button>

@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { RotateCcw } from 'lucide-react';
 import BottomSheet from './BottomSheet';
+import FilterSelect from './FilterSelect';
 
 export default function MobileFilterSheet({
   isOpen,
@@ -40,16 +41,13 @@ export default function MobileFilterSheet({
     switch (filter.type) {
       case 'select':
         return (
-          <select
-            value={value}
-            onChange={(e) => handleChange(filter.key, e.target.value)}
-            className="w-full h-12 px-3 rounded-lg border text-sm font-brand appearance-none bg-[#FBF9F7] border-[#E8E2DB] text-[#2C2417]"
-          >
-            <option value="">{filter.placeholder || `Select ${filter.label}`}</option>
-            {(filter.options || []).map(opt => (
-              <option key={opt.value} value={opt.value}>{opt.label}</option>
-            ))}
-          </select>
+          <FilterSelect
+            options={(filter.options || []).map(opt => ({ value: String(opt.value), label: opt.label }))}
+            value={String(value)}
+            onChange={(v) => handleChange(filter.key, v)}
+            placeholder={filter.placeholder || `Select ${filter.label}`}
+            searchable={false}
+          />
         );
 
       case 'search':

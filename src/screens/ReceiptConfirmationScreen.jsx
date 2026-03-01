@@ -3,12 +3,13 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import {
   Receipt, CheckCircle, Clock, Loader2, Package,
-  Search, ChevronDown, X, AlertTriangle, FileText,
+  Search, X, AlertTriangle, FileText,
   ClipboardCheck, XCircle, AlertCircle, BarChart3
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
+import FilterSelect from '@/components/ui/FilterSelect';
 import { useIsMobile } from '@/hooks/useIsMobile';
 import { formatCurrency } from '../utils';
 import { includes as viIncludes } from '../utils/normalizeVietnamese';
@@ -192,19 +193,20 @@ const ReceiptConfirmationScreen = () => {
               )}
             </div>
 
-            <div className="relative">
-              <select
+            <div className="shrink-0 w-[150px]">
+              <FilterSelect
+                options={[
+                  { value: 'all', label: t('common.status') },
+                  { value: 'PENDING', label: t('receiptConfirm.statusPending') },
+                  { value: 'CONFIRMED', label: t('receiptConfirm.statusConfirmed') },
+                  { value: 'DISCREPANCY', label: t('receiptConfirm.statusDiscrepancy') },
+                  { value: 'PARTIAL', label: t('receiptConfirm.statusPartial') },
+                ]}
                 value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
-                className={`appearance-none px-2 py-1 pr-6 rounded-lg border ${border} bg-white text-xs font-brand ${textPrimary} outline-none cursor-pointer`}
-              >
-                <option value="all">{t('common.status')}</option>
-                <option value="PENDING">{t('receiptConfirm.statusPending')}</option>
-                <option value="CONFIRMED">{t('receiptConfirm.statusConfirmed')}</option>
-                <option value="DISCREPANCY">{t('receiptConfirm.statusDiscrepancy')}</option>
-                <option value="PARTIAL">{t('receiptConfirm.statusPartial')}</option>
-              </select>
-              <ChevronDown size={10} className={`absolute right-1.5 top-1/2 -translate-y-1/2 pointer-events-none ${textMuted}`} />
+                onChange={(v) => setStatusFilter(v)}
+                searchable={false}
+                compact
+              />
             </div>
 
             <button

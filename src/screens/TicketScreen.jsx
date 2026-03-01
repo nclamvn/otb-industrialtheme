@@ -9,6 +9,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useIsMobile } from '@/hooks/useIsMobile';
 import { MobileDataCard, TableSkeleton } from '@/components/ui';
+import FilterSelect from '@/components/ui/FilterSelect';
 import FloatingActionButton from '@/components/mobile/FloatingActionButton';
 import { formatCurrency, formatDate } from '../utils';
 
@@ -448,44 +449,41 @@ const TicketScreen = ({ onOpenTicketDetail }) => {
             <div className="p-4 space-y-3">
               <div>
                 <label className="block text-[11px] font-medium mb-1 text-content-muted">{t('ticket.budgetNameLabel')}</label>
-                <select
-                  value={newTicket.budgetName}
-                  onChange={(e) => setNewTicket(prev => ({ ...prev, budgetName: e.target.value }))}
-                  className="w-full border rounded-md px-2.5 py-1.5 text-xs focus:outline-none focus:ring-1 bg-white border-border-muted text-content focus:ring-dafc-gold focus:border-dafc-gold"
-                >
-                  <option value="">{t('ticket.selectBudgetPlaceholder')}</option>
-                  {tickets.filter(t => t.entityType === 'budget').map(b => (
-                    <option key={b.id} value={b.id}>{b.name}</option>
-                  ))}
-                </select>
+                <div className="w-full">
+                  <FilterSelect
+                    options={tickets.filter(t => t.entityType === 'budget').map(b => ({ value: String(b.id), label: b.name }))}
+                    value={newTicket.budgetName}
+                    onChange={(v) => setNewTicket(prev => ({ ...prev, budgetName: v }))}
+                    placeholder={t('ticket.selectBudgetPlaceholder')}
+                    searchable={false}
+                  />
+                </div>
               </div>
 
               <div>
                 <label className="block text-[11px] font-medium mb-1 text-content-muted">{t('ticket.seasonGroupLabel')}</label>
-                <select
-                  value={newTicket.seasonGroup}
-                  onChange={(e) => setNewTicket(prev => ({ ...prev, seasonGroup: e.target.value }))}
-                  className="w-full border rounded-md px-2.5 py-1.5 text-xs focus:outline-none focus:ring-1 bg-white border-border-muted text-content focus:ring-dafc-gold focus:border-dafc-gold"
-                >
-                  <option value="">{t('ticket.selectSeasonGroup')}</option>
-                  {SEASON_GROUPS.map(sg => (
-                    <option key={sg.id} value={sg.id}>{sg.label}</option>
-                  ))}
-                </select>
+                <div className="w-full">
+                  <FilterSelect
+                    options={SEASON_GROUPS.map(sg => ({ value: sg.id, label: sg.label }))}
+                    value={newTicket.seasonGroup}
+                    onChange={(v) => setNewTicket(prev => ({ ...prev, seasonGroup: v }))}
+                    placeholder={t('ticket.selectSeasonGroup')}
+                    searchable={false}
+                  />
+                </div>
               </div>
 
               <div>
                 <label className="block text-[11px] font-medium mb-1 text-content-muted">{t('ticket.seasonLabel')}</label>
-                <select
-                  value={newTicket.season}
-                  onChange={(e) => setNewTicket(prev => ({ ...prev, season: e.target.value }))}
-                  className="w-full border rounded-md px-2.5 py-1.5 text-xs focus:outline-none focus:ring-1 bg-white border-border-muted text-content focus:ring-dafc-gold focus:border-dafc-gold"
-                >
-                  <option value="">{t('ticket.selectSeason')}</option>
-                  {SEASONS.map(s => (
-                    <option key={s.id} value={s.id}>{s.label}</option>
-                  ))}
-                </select>
+                <div className="w-full">
+                  <FilterSelect
+                    options={SEASONS.map(s => ({ value: s.id, label: s.label }))}
+                    value={newTicket.season}
+                    onChange={(v) => setNewTicket(prev => ({ ...prev, season: v }))}
+                    placeholder={t('ticket.selectSeason')}
+                    searchable={false}
+                  />
+                </div>
               </div>
 
               {/* Actions */}

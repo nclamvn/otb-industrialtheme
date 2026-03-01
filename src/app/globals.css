@@ -33,7 +33,7 @@
     --popover: 0 0% 100%;
     --popover-foreground: 30 30% 13%;
     --muted: 30 18% 96%;
-    --muted-foreground: 25 13% 40%;
+    --muted-foreground: 25 16% 30%;
     --border: 30 15% 88%;
     --input: 30 18% 96%;
     --primary: 32 52% 56%;
@@ -57,8 +57,9 @@
   body {
     background-color: #FAF8F5;
     color: #2C2417;
-    font-family: var(--font-montserrat), system-ui, sans-serif;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
     font-size: 14px;
+    font-weight: 500;
     line-height: 1.5;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -115,10 +116,10 @@
   /* Label Style */
   .text-label {
     font-size: 12px;
-    font-weight: 500;
+    font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    color: #6B5D4F;
+    color: #4A3F35;
   }
 
   /* Value Style (KPI) */
@@ -192,7 +193,7 @@
     gap: 6px;
     height: 32px;
     padding: 0 16px;
-    font-weight: 500;
+    font-weight: 600;
     font-size: 14px;
     border-radius: 4px;
     transition: all 150ms ease;
@@ -223,7 +224,7 @@
   .ind-btn-ghost {
     background: transparent;
     border: none;
-    color: #6B5D4F;
+    color: #4A3F35;
   }
 
   .ind-btn-ghost:hover {
@@ -234,7 +235,7 @@
   /* DAFC Primary Button (Pill) */
   .dafc-btn-primary {
     padding: 10px 24px;
-    font-family: var(--font-montserrat), 'Montserrat', sans-serif;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
     font-weight: 600;
     font-size: 14px;
     text-transform: uppercase;
@@ -336,7 +337,7 @@
   /* DAFC Badge (Pill) */
   .dafc-badge {
     padding: 4px 12px;
-    font-family: var(--font-montserrat), 'Montserrat', sans-serif;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
     font-weight: 600;
     font-size: 12px;
     text-transform: uppercase;
@@ -380,7 +381,7 @@
   }
 
   .ind-input::placeholder {
-    color: #8C8178;
+    color: #6B5D4F;
   }
 
   /* DAFC Input (Pill) */
@@ -424,7 +425,7 @@
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    color: #6B5D4F;
+    color: #4A3F35;
     border-bottom: 1px solid #E8E2DB;
   }
 
@@ -506,10 +507,10 @@
 
   .kpi-label {
     font-size: 12px;
-    font-weight: 500;
+    font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    color: #6B5D4F;
+    color: #4A3F35;
     margin-bottom: 4px;
   }
 
@@ -527,7 +528,7 @@
     gap: 2px;
     font-family: var(--font-jetbrains-mono), 'JetBrains Mono', monospace;
     font-size: 13px;
-    font-weight: 500;
+    font-weight: 600;
     margin-top: 4px;
   }
 
@@ -615,7 +616,7 @@
   .trend-negative { color: #DC3545; }
   .trend-negative::before { content: '\25BC '; }
 
-  .trend-neutral { color: #8C8178; }
+  .trend-neutral { color: #6B5D4F; }
   .trend-neutral::before { content: '\25CF '; }
 
   /* Status Dot */

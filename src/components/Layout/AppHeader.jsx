@@ -329,9 +329,9 @@ const AppHeader = ({
               onClick={() => setShowSearch(!showSearch)}
               className="flex items-center gap-1.5 px-2 py-1.5 rounded-lg transition-all duration-200 text-content-muted hover:text-content-secondary"
             >
-              <Search size={15} />
-              <kbd className="hidden sm:flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[9px] font-data bg-surface-secondary text-content-muted">
-                <Command size={8} />K
+              <Search size={16} />
+              <kbd className="hidden sm:flex items-center gap-1 text-[13px] font-data text-content-muted">
+                <Command size={12} />K
               </kbd>
             </button>
 

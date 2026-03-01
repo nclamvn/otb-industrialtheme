@@ -13,6 +13,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useIsMobile } from '@/hooks/useIsMobile';
 import { useConfirmDialog } from '@/hooks/useConfirmDialog';
 import { ConfirmDialog } from '@/components/ui';
+import FilterSelect from '@/components/ui/FilterSelect';
 
 const ApprovalWorkflowScreen = ({ darkMode = false }) => {
   const { t } = useLanguage();
@@ -166,16 +167,17 @@ const ApprovalWorkflowScreen = ({ darkMode = false }) => {
 
           {/* Inline Filters */}
           <div className="flex flex-wrap items-center gap-2 ml-auto">
-            <select
-              value={selectedBrandId}
-              onChange={(e) => setSelectedBrandId(e.target.value)}
-              className="px-2 py-1 border rounded-lg text-xs font-brand transition-all focus:outline-none focus:ring-1 focus:ring-[#C4975A] bg-white border-[#E8E2DB] text-[#2C2417]"
-            >
-              <option value="all">{t('approval.brand')}</option>
-              {brands.map(brand => (
-                <option key={brand.id} value={brand.id}>{brand.name || brand.code}</option>
-              ))}
-            </select>
+            <div className="shrink-0 w-[160px]">
+              <FilterSelect
+                options={[
+                  { value: 'all', label: t('approval.brand') },
+                  ...brands.map(brand => ({ value: String(brand.id), label: brand.name || brand.code })),
+                ]}
+                value={selectedBrandId}
+                onChange={(v) => setSelectedBrandId(v)}
+                searchable={false}
+              />
+            </div>
 
             <button
               onClick={fetchSteps}
@@ -355,17 +357,16 @@ const ApprovalWorkflowScreen = ({ darkMode = false }) => {
               {/* Brand */}
               <div>
                 <label className="block text-xs font-medium mb-1.5 font-brand text-[#8C8178]">{t('approval.brand')}</label>
-                <select
-                  value={formData.brandId}
-                  onChange={(e) => setFormData(prev => ({ ...prev, brandId: e.target.value }))}
-                  disabled={!!editingStep}
-                  className="w-full px-3 py-2.5 border rounded-lg text-sm font-brand focus:outline-none focus:ring-2 focus:ring-[#C4975A] disabled:opacity-50 bg-white border-[#E8E2DB] text-[#2C2417]"
-                >
-                  <option value="">{t('approval.selectBrand')}</option>
-                  {brands.map(brand => (
-                    <option key={brand.id} value={brand.id}>{brand.name || brand.code}</option>
-                  ))}
-                </select>
+                <div className="w-full">
+                  <FilterSelect
+                    options={brands.map(brand => ({ value: String(brand.id), label: brand.name || brand.code }))}
+                    value={formData.brandId}
+                    onChange={(v) => setFormData(prev => ({ ...prev, brandId: v }))}
+                    placeholder={t('approval.selectBrand')}
+                    disabled={!!editingStep}
+                    searchable={false}
+                  />
+                </div>
               </div>
 
               {/* Step Number */}

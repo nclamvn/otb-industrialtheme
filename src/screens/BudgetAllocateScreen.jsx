@@ -800,7 +800,7 @@ const BudgetAllocateScreen = ({
                     <ChevronDown size={11} className={`shrink-0 transition-transform duration-200 ${isYearDropdownOpen ? 'rotate-180' : ''}`} />
                   </button>
                   {isYearDropdownOpen && (
-                    <div className="absolute top-full left-0 right-0 mt-1 border rounded-lg shadow-lg z-[9999] overflow-hidden bg-white border-[#E8E2DB]">
+                    <div className="absolute top-full left-0 mt-1 border rounded-lg shadow-lg z-[9999] overflow-hidden min-w-[160px] bg-white border-[#E8E2DB]">
                       {YEARS.map((year) => (
                         <div
                           key={year}
@@ -840,7 +840,7 @@ const BudgetAllocateScreen = ({
                     <ChevronDown size={11} className={`shrink-0 transition-transform duration-200 ${isGroupBrandDropdownOpen ? 'rotate-180' : ''}`} />
                   </button>
                   {isGroupBrandDropdownOpen && (
-                    <div className="absolute top-full left-0 right-0 mt-1 border rounded-lg shadow-lg z-[9999] overflow-hidden bg-white border-[#E8E2DB]">
+                    <div className="absolute top-full left-0 mt-1 border rounded-lg shadow-lg z-[9999] overflow-hidden min-w-[200px] bg-white border-[#E8E2DB]">
                       <div
                         onClick={() => { setSelectedGroupBrand(null); setIsGroupBrandDropdownOpen(false); }}
                         className={`px-3 py-2.5 flex items-center justify-between cursor-pointer text-sm transition-colors ${selectedGroupBrand === null
@@ -890,7 +890,7 @@ const BudgetAllocateScreen = ({
                     <ChevronDown size={11} className={`transition-transform duration-200 ${isBrandDropdownOpen ? 'rotate-180' : ''}`} />
                   </button>
                   {isBrandDropdownOpen && (
-                    <div className="absolute top-full left-0 right-0 mt-1 border rounded-lg shadow-lg z-[9999] overflow-hidden max-h-60 overflow-y-auto bg-white border-[#E8E2DB]">
+                    <div className="absolute top-full left-0 mt-1 border rounded-lg shadow-lg z-[9999] overflow-hidden max-h-60 overflow-y-auto min-w-[220px] bg-white border-[#E8E2DB]">
                       <div
                         onClick={() => { setSelectedBrand(null); setIsBrandDropdownOpen(false); }}
                         className={`px-3 py-2.5 flex items-center justify-between cursor-pointer text-sm transition-colors ${selectedBrand === null
@@ -940,7 +940,7 @@ const BudgetAllocateScreen = ({
                     <ChevronDown size={11} className={`transition-transform duration-200 ${isSeasonDropdownOpen ? 'rotate-180' : ''}`} />
                   </button>
                   {isSeasonDropdownOpen && (
-                    <div className="absolute top-full left-0 right-0 mt-1 border rounded-lg shadow-lg z-[9999] overflow-hidden bg-white border-[#E8E2DB]">
+                    <div className="absolute top-full left-0 mt-1 border rounded-lg shadow-lg z-[9999] overflow-hidden min-w-[200px] bg-white border-[#E8E2DB]">
                       <div
                         onClick={() => { setSelectedSeasonGroup(null); setIsSeasonDropdownOpen(false); }}
                         className={`px-3 py-2.5 flex items-center justify-between cursor-pointer text-sm transition-colors ${selectedSeasonGroup === null

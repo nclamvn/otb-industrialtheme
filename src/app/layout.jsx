@@ -1,13 +1,6 @@
-import { Montserrat, JetBrains_Mono } from 'next/font/google';
+import { JetBrains_Mono } from 'next/font/google';
 import './globals.css';
 import { Providers } from './providers';
-
-const montserrat = Montserrat({
-  subsets: ['latin'],
-  variable: '--font-montserrat',
-  display: 'swap',
-  weight: ['400', '500', '600', '700', '800'],
-});
 
 const jetbrainsMono = JetBrains_Mono({
   subsets: ['latin'],
@@ -33,7 +26,7 @@ export default function RootLayout({ children }) {
   return (
     <html
       lang="en"
-      className={`${montserrat.variable} ${jetbrainsMono.variable}`}
+      className={`${jetbrainsMono.variable}`}
       suppressHydrationWarning
     >
       <body>

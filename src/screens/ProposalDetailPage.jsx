@@ -13,6 +13,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useIsMobile } from '@/hooks/useIsMobile';
 import { useConfirmDialog } from '@/hooks/useConfirmDialog';
 import { ConfirmDialog } from '@/components/ui';
+import FilterSelect from '@/components/ui/FilterSelect';
 import toast from 'react-hot-toast';
 
 const ProposalDetailPage = ({ proposal, onBack, onSave }) => {
@@ -788,14 +789,15 @@ const ProposalDetailPage = ({ proposal, onBack, onSave }) => {
                           </div>
                           <div>
                             <label className="block text-[10px] text-slate-500 uppercase tracking-wider mb-1">{t('proposal.customerTarget') || 'Customer'}</label>
-                            <select
+                            <FilterSelect
+                              options={[
+                                { value: 'New', label: 'New' },
+                                { value: 'Existing', label: 'Existing' },
+                              ]}
                               value={fd.customerTarget}
-                              onChange={(e) => setSkuFormData(prev => ({ ...prev, [skuId]: { ...prev[skuId], customerTarget: e.target.value } }))}
-                              className="w-full px-2.5 py-1.5 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white"
-                            >
-                              <option value="New">New</option>
-                              <option value="Existing">Existing</option>
-                            </select>
+                              onChange={(v) => setSkuFormData(prev => ({ ...prev, [skuId]: { ...prev[skuId], customerTarget: v } }))}
+                              searchable={false}
+                            />
                           </div>
                         </div>
 

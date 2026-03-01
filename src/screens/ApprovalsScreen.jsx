@@ -17,6 +17,7 @@ import { includes as viIncludes } from '../utils/normalizeVietnamese';
 import { ExpandableStatCard } from '../components/Common';
 import { useIsMobile } from '@/hooks/useIsMobile';
 import { SwipeAction, MobileDataCard, MobileFilterSheet, TableSkeleton } from '@/components/ui';
+import FilterSelect from '@/components/ui/FilterSelect';
 
 /* ═══════════════════════════════════════════════
    STATUS CONFIG
@@ -311,31 +312,33 @@ const ApprovalsScreen = () => {
                   )}
                 </div>
 
-                <div className="relative">
-                  <select
+                <div className="shrink-0 w-[140px]">
+                  <FilterSelect
+                    options={[
+                      { value: 'all', label: t('approvals.colType') },
+                      { value: 'budget', label: t('approvals.typeBudget') },
+                      { value: 'planning', label: t('approvals.typePlanning') },
+                      { value: 'proposal', label: t('approvals.typeProposal') },
+                    ]}
                     value={entityFilter}
-                    onChange={(e) => setEntityFilter(e.target.value)}
-                    className={`appearance-none px-2 py-1 pr-6 rounded-lg border ${border} bg-[#FBF9F7] text-xs font-brand ${textPrimary} outline-none cursor-pointer`}
-                  >
-                    <option value="all">{t('approvals.colType')}</option>
-                    <option value="budget">{t('approvals.typeBudget')}</option>
-                    <option value="planning">{t('approvals.typePlanning')}</option>
-                    <option value="proposal">{t('approvals.typeProposal')}</option>
-                  </select>
-                  <ChevronDown size={10} className={`absolute right-1.5 top-1/2 -translate-y-1/2 pointer-events-none ${textMuted}`} />
+                    onChange={(v) => setEntityFilter(v)}
+                    searchable={false}
+                    compact
+                  />
                 </div>
 
-                <div className="relative">
-                  <select
+                <div className="shrink-0 w-[120px]">
+                  <FilterSelect
+                    options={[
+                      { value: 'all', label: t('approvals.colLevel') },
+                      { value: '1', label: 'Level 1' },
+                      { value: '2', label: 'Level 2' },
+                    ]}
                     value={levelFilter}
-                    onChange={(e) => setLevelFilter(e.target.value)}
-                    className={`appearance-none px-2 py-1 pr-6 rounded-lg border ${border} bg-[#FBF9F7] text-xs font-brand ${textPrimary} outline-none cursor-pointer`}
-                  >
-                    <option value="all">{t('approvals.colLevel')}</option>
-                    <option value="1">Level 1</option>
-                    <option value="2">Level 2</option>
-                  </select>
-                  <ChevronDown size={10} className={`absolute right-1.5 top-1/2 -translate-y-1/2 pointer-events-none ${textMuted}`} />
+                    onChange={(v) => setLevelFilter(v)}
+                    searchable={false}
+                    compact
+                  />
                 </div>
 
                 <button

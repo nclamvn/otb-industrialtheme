@@ -11,6 +11,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useIsMobile } from '@/hooks/useIsMobile';
 import { useConfirmDialog } from '@/hooks/useConfirmDialog';
 import { ConfirmDialog } from '@/components/ui';
+import FilterSelect from '@/components/ui/FilterSelect';
 
 const SettingsScreen = ({ user }) => {
   const { t, language, setLanguage } = useLanguage();
@@ -149,14 +150,15 @@ const SettingsScreen = ({ user }) => {
           label={t('settings.language')}
           description={t('settings.chooseLanguage')}
         >
-          <select
+          <FilterSelect
+            options={[
+              { value: 'vi', label: t('settings.vietnamese') },
+              { value: 'en', label: t('settings.english') },
+            ]}
             value={language}
-            onChange={(e) => updateSetting(null, 'language', e.target.value)}
-            className="pl-3 pr-8 py-1.5 rounded-lg text-sm font-medium border outline-none cursor-pointer bg-[#FBF9F7] border-[#E8E2DB] text-[#2C2417]"
-          >
-            <option value="vi">{t('settings.vietnamese')}</option>
-            <option value="en">{t('settings.english')}</option>
-          </select>
+            onChange={(v) => updateSetting(null, 'language', v)}
+            searchable={false}
+          />
         </SettingRow>
       </SettingSection>
 

@@ -513,6 +513,11 @@ const OTBAnalysisScreen = ({ otbContext, onOpenSkuProposal, darkMode = false }) 
     }
   }, [selectedVersionId, localData, t]);
 
+  // Derived: selected budget object (moved before fetchHistorical to avoid TDZ)
+  const selectedBudget = selectedBudgetId === 'all'
+    ? null
+    : apiBudgets.find(b => b.id === selectedBudgetId);
+
   // Register save handler with AppContext
   useEffect(() => {
     if (selectedVersionId && registerSave) {
@@ -630,9 +635,6 @@ const OTBAnalysisScreen = ({ otbContext, onOpenSkuProposal, darkMode = false }) 
   };
 
   const hasActiveFilters = selectedBudgetId !== 'all' || (selectedSeasonGroup && selectedSeasonGroup !== 'all') || (selectedSeason && selectedSeason !== 'all') || selectedVersionId || selectedBrandIds.length > 0 || comparisonType !== 'same' || seasonCount !== 1;
-  const selectedBudget = selectedBudgetId === 'all'
-    ? null
-    : apiBudgets.find(b => b.id === selectedBudgetId);
   const selectedVersion = versions.find(v => v.id === selectedVersionId);
 
   // Build current allocation from localData for AI comparison
@@ -1367,7 +1369,7 @@ const OTBAnalysisScreen = ({ otbContext, onOpenSkuProposal, darkMode = false }) 
   return (
     <div className="space-y-0">
       {/* Unified Header: Filters + Budget Context + Tabs */}
-      <div className="relative z-[100] bg-white rounded-xl border border-border-muted overflow-hidden">
+      <div className="relative z-[100] bg-white rounded-xl border border-border-muted">
         {/* Row 1: Filters + Budget Summary */}
         <div className="px-3 py-1.5 relative z-[100] border-b border-[#E8E2DB]/60">
           <div className="flex items-center justify-between gap-2">
@@ -1392,7 +1394,7 @@ const OTBAnalysisScreen = ({ otbContext, onOpenSkuProposal, darkMode = false }) 
                   <ChevronDown size={11} className={`shrink-0 transition-transform duration-200 ${openDropdown === 'year' ? 'rotate-180' : ''}`} />
                 </button>
                 {openDropdown === 'year' && (
-                  <div className="absolute top-full left-0 right-0 mt-1 border rounded-lg shadow-lg z-[9999] overflow-hidden bg-white border-[#E8E2DB]">
+                  <div className="absolute top-full left-0 mt-1 border rounded-lg shadow-lg z-[9999] overflow-hidden min-w-[160px] bg-white border-[#E8E2DB]">
                     {yearOptions.map((year) => (
                       <div
                         key={year}
@@ -1523,7 +1525,7 @@ const OTBAnalysisScreen = ({ otbContext, onOpenSkuProposal, darkMode = false }) 
                   <ChevronDown size={11} className={`shrink-0 transition-transform duration-200 ${openDropdown === 'seasonGroup' ? 'rotate-180' : ''}`} />
                 </button>
                 {openDropdown === 'seasonGroup' && (
-                  <div className="absolute top-full left-0 right-0 mt-1 border rounded-lg shadow-lg z-[9999] overflow-hidden bg-white border-[#E8E2DB]">
+                  <div className="absolute top-full left-0 mt-1 border rounded-lg shadow-lg z-[9999] overflow-hidden min-w-[180px] bg-white border-[#E8E2DB]">
                     {SEASON_GROUPS.map((season) => (
                       <div
                         key={season.id}
@@ -1561,7 +1563,7 @@ const OTBAnalysisScreen = ({ otbContext, onOpenSkuProposal, darkMode = false }) 
                   <ChevronDown size={11} className={`shrink-0 transition-transform duration-200 ${openDropdown === 'season' ? 'rotate-180' : ''}`} />
                 </button>
                 {openDropdown === 'season' && (
-                  <div className="absolute top-full left-0 right-0 mt-1 border rounded-lg shadow-lg z-[9999] overflow-hidden bg-white border-[#E8E2DB]">
+                  <div className="absolute top-full left-0 mt-1 border rounded-lg shadow-lg z-[9999] overflow-hidden min-w-[160px] bg-white border-[#E8E2DB]">
                     {SEASONS.map((season) => (
                       <div
                         key={season.id}
@@ -1599,7 +1601,7 @@ const OTBAnalysisScreen = ({ otbContext, onOpenSkuProposal, darkMode = false }) 
                   <ChevronDown size={11} className={`shrink-0 transition-transform duration-200 ${openDropdown === 'comparison' ? 'rotate-180' : ''}`} />
                 </button>
                 {openDropdown === 'comparison' && (
-                  <div className="absolute top-full left-0 right-0 mt-1 border rounded-lg shadow-lg z-[9999] overflow-hidden bg-white border-[#E8E2DB] min-w-[160px]">
+                  <div className="absolute top-full left-0 mt-1 border rounded-lg shadow-lg z-[9999] overflow-hidden min-w-[200px] bg-white border-[#E8E2DB]">
                     {[
                       { id: 'same', label: 'Same Season' },
                       { id: 'different', label: 'Different Season' },
@@ -1640,7 +1642,7 @@ const OTBAnalysisScreen = ({ otbContext, onOpenSkuProposal, darkMode = false }) 
                   <ChevronDown size={11} className={`shrink-0 transition-transform duration-200 ${openDropdown === 'seasonCount' ? 'rotate-180' : ''}`} />
                 </button>
                 {openDropdown === 'seasonCount' && (
-                  <div className="absolute top-full left-0 right-0 mt-1 border rounded-lg shadow-lg z-[9999] overflow-hidden bg-white border-[#E8E2DB]">
+                  <div className="absolute top-full left-0 mt-1 border rounded-lg shadow-lg z-[9999] overflow-hidden min-w-[140px] bg-white border-[#E8E2DB]">
                     {[1, 2, 3].map((count) => (
                       <div
                         key={count}
@@ -1684,7 +1686,7 @@ const OTBAnalysisScreen = ({ otbContext, onOpenSkuProposal, darkMode = false }) 
                   <ChevronDown size={11} className={`shrink-0 transition-transform duration-200 ${openDropdown === 'brand' ? 'rotate-180' : ''}`} />
                 </button>
                 {openDropdown === 'brand' && (
-                  <div className="absolute top-full left-0 mt-1 border rounded-xl shadow-xl z-[9999] overflow-hidden min-w-[220px] bg-white border-[#E8E2DB]">
+                  <div className="absolute top-full left-0 mt-1 border rounded-xl shadow-xl z-[9999] overflow-hidden min-w-[260px] bg-white border-[#E8E2DB]">
                     <div className="p-2 border-b bg-[#FBF9F7] border-[#E8E2DB] flex items-center justify-between">
                       <span className="text-xs font-semibold uppercase tracking-wide font-brand text-[#6B5D4F]">Brand</span>
                       {selectedBrandIds.length > 0 && (

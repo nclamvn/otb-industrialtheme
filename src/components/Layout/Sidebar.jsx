@@ -6,7 +6,7 @@ import {
   CheckCircle, ChevronRight, ShoppingCart,
   ChevronDown, Wallet, FileCheck,
   ClipboardList, Receipt, Ticket, Home, LogOut,
-  Settings, Crown, PanelLeftClose,
+  Settings, Crown, PanelLeftClose, PanelLeft,
   Database, Building2, FolderTree, Tag,
   LineChart, PieChart, Activity, Upload
 } from 'lucide-react';
@@ -60,28 +60,34 @@ const Sidebar = ({ currentScreen, setDarkMode, user, onLogout }) => {
 
   const userInitials = user?.name?.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() || 'U';
 
-  /* ── Expanded nav item — no backgrounds, only gold left bar for active ── */
-  const NavItem = ({ id, label, icon: Icon, indent = false }) => {
+  /* ── Nav Item — minimal, clean hover with subtle bg ── */
+  const NavItem = ({ id, label, icon: Icon }) => {
     const isActive = currentScreen === id;
     return (
       <button
         onClick={() => navigateTo(id)}
-        className={`group relative w-full flex items-center gap-2 px-3 py-[7px] text-[13px] font-brand transition-all duration-200
+        className={`group relative w-full flex items-center gap-3 px-4 py-2 rounded-lg text-[13.5px] font-brand transition-all duration-150
           ${isActive
-            ? 'text-dafc-gold font-semibold'
-            : 'text-content-secondary font-medium hover:text-content'
+            ? 'bg-[#C4975A]/10 text-[#A67B3D] font-semibold'
+            : 'text-[#2C2417] font-medium hover:bg-[#FAF8F5]'
           }`}
       >
         {isActive && (
-          <span className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-r-full bg-dafc-gold" />
+          <span className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-r-full bg-[#C4975A]" />
         )}
-        <Icon size={16} strokeWidth={isActive ? 2.2 : 2} className={isActive ? 'text-dafc-gold' : 'text-content-muted group-hover:text-content-secondary'} />
-        {!isCollapsed && <span className="whitespace-nowrap">{label}</span>}
+        <Icon
+          size={18}
+          strokeWidth={isActive ? 2 : 1.8}
+          className={`flex-shrink-0 transition-colors duration-150 ${
+            isActive ? 'text-[#C4975A]' : 'text-[#8C8178] group-hover:text-[#6B5D4F]'
+          }`}
+        />
+        {!isCollapsed && <span className="truncate">{label}</span>}
       </button>
     );
   };
 
-  /* ── Collapsed item — gold dot below active icon instead of background ── */
+  /* ── Collapsed Item ── */
   const CollapsedItem = ({ id, label, icon: Icon }) => {
     const isActive = currentScreen === id;
     return (
@@ -90,14 +96,18 @@ const Sidebar = ({ currentScreen, setDarkMode, user, onLogout }) => {
           onClick={() => navigateTo(id)}
           onMouseEnter={() => setHoveredItem(id)}
           onMouseLeave={() => setHoveredItem(null)}
-          className="group w-full flex flex-col items-center justify-center h-9 transition-all duration-200"
+          className={`group w-full flex items-center justify-center h-10 rounded-lg transition-all duration-150
+            ${isActive ? 'bg-[#C4975A]/10' : 'hover:bg-[#FAF8F5]'}`}
         >
-          <Icon size={17} strokeWidth={isActive ? 2.2 : 2} className={isActive ? 'text-dafc-gold' : 'text-content-muted group-hover:text-content-secondary'} />
-          {isActive && <span className="w-1 h-1 rounded-full bg-dafc-gold mt-1" />}
+          <Icon
+            size={18}
+            strokeWidth={isActive ? 2 : 1.8}
+            className={isActive ? 'text-[#C4975A]' : 'text-[#8C8178] group-hover:text-[#6B5D4F]'}
+          />
         </button>
         {hoveredItem === id && (
           <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 z-50 pointer-events-none">
-            <div className="px-3 py-1.5 rounded-xl whitespace-nowrap text-[11px] font-semibold font-brand text-content bg-white border border-border shadow-elevated">
+            <div className="px-3 py-1.5 rounded-lg whitespace-nowrap text-[12px] font-medium font-brand text-[#2C2417] bg-white border border-[#E8E2DB] shadow-lg">
               {label}
             </div>
           </div>
@@ -106,57 +116,68 @@ const Sidebar = ({ currentScreen, setDarkMode, user, onLogout }) => {
     );
   };
 
-  /* ── Section header — no icon, tiny uppercase text only ── */
+  /* ── Section Header — clean, no uppercase ── */
   const SectionHeader = ({ label, isOpen, onToggle }) => (
     <button
       onClick={onToggle}
-      className="group w-full px-3 pt-4 pb-1 flex items-center justify-between transition-colors"
+      className="group w-full px-4 pt-5 pb-1.5 flex items-center justify-between transition-colors"
     >
-      <span className="font-semibold text-[9px] uppercase tracking-[0.2em] font-brand text-content-muted">
+      <span className="text-[11px] font-semibold uppercase tracking-[0.08em] font-brand text-[#8C8178]">
         {label}
       </span>
-      <ChevronDown size={10} strokeWidth={2} className={`text-content-muted/40 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
+      <ChevronDown
+        size={14}
+        strokeWidth={2}
+        className={`text-[#8C8178] group-hover:text-[#6B5D4F] transition-all duration-200 ${isOpen ? 'rotate-180' : ''}`}
+      />
     </button>
   );
 
   return (
-    <div className={`${isCollapsed ? 'w-[60px]' : 'w-[260px]'} h-full flex flex-col z-40 transition-all duration-300 ease-in-out bg-white`}>
+    <div className={`${isCollapsed ? 'w-[64px]' : 'w-[252px]'} h-full flex flex-col z-40 transition-all duration-300 ease-in-out bg-white border-r border-[#F0EBE5]`}>
 
-      {/* ── Logo Header — no bottom border, taller, muted brand text ── */}
-      <div className="h-[48px] flex items-center justify-center flex-shrink-0">
+      {/* ── Logo ── */}
+      <div className="h-[56px] flex items-center flex-shrink-0 border-b border-[#F0EBE5]">
         {isCollapsed ? (
-          <button onClick={() => setIsExpanded(true)} className="w-full h-full flex items-center justify-center hover:text-dafc-gold transition-colors" title={t('components.expandSidebar')}>
-            <img src="/dafc-logo.png" alt="DAFC" className="h-7 w-auto object-contain" />
+          <button
+            onClick={() => setIsExpanded(true)}
+            className="w-full h-full flex items-center justify-center hover:bg-[#FAF8F5] transition-colors"
+            title={t('components.expandSidebar')}
+          >
+            <PanelLeft size={18} strokeWidth={1.8} className="text-[#8C8178]" />
           </button>
         ) : (
-          <div className="flex items-center gap-2.5 px-4 w-full h-full">
-            <img src="/dafc-logo.png" alt="DAFC" className="h-8 w-auto object-contain flex-shrink-0" />
-            <span className="flex-1 text-[10px] font-bold tracking-[0.25em] whitespace-nowrap leading-none font-brand text-content-muted">
-              {t('components.otbSystem')}
-            </span>
-            <button onClick={() => setIsExpanded(false)} className="p-1.5 rounded-xl flex-shrink-0 transition-colors text-content-muted hover:text-dafc-gold" title={t('components.collapseSidebar')}>
-              <PanelLeftClose size={15} strokeWidth={1.8} />
+          <div className="flex items-center gap-3 px-4 w-full">
+            <img src="/dafc-logo.png" alt="DAFC" className="h-9 w-auto object-contain flex-shrink-0" />
+            <div className="flex-1 min-w-0">
+              <div className="text-[13px] font-bold font-brand text-[#2C2417] leading-tight tracking-wide">OTB SYSTEM</div>
+            </div>
+            <button
+              onClick={() => setIsExpanded(false)}
+              className="p-1.5 rounded-lg flex-shrink-0 transition-colors text-[#8C8178] hover:text-[#6B5D4F] hover:bg-[#FAF8F5]"
+              title={t('components.collapseSidebar')}
+            >
+              <PanelLeftClose size={16} strokeWidth={1.8} />
             </button>
           </div>
         )}
       </div>
 
       {/* ── Navigation ── */}
-      <nav className="relative flex-1 overflow-y-auto py-2 scrollbar-hide">
+      <nav className="relative flex-1 overflow-y-auto py-3 scrollbar-hide">
         {isCollapsed ? (
-          /* ── Collapsed nav ── */
-          <div className="px-1.5 space-y-0.5">
+          <div className="px-2 space-y-1">
             <CollapsedItem id="home" label={t('nav.homeDashboard')} icon={Home} />
-            <div className="my-2 mx-5 h-px bg-border-muted/50" />
+            <div className="my-2 mx-3 h-px bg-[#F0EBE5]" />
             {menuGroups.map((group, gi) => (
               <div key={group.id}>
                 {group.items.map((item) => (
                   <CollapsedItem key={item.id} id={item.id} label={item.label} icon={item.icon} />
                 ))}
-                {gi < menuGroups.length - 1 && <div className="my-2 mx-5 h-px bg-border-muted/50" />}
+                {gi < menuGroups.length - 1 && <div className="my-2 mx-3 h-px bg-[#F0EBE5]" />}
               </div>
             ))}
-            <div className="my-2 mx-5 h-px bg-border-muted/50" />
+            <div className="my-2 mx-3 h-px bg-[#F0EBE5]" />
             <CollapsedItem id="master-brands" label={t('nav.masterData')} icon={Database} />
             <CollapsedItem id="analytics-sales" label={t('nav.salesPerformance', 'Sales')} icon={LineChart} />
             <CollapsedItem id="analytics-budget" label={t('nav.budgetAnalytics', 'Budget')} icon={PieChart} />
@@ -164,11 +185,9 @@ const Sidebar = ({ currentScreen, setDarkMode, user, onLogout }) => {
             <CollapsedItem id="import-data" label={t('nav.importData', 'Import Data')} icon={Upload} />
           </div>
         ) : (
-          /* ── Expanded nav — flush left items, hierarchy via typography ── */
-          <div className="px-3 space-y-0.5">
+          <div className="px-2 space-y-0.5">
             <NavItem id="home" label={t('nav.homeDashboard')} icon={Home} />
 
-            {/* Menu Groups */}
             {menuGroups.map((group) => (
               <div key={group.id}>
                 <SectionHeader label={group.label} isOpen={openGroups[group.id]} onToggle={() => toggleGroup(group.id)} />
@@ -182,9 +201,8 @@ const Sidebar = ({ currentScreen, setDarkMode, user, onLogout }) => {
               </div>
             ))}
 
-            <div className="py-1.5 px-5"><div className="h-px bg-border-muted/50" /></div>
+            <div className="my-2 mx-4 h-px bg-[#F0EBE5]" />
 
-            {/* Master Data */}
             <SectionHeader label={t('nav.masterData')} isOpen={isMasterDataOpen} onToggle={() => setIsMasterDataOpen(!isMasterDataOpen)} />
             {isMasterDataOpen && (
               <div className="space-y-0.5">
@@ -197,7 +215,6 @@ const Sidebar = ({ currentScreen, setDarkMode, user, onLogout }) => {
               </div>
             )}
 
-            {/* Analytics */}
             <SectionHeader label={t('nav.analytics')} isOpen={isAnalyticsOpen} onToggle={() => setIsAnalyticsOpen(!isAnalyticsOpen)} />
             {isAnalyticsOpen && (
               <div className="space-y-0.5">
@@ -209,59 +226,45 @@ const Sidebar = ({ currentScreen, setDarkMode, user, onLogout }) => {
               </div>
             )}
 
-            {/* Import Data */}
             <NavItem id="import-data" label={t('nav.importData', 'Import Data')} icon={Upload} />
-
-            <div className="py-1.5 px-5"><div className="h-px bg-border-muted/50" /></div>
           </div>
         )}
       </nav>
 
-      {/* ── Footer — User Profile — no border-t, plain avatar ── */}
-      <div className="relative p-2.5 flex-shrink-0">
-        {/* User Menu Popup */}
+      {/* ── User Footer ── */}
+      <div className="relative flex-shrink-0 border-t border-[#F0EBE5]">
         {showUserMenu && (
           <>
             <div className="fixed inset-0 z-40" onClick={() => setShowUserMenu(false)} />
             <div
-              className={`absolute ${isCollapsed ? 'left-full ml-2 bottom-0' : 'left-2.5 right-2.5 bottom-full mb-2'} z-50 rounded-2xl overflow-hidden bg-white border border-border shadow-elevated`}
+              className={`absolute ${isCollapsed ? 'left-full ml-2 bottom-0' : 'left-2 right-2 bottom-full mb-2'} z-50 rounded-xl overflow-hidden bg-white border border-[#E8E2DB] shadow-xl`}
               style={{ minWidth: isCollapsed ? '200px' : 'auto' }}
             >
-              {/* User Info Header */}
-              <div className="p-3 border-b border-border-muted bg-surface-secondary">
+              <div className="p-3 border-b border-[#F0EBE5]">
                 <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-full flex items-center justify-center text-[11px] font-semibold font-brand bg-canvas text-content-secondary">
+                  <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#C4975A] to-[#A67B3D] flex items-center justify-center text-[11px] font-semibold text-white">
                     {userInitials}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="text-xs font-semibold font-brand truncate text-content">{user?.name || 'User'}</div>
-                    <div className="text-[11px] text-content-muted">{user?.email || user?.role?.name || 'User'}</div>
+                    <div className="text-[13px] font-semibold font-brand truncate text-[#2C2417]">{user?.name || 'User'}</div>
+                    <div className="text-[11px] text-[#8C8178]">{user?.email || user?.role?.name || 'User'}</div>
                   </div>
                 </div>
               </div>
               <div className="p-1.5">
-                <button onClick={() => { navigateTo('profile'); setShowUserMenu(false); }} className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl transition-colors text-content-secondary hover:text-content hover:bg-surface-secondary">
-                  <div className="p-1 rounded-lg bg-dafc-gold/10"><Crown size={14} className="text-dafc-gold" /></div>
-                  <div className="flex-1 text-left">
-                    <div className="text-xs font-medium font-brand">{t('userMenu.myProfile')}</div>
-                    <div className="text-[10px] text-content-muted">{t('userMenu.viewAndEditProfile')}</div>
-                  </div>
+                <button onClick={() => { navigateTo('profile'); setShowUserMenu(false); }} className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg transition-colors hover:bg-[#FAF8F5]">
+                  <Crown size={15} className="text-[#C4975A]" />
+                  <span className="text-[13px] font-medium font-brand text-[#2C2417]">{t('userMenu.myProfile')}</span>
                 </button>
-                <button onClick={() => { navigateTo('settings'); setShowUserMenu(false); }} className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl transition-colors text-content-secondary hover:text-content hover:bg-surface-secondary">
-                  <div className="p-1 rounded-lg bg-surface-secondary"><Settings size={14} className="text-content-muted" /></div>
-                  <div className="flex-1 text-left">
-                    <div className="text-xs font-medium font-brand">{t('userMenu.settings')}</div>
-                    <div className="text-[10px] text-content-muted">{t('userMenu.appPreferences')}</div>
-                  </div>
+                <button onClick={() => { navigateTo('settings'); setShowUserMenu(false); }} className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg transition-colors hover:bg-[#FAF8F5]">
+                  <Settings size={15} className="text-[#8C8178]" />
+                  <span className="text-[13px] font-medium font-brand text-[#2C2417]">{t('userMenu.settings')}</span>
                 </button>
-                <div className="my-1.5 mx-2 h-px bg-border-muted" />
+                <div className="my-1 mx-2 h-px bg-[#F0EBE5]" />
                 {onLogout && (
-                  <button onClick={() => { setShowUserMenu(false); onLogout(); }} className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl transition-colors text-status-critical hover:bg-status-critical-muted">
-                    <div className="p-1 rounded-lg bg-status-critical-muted"><LogOut size={14} className="text-status-critical" /></div>
-                    <div className="flex-1 text-left">
-                      <div className="text-xs font-medium font-brand">{t('userMenu.logout')}</div>
-                      <div className="text-[10px] text-content-muted">{t('userMenu.signOutOfAccount')}</div>
-                    </div>
+                  <button onClick={() => { setShowUserMenu(false); onLogout(); }} className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg transition-colors text-[#DC3545] hover:bg-red-50">
+                    <LogOut size={15} />
+                    <span className="text-[13px] font-medium font-brand">{t('userMenu.logout')}</span>
                   </button>
                 )}
               </div>
@@ -269,11 +272,10 @@ const Sidebar = ({ currentScreen, setDarkMode, user, onLogout }) => {
           </>
         )}
 
-        {/* User Avatar Button — plain circle, no gold border, no status dot */}
         {isCollapsed ? (
-          <div className="flex justify-center">
+          <div className="flex justify-center py-3">
             <button onClick={() => setShowUserMenu(!showUserMenu)} className="relative group">
-              <div className="w-8 h-8 rounded-full flex items-center justify-center text-[11px] font-semibold font-brand bg-canvas text-content-secondary transition-colors hover:bg-border-muted">
+              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#C4975A] to-[#A67B3D] flex items-center justify-center text-[11px] font-semibold text-white transition-shadow hover:shadow-md">
                 {userInitials}
               </div>
             </button>
@@ -281,18 +283,17 @@ const Sidebar = ({ currentScreen, setDarkMode, user, onLogout }) => {
         ) : (
           <button
             onClick={() => setShowUserMenu(!showUserMenu)}
-            className={`w-full rounded-2xl p-2.5 flex items-center gap-2.5 transition-all duration-200
-              ${showUserMenu ? 'bg-surface-secondary' : 'bg-transparent hover:bg-surface-secondary'}`}
+            className={`w-full p-3 flex items-center gap-3 transition-all duration-150
+              ${showUserMenu ? 'bg-[#FAF8F5]' : 'hover:bg-[#FAF8F5]'}`}
           >
-            <div className="flex-shrink-0">
-              <div className="w-8 h-8 rounded-full flex items-center justify-center text-[11px] font-semibold font-brand bg-canvas text-content-secondary">
-                {userInitials}
-              </div>
+            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#C4975A] to-[#A67B3D] flex items-center justify-center text-[11px] font-semibold text-white flex-shrink-0">
+              {userInitials}
             </div>
             <div className="flex-1 min-w-0 text-left">
-              <div className="text-xs font-semibold font-brand truncate text-content">{user?.name || 'User'}</div>
-              <div className="text-[11px] text-content-muted">{user?.role?.name || 'User'}</div>
+              <div className="text-[13px] font-semibold font-brand truncate text-[#2C2417]">{user?.name || 'User'}</div>
+              <div className="text-[11px] text-[#8C8178]">{user?.role?.name || 'User'}</div>
             </div>
+            <ChevronRight size={14} className={`text-[#8C8178] transition-transform duration-200 ${showUserMenu ? 'rotate-90' : ''}`} />
           </button>
         )}
       </div>

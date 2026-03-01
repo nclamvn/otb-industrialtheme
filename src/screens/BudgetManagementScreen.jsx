@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo, useEffect, useCallback } from 'react';
+import React, { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import {
   ChevronDown, Plus, Search, Table, PieChart, X, Eye, Split,
   Wallet, CircleCheckBig, Hourglass, Trash2, Send, Copy, Clock, Archive,
@@ -19,6 +19,8 @@ import { useIsMobile } from '@/hooks/useIsMobile';
 import { MobileFilterSheet, MobileDataCard } from '@/components/ui';
 import FloatingActionButton from '@/components/mobile/FloatingActionButton';
 import PullToRefresh from '@/components/mobile/PullToRefresh';
+import { useClickOutside } from '@/hooks/useClickOutside';
+import FilterSelect from '@/components/ui/FilterSelect';
 
 const YEARS = Array.from({ length: 4 }, (_, i) => new Date().getFullYear() - 2 + i);
 
@@ -117,6 +119,16 @@ const BudgetManagementScreen = ({
   const [yearDropdownOpen, setYearDropdownOpen] = useState(false);
   const [groupBrandDropdownOpen, setGroupBrandDropdownOpen] = useState(false);
   const [brandDropdownOpen, setBrandDropdownOpen] = useState(false);
+
+  // Dropdown refs for click-outside
+  const yearDropdownRef = useRef(null);
+  const groupBrandDropdownRef = useRef(null);
+  const brandDropdownRef = useRef(null);
+
+  // Close dropdowns on outside click
+  useClickOutside(yearDropdownRef, () => setYearDropdownOpen(false), yearDropdownOpen);
+  useClickOutside(groupBrandDropdownRef, () => setGroupBrandDropdownOpen(false), groupBrandDropdownOpen);
+  useClickOutside(brandDropdownRef, () => setBrandDropdownOpen(false), brandDropdownOpen);
 
   const [showViewModal, setShowViewModal] = useState(false);
   const [selectedBudget, setSelectedBudget] = useState(null);
@@ -406,7 +418,7 @@ const BudgetManagementScreen = ({
             <></>
           )}
           {/* Desktop filters - hidden on mobile */}
-          {!isMobile && <><div className="relative">
+          {!isMobile && <><div className="relative" ref={yearDropdownRef}>
             <button
               onClick={() => {
                 setYearDropdownOpen(!yearDropdownOpen);
@@ -422,7 +434,7 @@ const BudgetManagementScreen = ({
               <ChevronDown size={11} className="opacity-50 shrink-0" />
             </button>
             {yearDropdownOpen && (
-              <div className="absolute top-full left-0 mt-1 rounded-lg shadow-lg border py-1 z-20 min-w-[140px] bg-white border-[#E8E2DB]">
+              <div className="absolute top-full left-0 mt-1 rounded-lg shadow-lg border py-1 z-20 min-w-[160px] bg-white border-[#E8E2DB]">
                 <button
                   onClick={() => { setSelectedYear(null); setYearDropdownOpen(false); }}
                   className={`w-full px-4 py-2 text-left text-sm transition-colors hover:bg-[rgba(160,120,75,0.18)] ${!selectedYear ? 'text-[#8A6340] font-medium' : 'text-[#2C2417]'}`}
@@ -443,7 +455,7 @@ const BudgetManagementScreen = ({
           </div>
 
           {/* Group Brand Filter */}
-          <div className="relative">
+          <div className="relative" ref={groupBrandDropdownRef}>
             <button
               onClick={() => {
                 setGroupBrandDropdownOpen(!groupBrandDropdownOpen);
@@ -463,7 +475,7 @@ const BudgetManagementScreen = ({
               <ChevronDown size={11} className="opacity-50 shrink-0" />
             </button>
             {groupBrandDropdownOpen && (
-              <div className="absolute top-full left-0 mt-1 rounded-lg shadow-lg border py-1 z-20 min-w-[150px] bg-white border-[#E8E2DB]">
+              <div className="absolute top-full left-0 mt-1 rounded-lg shadow-lg border py-1 z-20 min-w-[200px] bg-white border-[#E8E2DB]">
                 <button
                   onClick={() => { setSelectedGroupBrand(null); setGroupBrandDropdownOpen(false); }}
                   className={`w-full px-4 py-2 text-left text-sm transition-colors hover:bg-[rgba(160,120,75,0.18)] ${!selectedGroupBrand ? 'text-[#8A6340] font-medium' : 'text-[#2C2417]'}`}
@@ -484,7 +496,7 @@ const BudgetManagementScreen = ({
           </div>
 
           {/* Brand Filter */}
-          <div className="relative">
+          <div className="relative" ref={brandDropdownRef}>
             <button
               onClick={() => {
                 setBrandDropdownOpen(!brandDropdownOpen);
@@ -502,7 +514,7 @@ const BudgetManagementScreen = ({
               <ChevronDown size={11} className="opacity-50 shrink-0" />
             </button>
             {brandDropdownOpen && (
-              <div className="absolute top-full left-0 mt-1 rounded-lg shadow-lg border py-1 z-20 min-w-[140px] bg-white border-[#E8E2DB]">
+              <div className="absolute top-full left-0 mt-1 rounded-lg shadow-lg border py-1 z-20 min-w-[220px] bg-white border-[#E8E2DB]">
                 <button
                   onClick={() => { setSelectedBrand(null); setBrandDropdownOpen(false); }}
                   className={`w-full px-4 py-2 text-left text-sm transition-colors hover:bg-[rgba(160,120,75,0.18)] ${!selectedBrand ? 'text-[#8A6340] font-medium' : 'text-[#2C2417]'}`}
@@ -1018,22 +1030,19 @@ const BudgetManagementScreen = ({
                   <label className="block text-sm font-medium mb-2 font-brand text-[#2C2417]">
                     {t('budget.fiscalYear')} <span className="text-[#DC3545]">{t('common.required')}</span>
                   </label>
-                  <select
-                    value={newBudgetForm.fiscalYear}
-                    onChange={(e) =>
-                      setNewBudgetForm({
-                        ...newBudgetForm,
-                        fiscalYear: parseInt(e.target.value),
-                      })
-                    }
-                    className="w-full px-4 py-2.5 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#C4975A] focus:border-[#C4975A] bg-white border-[#E8E2DB] text-[#2C2417]"
-                  >
-                    {YEARS.map((year) => (
-                      <option key={year} value={year}>
-                        {year}
-                      </option>
-                    ))}
-                  </select>
+                  <div className="w-full">
+                    <FilterSelect
+                      options={YEARS.map((year) => ({ value: String(year), label: String(year) }))}
+                      value={String(newBudgetForm.fiscalYear)}
+                      onChange={(v) =>
+                        setNewBudgetForm({
+                          ...newBudgetForm,
+                          fiscalYear: parseInt(v),
+                        })
+                      }
+                      searchable={false}
+                    />
+                  </div>
                 </div>
 
                 {/* Group Brand */}
@@ -1041,19 +1050,16 @@ const BudgetManagementScreen = ({
                   <label className="block text-sm font-medium mb-2 font-brand text-[#2C2417]">
                     {t('budget.groupBrand')} <span className="text-[#DC3545]">{t('common.required')}</span>
                   </label>
-                  <select
-                    value={newBudgetForm.groupBrand}
-                    onChange={(e) =>
-                      setNewBudgetForm({ ...newBudgetForm, groupBrand: e.target.value })
-                    }
-                    className="w-full px-4 py-2.5 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#C4975A] focus:border-[#C4975A] bg-white border-[#E8E2DB] text-[#2C2417]"
-                  >
-                    {groupBrandCategories.map((group) => (
-                      <option key={group.id} value={group.id}>
-                        {group.name}
-                      </option>
-                    ))}
-                  </select>
+                  <div className="w-full">
+                    <FilterSelect
+                      options={groupBrandCategories.map((group) => ({ value: String(group.id), label: group.name }))}
+                      value={String(newBudgetForm.groupBrand)}
+                      onChange={(v) =>
+                        setNewBudgetForm({ ...newBudgetForm, groupBrand: v })
+                      }
+                      searchable={false}
+                    />
+                  </div>
                 </div>
 
                 {/* Brand */}
@@ -1061,20 +1067,17 @@ const BudgetManagementScreen = ({
                   <label className="block text-sm font-medium mb-2 font-brand text-[#2C2417]">
                     {t('budget.brand')} <span className="text-[#DC3545]">{t('common.required')}</span>
                   </label>
-                  <select
-                    value={newBudgetForm.brandId}
-                    onChange={(e) =>
-                      setNewBudgetForm({ ...newBudgetForm, brandId: e.target.value })
-                    }
-                    className="w-full px-4 py-2.5 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#C4975A] focus:border-[#C4975A] bg-white border-[#E8E2DB] text-[#2C2417]"
-                  >
-                    <option value="">{t('budget.selectBrand')}</option>
-                    {apiBrands.map((brand) => (
-                      <option key={brand.id} value={brand.id}>
-                        {brand.name}
-                      </option>
-                    ))}
-                  </select>
+                  <div className="w-full">
+                    <FilterSelect
+                      options={apiBrands.map((brand) => ({ value: String(brand.id), label: brand.name }))}
+                      value={newBudgetForm.brandId}
+                      onChange={(v) =>
+                        setNewBudgetForm({ ...newBudgetForm, brandId: v })
+                      }
+                      placeholder={t('budget.selectBrand')}
+                      searchable={false}
+                    />
+                  </div>
                 </div>
               </div>
 
@@ -1084,27 +1087,33 @@ const BudgetManagementScreen = ({
                   <label className="block text-sm font-medium mb-2 font-brand text-[#2C2417]">
                     {t('otbAnalysis.seasonGroup')} <span className="text-[#DC3545]">{t('common.required')}</span>
                   </label>
-                  <select
-                    value={newBudgetForm.seasonGroup}
-                    onChange={(e) => setNewBudgetForm({ ...newBudgetForm, seasonGroup: e.target.value })}
-                    className="w-full px-4 py-2.5 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#C4975A] focus:border-[#C4975A] bg-white border-[#E8E2DB] text-[#2C2417]"
-                  >
-                    <option value="SS">Spring Summer</option>
-                    <option value="FW">Fall Winter</option>
-                  </select>
+                  <div className="w-full">
+                    <FilterSelect
+                      options={[
+                        { value: 'SS', label: 'Spring Summer' },
+                        { value: 'FW', label: 'Fall Winter' },
+                      ]}
+                      value={newBudgetForm.seasonGroup}
+                      onChange={(v) => setNewBudgetForm({ ...newBudgetForm, seasonGroup: v })}
+                      searchable={false}
+                    />
+                  </div>
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-2 font-brand text-[#2C2417]">
                     {t('otbAnalysis.season')} <span className="text-[#DC3545]">{t('common.required')}</span>
                   </label>
-                  <select
-                    value={newBudgetForm.seasonType}
-                    onChange={(e) => setNewBudgetForm({ ...newBudgetForm, seasonType: e.target.value })}
-                    className="w-full px-4 py-2.5 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#C4975A] focus:border-[#C4975A] bg-white border-[#E8E2DB] text-[#2C2417]"
-                  >
-                    <option value="pre">Pre</option>
-                    <option value="main">Main / Show</option>
-                  </select>
+                  <div className="w-full">
+                    <FilterSelect
+                      options={[
+                        { value: 'pre', label: 'Pre' },
+                        { value: 'main', label: 'Main / Show' },
+                      ]}
+                      value={newBudgetForm.seasonType}
+                      onChange={(v) => setNewBudgetForm({ ...newBudgetForm, seasonType: v })}
+                      searchable={false}
+                    />
+                  </div>
                 </div>
               </div>
 

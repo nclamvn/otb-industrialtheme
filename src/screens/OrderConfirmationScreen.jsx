@@ -15,6 +15,7 @@ import { useIsMobile } from '@/hooks/useIsMobile';
 import { formatCurrency } from '../utils';
 import { includes as viIncludes } from '../utils/normalizeVietnamese';
 import { ExpandableStatCard } from '../components/Common';
+import FilterSelect from '@/components/ui/FilterSelect';
 
 /* ═══════════════════════════════════════════════
    STATUS CONFIG
@@ -195,19 +196,20 @@ const OrderConfirmationScreen = () => {
               )}
             </div>
 
-            <div className="relative">
-              <select
+            <div className="shrink-0 w-[160px]">
+              <FilterSelect
+                options={[
+                  { value: 'all', label: t('common.status') },
+                  { value: 'PENDING', label: t('orderConfirm.statusPending') },
+                  { value: 'CONFIRMED', label: t('orderConfirm.statusConfirmed') },
+                  { value: 'SHIPPED', label: t('orderConfirm.statusShipped') },
+                  { value: 'CANCELLED', label: t('orderConfirm.statusCancelled') },
+                ]}
                 value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
-                className={`appearance-none px-2 py-1 pr-6 rounded-lg border ${border} bg-white text-xs font-brand ${textPrimary} outline-none cursor-pointer`}
-              >
-                <option value="all">{t('common.status')}</option>
-                <option value="PENDING">{t('orderConfirm.statusPending')}</option>
-                <option value="CONFIRMED">{t('orderConfirm.statusConfirmed')}</option>
-                <option value="SHIPPED">{t('orderConfirm.statusShipped')}</option>
-                <option value="CANCELLED">{t('orderConfirm.statusCancelled')}</option>
-              </select>
-              <ChevronDown size={10} className={`absolute right-1.5 top-1/2 -translate-y-1/2 pointer-events-none ${textMuted}`} />
+                onChange={(v) => setStatusFilter(v)}
+                searchable={false}
+                compact
+              />
             </div>
 
             <button

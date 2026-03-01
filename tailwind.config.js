@@ -43,8 +43,8 @@ module.exports = {
         // Content/Text Colors
         content: {
           DEFAULT: '#2C2417',
-          secondary: '#6B5D4F',
-          muted: '#8C8178',
+          secondary: '#4A3F35',
+          muted: '#6B5D4F',
           inverse: '#FFFFFF',
         },
 
@@ -78,8 +78,8 @@ module.exports = {
             text: '#2563EB',
           },
           neutral: {
-            DEFAULT: '#8C8178',
-            muted: 'rgba(140, 129, 120, 0.1)',
+            DEFAULT: '#6B5D4F',
+            muted: 'rgba(107, 93, 79, 0.1)',
           },
         },
 
@@ -87,7 +87,7 @@ module.exports = {
         data: {
           positive: '#1B6B45',
           negative: '#DC3545',
-          neutral: '#8C8178',
+          neutral: '#6B5D4F',
         },
 
         // Chart Colors
@@ -112,10 +112,22 @@ module.exports = {
 
       // ===== TYPOGRAPHY =====
       fontFamily: {
-        brand: ['var(--font-montserrat)', 'system-ui', 'sans-serif'],
-        display: ['var(--font-montserrat)', 'system-ui', 'sans-serif'],
+        brand: ['"Segoe UI"', 'system-ui', '-apple-system', 'sans-serif'],
+        display: ['"Segoe UI"', 'system-ui', '-apple-system', 'sans-serif'],
         data: ['var(--font-jetbrains-mono)', 'Consolas', 'monospace'],
         mono: ['var(--font-jetbrains-mono)', 'Consolas', 'monospace'],
+      },
+
+      fontWeight: {
+        thin: '300',
+        extralight: '400',
+        light: '400',
+        normal: '500',
+        medium: '600',
+        semibold: '600',
+        bold: '700',
+        extrabold: '800',
+        black: '900',
       },
 
       fontSize: {

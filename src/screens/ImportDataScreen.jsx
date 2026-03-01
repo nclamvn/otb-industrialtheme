@@ -5,6 +5,7 @@ import {
   AlertCircle, CheckCircle, XCircle, Search, ArrowUpDown, Download, X, Play, Pause
 } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
+import FilterSelect from '@/components/ui/FilterSelect';
 import { useIsMobile } from '@/hooks/useIsMobile';
 import { useDataImport } from '../hooks/useDataImport';
 import { formatDate } from '../utils';
@@ -80,15 +81,12 @@ const ImportDataScreen = () => {
             <label className={`block text-xs font-medium mb-1 ${textSecondary}`}>
               {t('import.target', 'Target')}
             </label>
-            <select
+            <FilterSelect
+              options={IMPORT_TARGETS.map(opt => ({ value: opt.value, label: opt.label }))}
               value={target}
-              onChange={(e) => setTarget(e.target.value)}
-              className={`w-full text-xs rounded-lg border px-2.5 py-2 ${inputBg} focus:outline-none focus:ring-1 focus:ring-[#C4975A]`}
-            >
-              {IMPORT_TARGETS.map(opt => (
-                <option key={opt.value} value={opt.value}>{opt.label}</option>
-              ))}
-            </select>
+              onChange={(v) => setTarget(v)}
+              searchable={false}
+            />
           </div>
 
           {/* Import Mode */}
@@ -96,15 +94,16 @@ const ImportDataScreen = () => {
             <label className={`block text-xs font-medium mb-1 ${textSecondary}`}>
               {t('import.mode', 'Import Mode')}
             </label>
-            <select
+            <FilterSelect
+              options={[
+                { value: 'upsert', label: 'Upsert (Insert or Update)' },
+                { value: 'insert', label: 'Insert Only' },
+                { value: 'update_only', label: 'Update Only' },
+              ]}
               value={importMode}
-              onChange={(e) => setImportMode(e.target.value)}
-              className={`w-full text-xs rounded-lg border px-2.5 py-2 ${inputBg} focus:outline-none focus:ring-1 focus:ring-[#C4975A]`}
-            >
-              <option value="upsert">Upsert (Insert or Update)</option>
-              <option value="insert">Insert Only</option>
-              <option value="update_only">Update Only</option>
-            </select>
+              onChange={(v) => setImportMode(v)}
+              searchable={false}
+            />
           </div>
 
           {/* Duplicate Handling */}
@@ -112,15 +111,12 @@ const ImportDataScreen = () => {
             <label className={`block text-xs font-medium mb-1 ${textSecondary}`}>
               {t('import.duplicateHandling', 'Duplicate Handling')}
             </label>
-            <select
+            <FilterSelect
+              options={DUPLICATE_MODES.map(opt => ({ value: opt.value, label: opt.label }))}
               value={duplicateHandling}
-              onChange={(e) => setDuplicateHandling(e.target.value)}
-              className={`w-full text-xs rounded-lg border px-2.5 py-2 ${inputBg} focus:outline-none focus:ring-1 focus:ring-[#C4975A]`}
-            >
-              {DUPLICATE_MODES.map(opt => (
-                <option key={opt.value} value={opt.value}>{opt.label}</option>
-              ))}
-            </select>
+              onChange={(v) => setDuplicateHandling(v)}
+              searchable={false}
+            />
           </div>
 
           {/* Match Keys */}
@@ -338,15 +334,15 @@ const ImportDataScreen = () => {
         {/* Filters */}
         <div className={`rounded-xl border p-4 ${cardBg}`}>
           <div className="flex flex-wrap items-center gap-3">
-            <select
-              value={viewTarget}
-              onChange={(e) => { setViewTarget(e.target.value); setCurrentPage(1); }}
-              className={`text-xs rounded-lg border px-2.5 py-2 ${inputBg} focus:outline-none focus:ring-1 focus:ring-[#C4975A]`}
-            >
-              {IMPORT_TARGETS.map(opt => (
-                <option key={opt.value} value={opt.value}>{opt.label}</option>
-              ))}
-            </select>
+            <div className="shrink-0 w-[160px]">
+              <FilterSelect
+                options={IMPORT_TARGETS.map(opt => ({ value: opt.value, label: opt.label }))}
+                value={viewTarget}
+                onChange={(v) => { setViewTarget(v); setCurrentPage(1); }}
+                searchable={false}
+                compact
+              />
+            </div>
 
             <div className="relative flex-1 min-w-[200px]">
               <Search size={14} className={`absolute left-2.5 top-1/2 -translate-y-1/2 ${textMuted}`} />

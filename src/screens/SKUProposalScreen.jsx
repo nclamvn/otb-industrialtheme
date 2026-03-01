@@ -15,6 +15,7 @@ import { useIsMobile } from '@/hooks/useIsMobile';
 import { useAppContext } from '@/contexts/AppContext';
 import { useConfirmDialog } from '@/hooks/useConfirmDialog';
 import { MobileDataCard, MobileFilterSheet, ConfirmDialog, ProductPlaceholder } from '@/components/ui';
+import FilterSelect from '@/components/ui/FilterSelect';
 
 const SEASON_GROUPS = [
   { id: 'all', label: 'Season Group' },
@@ -845,40 +846,88 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, onNavigateBack, onNaviga
             )}
           </div>
         ) : (
-        <div className="flex items-center gap-1.5 px-3 py-1.5 overflow-x-auto scrollbar-hide">
-          <select value={fyFilter} onChange={(e) => setFyFilter(e.target.value)}
-            className="shrink-0 border rounded pl-1.5 pr-6 py-1 text-[11px] appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2210%22%20height%3D%2210%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%238C8178%22%20stroke-width%3D%222.5%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22m6%209%206%206%206-6%22%2F%3E%3C%2Fsvg%3E')] bg-[length:10px] bg-[right_0.4rem_center] bg-no-repeat bg-white border-border-muted text-content focus:outline-none focus:ring-1 focus:ring-dafc-gold/30">
-            {fyOptions.map(opt => (<option key={opt.id} value={opt.id}>{opt.label}</option>))}
-          </select>
-          <select value={budgetFilter} onChange={(e) => setBudgetFilter(e.target.value)}
-            className="shrink-0 border rounded pl-1.5 pr-6 py-1 text-[11px] appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2210%22%20height%3D%2210%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%238C8178%22%20stroke-width%3D%222.5%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22m6%209%206%206%206-6%22%2F%3E%3C%2Fsvg%3E')] bg-[length:10px] bg-[right_0.4rem_center] bg-no-repeat bg-white border-border-muted text-content focus:outline-none focus:ring-1 focus:ring-dafc-gold/30">
-            {budgetOptions.map(opt => (<option key={opt.id} value={opt.id}>{opt.label}</option>))}
-          </select>
-          <select value={seasonGroupFilter} onChange={(e) => setSeasonGroupFilter(e.target.value)}
-            className="shrink-0 border rounded pl-1.5 pr-6 py-1 text-[11px] appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2210%22%20height%3D%2210%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%238C8178%22%20stroke-width%3D%222.5%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22m6%209%206%206%206-6%22%2F%3E%3C%2Fsvg%3E')] bg-[length:10px] bg-[right_0.4rem_center] bg-no-repeat bg-white border-border-muted text-content focus:outline-none focus:ring-1 focus:ring-dafc-gold/30">
-            {SEASON_GROUPS.map(opt => (<option key={opt.id} value={opt.id}>{opt.label}</option>))}
-          </select>
-          <select value={seasonFilter} onChange={(e) => setSeasonFilter(e.target.value)}
-            className="shrink-0 border rounded pl-1.5 pr-6 py-1 text-[11px] appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2210%22%20height%3D%2210%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%238C8178%22%20stroke-width%3D%222.5%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22m6%209%206%206%206-6%22%2F%3E%3C%2Fsvg%3E')] bg-[length:10px] bg-[right_0.4rem_center] bg-no-repeat bg-white border-border-muted text-content focus:outline-none focus:ring-1 focus:ring-dafc-gold/30">
-            {SEASONS.map(opt => (<option key={opt.id} value={opt.id}>{opt.label}</option>))}
-          </select>
-          <select value={brandFilter} onChange={(e) => setBrandFilter(e.target.value)}
-            className="shrink-0 border rounded pl-1.5 pr-6 py-1 text-[11px] appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2210%22%20height%3D%2210%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%238C8178%22%20stroke-width%3D%222.5%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22m6%209%206%206%206-6%22%2F%3E%3C%2Fsvg%3E')] bg-[length:10px] bg-[right_0.4rem_center] bg-no-repeat bg-white border-border-muted text-content focus:outline-none focus:ring-1 focus:ring-dafc-gold/30">
-            {brandOptions.map(opt => (<option key={opt.id} value={opt.id}>{opt.label}</option>))}
-          </select>
+        <div className="flex flex-wrap items-center gap-1.5 px-3 py-1.5">
+          <div className="shrink-0">
+            <FilterSelect
+              options={fyOptions.map(opt => ({ value: String(opt.id), label: opt.label }))}
+              value={String(fyFilter)}
+              onChange={(v) => setFyFilter(v)}
+              placeholder="FY"
+              searchable={false}
+              compact
+            />
+          </div>
+          <div className="shrink-0">
+            <FilterSelect
+              options={budgetOptions.map(opt => ({ value: String(opt.id), label: opt.label }))}
+              value={String(budgetFilter)}
+              onChange={(v) => setBudgetFilter(v)}
+              placeholder={t('skuProposal.allBudgets')}
+              searchable={budgetOptions.length > 6}
+              compact
+            />
+          </div>
+          <div className="shrink-0">
+            <FilterSelect
+              options={SEASON_GROUPS.map(opt => ({ value: opt.id, label: opt.label }))}
+              value={seasonGroupFilter}
+              onChange={(v) => setSeasonGroupFilter(v)}
+              placeholder={t('skuProposal.seasonGroup')}
+              searchable={false}
+              compact
+            />
+          </div>
+          <div className="shrink-0">
+            <FilterSelect
+              options={SEASONS.map(opt => ({ value: opt.id, label: opt.label }))}
+              value={seasonFilter}
+              onChange={(v) => setSeasonFilter(v)}
+              placeholder={t('skuProposal.season')}
+              searchable={false}
+              compact
+            />
+          </div>
+          <div className="shrink-0">
+            <FilterSelect
+              options={brandOptions.map(opt => ({ value: String(opt.id), label: opt.label }))}
+              value={String(brandFilter)}
+              onChange={(v) => setBrandFilter(v)}
+              placeholder="Brand"
+              searchable={brandOptions.length > 6}
+              compact
+            />
+          </div>
           <div className="h-4 w-px shrink-0 bg-border-muted" />
-          <select value={genderFilter} onChange={(e) => setGenderFilter(e.target.value)}
-            className="shrink-0 border rounded pl-1.5 pr-6 py-1 text-[11px] appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2210%22%20height%3D%2210%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%238C8178%22%20stroke-width%3D%222.5%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22m6%209%206%206%206-6%22%2F%3E%3C%2Fsvg%3E')] bg-[length:10px] bg-[right_0.4rem_center] bg-no-repeat bg-white border-border-muted text-content focus:outline-none focus:ring-1 focus:ring-dafc-gold/30">
-            {genderOptions.map(g => (<option key={g} value={g}>{g === 'all' ? t('skuProposal.gender') : g}</option>))}
-          </select>
-          <select value={categoryFilter} onChange={(e) => setCategoryFilter(e.target.value)}
-            className="shrink-0 border rounded pl-1.5 pr-6 py-1 text-[11px] appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2210%22%20height%3D%2210%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%238C8178%22%20stroke-width%3D%222.5%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22m6%209%206%206%206-6%22%2F%3E%3C%2Fsvg%3E')] bg-[length:10px] bg-[right_0.4rem_center] bg-no-repeat bg-white border-border-muted text-content focus:outline-none focus:ring-1 focus:ring-dafc-gold/30">
-            {categoryOptions.map(c => (<option key={c} value={c}>{c === 'all' ? t('skuProposal.category') : c}</option>))}
-          </select>
-          <select value={subCategoryFilter} onChange={(e) => setSubCategoryFilter(e.target.value)}
-            className="shrink-0 border rounded pl-1.5 pr-6 py-1 text-[11px] appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2210%22%20height%3D%2210%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%238C8178%22%20stroke-width%3D%222.5%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22m6%209%206%206%206-6%22%2F%3E%3C%2Fsvg%3E')] bg-[length:10px] bg-[right_0.4rem_center] bg-no-repeat bg-white border-border-muted text-content focus:outline-none focus:ring-1 focus:ring-dafc-gold/30">
-            {subCategoryOptions.map(s => (<option key={s} value={s}>{s === 'all' ? t('skuProposal.subCategory') : s}</option>))}
-          </select>
+          <div className="shrink-0">
+            <FilterSelect
+              options={genderOptions.map(g => ({ value: g, label: g === 'all' ? t('skuProposal.gender') : g }))}
+              value={genderFilter}
+              onChange={(v) => setGenderFilter(v)}
+              placeholder={t('skuProposal.gender')}
+              searchable={false}
+              compact
+            />
+          </div>
+          <div className="shrink-0">
+            <FilterSelect
+              options={categoryOptions.map(c => ({ value: c, label: c === 'all' ? t('skuProposal.category') : c }))}
+              value={categoryFilter}
+              onChange={(v) => setCategoryFilter(v)}
+              placeholder={t('skuProposal.category')}
+              searchable={false}
+              compact
+            />
+          </div>
+          <div className="shrink-0">
+            <FilterSelect
+              options={subCategoryOptions.map(s => ({ value: s, label: s === 'all' ? t('skuProposal.subCategory') : s }))}
+              value={subCategoryFilter}
+              onChange={(v) => setSubCategoryFilter(v)}
+              placeholder={t('skuProposal.subCategory')}
+              searchable={false}
+              compact
+            />
+          </div>
         </div>
         )}
 
@@ -1324,18 +1373,13 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, onNavigateBack, onNaviga
 
                 {item.isNew && (
                   <div className="mt-3">
-                    <select
+                    <FilterSelect
+                      options={skuCatalog.map(sku => ({ value: sku.sku, label: `${sku.sku} - ${sku.name}` }))}
                       value={item.sku}
-                      onChange={(e) => handleSkuSelect(blockKey, idx, e.target.value)}
-                      className="w-full px-3 pr-8 py-2 rounded-lg border-2 text-sm appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2212%22%20height%3D%2212%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%238C8178%22%20stroke-width%3D%222.5%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22m6%209%206%206%206-6%22%2F%3E%3C%2Fsvg%3E')] bg-[length:12px] bg-[right_0.6rem_center] bg-no-repeat focus:outline-none focus:ring-2 font-data border-[#1B6B45] bg-white text-[#2C2417] focus:ring-[rgba(27,107,69,0.3)]"
-                    >
-                      <option value="">{t('proposal.selectSku')}</option>
-                      {skuCatalog.map(sku => (
-                        <option key={sku.sku} value={sku.sku}>
-                          {sku.sku} - {sku.name}
-                        </option>
-                      ))}
-                    </select>
+                      onChange={(v) => handleSkuSelect(blockKey, idx, v)}
+                      placeholder={t('proposal.selectSku')}
+                      searchable={true}
+                    />
                   </div>
                 )}
 
@@ -1397,14 +1441,14 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, onNavigateBack, onNaviga
                       </div>
                       <div>
                         <span className="text-xs text-[#8C8178]">Customer target</span>
-                        <select
-                          value={item.customerTarget}
-                          onChange={(e) => handleSelectChange(blockKey, idx, 'customerTarget', e.target.value)}
-                          className="mt-1 w-full px-3 pr-8 py-2 rounded-lg border text-sm appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2212%22%20height%3D%2212%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%238C8178%22%20stroke-width%3D%222.5%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22m6%209%206%206%206-6%22%2F%3E%3C%2Fsvg%3E')] bg-[length:12px] bg-[right_0.5rem_center] bg-no-repeat focus:outline-none focus:ring-2 bg-white border-[rgba(196,151,90,0.3)] text-[#2C2417] focus:ring-[rgba(196,151,90,0.3)] focus:border-[#C4975A]"
-                        >
-                          <option value="New">New</option>
-                          <option value="Existing">Existing</option>
-                        </select>
+                        <div className="mt-1">
+                          <FilterSelect
+                            options={[{ value: 'New', label: 'New' }, { value: 'Existing', label: 'Existing' }]}
+                            value={item.customerTarget}
+                            onChange={(v) => handleSelectChange(blockKey, idx, 'customerTarget', v)}
+                            searchable={false}
+                          />
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -1686,18 +1730,13 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, onNavigateBack, onNaviga
                             {item.isNew ? (
                               <>
                                 <td colSpan={2} className="px-2 py-1">
-                                  <select
+                                  <FilterSelect
+                                    options={skuCatalog.map(sku => ({ value: sku.sku, label: `${sku.sku} - ${sku.name}` }))}
                                     value={item.sku}
-                                    onChange={(e) => handleSkuSelect(key, idx, e.target.value)}
-                                    className="w-full px-2 pr-7 py-1 rounded border-2 text-xs appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2212%22%20height%3D%2212%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%238C8178%22%20stroke-width%3D%222.5%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22m6%209%206%206%206-6%22%2F%3E%3C%2Fsvg%3E')] bg-[length:10px] bg-[right_0.4rem_center] bg-no-repeat focus:outline-none focus:ring-1 font-data border-[#1B6B45] bg-white text-[#2C2417] focus:ring-[rgba(27,107,69,0.3)]"
-                                  >
-                                    <option value="">{t('proposal.selectSku')}</option>
-                                    {skuCatalog.map(sku => (
-                                      <option key={sku.sku} value={sku.sku}>
-                                        {sku.sku} - {sku.name}
-                                      </option>
-                                    ))}
-                                  </select>
+                                    onChange={(v) => handleSkuSelect(key, idx, v)}
+                                    placeholder={t('proposal.selectSku')}
+                                    searchable={true}
+                                  />
                                 </td>
                               </>
                             ) : (
@@ -1788,14 +1827,12 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, onNavigateBack, onNaviga
                             </td>
                             <td className="px-2 py-1 text-right font-data text-[#1B6B45] whitespace-nowrap">{formatCurrency(item.ttlValue)}</td>
                             <td className="px-2 py-1 text-center">
-                              <select
+                              <FilterSelect
+                                options={[{ value: 'New', label: 'New' }, { value: 'Existing', label: 'Existing' }]}
                                 value={item.customerTarget}
-                                onChange={(e) => handleSelectChange(key, idx, 'customerTarget', e.target.value)}
-                                className="px-1.5 pr-5 py-0.5 rounded border text-xs appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2210%22%20height%3D%2210%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%238C8178%22%20stroke-width%3D%222.5%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22m6%209%206%206%206-6%22%2F%3E%3C%2Fsvg%3E')] bg-[length:10px] bg-[right_0.3rem_center] bg-no-repeat focus:outline-none focus:ring-1 border-[rgba(196,151,90,0.25)] bg-white text-[#2C2417] focus:ring-[rgba(196,151,90,0.3)] focus:border-[#C4975A]"
-                              >
-                                <option value="New">New</option>
-                                <option value="Existing">Existing</option>
-                              </select>
+                                onChange={(v) => handleSelectChange(key, idx, 'customerTarget', v)}
+                                searchable={false}
+                              />
                             </td>
                           </tr>
                         );
