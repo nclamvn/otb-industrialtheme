@@ -176,6 +176,7 @@ const ApprovalWorkflowScreen = ({ darkMode = false }) => {
                 value={selectedBrandId}
                 onChange={(v) => setSelectedBrandId(v)}
                 searchable={false}
+                compact
               />
             </div>
 

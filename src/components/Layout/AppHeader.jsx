@@ -410,7 +410,7 @@ const AppHeader = ({
             title={language === 'en' ? 'Chuyển sang Tiếng Việt' : 'Switch to English'}
             aria-label={language === 'en' ? 'Chuyển sang Tiếng Việt' : 'Switch to English'}
           >
-            <span className="text-[11px] font-bold font-data">
+            <span className="text-[13px] font-bold font-data">
               {language === 'en' ? 'EN' : 'VN'}
             </span>
           </button>
