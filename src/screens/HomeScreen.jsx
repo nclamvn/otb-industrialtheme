@@ -125,7 +125,7 @@ const PipelineBar = ({ segments, total }) => {
   return (
     <div className="flex h-2 rounded-full overflow-hidden bg-border-muted">
       {segments.map((seg, i) => (
-        <div key={i} className="h-full transition-all duration-500" title={`${seg.label}: ${seg.value}`}
+        <div key={seg.label || i} className="h-full transition-all duration-500" title={`${seg.label}: ${seg.value}`}
           style={{ width: `${(seg.value / total) * 100}%`, backgroundColor: seg.color }} />
       ))}
     </div>
@@ -491,7 +491,7 @@ const HomeScreen = () => {
             <polyline fill="none" stroke="#1B6B45" strokeDasharray="4 3" strokeWidth="1.5" strokeLinecap="round"
               points="10,134 42,124 74,114 106,104 138,96 170,88 202,80 234,72 266,64" />
             {[[10,128],[42,118],[74,102],[106,95],[138,82],[170,72],[202,60],[234,50],[266,40]].map(([cx, cy], i) => (
-              <circle key={i} cx={cx} cy={cy} r="2.5" fill="#FFF" stroke="#C4975A" strokeWidth="1.5" />
+              <circle key={`${cx}-${cy}`} cx={cx} cy={cy} r="2.5" fill="#FFF" stroke="#C4975A" strokeWidth="1.5" />
             ))}
             {[
               { x: 10, m: 'jan' }, { x: 42, m: 'feb' }, { x: 74, m: 'mar' },
@@ -508,7 +508,7 @@ const HomeScreen = () => {
               { label: t('home.totalRevenue'), value: totalBudgetAmount > 0 ? fmtCurrency(totalBudgetAmount) : (statsLoading ? '...' : stats.totalSales), trend: '+12.5%', up: true },
               { label: t('home.monthlyGrowth'), value: '+8.2%', trend: t('home.aboveTarget'), up: true },
             ].map((s, i) => (
-              <div key={i}>
+              <div key={s.label || i}>
                 <p className="text-[9px] font-brand uppercase tracking-wider text-content-muted">{s.label}</p>
                 <p className="text-base font-bold font-data tabular-nums mt-0.5 text-content">{s.value}</p>
                 <span className={`text-[10px] font-semibold font-data ${s.up ? 'text-status-success' : 'text-status-critical'}`}>
@@ -532,7 +532,7 @@ const HomeScreen = () => {
             </div>
             <div className="space-y-1">
               {dynamicAlerts.slice(0, 4).map((alert, i) => (
-                <div key={i} className={`flex items-center gap-2.5 px-2.5 py-2 rounded-lg transition-colors ${
+                <div key={alert.title || i} className={`flex items-center gap-2.5 px-2.5 py-2 rounded-lg transition-colors ${
                   i === 0 && alert.severity === 'critical' ? 'bg-status-critical-muted' : severityBg[alert.severity] || ''
                 }`}>
                   <span className={`w-2 h-2 rounded-full shrink-0 ${severityColor[alert.severity]} ${

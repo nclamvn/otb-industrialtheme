@@ -44,10 +44,6 @@ export const aiService = {
     });
   },
 
-  async calculateSizeCurve(data) {
-    return safePost('/ai/size-curve/calculate', data);
-  },
-
   async compareSizeCurve(skuId, storeId, userSizing) {
     return safePost('/ai/size-curve/compare', { skuId, storeId, userSizing });
   },
@@ -64,40 +60,9 @@ export const aiService = {
     return result || [];
   },
 
-  async markAlertRead(alertId) {
-    if (!_alertsAvailable) return null;
-    return safePatch(`/ai/alerts/${alertId}/read`);
-  },
-
   async dismissAlert(alertId) {
     if (!_alertsAvailable) return null;
     return safePatch(`/ai/alerts/${alertId}/dismiss`);
-  },
-
-  async triggerAlertCheck() {
-    if (!_alertsAvailable) return null;
-    return safePost('/ai/alerts/check');
-  },
-
-  // ── OTB Auto-Allocation ────────────────────────────────────────────
-
-  async generateAllocation(input) {
-    return safePost('/ai/allocation/generate', input);
-  },
-
-  async getAllocationRecommendations(budgetDetailId) {
-    return safeGet(`/ai/allocation/${budgetDetailId}`);
-  },
-
-  async applyAllocationRecommendations(budgetDetailId, dimensionType = null) {
-    const url = dimensionType
-      ? `/ai/allocation/${budgetDetailId}/apply?dimensionType=${dimensionType}`
-      : `/ai/allocation/${budgetDetailId}/apply`;
-    return safePost(url);
-  },
-
-  async compareAllocation(budgetDetailId, userAllocation) {
-    return safePost('/ai/allocation/compare', { budgetDetailId, userAllocation });
   },
 
   // ── Risk Scoring ─────────────────────────────────────────────────────
@@ -118,13 +83,6 @@ export const aiService = {
 
   async generateSkuRecommendations(input) {
     return safePost('/ai/sku-recommend/generate', input);
-  },
-
-  async getSkuRecommendations(budgetDetailId, category = null) {
-    const url = category
-      ? `/ai/sku-recommend/${budgetDetailId}?category=${encodeURIComponent(category)}`
-      : `/ai/sku-recommend/${budgetDetailId}`;
-    return safeGet(url);
   },
 
   async updateSkuRecommendationStatus(recommendationId, status) {

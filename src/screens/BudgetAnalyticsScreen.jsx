@@ -100,7 +100,7 @@ const BudgetAnalyticsScreen = () => {
     <div className={`flex-1 ${bg} p-6`}>
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
         {Array.from({ length: 4 }).map((_, i) => (
-          <div key={i} className="bg-white rounded-xl border border-[#E8E2DB] p-4 animate-pulse">
+          <div key={`skeleton-${i}`} className="bg-white rounded-xl border border-[#E8E2DB] p-4 animate-pulse">
             <div className="h-3 w-20 bg-[#E8E2DB] rounded mb-3" />
             <div className="h-6 w-28 bg-[#E8E2DB] rounded mb-2" />
             <div className="h-3 w-16 bg-[#E8E2DB] rounded" />
@@ -157,7 +157,7 @@ const BudgetAnalyticsScreen = () => {
           { label: t('analytics.unreadAlerts', 'Unread Alerts'), value: summary.unreadAlerts || 0, icon: Bell, color: '#DC3545' },
           { label: t('analytics.allocEfficiency', 'Alloc Efficiency'), value: `${(summary.avgEfficiency || 0).toFixed(1)}%`, icon: Zap, color: '#D4B082' },
         ].map((kpi, i) => (
-          <div key={i} className={`${cardBg} border ${border} rounded-xl p-4`}>
+          <div key={kpi.label || i} className={`${cardBg} border ${border} rounded-xl p-4`}>
             <div className="flex items-center justify-between mb-2">
               <span className={`text-xs ${subtext} uppercase tracking-wide`}>{kpi.label}</span>
               <kpi.icon size={16} style={{ color: kpi.color }} />
@@ -218,7 +218,7 @@ const BudgetAnalyticsScreen = () => {
                     <span className="text-xs font-semibold uppercase" style={{ color: cfg.color }}>{cfg.label} ({items.length})</span>
                   </div>
                   {items.map((a, i) => (
-                    <div key={i} className={`${cfg.bg} rounded-lg p-2 mb-1 text-xs`}>
+                    <div key={a.title || i} className={`${cfg.bg} rounded-lg p-2 mb-1 text-xs`}>
                       <div className="font-semibold">{a.title}</div>
                       <div className={subtext}>{a.message}</div>
                     </div>
@@ -248,7 +248,7 @@ const BudgetAnalyticsScreen = () => {
               </thead>
               <tbody>
                 {efficiency.filter(e => e.actualSales).slice(0, 15).map((row, i) => (
-                  <tr key={i} className={`border-t ${border}`}>
+                  <tr key={row.dimensionValue || i} className={`border-t ${border}`}>
                     <td className="py-2">
                       <div className="text-xs font-medium">{row.dimensionValue}</div>
                       <div className={`text-xs ${subtext}`}>{row.dimensionType}</div>

@@ -566,7 +566,8 @@ const OTBAnalysisScreen = ({ otbContext, onOpenSkuProposal, darkMode = false }) 
     if (!data?.details || !Array.isArray(data.details)) return {};
     const lookup = {};
     data.details.forEach(detail => {
-      const key = (detail[dimensionKey] || detail.collection || detail.gender || detail.category || detail.name || '').toLowerCase().trim();
+      const raw = detail[dimensionKey] || detail.collection || detail.gender || detail.category || detail.name || '';
+      const key = (typeof raw === 'string' ? raw : raw?.name || String(raw || '')).toLowerCase().trim();
       if (key) {
         lookup[key] = {
           buyPct: detail.buyPct ?? detail.percentBuy ?? 0,
@@ -577,6 +578,19 @@ const OTBAnalysisScreen = ({ otbContext, onOpenSkuProposal, darkMode = false }) 
     });
     return lookup;
   }, []);
+
+  const handleOpenSkuProposal = useCallback(() => {
+    if (onOpenSkuProposal) {
+      onOpenSkuProposal({
+        budgetId: selectedBudgetId !== 'all' ? selectedBudgetId : budgetContext?.budgetId,
+        budgetName: selectedBudget?.budgetName || budgetContext?.budgetName,
+        fiscalYear: selectedBudget?.fiscalYear || budgetContext?.fiscalYear,
+        brandName: selectedBudget?.brandName || budgetContext?.brandName,
+        seasonGroup: selectedSeasonGroup !== 'all' ? selectedSeasonGroup : budgetContext?.seasonGroup,
+        season: selectedSeason !== 'all' ? selectedSeason : budgetContext?.season,
+      });
+    }
+  }, [onOpenSkuProposal, selectedBudgetId, selectedBudget, selectedSeasonGroup, selectedSeason, budgetContext]);
 
   // OA-5: Memoized historical lookups for each tab dimension
   const historicalLookup = useMemo(() => {
@@ -1367,7 +1381,7 @@ const OTBAnalysisScreen = ({ otbContext, onOpenSkuProposal, darkMode = false }) 
   };
 
   return (
-    <div className="space-y-0">
+    <div className="space-y-0 pb-14">
       {/* Unified Header: Filters + Budget Context + Tabs */}
       <div className="relative z-[100] bg-white rounded-xl border border-border-muted">
         {/* Row 1: Filters + Budget Summary */}
@@ -2133,7 +2147,7 @@ const OTBAnalysisScreen = ({ otbContext, onOpenSkuProposal, darkMode = false }) 
 
         {/* Tab Content */}
         {selectedBudget && selectedSeason && selectedSeasonGroup && (
-          <div className="max-h-[calc(100vh-280px)] overflow-y-auto overflow-x-auto">
+          <div className="max-h-[calc(100vh-340px)] overflow-y-auto overflow-x-auto">
             {/* OA-6: Show comparison view when 2+ budgets selected */}
             {compareModeActive && comparisonBudgetIds.length >= 2 ? (
               renderBudgetComparison()
@@ -2158,7 +2172,7 @@ const OTBAnalysisScreen = ({ otbContext, onOpenSkuProposal, darkMode = false }) 
 
       {/* Sticky Bottom Action Bar */}
       {selectedBudget && selectedSeason && selectedSeasonGroup && (
-        <div className="sticky bottom-0 z-50 mt-3">
+        <div className="sticky bottom-0 z-30 mt-3">
           <div className="bg-white/95 backdrop-blur-sm border border-border-muted rounded-xl px-4 py-2.5 flex items-center justify-between shadow-[0_-2px_12px_rgba(0,0,0,0.06)]">
             <button
               onClick={() => window.history.back()}
@@ -2175,18 +2189,7 @@ const OTBAnalysisScreen = ({ otbContext, onOpenSkuProposal, darkMode = false }) 
                 </span>
               )}
               <button
-                onClick={() => {
-                  if (onOpenSkuProposal) {
-                    onOpenSkuProposal({
-                      budgetId: selectedBudgetId !== 'all' ? selectedBudgetId : budgetContext?.budgetId,
-                      budgetName: selectedBudget?.budgetName || budgetContext?.budgetName,
-                      fiscalYear: selectedBudget?.fiscalYear || budgetContext?.fiscalYear,
-                      brandName: selectedBudget?.brandName || budgetContext?.brandName,
-                      seasonGroup: selectedSeasonGroup !== 'all' ? selectedSeasonGroup : budgetContext?.seasonGroup,
-                      season: selectedSeason !== 'all' ? selectedSeason : budgetContext?.season,
-                    });
-                  }
-                }}
+                onClick={handleOpenSkuProposal}
                 className="flex items-center gap-1.5 px-4 py-1.5 text-xs font-semibold font-brand rounded-lg transition-all bg-gradient-to-r from-[#C4975A] to-[#B8894E] hover:from-[#B8894E] hover:to-[#A07B4B] text-white shadow-sm hover:shadow-md"
               >
                 <Package size={13} />

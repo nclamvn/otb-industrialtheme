@@ -508,6 +508,7 @@ const vi = {
     totalPlanned: 'Tổng kế hoạch',
     expandAll: 'Mở rộng tất cả',
     collapseAll: 'Thu gọn tất cả',
+    allBudgets: 'Tất cả ngân sách',
   },
 
   // ──────────────────────────────────────────────

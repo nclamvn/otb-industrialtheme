@@ -24,7 +24,6 @@ export default function ProposalDetailRoute() {
   };
 
   const handleSave = (data) => {
-    console.log('Saving proposal:', data);
     handleBack();
   };
 

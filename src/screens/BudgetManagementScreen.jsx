@@ -97,7 +97,7 @@ const BudgetManagementScreen = ({
         budgetName: budget.budgetCode || budget.name || budget.budgetName || 'Untitled',
         status: (budget.status || 'DRAFT').toLowerCase(),
         createdAt: budget.createdAt,
-        createdBy: budget.createdBy
+        createdBy: typeof budget.createdBy === 'object' ? budget.createdBy?.name : budget.createdBy
       }));
       setBudgetData(budgets);
     } catch (err) {
@@ -201,6 +201,14 @@ const BudgetManagementScreen = ({
     }
     return list;
   }, [budgetData, selectedYear, selectedGroupBrand, selectedBrand, searchQuery, sortColumn, sortDir]);
+
+  // Memoized FilterSelect option arrays for create modal
+  const memoYearOptions = useMemo(() =>
+    YEARS.map((year) => ({ value: String(year), label: String(year) })), []);
+  const memoGroupBrandOptions = useMemo(() =>
+    groupBrandCategories.map((group) => ({ value: String(group.id), label: group.name })), [groupBrandCategories]);
+  const memoBrandOptions = useMemo(() =>
+    apiBrands.map((brand) => ({ value: String(brand.id), label: brand.name })), [apiBrands]);
 
   // Calculate summary stats
   const summaryStats = useMemo(() => {
@@ -1011,7 +1019,7 @@ const BudgetManagementScreen = ({
       {/* Create Budget Modal */}
       {showCreateModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="rounded-2xl shadow-xl w-full max-w-lg max-h-[calc(100vh-2rem)] overflow-hidden bg-white">
+          <div className="rounded-2xl shadow-xl w-full max-w-lg max-h-[calc(100vh-2rem)] bg-white">
             <div className="flex items-center justify-between p-6 border-b border-[#E8E2DB]">
               <h3 className="text-lg font-semibold font-brand text-[#2C2417]">{t('budget.createNewBudget')}</h3>
               <button
@@ -1032,7 +1040,7 @@ const BudgetManagementScreen = ({
                   </label>
                   <div className="w-full">
                     <FilterSelect
-                      options={YEARS.map((year) => ({ value: String(year), label: String(year) }))}
+                      options={memoYearOptions}
                       value={String(newBudgetForm.fiscalYear)}
                       onChange={(v) =>
                         setNewBudgetForm({
@@ -1052,7 +1060,7 @@ const BudgetManagementScreen = ({
                   </label>
                   <div className="w-full">
                     <FilterSelect
-                      options={groupBrandCategories.map((group) => ({ value: String(group.id), label: group.name }))}
+                      options={memoGroupBrandOptions}
                       value={String(newBudgetForm.groupBrand)}
                       onChange={(v) =>
                         setNewBudgetForm({ ...newBudgetForm, groupBrand: v })
@@ -1069,7 +1077,7 @@ const BudgetManagementScreen = ({
                   </label>
                   <div className="w-full">
                     <FilterSelect
-                      options={apiBrands.map((brand) => ({ value: String(brand.id), label: brand.name }))}
+                      options={memoBrandOptions}
                       value={newBudgetForm.brandId}
                       onChange={(v) =>
                         setNewBudgetForm({ ...newBudgetForm, brandId: v })

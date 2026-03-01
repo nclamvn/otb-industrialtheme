@@ -28,7 +28,6 @@ export default function ProposalPage() {
   };
 
   const handleSaveProposal = (data) => {
-    console.log('Saving proposal:', data);
     handleCloseDetail();
   };
 

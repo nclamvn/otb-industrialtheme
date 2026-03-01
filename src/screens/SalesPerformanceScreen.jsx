@@ -122,7 +122,7 @@ const SalesPerformanceScreen = () => {
           { label: t('analytics.avgGrossMargin', 'Avg Gross Margin'), value: `${kpis.avgMargin.toFixed(1)}%`, icon: TrendingUp, color: '#2563EB' },
           { label: t('analytics.topScore', 'Top Score'), value: kpis.topScore, icon: Award, color: '#D4B082' },
         ].map((kpi, i) => (
-          <div key={i} className={`${cardBg} border ${border} rounded-xl p-4`}>
+          <div key={kpi.label || i} className={`${cardBg} border ${border} rounded-xl p-4`}>
             <div className="flex items-center justify-between mb-2">
               <span className={`text-xs ${subtext} uppercase tracking-wide`}>{kpi.label}</span>
               <kpi.icon size={16} style={{ color: kpi.color }} />
@@ -152,7 +152,7 @@ const SalesPerformanceScreen = () => {
               </thead>
               <tbody>
                 {topSkus.slice(0, 8).map((sku, i) => (
-                  <tr key={i} className={`border-t ${border}`}>
+                  <tr key={sku.skuCode || i} className={`border-t ${border}`}>
                     <td className="py-2 font-mono text-xs">{sku.skuCode}</td>
                     <td className="py-2 text-right">
                       <span className="inline-block px-2 py-0.5 rounded text-xs font-semibold" style={{ backgroundColor: `${accent}22`, color: accent }}>
@@ -186,7 +186,7 @@ const SalesPerformanceScreen = () => {
               </thead>
               <tbody>
                 {bottomSkus.slice(0, 8).map((sku, i) => (
-                  <tr key={i} className={`border-t ${border}`}>
+                  <tr key={sku.skuCode || i} className={`border-t ${border}`}>
                     <td className="py-2 font-mono text-xs">{sku.skuCode}</td>
                     <td className="py-2 text-right">
                       <span className="inline-block px-2 py-0.5 rounded text-xs font-semibold bg-[#DC3545]/10 text-[#DC3545]">
@@ -210,7 +210,7 @@ const SalesPerformanceScreen = () => {
           {salesByDimension.map((dim, i) => {
             const pct = (Number(dim.allocatedAmount) / maxDimAmount) * 100;
             return (
-              <div key={i} className="flex items-center gap-3">
+              <div key={dim.dimensionValue || i} className="flex items-center gap-3">
                 <span className={`text-sm w-36 truncate ${subtext}`}>{dim.dimensionValue}</span>
                 <div className="flex-1 h-7 rounded-lg overflow-hidden" style={{ backgroundColor: '#F0EBE5' }}>
                   <div className="h-full rounded-lg flex items-center px-2" style={{ width: `${Math.max(pct, 5)}%`, backgroundColor: accent }}>
@@ -242,7 +242,7 @@ const SalesPerformanceScreen = () => {
             </thead>
             <tbody>
               {sellThroughSummary.map((row, i) => (
-                <tr key={i} className={`border-t ${border}`}>
+                <tr key={row.productType || i} className={`border-t ${border}`}>
                   <td className="py-2 font-medium">{row.productType}</td>
                   <td className="py-2 text-right">{row.count}</td>
                   <td className="py-2 text-right">{row.avgSellThrough}%</td>

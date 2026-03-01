@@ -508,6 +508,7 @@ const en = {
     totalPlanned: 'Total Planned',
     expandAll: 'Expand All',
     collapseAll: 'Collapse All',
+    allBudgets: 'All Budgets',
   },
 
   // ──────────────────────────────────────────────

@@ -131,7 +131,7 @@ const CategoryTrendsScreen = () => {
           { label: t('analytics.avgTrendScore', 'Avg Trend Score'), value: kpis.avgTrendScore.toFixed(0), icon: Activity, color: '#1B6B45' },
           { label: t('analytics.avgYoyGrowth', 'Avg YoY Growth'), value: `${kpis.avgYoyGrowth >= 0 ? '+' : ''}${kpis.avgYoyGrowth.toFixed(1)}%`, icon: kpis.avgYoyGrowth >= 0 ? ArrowUpRight : ArrowDownRight, color: kpis.avgYoyGrowth >= 0 ? '#1B6B45' : '#DC3545' },
         ].map((kpi, i) => (
-          <div key={i} className={`${cardBg} border ${border} rounded-xl p-4`}>
+          <div key={kpi.label || i} className={`${cardBg} border ${border} rounded-xl p-4`}>
             <div className="flex items-center justify-between mb-2">
               <span className={`text-xs ${subtext} uppercase tracking-wide`}>{kpi.label}</span>
               <kpi.icon size={16} style={{ color: kpi.color }} />
@@ -152,7 +152,7 @@ const CategoryTrendsScreen = () => {
               : attr.attributeType === 'product_type' ? accent
               : '#6B7280';
             return (
-              <div key={i} className="flex items-center gap-3">
+              <div key={attr.attributeValue || i} className="flex items-center gap-3">
                 <span className={`text-xs w-32 truncate`}>{attr.attributeValue}</span>
                 <span className="text-xs px-1.5 py-0.5 rounded" style={{ backgroundColor: `${typeColor}22`, color: typeColor }}>
                   {attr.attributeType}
@@ -188,7 +188,7 @@ const CategoryTrendsScreen = () => {
                 {yoyComparison.slice(0, 15).map((row, i) => {
                   const growth = Number(row.yoyGrowth);
                   return (
-                    <tr key={i} className={`border-t ${border}`}>
+                    <tr key={row.attributeValue || i} className={`border-t ${border}`}>
                       <td className="py-2">
                         <div className="text-xs font-medium">{row.attributeValue}</div>
                         <div className={`text-xs ${subtext}`}>{row.attributeType}</div>
@@ -218,7 +218,7 @@ const CategoryTrendsScreen = () => {
           </h3>
           <div className="space-y-4">
             {genderBreakdown.map((g, i) => (
-              <div key={i} className={`rounded-lg p-3 border ${border}`}>
+              <div key={g.gender || i} className={`rounded-lg p-3 border ${border}`}>
                 <div className="flex items-center justify-between mb-2">
                   <span className="font-semibold">{g.gender}</span>
                   <span className="text-sm" style={{ color: accent }}>{g.totalSkus} SKUs</span>

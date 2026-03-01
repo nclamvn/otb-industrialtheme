@@ -612,7 +612,6 @@ const AppHeader = ({
           </button>
           <button
             onClick={() => {
-              console.log('Save As New Version');
               setOpenSaveMenu(false);
             }}
             className="w-full px-4 py-3 flex items-center gap-3 text-left text-sm font-medium border-t transition-colors border-border-muted hover:bg-surface-secondary text-content"

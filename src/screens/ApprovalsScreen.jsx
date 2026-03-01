@@ -271,7 +271,7 @@ const ApprovalsScreen = () => {
 
       {/* Compact Header + Filters */}
       <div className={`border ${border} rounded-xl px-3 py-2 mb-3 bg-white`}>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           <FileCheck size={14} className="text-content-muted flex-shrink-0" />
           <div className="flex-shrink-0">
             <h1 className={`text-sm font-semibold font-brand ${textPrimary} leading-tight`}>
@@ -282,7 +282,7 @@ const ApprovalsScreen = () => {
             </p>
           </div>
 
-          <div className="flex items-center gap-2 ml-auto">
+          <div className="flex flex-wrap items-center gap-2 ml-auto">
             {isMobile ? (
               <button
                 onClick={() => setShowMobileFilters(true)}
@@ -343,7 +343,7 @@ const ApprovalsScreen = () => {
 
                 <button
                   onClick={fetchPendingApprovals}
-                  className={`px-2.5 py-1 rounded-lg border ${border} text-xs font-medium font-brand transition-all text-[#A67B3D] hover:bg-[rgba(196,151,90,0.1)]`}
+                  className={`shrink-0 px-2.5 py-1 rounded-lg border ${border} text-xs font-medium font-brand transition-all text-[#A67B3D] hover:bg-[rgba(196,151,90,0.1)]`}
                 >
                   {t('common.refresh')}
                 </button>

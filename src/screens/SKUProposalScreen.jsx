@@ -523,6 +523,24 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, onNavigateBack, onNaviga
     return ['all', ...Array.from(new Set([...fromBlocks, ...fromMaster]))];
   }, [genderFilter, categoryFilter, skuBlocks, masterCategories]);
 
+  // Memoized FilterSelect option arrays — avoid creating new arrays every render
+  const memoFyOptions = useMemo(() =>
+    fyOptions.map(opt => ({ value: String(opt.id), label: opt.label })), [fyOptions]);
+  const memoBudgetOptions = useMemo(() =>
+    budgetOptions.map(opt => ({ value: String(opt.id), label: opt.label })), [budgetOptions]);
+  const memoSeasonGroupOptions = useMemo(() =>
+    SEASON_GROUPS.map(opt => ({ value: opt.id, label: opt.label })), []);
+  const memoSeasonOptions = useMemo(() =>
+    SEASONS.map(opt => ({ value: opt.id, label: opt.label })), []);
+  const memoBrandOptions = useMemo(() =>
+    brandOptions.map(opt => ({ value: String(opt.id), label: opt.label })), [brandOptions]);
+  const memoGenderOptions = useMemo(() =>
+    genderOptions.map(g => ({ value: g, label: g === 'all' ? t('skuProposal.gender') : g })), [genderOptions, t]);
+  const memoCategoryOptions = useMemo(() =>
+    categoryOptions.map(c => ({ value: c, label: c === 'all' ? t('skuProposal.category') : c })), [categoryOptions, t]);
+  const memoSubCategoryOptions = useMemo(() =>
+    subCategoryOptions.map(s => ({ value: s, label: s === 'all' ? t('skuProposal.subCategory') : s })), [subCategoryOptions, t]);
+
   const filteredSkuBlocks = useMemo(() => {
     return skuBlocks.filter(block => {
       if (budgetFilter !== 'all' && block.budgetId && block.budgetId !== budgetFilter) return false;
@@ -786,7 +804,7 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, onNavigateBack, onNaviga
   };
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-5 pb-14">
       {/* Unified Toolbar: Filters + Version + View Toggle */}
       <div className="rounded-xl border border-border-muted bg-white">
         {/* Row 1: Filters */}
@@ -849,7 +867,7 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, onNavigateBack, onNaviga
         <div className="flex flex-wrap items-center gap-1.5 px-3 py-1.5">
           <div className="shrink-0">
             <FilterSelect
-              options={fyOptions.map(opt => ({ value: String(opt.id), label: opt.label }))}
+              options={memoFyOptions}
               value={String(fyFilter)}
               onChange={(v) => setFyFilter(v)}
               placeholder="FY"
@@ -859,7 +877,7 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, onNavigateBack, onNaviga
           </div>
           <div className="shrink-0">
             <FilterSelect
-              options={budgetOptions.map(opt => ({ value: String(opt.id), label: opt.label }))}
+              options={memoBudgetOptions}
               value={String(budgetFilter)}
               onChange={(v) => setBudgetFilter(v)}
               placeholder={t('skuProposal.allBudgets')}
@@ -869,7 +887,7 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, onNavigateBack, onNaviga
           </div>
           <div className="shrink-0">
             <FilterSelect
-              options={SEASON_GROUPS.map(opt => ({ value: opt.id, label: opt.label }))}
+              options={memoSeasonGroupOptions}
               value={seasonGroupFilter}
               onChange={(v) => setSeasonGroupFilter(v)}
               placeholder={t('skuProposal.seasonGroup')}
@@ -879,7 +897,7 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, onNavigateBack, onNaviga
           </div>
           <div className="shrink-0">
             <FilterSelect
-              options={SEASONS.map(opt => ({ value: opt.id, label: opt.label }))}
+              options={memoSeasonOptions}
               value={seasonFilter}
               onChange={(v) => setSeasonFilter(v)}
               placeholder={t('skuProposal.season')}
@@ -889,7 +907,7 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, onNavigateBack, onNaviga
           </div>
           <div className="shrink-0">
             <FilterSelect
-              options={brandOptions.map(opt => ({ value: String(opt.id), label: opt.label }))}
+              options={memoBrandOptions}
               value={String(brandFilter)}
               onChange={(v) => setBrandFilter(v)}
               placeholder="Brand"
@@ -900,7 +918,7 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, onNavigateBack, onNaviga
           <div className="h-4 w-px shrink-0 bg-border-muted" />
           <div className="shrink-0">
             <FilterSelect
-              options={genderOptions.map(g => ({ value: g, label: g === 'all' ? t('skuProposal.gender') : g }))}
+              options={memoGenderOptions}
               value={genderFilter}
               onChange={(v) => setGenderFilter(v)}
               placeholder={t('skuProposal.gender')}
@@ -910,7 +928,7 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, onNavigateBack, onNaviga
           </div>
           <div className="shrink-0">
             <FilterSelect
-              options={categoryOptions.map(c => ({ value: c, label: c === 'all' ? t('skuProposal.category') : c }))}
+              options={memoCategoryOptions}
               value={categoryFilter}
               onChange={(v) => setCategoryFilter(v)}
               placeholder={t('skuProposal.category')}
@@ -920,7 +938,7 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, onNavigateBack, onNaviga
           </div>
           <div className="shrink-0">
             <FilterSelect
-              options={subCategoryOptions.map(s => ({ value: s, label: s === 'all' ? t('skuProposal.subCategory') : s }))}
+              options={memoSubCategoryOptions}
               value={subCategoryFilter}
               onChange={(v) => setSubCategoryFilter(v)}
               placeholder={t('skuProposal.subCategory')}
@@ -1673,7 +1691,7 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, onNavigateBack, onNaviga
             const key = `${block.gender}_${block.category}_${block.subCategory}_${block.budgetId || ''}`;
             const isCollapsed = collapsed[key];
             return (
-              <div key={key} className="rounded-xl border overflow-hidden bg-white border-[rgba(196,151,90,0.2)]">
+              <div key={key} className="rounded-xl border bg-white border-[rgba(196,151,90,0.2)]">
                 <button
                   type="button"
                   onClick={() => handleToggle(key)}
@@ -2001,7 +2019,7 @@ const SKUProposalScreen = ({ skuContext, onContextUsed, onNavigateBack, onNaviga
       )}
 
       {/* Sticky Bottom Action Bar */}
-      <div className="sticky bottom-0 z-50 mt-3">
+      <div className="sticky bottom-0 z-30 mt-3">
         <div className="bg-white/95 backdrop-blur-sm border border-border-muted rounded-xl px-4 py-2.5 flex items-center justify-between shadow-[0_-2px_12px_rgba(0,0,0,0.06)]">
           <button
             onClick={() => onNavigateBack ? onNavigateBack() : window.history.back()}
